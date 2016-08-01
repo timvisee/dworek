@@ -1,14 +1,19 @@
 extends layout
 
 block page
+    //- Page block
+    //- TODO: Should we use the 'data-unload="false"' attribute to minimize internet usage on mobile
     div(data-role='page')
+        //- Page header
         div(data-role='header')
             h1
                 a(href='/', data-ajax='false', title='Reload application')= title
 
-        div(data-role='main')
+        //- Page content
+        div.ui-content(data-role='main')
             block content
 
+        //- Page footer
         div(data-role='footer')
             h1
                 a(href='/about') Copyright © Tim Visée 2016
