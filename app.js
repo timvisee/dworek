@@ -10,6 +10,11 @@ var users = require('./routes/users');
 
 var app = express();
 
+var appInfo = require('./appInfo');
+
+// Show an initialization message
+console.log('Initializing ' + appInfo.APP_NAME + ' v' + appInfo.VERSION_NAME + ' (' + appInfo.VERSION_CODE + ')...');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
