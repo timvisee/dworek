@@ -33,7 +33,8 @@ var appInfo = require('../appInfo');
 // Index page
 router.get('/', function(req, res, next) {
   res.render('index', {
-    title: appInfo.APP_NAME
+    title: appInfo.APP_NAME,
+    hideBackButton: true
   });
 });
 

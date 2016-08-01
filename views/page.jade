@@ -7,7 +7,8 @@ block page
         //- Page header
         div(data-role='header')
             //- Back button
-            a.ui-btn.ui-corner-all.ui-shadow.ui-icon-back.ui-btn-icon-left(href='#', data-rel='back', data-direction='reverse') Back
+            unless hideBackButton
+                a.ui-btn.ui-corner-all.ui-shadow.ui-icon-back.ui-btn-icon-left(href='#', data-rel='back', data-direction='reverse') Back
 
             //- Header title
             h1: a(href='/', data-ajax='false', title='Reload application')= title
