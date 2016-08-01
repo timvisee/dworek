@@ -6,8 +6,11 @@ block page
     div(data-role='page')
         //- Page header
         div(data-role='header')
-            h1
-                a(href='/', data-ajax='false', title='Reload application')= title
+            //- Back button
+            a.ui-btn.ui-corner-all.ui-shadow.ui-icon-back.ui-btn-icon-left(href='#', data-rel='back', data-direction='reverse') Back
+
+            //- Header title
+            h1: a(href='/', data-ajax='false', title='Reload application')= title
 
         //- Page content
         div.ui-content(data-role='main')
@@ -15,5 +18,5 @@ block page
 
         //- Page footer
         div(data-role='footer')
-            h1
-                a(href='/about') Copyright © Tim Visée 2016
+            //- Footer title
+            h1: a(href='/about') Copyright © Tim Visée 2016
