@@ -27,12 +27,12 @@ body {
 
 .ui-header h1 a,
 .ui-footer h1 a {
-  color: inherit;
+  color: inherit !important;
   text-decoration: inherit; }
 
 .ui-header h1 a:hover,
 .ui-footer h1 a:hover {
-  color: inherit;
+  color: inherit !important;
   text-decoration: underline; }
 
 table.table-list tr td {
