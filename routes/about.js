@@ -1,14 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-var about = require('./about');
-
-// Index page
+// About index
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+    res.render('about', {
+        title: 'About'
+    });
 });
-
-// About page
-router.use('/about', about);
 
 module.exports = router;
