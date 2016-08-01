@@ -1,17 +1,9 @@
-extends layout
+extends page
 
 block content
-  div(data-role='page')
-    div(data-role='header')
-      h1 Whoops!
-
-    div(data-role='main')
-      //- ul(data-role='listview', data-inset='true', data-filter='true')
-      //-   li: a(href='#') Welcome to #{title}
-      p Error: #{message}
-      p Status: #{error.status}
-      p Stack: #{error.stack}
-
-    div(data-role='footer')
-      //- TODO: Use proper special character encodings here!
-      h1 Copyright © Tim Visée 2016
+  //- TODO: Change page title to Whoops?
+  //- ul(data-role='listview', data-inset='true', data-filter='true')
+  //-   li: a(href='#') Welcome to #{title}
+  p Error: #{message}
+  p Status: #{error.status}
+  p Stack: #{error.stack}

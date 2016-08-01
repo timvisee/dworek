@@ -1,0 +1,12 @@
+extends layout
+
+block page
+    div(data-role='page')
+        div(data-role='header')
+            h1= title
+
+        div(data-role='main')
+            block content
+
+        div(data-role='footer')
+            h1 Copyright © Tim Visée 2016
