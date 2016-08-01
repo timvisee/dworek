@@ -42,7 +42,7 @@ appInfo.APP_NAME = 'Dworek';
  *
  * @constant {string}
  */
-appInfo.VERSION_NAME = '0.0.0';
+appInfo.VERSION_NAME = '0.0.1';
 
 /**
  * Application version code.
