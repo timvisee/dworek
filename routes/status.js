@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var os = require('os');
 
 var appInfo = require('../appInfo');
 
@@ -8,10 +9,7 @@ router.get('/', function(req, res, next) {
     res.render('status', {
         title: 'Application status',
 
-        // TODO: Always include these parameters, in every page render
-        appName: appInfo.APP_NAME,
-        appVersionName: appInfo.VERSION_NAME,
-        appVersionCode: appInfo.VERSION_CODE
+        uptime: Math.round(os.uptime())
     });
 });
 

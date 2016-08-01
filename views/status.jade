@@ -2,4 +2,12 @@ extends page
 
 block content
     div(align='center')
-        p Status page is not yet available.
+        p The current application status is shown below.
+
+        table.ui-responsive.table-list
+            tr
+                td Web server
+                td: span(style='color: green;') Online
+            tr
+                td Uptime
+                td #{uptime} seconds
