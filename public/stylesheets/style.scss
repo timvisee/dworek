@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #EEE;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.ui-header h1 a,
+.ui-footer h1 a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.ui-header h1 a:hover,
+.ui-footer h1 a:hover {
+  color: inherit;
+  text-decoration: underline;
+}
