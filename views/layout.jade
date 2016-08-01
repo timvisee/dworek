@@ -1,7 +1,22 @@
 doctype html
 html
   head
+    //- Configure the character set
+    meta(http-equiv='X-UA-Compatible', content='text/html', charset='UTF-8')
+
+    //- Page title
     title= title
+
+    //- Style
     link(rel='stylesheet', href='/stylesheets/style.css')
+
+    //- jQuery
+    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
+
+    //- jQuery Mobile
+    script(type='text/javascript', src='js/jquery.mobile.settings.js')
+    link(rel='stylesheet', href='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css')
+    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js')
+
   body
     block content
