@@ -1,4 +1,21 @@
 extends page
 
 block content
-    p This is the about page
+    div(align='center')
+        h2 #{appName}
+        p: b Version: #{appVersionName} #[sup (#{appVersionCode})]
+
+        p #{appName} is developed and maintained by #[a(href='http://timvisee.com/', target='_blank', title='About Tim Visée') Tim Visée].
+
+        p The source code of this application is available on #[a(href='http://github.com/timvisee/dworek', target='_blank', title='View on GitHub') GitHub].
+
+        fieldset(data-role='controlgroup', data-type='vertical')
+            a.ui-btn.ui-icon-info.ui-btn-icon-left(href='/status') Application Status
+
+        //- TODO: Include list of used technologies, such as jQuery, jQuery Mobile, MapBox, NodeJS and others
+
+        p Licensed under MIT license.
+
+        p.
+            Copyright © Tim Visée 2016.#[br]
+            All rights reserved.
