@@ -3,10 +3,12 @@ extends layout
 block page
     div(data-role='page')
         div(data-role='header')
-            h1= title
+            h1
+                a(href='/', data-ajax='false', title='Reload application')= title
 
         div(data-role='main')
             block content
 
         div(data-role='footer')
-            h1 Copyright © Tim Visée 2016
+            h1
+                a(href='/about') Copyright © Tim Visée 2016
