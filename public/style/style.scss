@@ -18,3 +18,15 @@ body {
   color: inherit;
   text-decoration: underline;
 }
+
+// Table lists
+table.table-list tr td {
+  text-align: left;
+  line-height: 1.8em;
+}
+
+table.table-list tr td:first-child {
+  padding-right: 16px;
+  font-weight: bold;
+  text-align: right;
+}
