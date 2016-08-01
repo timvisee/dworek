@@ -1,0 +1,8 @@
+# Configuration for Travis CI
+
+language: node_js
+node_js:
+  - "5"
+  - "4"
+services:
+  - mongodb
