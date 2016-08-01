@@ -1,0 +1,13 @@
+extends page
+
+block content
+    p Enter your preferred username and password to register.
+
+    form(method='POST', action='/login')
+        input(type='text', name='login_user', placeholder='Username')
+        input(type='password', name='login_password', placeholder='Password')
+        input(type='password', name='login_password_verify', placeholder='Password verification')
+
+        input.ui-btn.ui-icon-lock.ui-btn-icon-right(type='submit', value='Register')
+
+        a.ui-btn.ui-shadow(href='/login') Login

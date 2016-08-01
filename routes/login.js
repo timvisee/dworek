@@ -23,30 +23,11 @@
 var express = require('express');
 var router = express.Router();
 
-var login = require('./login');
-var register = require('./register');
-var about = require('./about');
-var status = require('./status');
-
-var appInfo = require('../appInfo');
-
-// Index page
+// Login index
 router.get('/', function(req, res, next) {
-  res.render('index', {
-    title: appInfo.APP_NAME
-  });
+    res.render('login', {
+        title: 'Login'
+    });
 });
-
-// Login page
-router.use('/login', login);
-
-// Register page
-router.use('/register', register);
-
-// About page
-router.use('/about', about);
-
-// Status page
-router.use('/status', status);
 
 module.exports = router;
