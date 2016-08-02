@@ -46,14 +46,27 @@ var HashUtils = function() {
  *
  * @param {string} secret Secret to hash as a string.
  * @param {HashUtils~hashCallback} callback Callback function with the hash result.
+ * @param {*} [options] Optional parameters.
+ * @param {string} [options.salt] Salt to use for the hash.
+ * @param {int} [options.rounds] Number of rounds to hash.
  */
-HashUtils.prototype.hash = function(secret, callback) {
-    // Apply the global salt
-    if(this.useGlobalSalt)
-        secret = secret + config.security.globalSalt;
+HashUtils.prototype.hash = function(secret, callback, options) {
+    // Get the global salt
+    let salt = this.useGlobalSalt ? config.security.globalSalt : '';
 
-    // Determine the number of times to hash
+    // Use a custom salt if configured
+    if(options !== undefined && options.hasOwnProperty('salt'))
+        salt = options.salt;
+
+    // Apply the salt
+    secret = secret + salt;
+
+    // Get the global number of rounds to hash
     let hashRounds = config.security.hashRounds;
+
+    // Use a custom number of rounds if configured
+    if(options !== undefined && options.hasOwnProperty('rounds'))
+        hashRounds = options.rounds;
 
     // Hash the secret
     bcrypt.hash(secret, hashRounds, callback);
@@ -74,11 +87,19 @@ HashUtils.prototype.hash = function(secret, callback) {
  * @param {string} secret The secret to compare the hash to as a string.
  * @param {string} hash The hash to compare the secret to as a string.
  * @param {HashUtils~compareCallback} callback Callback function with the comparison result.
+ * @param {*} [options] Optional parameters.
+ * @param {string} [options.salt] Salt that was used for the hash.
  */
-HashUtils.prototype.compare = function(secret, hash, callback) {
-    // Apply the global salt
-    if(this.useGlobalSalt)
-        secret = secret + config.security.globalSalt;
+HashUtils.prototype.compare = function(secret, hash, callback, options) {
+    // Get the global salt
+    let salt = this.useGlobalSalt ? config.security.globalSalt : '';
+
+    // Use a custom salt if configured
+    if(options !== undefined && options.hasOwnProperty('salt'))
+        salt = options.salt;
+
+    // Apply the salt
+    secret = secret + salt;
 
     // Compare the hash and secret
     bcrypt.compare(secret, hash, callback);
