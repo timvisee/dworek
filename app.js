@@ -41,8 +41,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Configure the favicon
-// TODO: Configure static favicons here
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// TODO: Configure static all favicons here, instead of the default one
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 // Configure the logger, body parser, cookie parser and the static public directory
 app.use(logger('dev'));
