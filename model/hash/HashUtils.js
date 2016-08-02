@@ -33,15 +33,6 @@ var HashUtils = function() {
 };
 
 /**
- * Hash callback, called when a secret has been hashed.
- * This callback contains the hash as a string, unless an error occurred.
- *
- * @callback HashUtils~hashCallback
- * @param {Error|null} An error instance if an error occurred, null otherwise.
- * @param {string} Hash as a string.
- */
-
-/**
  * Hash the given secret.
  *
  * @param {string} secret Secret to hash as a string.
@@ -73,12 +64,12 @@ HashUtils.prototype.hash = function(secret, callback, options) {
 };
 
 /**
- * Hash comparison callback, called when a hash has been compared to a secret.
- * This callback contains the result of the comparison, unless an error occurred.
+ * Hash callback, called when a secret has been hashed.
+ * This callback contains the hash as a string, unless an error occurred.
  *
- * @callback HashUtils~compareCallback
+ * @callback HashUtils~hashCallback
  * @param {Error|null} An error instance if an error occurred, null otherwise.
- * @param {boolean} True if the comparison was successful and the hash matched the secret, false otherwise.
+ * @param {string} Hash as a string.
  */
 
 /**
@@ -104,6 +95,15 @@ HashUtils.prototype.compare = function(secret, hash, callback, options) {
     // Compare the hash and secret
     bcrypt.compare(secret, hash, callback);
 };
+
+/**
+ * Hash comparison callback, called when a hash has been compared to a secret.
+ * This callback contains the result of the comparison, unless an error occurred.
+ *
+ * @callback HashUtils~compareCallback
+ * @param {Error|null} An error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the comparison was successful and the hash matched the secret, false otherwise.
+ */
 
 // Export the class
 module.exports = HashUtils;
