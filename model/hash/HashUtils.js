@@ -23,6 +23,10 @@
 var config = require('../../config');
 var bcrypt = require('bcrypt');
 
+// Define whether to use the global salt when hashing
+// TODO: Create a getter/setter for this property
+var useGlobalSalt = true;
+
 // The actual module with it's methods
 module.exports = {
 
@@ -30,13 +34,12 @@ module.exports = {
      * Hash the given secret.
      *
      * @param {string} secret Secret to hash as a string.
-     * @param {string|undefined} salt Global salt to use for this hash, use {@code undefined} to ignore the global salt.
      * @param {HashUtils~hashCallback} callback Callback function with the hash result.
      */
-    hash: function(secret, salt, callback) {
-        // Concatenate the secret and salt, if a salt is configured
-        if(salt !== undefined && salt !== null && salt.length > 0)
-            secret = secret + salt;
+    hash: function(secret, callback) {
+        // Apply the global salt
+        if(useGlobalSalt)
+            secret = secret + config.security.globalSalt;
 
         // Determine the number of times to hash
         let hashRounds = config.security.hashRounds;
@@ -58,14 +61,13 @@ module.exports = {
      * Compare a secret to a hash.
      *
      * @param {string} secret The secret to compare the hash to as a string.
-     * @param {string|undefined} salt Global salt that was used for the hash, use {@code undefined} to ignore this property.
      * @param {string} hash The hash to compare the secret to as a string.
      * @param {HashUtils~compareCallback} callback Callback function with the comparison result.
      */
-    compare: function(secret, salt, hash, callback) {
-        // Concatenate the secret and salt, if a salt is configured
-        if(salt !== undefined && salt !== null && salt.length > 0)
-            secret = secret + salt;
+    compare: function(secret, hash, callback) {
+        // Apply the global salt
+        if(useGlobalSalt)
+            secret = secret + config.security.globalSalt;
 
         // Compare the hash and secret
         bcrypt.compare(secret, hash, callback);
