@@ -92,17 +92,6 @@ config.web.port = process.env.WEB_PORT || 3000;
 
 
 /******************************************************************************
- * User configuration.                                                        *
- ******************************************************************************/
-
-/**
- * Global salt used to hash user passwords.
- * @type {string}
- */
-config.user.salt = 'OjERCLGYME6U8EwaPCKUN91q6wbyc5fL'; // Examples: https://goo.gl/iAzWfz
-
-
-/******************************************************************************
  * Security configuration.                                                    *
  ******************************************************************************/
 
@@ -111,6 +100,12 @@ config.user.salt = 'OjERCLGYME6U8EwaPCKUN91q6wbyc5fL'; // Examples: https://goo.
  * @type {string}
  */
 config.security.hashRounds = 6;
+
+/**
+ * Global salt used with hashing.
+ * @type {string}
+ */
+config.security.globalSalt = 'mKd5xolXY6JCnLUkRZjmgjHsdkVK9dSiUg0m69z4'; // Examples: https://goo.gl/iAzWfz
 
 /**
  * Default length of tokens, such as session tokens.
