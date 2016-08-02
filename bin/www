@@ -22,14 +22,15 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var config = require('../config');
-
 var app = require('../app');
-var debug = require('debug')(config.debug.name);
 var http = require('http');
+var PortUtils = require('../model/util/PortUtils');
+
+var config = require('../config');
+var debug = require('debug')(config.debug.name);
 
 // Get and configure the web port
-var port = normalizePort(config.web.port);
+var port = PortUtils.normalizePort(config.web.port);
 app.set('port', port);
 
 // Set up the HTTP server
@@ -39,29 +40,6 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-/**
- * Normalize a port number.
- *
- * @param {number|string} val Port number, or named pipe.
- *
- * @returns {number|string|boolean} Port number, or named pipe. False is returned if the port is invalid.
- */
-function normalizePort(val) {
-    // Parse the port as integer
-    var port = parseInt(val, 10);
-
-    // Make sure we're working with a number, not a named pipe
-    if(isNaN(port))
-        return val;
-
-    // Port number
-    if(port >= 0)
-        return port;
-
-    // Failed, return false
-    return false;
-}
 
 /**
  * Event listener for HTTP server error event.
