@@ -27,61 +27,55 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
+
+var routes = require('./routes/index');
 
 var appInfo = require('./appInfo');
 
 // Show an initialization message
 console.log('Initializing ' + appInfo.APP_NAME + ' v' + appInfo.VERSION_NAME + ' (' + appInfo.VERSION_CODE + ')...');
 
-// view engine setup
+// Configure the template/view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
+// Configure the favicon
+// TODO: Configure static favicons here
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+// Configure the logger, body parser, cookie parser and the static public directory
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configure the base routes
 app.use('/', routes);
-app.use('/users', users);
 
-// catch 404 and forward to error handler
+// Catch 404 errors, and forward them to the error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    // Create an error, and set the status code
+    var error = new Error('Not Found');
+    error.status = 404;
+
+    // Forward the error
+    next(error);
 });
 
-// error handlers
+// Error handler
+app.use(function(err, req, res, next) {
+    // Determine whether we're in development mode
+    var dev = app.get('env') === 'development';
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+    // Show an error page, render the stack trace if we're in development mode
     res.status(err.status || 500);
     res.render('error', {
-      message: err.message,
-      error: err
+        message: err.message,
+        error: dev ? err : {}
     });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
 });
 
-
+// Export the module
 module.exports = app;
