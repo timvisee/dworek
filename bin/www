@@ -22,93 +22,94 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var config = require('../config');
-
-/**
- * Module dependencies.
- */
-
 var app = require('../app');
 var debug = require('debug')('dworek:server');
 var http = require('http');
 
-/**
- * Get port from environment and store in Express.
- */
+var config = require('../config');
 
+// Get and configure the web port
 var port = normalizePort(config.web.port);
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
+// Set up the HTTP server
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
+// Listen on the provided port, on all interfaces
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
+ * Normalize a port number.
+ *
+ * @param {number|string} val Port number, or named pipe.
+ *
+ * @returns {number|string|boolean} Port number, or named pipe. False is returned if the port is invalid.
  */
-
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+    // Parse the port as integer
+    var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    // Make sure we're working with a number, not a named pipe
+    if(isNaN(port))
+        return val;
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    // Port number
+    if(port >= 0)
+        return port;
 
-  return false;
+    // Failed, return false
+    return false;
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener for HTTP server error event.
+ *
+ * @throws
  */
-
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    // Make sure this originates from the listen call
+    if(error.syscall !== 'listen')
+        throw error;
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    // Build a port/pipe string
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // Handle specific listen errors with friendly messages
+    switch(error.code) {
+        case 'EACCES':
+            // No access to listen to the given port
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+
+        case 'EADDRINUSE':
+            // The port is already in use
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+
+        default:
+            // Throw the error
+            throw error;
+    }
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for HTTP server listening event.
  */
-
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    // Get the address
+    var address = server.address();
+
+    // Build a port/pipe string
+    var bind = typeof address === 'string'
+        ? 'pipe ' + address
+        : 'port ' + address.port;
+
+    // Debug a listening message
+    debug('Listening on ' + bind);
 }
