@@ -42,7 +42,7 @@ config.session = {};
  * NodeJS debug name for the server.
  * @type {string}
  */
-config.debug.name = 'Dworek:server';
+config.debug.name = 'dworek:server';
 
 
 /******************************************************************************

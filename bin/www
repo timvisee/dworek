@@ -22,11 +22,11 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var app = require('../app');
-var debug = require('debug')('dworek:server');
-var http = require('http');
-
 var config = require('../config');
+
+var app = require('../app');
+var debug = require('debug')(config.debug.name);
+var http = require('http');
 
 // Get and configure the web port
 var port = normalizePort(config.web.port);
@@ -111,5 +111,5 @@ function onListening() {
         : 'port ' + address.port;
 
     // Debug a listening message
-    debug('Listening on ' + bind);
+    debug('Web server listening on ' + bind);
 }
