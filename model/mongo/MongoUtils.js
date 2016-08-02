@@ -22,12 +22,10 @@
 
 var config = require('../../config');
 var mongodb = require('mongodb');
-
-// Get the MongoDB client
 var MongoClient = mongodb.MongoClient;
 
-// The database instance once created
-var dbInstance = null;
+// The database connection instance
+var connection = null;
 
 // The actual module with it's methods
 module.exports = {
@@ -53,7 +51,7 @@ module.exports = {
             console.log("Successfully established a connection to the database!");
 
             // Set the database instance
-            dbInstance = db;
+            connection = db;
 
             // Call the callback
             return callback(err, db);
@@ -61,11 +59,11 @@ module.exports = {
     },
 
     /**
-     * Get the Mongo DB database instance. A connection must have been established, or null will be returned.
+     * Get the Mongo DB database connection instance. A connection must have been established, or null will be returned.
      *
      * @returns {*}
      */
-    getDb: function() {
-        return dbInstance;
+    getConnection: function() {
+        return connection;
     }
 };
