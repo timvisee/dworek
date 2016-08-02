@@ -23,62 +23,66 @@
 var config = require('../../config');
 var bcrypt = require('bcrypt');
 
-// Define whether to use the global salt when hashing
-// TODO: Create a getter/setter for this property
-var useGlobalSalt = true;
-
-// The actual module with it's methods
-module.exports = {
-
-    /**
-     * Hash the given secret.
-     *
-     * @param {string} secret Secret to hash as a string.
-     * @param {HashUtils~hashCallback} callback Callback function with the hash result.
-     */
-    hash: function(secret, callback) {
-        // Apply the global salt
-        if(useGlobalSalt)
-            secret = secret + config.security.globalSalt;
-
-        // Determine the number of times to hash
-        let hashRounds = config.security.hashRounds;
-
-        // Hash the secret
-        bcrypt.hash(secret, hashRounds, callback);
-    },
-
-    /**
-     * Hash callback, called when a secret has been hashed.
-     * This callback contains the hash as a string, unless an error occurred.
-     *
-     * @callback HashUtils~hashCallback
-     * @param {Error|null} An error instance if an error occurred, null otherwise.
-     * @param {string} Hash as a string.
-     */
-
-    /**
-     * Compare a secret to a hash.
-     *
-     * @param {string} secret The secret to compare the hash to as a string.
-     * @param {string} hash The hash to compare the secret to as a string.
-     * @param {HashUtils~compareCallback} callback Callback function with the comparison result.
-     */
-    compare: function(secret, hash, callback) {
-        // Apply the global salt
-        if(useGlobalSalt)
-            secret = secret + config.security.globalSalt;
-
-        // Compare the hash and secret
-        bcrypt.compare(secret, hash, callback);
-    }
-
-    /**
-     * Hash comparison callback, called when a hash has been compared to a secret.
-     * This callback contains the result of the comparison, unless an error occurred.
-     *
-     * @callback HashUtils~compareCallback
-     * @param {Error|null} An error instance if an error occurred, null otherwise.
-     * @param {boolean} True if the comparison was successful and the hash matched the secret, false otherwise.
-     */
+/**
+ * @class
+ * @constructor
+ */
+var HashUtils = function() {
+    // Define whether to use the global salt
+    this.useGlobalSalt = true;
 };
+
+/**
+ * Hash callback, called when a secret has been hashed.
+ * This callback contains the hash as a string, unless an error occurred.
+ *
+ * @callback HashUtils~hashCallback
+ * @param {Error|null} An error instance if an error occurred, null otherwise.
+ * @param {string} Hash as a string.
+ */
+
+/**
+ * Hash the given secret.
+ *
+ * @param {string} secret Secret to hash as a string.
+ * @param {HashUtils~hashCallback} callback Callback function with the hash result.
+ */
+HashUtils.prototype.hash = function(secret, callback) {
+    // Apply the global salt
+    if(this.useGlobalSalt)
+        secret = secret + config.security.globalSalt;
+
+    // Determine the number of times to hash
+    let hashRounds = config.security.hashRounds;
+
+    // Hash the secret
+    bcrypt.hash(secret, hashRounds, callback);
+};
+
+/**
+ * Hash comparison callback, called when a hash has been compared to a secret.
+ * This callback contains the result of the comparison, unless an error occurred.
+ *
+ * @callback HashUtils~compareCallback
+ * @param {Error|null} An error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the comparison was successful and the hash matched the secret, false otherwise.
+ */
+
+/**
+ * Compare a secret to a hash.
+ *
+ * @param {string} secret The secret to compare the hash to as a string.
+ * @param {string} hash The hash to compare the secret to as a string.
+ * @param {HashUtils~compareCallback} callback Callback function with the comparison result.
+ */
+HashUtils.prototype.compare = function(secret, hash, callback) {
+    // Apply the global salt
+    if(this.useGlobalSalt)
+        secret = secret + config.security.globalSalt;
+
+    // Compare the hash and secret
+    bcrypt.compare(secret, hash, callback);
+};
+
+// Export the class
+module.exports = HashUtils;
