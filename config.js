@@ -110,7 +110,7 @@ config.user.salt = 'OjERCLGYME6U8EwaPCKUN91q6wbyc5fL'; // Examples: https://goo.
  * Number of rounds to hash.
  * @type {string}
  */
-config.security.hashRounds = 5;
+config.security.hashRounds = 6;
 
 /**
  * Default length of tokens, such as session tokens.
