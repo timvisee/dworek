@@ -47,7 +47,7 @@ var HashUtils = function() {};
  */
 HashUtils.hash = function(secret, callback, options) {
     // Get the global salt
-    let salt = useGlobalSalt ? config.security.globalSalt : '';
+    var salt = useGlobalSalt ? config.security.globalSalt : '';
 
     // Use a custom salt if configured
     if(options !== undefined && options.hasOwnProperty('salt'))
@@ -57,7 +57,7 @@ HashUtils.hash = function(secret, callback, options) {
     secret = secret + salt;
 
     // Get the global number of rounds to hash
-    let hashRounds = config.security.hashRounds;
+    var hashRounds = config.security.hashRounds;
 
     // Use a custom number of rounds if configured
     if(options !== undefined && options.hasOwnProperty('rounds'))
@@ -87,7 +87,7 @@ HashUtils.hash = function(secret, callback, options) {
  */
 HashUtils.compare = function(secret, hash, callback, options) {
     // Get the global salt
-    let salt = useGlobalSalt ? config.security.globalSalt : '';
+    var salt = useGlobalSalt ? config.security.globalSalt : '';
 
     // Use a custom salt if configured
     if(options !== undefined && options.hasOwnProperty('salt'))

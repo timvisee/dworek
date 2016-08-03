@@ -52,11 +52,11 @@ UserManager.getUserByUsername = function(username, callback) {
         }
 
         // Get the user data
-        let rawUserData = data[0];
+        var rawUserData = data[0];
 
         // Get the user ID
         // TODO: Should we convert the user ID to a (MongoDB) ObjectId instance
-        let userId = rawUserData._id.toString();
+        var userId = rawUserData._id.toString();
 
         // Get the user and call it back
         callback(null, new User(userId));
@@ -106,10 +106,10 @@ UserManager.getUserByCredentials = function(username, password, callback) {
         }
 
         // Get the user data
-        let rawUserData = data[0];
+        var rawUserData = data[0];
 
         // Gather the user ID, password hash and it's salt
-        let passwordHash = rawUserData.password_hash;
+        var passwordHash = rawUserData.password_hash;
 
         // Compare the password hash to the password
         HashUtils.compare(password, passwordHash, function(err, matched) {
