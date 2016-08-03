@@ -24,13 +24,17 @@ var config = require('../../config');
 var bcrypt = require('bcrypt');
 
 /**
+ * Define whether to use the globally configured salt by default.
+ *
+ * @type {boolean} True if the global salt should be used, false if not.
+ */
+var useGlobalSalt = true;
+
+/**
  * @class
  * @constructor
  */
-var HashUtils = function() {
-    // Define whether to use the global salt
-    this.useGlobalSalt = true;
-};
+var HashUtils = function() {};
 
 /**
  * Hash the given secret.
@@ -41,9 +45,9 @@ var HashUtils = function() {
  * @param {string} [options.salt] Salt to use for the hash.
  * @param {int} [options.rounds] Number of rounds to hash.
  */
-HashUtils.prototype.hash = function(secret, callback, options) {
+HashUtils.hash = function(secret, callback, options) {
     // Get the global salt
-    let salt = this.useGlobalSalt ? config.security.globalSalt : '';
+    let salt = useGlobalSalt ? config.security.globalSalt : '';
 
     // Use a custom salt if configured
     if(options !== undefined && options.hasOwnProperty('salt'))
@@ -81,9 +85,9 @@ HashUtils.prototype.hash = function(secret, callback, options) {
  * @param {*} [options] Optional parameters.
  * @param {string} [options.salt] Salt that was used for the hash.
  */
-HashUtils.prototype.compare = function(secret, hash, callback, options) {
+HashUtils.compare = function(secret, hash, callback, options) {
     // Get the global salt
-    let salt = this.useGlobalSalt ? config.security.globalSalt : '';
+    let salt = useGlobalSalt ? config.security.globalSalt : '';
 
     // Use a custom salt if configured
     if(options !== undefined && options.hasOwnProperty('salt'))
