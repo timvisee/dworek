@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) HHS OnTime 2016. All rights reserved.                        *
+ * Copyright (c) Dworek 2016. All rights reserved.                            *
  *                                                                            *
  * @author Tim Visee                                                          *
  * @website http://timvisee.com/                                              *
