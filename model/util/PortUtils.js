@@ -20,29 +20,36 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-// The actual module with it's methods
-module.exports = {
+/**
+ * PortUtils class.
+ *
+ * @class
+ * @constructor
+ */
+var PortUtils = function() {};
 
-    /**
-     * Normalize a port number.
-     *
-     * @param {number|string} val Port number, or named pipe.
-     *
-     * @returns {number|string|boolean} Port number, or named pipe. False is returned if the port is invalid.
-     */
-    normalizePort: function(val) {
-        // Parse the port as integer
-        var port = parseInt(val, 10);
+/**
+ * Normalize a port number.
+ *
+ * @param {number|string} val Port number, or named pipe.
+ *
+ * @returns {number|string|boolean} Port number, or named pipe. False is returned if the port is invalid.
+ */
+PortUtils.normalizePort = function(val) {
+    // Parse the port as integer
+    var port = parseInt(val, 10);
 
-        // Make sure we're working with a number, not a named pipe
-        if(isNaN(port))
-            return val;
+    // Make sure we're working with a number, not a named pipe
+    if(isNaN(port))
+        return val;
 
-        // Port number
-        if(port >= 0)
-            return port;
+    // Port number
+    if(port >= 0)
+        return port;
 
-        // Failed, return false
-        return false;
-    }
+    // Failed, return false
+    return false;
 };
+
+// Export the class
+module.exports = PortUtils;
