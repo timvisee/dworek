@@ -43,7 +43,7 @@ var TokenGenerator = function() {};
  * @param {int} length Length of the token.
  * @param {TokenGenerator~generateTokenCallback} callback Called when a connection has been made, or when failed to connect.
  */
-TokenGenerator.prototype.generateToken = function(length, callback) {
+TokenGenerator.generateToken = function(length, callback) {
     // Generate some random bytes
     crypto.randomBytes(length / 2, function(err, bytes) {
         // Convert the bytes into hexadecimal
