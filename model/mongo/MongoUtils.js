@@ -24,46 +24,69 @@ var config = require('../../config');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 
-// The database connection instance
-var connection = null;
-
-// The actual module with it's methods
-module.exports = {
+/**
+ * MongoUtils class.
+ *
+ * @class
+ * @constructor
+ */
+var MongoUtils = function() {
     /**
-     * Connect to the Mongo DB database as configured in the configuration file.
+     * MongoDB database connection instance.
      *
-     * @param {function} callback Called when a connection has been made, or when failed to connect.
+     * @type {MongoClient|null} MongoDB client, or null.
      */
-    connect: function(callback) {
-        // Show a status message
-        console.log('Connecting to the database...');
-
-        // Connect to the database
-        MongoClient.connect(config.db.url, function(err, db) {
-            // Make sure the connection has been successfully established
-            if(err != null) {
-                console.error("Failed to establish a connection to the database!");
-                console.error(err);
-                return;
-            }
-
-            // A connection was made, show a status message
-            console.log("Successfully established a connection to the database!");
-
-            // Set the database instance
-            connection = db;
-
-            // Call the callback
-            return callback(err, db);
-        });
-    },
-
-    /**
-     * Get the Mongo DB database connection instance. A connection must have been established, or null will be returned.
-     *
-     * @returns {*}
-     */
-    getConnection: function() {
-        return connection;
-    }
+    this.connection = null;
 };
+
+/**
+ * Connect to the Mongo DB database as configured in the configuration file.
+ *
+ * @param {MongoUtils~connectCallback} callback Called when a connection has been made, or when failed to connect.
+ */
+MongoUtils.prototype.connect = function(callback) {
+    // Show a status message
+    console.log('Connecting to the database...');
+
+    // Store the current instance
+    let instance = this;
+
+    // Connect to the database
+    MongoClient.connect(config.db.url, function(err, db) {
+        // Make sure the connection has been successfully established
+        if(err != null) {
+            console.error("Failed to establish a connection to the database!");
+            console.error(err);
+            return;
+        }
+
+        // A connection was made, show a status message
+        console.log("Successfully established a connection to the database!");
+
+        // Set the database instance
+        instance.connection = db;
+
+        // Call the callback
+        return callback(err, db);
+    });
+};
+
+/**
+ * Callback invoked when a connection has been made, or if we failed to connect.
+ *
+ * @callback MongoUtils~connectCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {MongoClient|null} MongoDB client instance if a connection has been made, null otherwise.
+ */
+
+/**
+ * Get the MongoDB database connection instance. A connection must have been established, or null will be returned.
+ *
+ * @returns {MongoClient|null}
+ */
+MongoUtils.prototype.getConnection = function() {
+    return this.connection;
+};
+
+// Export the class
+module.exports = MongoUtils;
