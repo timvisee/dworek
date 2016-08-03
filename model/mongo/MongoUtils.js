@@ -25,31 +25,28 @@ var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 
 /**
+ * MongoDB database connection instance.
+ *
+ * @type {MongoClient|null} MongoDB client, or null.
+ */
+var connection = null;
+
+/**
  * MongoUtils class.
  *
  * @class
  * @constructor
  */
-var MongoUtils = function() {
-    /**
-     * MongoDB database connection instance.
-     *
-     * @type {MongoClient|null} MongoDB client, or null.
-     */
-    this.connection = null;
-};
+var MongoUtils = function() {};
 
 /**
  * Connect to the Mongo DB database as configured in the configuration file.
  *
  * @param {MongoUtils~connectCallback} callback Called when a connection has been made, or when failed to connect.
  */
-MongoUtils.prototype.connect = function(callback) {
+MongoUtils.connect = function(callback) {
     // Show a status message
     console.log('Connecting to the database...');
-
-    // Store the current instance
-    let instance = this;
 
     // Connect to the database
     MongoClient.connect(config.db.url, function(err, db) {
@@ -64,7 +61,7 @@ MongoUtils.prototype.connect = function(callback) {
         console.log("Successfully established a connection to the database!");
 
         // Set the database instance
-        instance.connection = db;
+        connection = db;
 
         // Call the callback
         return callback(err, db);
@@ -84,8 +81,8 @@ MongoUtils.prototype.connect = function(callback) {
  *
  * @returns {MongoClient|null}
  */
-MongoUtils.prototype.getConnection = function() {
-    return this.connection;
+MongoUtils.getConnection = function() {
+    return connection;
 };
 
 // Export the class
