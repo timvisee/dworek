@@ -26,6 +26,8 @@ var config = require('../../config');
 var redis = require('redis');
 
 /**
+ * RedisUtils class.
+ *
  * @class
  * @constructor
  */
@@ -82,8 +84,6 @@ RedisUtils.prototype.connect = function(callback) {
 
     // Handle ready
     this.redisClient.on('ready', function(err) {
-        // TODO: Handle errors!
-
         // Show a message
         console.log('Redis is ready!');
 
@@ -92,7 +92,7 @@ RedisUtils.prototype.connect = function(callback) {
 
         // Call the callback
         if(callback != undefined)
-            callback(null, instance.redisClient);
+            callback(err, instance.redisClient);
     });
 
     // Handle reconnecting
