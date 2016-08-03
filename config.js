@@ -81,6 +81,41 @@ config.db.url = 'mongodb://' + config.db.host + ':' + config.db.port + '/' + con
 
 
 /******************************************************************************
+ * Redis cache configuration.                                                 *
+ ******************************************************************************/
+
+/**
+ * Define whether to enable/usage Redis.
+ * @type {boolean}
+ */
+config.redis.enable = true;
+
+/**
+ * Redis host.
+ * @type {string}
+ */
+config.redis.host = '127.0.0.1';
+
+/**
+ * Redis port.
+ * @type {number}
+ */
+config.redis.port = 6379;
+
+/**
+ * Redis database number.
+ * @type {number}
+ */
+config.redis.dbNumber = 1;
+
+/**
+ * Redis connection URL.
+ * @type {string}
+ */
+config.redis.url = 'redis://' + config.redis.host + ':' + config.redis.port + '/' + config.redis.dbNumber;
+
+
+/******************************************************************************
  * Web configuration.                                                         *
  ******************************************************************************/
 
