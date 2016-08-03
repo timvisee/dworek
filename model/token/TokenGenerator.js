@@ -24,32 +24,35 @@ const crypto = require('crypto');
 
 /**
  * Regular expression to match a token. The length is not taken into account.
+ *
  * @type {RegExp}
  */
 const TOKEN_REGEX = /^[0-9a-f]*$/gi;
 
-// The actual module with it's methods
-module.exports = {
-    /**
-     * Regular expression to match a token. The length is not taken into account.
-     * @type {RegExp}
-     */
-    TOKEN_REGEX: TOKEN_REGEX,
+/**
+ * TokenGenerator class.
+ *
+ * @class
+ * @constructor
+ */
+var TokenGenerator = function() {};
 
-    /**
-     * Generate a safe token with the given length.
-     *
-     * @param {int} length Length of the token.
-     * @param {function} callback (err, {string} token) Called when a connection has been made, or when failed to connect.
-     */
-    generateToken: function(length, callback) {
-        // Generate some random bytes
-        crypto.randomBytes(length / 2, function(err, bytes) {
-            // Convert the bytes into hexadecimal
-            var token = bytes.toString('hex').toLowerCase();
+/**
+ * Generate a safe token with the given length.
+ *
+ * @param {int} length Length of the token.
+ * @param {function} callback (err, {string} token) Called when a connection has been made, or when failed to connect.
+ */
+TokenGenerator.prototype.generateToken = function(length, callback) {
+    // Generate some random bytes
+    crypto.randomBytes(length / 2, function(err, bytes) {
+        // Convert the bytes into hexadecimal
+        var token = bytes.toString('hex').toLowerCase();
 
-            // Send the token through the callback
-            callback(err, token);
-        });
-    }
+        // Send the token through the callback
+        callback(err, token);
+    });
 };
+
+// Export the class
+module.exports = TokenGenerator;
