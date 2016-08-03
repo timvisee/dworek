@@ -71,7 +71,7 @@ RedisUtils.connect = function(callback) {
     redisClient = redis.createClient(config.redis.url);
 
     // Handle connect
-    this.redisClient.on('connect', function() {
+    redisClient.on('connect', function() {
         // Show a status message
         console.log('Successfully established a connection to Redis!');
 
@@ -80,7 +80,7 @@ RedisUtils.connect = function(callback) {
     });
 
     // Handle ready
-    this.redisClient.on('ready', function(err) {
+    redisClient.on('ready', function(err) {
         // Show a message
         console.log('Redis is ready!');
 
