@@ -26,33 +26,33 @@ var config = require('../../config');
 var redis = require('redis');
 
 /**
+ * Defines whether the Redis client is ready.
+ *
+ * @type {boolean} True if ready, false if not.
+ */
+var ready = false;
+
+/**
+ * Redis client instance.
+ *
+ * @type {RedisClient} Redis client instance.
+ */
+var redisClient = null;
+
+/**
  * RedisUtils class.
  *
  * @class
  * @constructor
  */
-var RedisUtils = function() {
-    /**
-     * Defines whether the Redis client is ready.
-     *
-     * @type {boolean} True if ready, false if not.
-     */
-    this.ready = false;
-
-    /**
-     * Redis client instance.
-     *
-     * @type {RedisClient} Redis client instance.
-     */
-    this.redisClient = null;
-};
+var RedisUtils = function() {};
 
 /**
  * Connect to Redis as configured in the configuration file.
  *
  * @param {RedisUtils~connectCallback} [callback] Called when a connection has been made, or when failed to connect.
  */
-RedisUtils.prototype.connect = function(callback) {
+RedisUtils.connect = function(callback) {
     // Do not connect if Redis usage is disabled
     if(!config.redis.enable) {
         // Show a warning
@@ -68,7 +68,7 @@ RedisUtils.prototype.connect = function(callback) {
     console.log('Connecting to Redis...');
 
     // Connect to the redis client
-    this.redisClient = redis.createClient(config.redis.url);
+    redisClient = redis.createClient(config.redis.url);
 
     // Handle connect
     this.redisClient.on('connect', function() {
@@ -76,11 +76,8 @@ RedisUtils.prototype.connect = function(callback) {
         console.log('Successfully established a connection to Redis!');
 
         // Reset the ready flag
-        this.ready = false;
+        ready = false;
     });
-
-    // Store this instance
-    let instance = this;
 
     // Handle ready
     this.redisClient.on('ready', function(err) {
@@ -88,26 +85,26 @@ RedisUtils.prototype.connect = function(callback) {
         console.log('Redis is ready!');
 
         // Set the ready flag
-        this.ready = true;
+        ready = true;
 
         // Call the callback
         if(callback != undefined)
-            callback(err, instance.redisClient);
+            callback(err, redisClient);
     });
 
     // Handle reconnecting
-    this.redisClient.on('reconnecting', function() {
+    redisClient.on('reconnecting', function() {
         // Reset the ready flag
-        this.ready = false;
+        ready = false;
     });
 
     // Handle errors
-    this.redisClient.on('error', function(err) {
+    redisClient.on('error', function(err) {
         // Show an error message
         console.warn('Redis error: ' + err);
 
         // Reset the ready flag
-        this.ready = false;
+        ready = false;
 
         // Call the callback
         if(callback != undefined)
@@ -115,9 +112,9 @@ RedisUtils.prototype.connect = function(callback) {
     });
 
     // Handle end
-    this.redisClient.on('end', function() {
+    redisClient.on('end', function() {
         // Reset the ready flag
-        this.ready = false;
+        ready = false;
     });
 };
 
@@ -132,8 +129,8 @@ RedisUtils.prototype.connect = function(callback) {
  *
  * @returns {RedisClient} RedisClient instance.
  */
-RedisUtils.prototype.getRedis = function() {
-    return this.redisClient;
+RedisUtils.getRedis = function() {
+    return redisClient;
 };
 
 /**
@@ -141,8 +138,8 @@ RedisUtils.prototype.getRedis = function() {
  *
  * @returns {boolean} True if ready, false if not.
  */
-RedisUtils.prototype.isReady = function() {
-    return this.ready;
+RedisUtils.isReady = function() {
+    return ready;
 };
 
 // Export the class
