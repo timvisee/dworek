@@ -41,7 +41,7 @@ var TokenGenerator = function() {};
  * Generate a safe token with the given length.
  *
  * @param {int} length Length of the token.
- * @param {function} callback (err, {string} token) Called when a connection has been made, or when failed to connect.
+ * @param {TokenGenerator~generateTokenCallback} callback Called when a connection has been made, or when failed to connect.
  */
 TokenGenerator.prototype.generateToken = function(length, callback) {
     // Generate some random bytes
@@ -53,6 +53,15 @@ TokenGenerator.prototype.generateToken = function(length, callback) {
         callback(err, token);
     });
 };
+
+/**
+ * Callback, called when a token has been generated.
+ * The callback is also called if an error occurred while generating a token.
+ *
+ * @callback TokenGenerator~generateTokenCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {string} Generated token as a string.
+ */
 
 // Export the class
 module.exports = TokenGenerator;
