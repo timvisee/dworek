@@ -29,7 +29,7 @@ var appInfo = require('../appInfo');
 // Status index
 router.get('/', function(req, res, next) {
     res.render('status', {
-        title: 'Application status',
+        title: 'Status',
 
         uptime: Math.round(os.uptime())
     });
