@@ -20,8 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var config = require('../../config');
-var MongoUtil = require('.././MongoUtils');
+var config = require('../../../config');
+var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
  * Constructor.

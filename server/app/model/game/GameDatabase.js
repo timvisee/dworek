@@ -20,7 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var MongoUtil = require('.././MongoUtils');
+var MongoUtil = require('../../mongo/MongoUtils');
 
 // TODO: Fully rename this file from user to game.
 

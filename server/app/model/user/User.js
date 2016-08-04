@@ -22,7 +22,7 @@
 
 var util = require('util');
 var UserDatabase = require('./UserDatabase');
-var DatabaseObjectLayer = require('./.././DatabaseObjectLayer');
+var DatabaseObjectLayer = require('./../../database/DatabaseObjectLayer');
 
 /**
  * Constructor.

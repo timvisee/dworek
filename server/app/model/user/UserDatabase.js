@@ -20,7 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var MongoUtil = require('.././MongoUtils');
+var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
  * Constructor.

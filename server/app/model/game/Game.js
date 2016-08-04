@@ -22,7 +22,9 @@
 
 var util = require('util');
 var GameDatabase = require('./GameDatabase');
-var DatabaseObjectLayer = require('./.././DatabaseObjectLayer');
+var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
+var User = require('../user/User');
+var ObjectId = require('mongodb').ObjectId;
 
 // TODO: Fully rename this file from user to game.
 
@@ -43,19 +45,23 @@ var Game = function(id) {
 
     // Apply the database object layer to this object
     this.layerApply(this, GameDatabase.DB_COLLECTION_NAME, {
-        username: {
-            field: 'username'
+        user: {
+            field: 'user_id',
+            toOutput: function(userId) {
+                return new User(userId);
+            },
+            fromDb: function(userId) {
+                return userId;
+            },
+            toRedis: function(userId) {
+                return userId.toString();
+            },
+            fromRedis: function(userIdHex) {
+                return new ObjectId(userIdHex);
+            }
         },
-        password_hash: {
-            // TODO: Do not automatically cache this!
-            field: 'password_hash',
-            cache: false
-        },
-        full_name: {
-            field: 'full_name'
-        },
-        nickname: {
-            field: 'nickname'
+        name: {
+            field: 'name'
         },
         create_date: {
             field: 'create_date',
