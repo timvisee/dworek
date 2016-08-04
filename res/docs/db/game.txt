@@ -1,0 +1,9 @@
+# game
+# This collection contains all the available games.
+
+# TODO: Not finished.
+
+_id : ID                Game ID.
+user_id : ID            User ID of the user that created this game.
+name : String           Game name.
+create_date : Date      The date and time this game was created on.
