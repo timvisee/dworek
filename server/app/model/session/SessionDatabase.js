@@ -31,7 +31,7 @@ var MongoUtil = require('../../mongo/MongoUtils');
 var SessionDatabase = function() {};
 
 /**
- * Database document name.
+ * Database collection name.
  */
 SessionDatabase.DB_COLLECTION_NAME = 'session';
 

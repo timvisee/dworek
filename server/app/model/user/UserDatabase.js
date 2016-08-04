@@ -30,7 +30,7 @@ var MongoUtil = require('../../mongo/MongoUtils');
 var UserDatabase = function() {};
 
 /**
- * Database document name.
+ * Database collection name.
  */
 UserDatabase.DB_COLLECTION_NAME = 'user';
 
