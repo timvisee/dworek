@@ -22,19 +22,17 @@
 
 var MongoUtil = require('../../mongo/MongoUtils');
 
-// TODO: Fully rename this file from user to game.
-
 /**
  * Constructor.
  *
  * @returns {GameDatabase} GameDatabase instance.
  */
-var UserDatabase = function() {};
+var GameDatabase = function() {};
 
 /**
  * Database collection name.
  */
-UserDatabase.DB_COLLECTION_NAME = 'game';
+GameDatabase.DB_COLLECTION_NAME = 'game';
 
 /**
  * Do a find query on the API token database. Parse the result as an array through a callback.
@@ -43,13 +41,13 @@ UserDatabase.DB_COLLECTION_NAME = 'game';
  * @param b Second find parameter.
  * @param {function} callback (err, data) Callback.
  */
-UserDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
+GameDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
     // Get the database instance
     var db = MongoUtil.getConnection();
 
     // Return some user data
-    db.collection(UserDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
+    db.collection(GameDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
 };
 
 // Export the user database module
-module.exports = UserDatabase;
+module.exports = GameDatabase;

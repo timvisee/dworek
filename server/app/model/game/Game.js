@@ -26,8 +26,6 @@ var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
 var User = require('../user/User');
 var ObjectId = require('mongodb').ObjectId;
 
-// TODO: Fully rename this file from user to game.
-
 /**
  * Constructor.
  *
@@ -75,7 +73,7 @@ var Game = function(id) {
 util.inherits(Game, DatabaseObjectLayer);
 
 /**
- * Get the ID object of the user.
+ * Get the ID object of the game.
  *
  * @returns {ObjectId} Game ID object.
  */
@@ -84,7 +82,7 @@ Game.prototype.getId = function() {
 };
 
 /**
- * Get the hexadecimal ID representation of the user.
+ * Get the hexadecimal ID representation of the game.
  *
  * @returns {*} Game ID as hexadecimal string.
  */
@@ -93,43 +91,25 @@ Game.prototype.getIdHex = function() {
 };
 
 /**
- * Get the username of the user.
+ * Get the user that created this game.
  *
- * @param {function} callback (err, {string} username) Callback with the result.
+ * @param {function} callback ({User} user) Callback with the result.
  */
-Game.prototype.getUsername = function(callback) {
-    this.layerFetchField('username', callback);
+Game.prototype.getUser = function(callback) {
+    this.layerFetchField('user', callback);
 };
 
 /**
- * Get the password hash of the user.
+ * Get the name of the game.
  *
- * @param {function} callback (err, {string} passwordHash) Callback with the result.
+ * @param {function} callback (err, {string} name) Callback with the result.
  */
-Game.prototype.getPasswordHash = function(callback) {
-    this.layerFetchField('password_hash', callback);
+Game.prototype.getName = function(callback) {
+    this.layerFetchField('name', callback);
 };
 
 /**
- * Get the full name of the user.
- *
- * @param {function} callback (err, {string} fullName) Callback with the result.
- */
-Game.prototype.getFullName = function(callback) {
-    this.layerFetchField('full_name', callback);
-};
-
-/**
- * Get the nickname of the user.
- *
- * @param {function} callback (err, {string} nickname) Callback with the result.
- */
-Game.prototype.getNickname = function(callback) {
-    this.layerFetchField('nickname', callback);
-};
-
-/**
- * Get the date this user was created on.
+ * Get the date this game was created on.
  *
  * @param {function} callback (err, {Date} createDate) Callback with the result.
  */
