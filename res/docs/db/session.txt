@@ -1,0 +1,10 @@
+# session
+# This collection contains all login sessions for all users.
+
+_id : ID                Session ID.
+user_id : ID            User ID of the user this session is for.
+token : String          Unique session token.
+create_date : Date      The date and time this session was created on.
+create_ip : String      The IP address this session was first initialized on (should be IP of the user, not the API
+last_use_date : Date    The date and time this session was last used on.
+expire_date : Date      The date and time this session expires on.
