@@ -208,6 +208,12 @@ DatabaseObjectLayer.prototype.layerFetchField = function(fieldName, callback) {
             return;
         }
 
+        // Call back null if the result is null
+        if(result === null) {
+            callback(null, null);
+            return;
+        }
+
         // Call back the data
         callback(null, result[fieldName]);
     });
@@ -361,7 +367,7 @@ DatabaseObjectLayer.prototype.layerFetchFields = function(fieldNames, callback) 
 
                 // Make sure any was returned, if not callback null
                 if(result.length == 0) {
-                    callback(null);
+                    callback(null, null);
                     return;
                 }
 
@@ -393,8 +399,10 @@ DatabaseObjectLayer.prototype.layerFetchFields = function(fieldNames, callback) 
 
                     // Queue the field to be cached in Redis if Redis is ready
                     if(cacheable && RedisUtils.isReady()) {
+                        // FIXME: Inspection: Private member is not accessible
                         DatabaseObjectLayer._LAYER_REDIS_CACHE_QUEUE.push({
                             value: value,
+                            // FIXME: Inspection: Private member is not accessible
                             cacheKey: instance._getCacheKeyField(dbFieldName),
                             parserToRedis: instance._fieldConfig[fieldName].toRedis
                         });

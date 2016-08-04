@@ -54,12 +54,11 @@ UserManager.getUserByUsername = function(username, callback) {
         // Get the user data
         var rawUserData = data[0];
 
-        // Get the user ID
-        // TODO: Should we convert the user ID to a (MongoDB) ObjectId instance
-        var userId = rawUserData._id.toString();
+        // Get the user ID and create an user instance
+        var user = new User(rawUserData._id);
 
         // Get the user and call it back
-        callback(null, new User(userId));
+        callback(null, user);
     });
 };
 
