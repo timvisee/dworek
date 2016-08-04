@@ -134,12 +134,12 @@ App.prototype.startRouter = function() {
 
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
-    this.expressApp.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+    this.expressApp.use(favicon(path.join(__dirname, '..', 'public', 'favicon.ico')));
     this.expressApp.use(logger('dev'));
     this.expressApp.use(bodyParser.json());
     this.expressApp.use(bodyParser.urlencoded({extended: false}));
     this.expressApp.use(cookieParser());
-    this.expressApp.use(express.static(path.join(__dirname, './public')));
+    this.expressApp.use(express.static(path.join(__dirname, '../public')));
 
     // Configuring routes
     console.log("Configuring router...");
