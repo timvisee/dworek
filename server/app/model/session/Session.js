@@ -22,10 +22,10 @@
 
 var util = require('util');
 var SessionDatabase = require('./SessionDatabase');
-var ObjectCache = require('../cache/ObjectCache');
+var ObjectCache = require('.././ObjectCache');
 var User = require('../user/User');
 var ObjectId = require('mongodb').ObjectId;
-var DatabaseObjectLayer = require('./../database/DatabaseObjectLayer');
+var DatabaseObjectLayer = require('./.././DatabaseObjectLayer');
 
 /**
  * Constructor.

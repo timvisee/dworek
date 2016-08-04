@@ -23,18 +23,31 @@
 var express = require('express');
 var router = express.Router();
 
-var appInfo = require('../appInfo');
+var login = require('./login');
+var register = require('./register');
+var about = require('./about');
+var status = require('./status');
 
-// About index
+var appInfo = require('../../appInfo');
+
+// Index page
 router.get('/', function(req, res, next) {
-    res.render('about', {
-        title: 'About',
-
-        // TODO: Always include these parameters, in every page render
-        appName: appInfo.APP_NAME,
-        appVersionName: appInfo.VERSION_NAME,
-        appVersionCode: appInfo.VERSION_CODE
-    });
+  res.render('index', {
+    title: appInfo.APP_NAME,
+    hideBackButton: true
+  });
 });
+
+// Login page
+router.use('/login', login);
+
+// Register page
+router.use('/register', register);
+
+// About page
+router.use('/about', about);
+
+// Status page
+router.use('/status', status);
 
 module.exports = router;

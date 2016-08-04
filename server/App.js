@@ -27,11 +27,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
+var routes = require('./app/routes/index');
 
 var appInfo = require('./appInfo');
-var MongoUtils = require('./model/mongo/MongoUtils');
-var RedisUtils = require('./model/redis/RedisUtils');
+var MongoUtils = require('./app/mongo/MongoUtils');
+var RedisUtils = require('./app/redis/RedisUtils');
 
 /**
  * Constructor.

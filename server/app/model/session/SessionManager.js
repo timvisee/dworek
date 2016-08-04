@@ -24,8 +24,8 @@ var config = require('../../config');
 var SessionDatabase = require('./SessionDatabase');
 var Session = require('./Session');
 var User = require('../user/User');
-var RedisUtil = require('../redis/RedisUtils');
-var TokenGenerator = require('../token/TokenGenerator');
+var RedisUtil = require('.././RedisUtils');
+var TokenGenerator = require('.././TokenGenerator');
 var ObjectId = require('mongodb').ObjectId;
 
 /**

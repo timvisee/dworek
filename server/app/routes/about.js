@@ -20,34 +20,21 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var MongoUtil = require('../mongo/MongoUtils');
+var express = require('express');
+var router = express.Router();
 
-/**
- * Constructor.
- *
- * @returns {UserDatabase} UserDatabase instance.
- */
-var UserDatabase = function() {};
+var appInfo = require('../../appInfo');
 
-/**
- * Database document name.
- */
-UserDatabase.DB_COLLECTION_NAME = 'user';
+// About index
+router.get('/', function(req, res, next) {
+    res.render('about', {
+        title: 'About',
 
-/**
- * Do a find query on the API token database. Parse the result as an array through a callback.
- *
- * @param a First find parameter.
- * @param b Second find parameter.
- * @param {function} callback (err, data) Callback.
- */
-UserDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
-    // Get the database instance
-    var db = MongoUtil.getConnection();
+        // TODO: Always include these parameters, in every page render
+        appName: appInfo.APP_NAME,
+        appVersionName: appInfo.VERSION_NAME,
+        appVersionCode: appInfo.VERSION_CODE
+    });
+});
 
-    // Return some user data
-    db.collection(UserDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
-};
-
-// Export the user database module
-module.exports = UserDatabase;
+module.exports = router;

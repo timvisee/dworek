@@ -22,10 +22,10 @@
 
 var util = require('util');
 var async = require('async');
-var SmartCallback = require('../util/SmartCallback');
+var SmartCallback = require('./SmartCallback');
 var ObjectCache = require('../cache/ObjectCache');
-var MongoUtils = require('../mongo/MongoUtils');
-var RedisUtils = require('../redis/RedisUtils');
+var MongoUtils = require('./MongoUtils');
+var RedisUtils = require('./RedisUtils');
 
 /**
  * Time in seconds for a cached database field to expire.

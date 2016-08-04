@@ -20,34 +20,34 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var express = require('express');
-var router = express.Router();
+var MongoUtil = require('.././MongoUtils');
 
-var login = require('./login');
-var register = require('./register');
-var about = require('./about');
-var status = require('./status');
+/**
+ * Constructor.
+ *
+ * @returns {UserDatabase} UserDatabase instance.
+ */
+var UserDatabase = function() {};
 
-var appInfo = require('../appInfo');
+/**
+ * Database document name.
+ */
+UserDatabase.DB_COLLECTION_NAME = 'user';
 
-// Index page
-router.get('/', function(req, res, next) {
-  res.render('index', {
-    title: appInfo.APP_NAME,
-    hideBackButton: true
-  });
-});
+/**
+ * Do a find query on the API token database. Parse the result as an array through a callback.
+ *
+ * @param a First find parameter.
+ * @param b Second find parameter.
+ * @param {function} callback (err, data) Callback.
+ */
+UserDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
+    // Get the database instance
+    var db = MongoUtil.getConnection();
 
-// Login page
-router.use('/login', login);
+    // Return some user data
+    db.collection(UserDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
+};
 
-// Register page
-router.use('/register', register);
-
-// About page
-router.use('/about', about);
-
-// Status page
-router.use('/status', status);
-
-module.exports = router;
+// Export the user database module
+module.exports = UserDatabase;

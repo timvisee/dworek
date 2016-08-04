@@ -20,19 +20,36 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var express = require('express');
-var router = express.Router();
-var os = require('os');
+var MongoUtil = require('.././MongoUtils');
 
-var appInfo = require('../appInfo');
+// TODO: Fully rename this file from user to game.
 
-// Status index
-router.get('/', function(req, res, next) {
-    res.render('status', {
-        title: 'Status',
+/**
+ * Constructor.
+ *
+ * @returns {GameDatabase} GameDatabase instance.
+ */
+var UserDatabase = function() {};
 
-        uptime: Math.round(os.uptime())
-    });
-});
+/**
+ * Database collection name.
+ */
+UserDatabase.DB_COLLECTION_NAME = 'game';
 
-module.exports = router;
+/**
+ * Do a find query on the API token database. Parse the result as an array through a callback.
+ *
+ * @param a First find parameter.
+ * @param b Second find parameter.
+ * @param {function} callback (err, data) Callback.
+ */
+UserDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
+    // Get the database instance
+    var db = MongoUtil.getConnection();
+
+    // Return some user data
+    db.collection(UserDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
+};
+
+// Export the user database module
+module.exports = UserDatabase;

@@ -21,7 +21,7 @@
  ******************************************************************************/
 
 var config = require('../../config');
-var MongoUtil = require('../mongo/MongoUtils');
+var MongoUtil = require('.././MongoUtils');
 
 /**
  * Constructor.

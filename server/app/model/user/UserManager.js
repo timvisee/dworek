@@ -22,7 +22,7 @@
 
 var UserDatabase = require('./UserDatabase');
 var User = require('./User');
-var HashUtils = require('../hash/HashUtils');
+var HashUtils = require('.././HashUtils');
 
 /**
  * UserManager class.

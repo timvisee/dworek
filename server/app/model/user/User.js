@@ -21,19 +21,17 @@
  ******************************************************************************/
 
 var util = require('util');
-var GameDatabase = require('./GameDatabase');
-var DatabaseObjectLayer = require('./../database/DatabaseObjectLayer');
-
-// TODO: Fully rename this file from user to game.
+var UserDatabase = require('./UserDatabase');
+var DatabaseObjectLayer = require('./.././DatabaseObjectLayer');
 
 /**
  * Constructor.
  *
- * @param {ObjectId} id Game ID object.
+ * @param {ObjectId} id User ID object.
  *
- * @returns {Game} Game instance.
+ * @returns {User} User instance.
  */
-var Game = function(id) {
+var User = function(id) {
     /**
      * Set the API application ID.
      *
@@ -42,7 +40,7 @@ var Game = function(id) {
     this._id = id;
 
     // Apply the database object layer to this object
-    this.layerApply(this, GameDatabase.DB_COLLECTION_NAME, {
+    this.layerApply(this, UserDatabase.DB_COLLECTION_NAME, {
         username: {
             field: 'username'
         },
@@ -66,23 +64,23 @@ var Game = function(id) {
 };
 
 // Inherit the database object layer
-util.inherits(Game, DatabaseObjectLayer);
+util.inherits(User, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the user.
  *
- * @returns {ObjectId} Game ID object.
+ * @returns {ObjectId} User ID object.
  */
-Game.prototype.getId = function() {
+User.prototype.getId = function() {
     return this._id;
 };
 
 /**
  * Get the hexadecimal ID representation of the user.
  *
- * @returns {*} Game ID as hexadecimal string.
+ * @returns {*} User ID as hexadecimal string.
  */
-Game.prototype.getIdHex = function() {
+User.prototype.getIdHex = function() {
     return this.getId().toString();
 };
 
@@ -91,7 +89,7 @@ Game.prototype.getIdHex = function() {
  *
  * @param {function} callback (err, {string} username) Callback with the result.
  */
-Game.prototype.getUsername = function(callback) {
+User.prototype.getUsername = function(callback) {
     this.layerFetchField('username', callback);
 };
 
@@ -100,7 +98,7 @@ Game.prototype.getUsername = function(callback) {
  *
  * @param {function} callback (err, {string} passwordHash) Callback with the result.
  */
-Game.prototype.getPasswordHash = function(callback) {
+User.prototype.getPasswordHash = function(callback) {
     this.layerFetchField('password_hash', callback);
 };
 
@@ -109,7 +107,7 @@ Game.prototype.getPasswordHash = function(callback) {
  *
  * @param {function} callback (err, {string} fullName) Callback with the result.
  */
-Game.prototype.getFullName = function(callback) {
+User.prototype.getFullName = function(callback) {
     this.layerFetchField('full_name', callback);
 };
 
@@ -118,7 +116,7 @@ Game.prototype.getFullName = function(callback) {
  *
  * @param {function} callback (err, {string} nickname) Callback with the result.
  */
-Game.prototype.getNickname = function(callback) {
+User.prototype.getNickname = function(callback) {
     this.layerFetchField('nickname', callback);
 };
 
@@ -127,9 +125,9 @@ Game.prototype.getNickname = function(callback) {
  *
  * @param {function} callback (err, {Date} createDate) Callback with the result.
  */
-Game.prototype.getCreateDate = function(callback) {
+User.prototype.getCreateDate = function(callback) {
     this.layerFetchField('create_date', callback);
 };
 
 // Export the user class
-module.exports = Game;
+module.exports = User;

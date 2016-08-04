@@ -22,7 +22,7 @@
 
 var GameDatabase = require('./GameDatabase');
 var Game = require('./Game');
-var HashUtils = require('../hash/HashUtils');
+var HashUtils = require('.././HashUtils');
 
 // TODO: Fully rename this file from user to game.
 

@@ -25,7 +25,7 @@ var appInfo = require('./appInfo');
 var debug = require('debug')(config.debug.name);
 var http = require('http');
 var App = require('./App');
-var PortUtils = require('./model/util/PortUtils');
+var PortUtils = require('./app/util/PortUtils');
 
 /**
  * Server instance.
