@@ -27,7 +27,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./app/routes/index');
+var routes = require('./app/route/index');
 
 var appInfo = require('./appInfo');
 var MongoUtils = require('./app/mongo/MongoUtils');
@@ -141,7 +141,7 @@ App.prototype.startRouter = function() {
     this.expressApp.use(cookieParser());
     this.expressApp.use(express.static(path.join(__dirname, '../public')));
 
-    // Configuring routes
+    // Configuring route
     console.log("Configuring router...");
 
     // Add application branding in HTTP responses
