@@ -33,7 +33,7 @@ var SessionDatabase = function() {};
 /**
  * Database document name.
  */
-SessionDatabase.DB_DOCUMENT_NAME = 'session';
+SessionDatabase.DB_COLLECTION_NAME = 'session';
 
 /**
  * Add a session to the database.
@@ -56,7 +56,7 @@ SessionDatabase.addSession = function(user, token, ip, callback) {
     var expireDate = new Date(new Date(createDate).setSeconds(createDate.getSeconds() + config.session.expire));
 
     // Insert the session into the database
-    db.collection(SessionDatabase.DB_DOCUMENT_NAME).insert({
+    db.collection(SessionDatabase.DB_COLLECTION_NAME).insert({
         user_id: user.getId(),
         token: token,
         create_date: createDate,
@@ -91,7 +91,7 @@ SessionDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
     var db = MongoUtil.getConnection();
 
     // Return some user data
-    db.collection(SessionDatabase.DB_DOCUMENT_NAME).find(a, b).toArray(callback);
+    db.collection(SessionDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
 };
 
 // Export the session database module

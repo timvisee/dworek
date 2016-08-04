@@ -40,7 +40,7 @@ var User = function(id) {
     this._id = id;
 
     // Apply the database object layer to this object
-    this.layerApply(this, UserDatabase.DB_DOCUMENT_NAME, {
+    this.layerApply(this, UserDatabase.DB_COLLECTION_NAME, {
         username: {
             field: 'username'
         },

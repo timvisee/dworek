@@ -27,12 +27,12 @@ var MongoUtil = require('../mongo/MongoUtils');
  *
  * @returns {UserDatabase} UserDatabase instance.
  */
-var UserDatabase = function() { };
+var UserDatabase = function() {};
 
 /**
  * Database document name.
  */
-UserDatabase.DB_DOCUMENT_NAME = 'user';
+UserDatabase.DB_COLLECTION_NAME = 'user';
 
 /**
  * Do a find query on the API token database. Parse the result as an array through a callback.
@@ -46,7 +46,7 @@ UserDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
     var db = MongoUtil.getConnection();
 
     // Return some user data
-    db.collection(UserDatabase.DB_DOCUMENT_NAME).find(a, b).toArray(callback);
+    db.collection(UserDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
 };
 
 // Export the user database module
