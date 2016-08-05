@@ -38,7 +38,7 @@ SessionDatabase.DB_COLLECTION_NAME = 'session';
 /**
  * Add a session to the database.
  *
- * @param {User} user The user this session is created for.
+ * @param {UserModel} user The user this session is created for.
  * @param {string} token Token.
  * @param {string|null} ip IP of the client that created this session.
  * @param {function} callback (err, {ObjectId} sessionId) Callback.

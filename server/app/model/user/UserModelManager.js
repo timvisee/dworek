@@ -21,24 +21,24 @@
  ******************************************************************************/
 
 var UserDatabase = require('./UserDatabase');
-var User = require('./User');
+var User = require('./UserModel');
 var HashUtils = require('../../hash/HashUtils');
 
 /**
- * UserManager class.
+ * UserModelManager class.
  *
  * @class
  * @constructor
  */
-var UserManager = function() {};
+var UserModelManager = function() {};
 
 /**
  * Get a user by it's username.
  *
  * @param username Username of the user.
- * @param {UserManager~getUserByUsername} callback Callback with the user.
+ * @param {UserModelManager~getUserByUsername} callback Callback with the user.
  */
-UserManager.getUserByUsername = function(username, callback) {
+UserModelManager.getUserByUsername = function(username, callback) {
     // Return some user data
     UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true}, function(err, data) {
         // Pass along errors
@@ -65,7 +65,7 @@ UserManager.getUserByUsername = function(username, callback) {
 /**
  * @callback UserManager~getUserByUsername
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {User|null} User instance, or null if no user was found.
+ * @param {UserModel|null} User instance, or null if no user was found.
  */
 
 /**
@@ -75,9 +75,9 @@ UserManager.getUserByUsername = function(username, callback) {
  *
  * @param username Username of the user.
  * @param password Password of the user. (not hashed)
- * @param {UserManager~getUserByCredentialsCallback} callback Callback with the user, or null if the credentials were invalid.
+ * @param {UserModelManager~getUserByCredentialsCallback} callback Callback with the user, or null if the credentials were invalid.
  */
-UserManager.getUserByCredentials = function(username, password, callback) {
+UserModelManager.getUserByCredentials = function(username, password, callback) {
     // Make sure all fields are given
     if(username === undefined || password === undefined || callback === undefined) {
         // Call the callback with nullif available
@@ -136,8 +136,8 @@ UserManager.getUserByCredentials = function(username, password, callback) {
 /**
  * @callback UserManager~getUserByCredentialsCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {User|null} User instance, or null if no user was found.
+ * @param {UserModel|null} User instance, or null if no user was found.
  */
 
 // Return the created class
-module.exports = UserManager;
+module.exports = UserModelManager;

@@ -22,8 +22,8 @@
 
 var config = require('../../../config');
 var SessionDatabase = require('./SessionDatabase');
-var Session = require('./Session');
-var User = require('../user/User');
+var Session = require('./SessionModel');
+var User = require('../user/UserModel');
 var RedisUtil = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
 var ObjectId = require('mongodb').ObjectId;
@@ -54,7 +54,7 @@ var SessionManager = function() {};
 /**
  * Create a new session for the given user.
  *
- * @param {User} user User this session is created for.
+ * @param {UserModel} user User this session is created for.
  * @param {string} ip IP address of the client.
  * @param {function} callback (err, {ObjectId) [sessionId], {string} [token]) Callback with the result as boolean.
  */
@@ -88,7 +88,7 @@ SessionManager.createSession = function(user, ip, callback) {
  * Get the session by the given session token if the session is valid.
  *
  * @param token The session token.
- * @param {function} callback (err, {Session|null} user) Callback with the session, or null.
+ * @param {function} callback (err, {SessionModel|null} user) Callback with the session, or null.
  */
 SessionManager.getSessionByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
@@ -394,7 +394,7 @@ SessionManager.isAllowedSessionToken = function(token) {
 /**
  * Get all sessions for the given user.
  *
- * @param {User} user User to get the session tokens for.
+ * @param {UserModel} user User to get the session tokens for.
  * @param {function} callback (err, {array} Array of sessions.) Callback with the an array of sessions.
  */
 SessionManager.getUserSessions = function(user, callback) {

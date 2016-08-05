@@ -21,19 +21,18 @@
  ******************************************************************************/
 
 var util = require('util');
-var GameDatabase = require('./GameDatabase');
-var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
-var User = require('../user/User');
-var ObjectId = require('mongodb').ObjectId;
+var UserDatabase = require('./UserDatabase');
+var DatabaseObjectLayer = require('./../../database/DatabaseObjectLayer');
 
 /**
- * Constructor.
+ * UserModel class.
  *
- * @param {ObjectId} id Game ID object.
+ * @class
+ * @constructor
  *
- * @returns {Game} Game instance.
+ * @param {ObjectId} id User ID object.
  */
-var Game = function(id) {
+var UserModel = function(id) {
     /**
      * Set the API application ID.
      *
@@ -42,24 +41,20 @@ var Game = function(id) {
     this._id = id;
 
     // Apply the database object layer to this object
-    this.layerApply(this, GameDatabase.DB_COLLECTION_NAME, {
-        user: {
-            field: 'user_id',
-            toOutput: function(userId) {
-                return new User(userId);
-            },
-            fromDb: function(userId) {
-                return userId;
-            },
-            toRedis: function(userId) {
-                return userId.toString();
-            },
-            fromRedis: function(userIdHex) {
-                return new ObjectId(userIdHex);
-            }
+    this.layerApply(this, UserDatabase.DB_COLLECTION_NAME, {
+        username: {
+            field: 'username'
         },
-        name: {
-            field: 'name'
+        password_hash: {
+            // TODO: Do not automatically cache this!
+            field: 'password_hash',
+            cache: false
+        },
+        full_name: {
+            field: 'full_name'
+        },
+        nickname: {
+            field: 'nickname'
         },
         create_date: {
             field: 'create_date',
@@ -70,52 +65,70 @@ var Game = function(id) {
 };
 
 // Inherit the database object layer
-util.inherits(Game, DatabaseObjectLayer);
+util.inherits(UserModel, DatabaseObjectLayer);
 
 /**
- * Get the ID object of the game.
+ * Get the ID object of the user.
  *
- * @returns {ObjectId} Game ID object.
+ * @returns {ObjectId} User ID object.
  */
-Game.prototype.getId = function() {
+UserModel.prototype.getId = function() {
     return this._id;
 };
 
 /**
- * Get the hexadecimal ID representation of the game.
+ * Get the hexadecimal ID representation of the user.
  *
- * @returns {*} Game ID as hexadecimal string.
+ * @returns {*} User ID as hexadecimal string.
  */
-Game.prototype.getIdHex = function() {
+UserModel.prototype.getIdHex = function() {
     return this.getId().toString();
 };
 
 /**
- * Get the user that created this game.
+ * Get the username of the user.
  *
- * @param {function} callback ({User} user) Callback with the result.
+ * @param {function} callback (err, {string} username) Callback with the result.
  */
-Game.prototype.getUser = function(callback) {
-    this.layerFetchField('user', callback);
+UserModel.prototype.getUsername = function(callback) {
+    this.layerFetchField('username', callback);
 };
 
 /**
- * Get the name of the game.
+ * Get the password hash of the user.
  *
- * @param {function} callback (err, {string} name) Callback with the result.
+ * @param {function} callback (err, {string} passwordHash) Callback with the result.
  */
-Game.prototype.getName = function(callback) {
-    this.layerFetchField('name', callback);
+UserModel.prototype.getPasswordHash = function(callback) {
+    this.layerFetchField('password_hash', callback);
 };
 
 /**
- * Get the date this game was created on.
+ * Get the full name of the user.
+ *
+ * @param {function} callback (err, {string} fullName) Callback with the result.
+ */
+UserModel.prototype.getFullName = function(callback) {
+    this.layerFetchField('full_name', callback);
+};
+
+/**
+ * Get the nickname of the user.
+ *
+ * @param {function} callback (err, {string} nickname) Callback with the result.
+ */
+UserModel.prototype.getNickname = function(callback) {
+    this.layerFetchField('nickname', callback);
+};
+
+/**
+ * Get the date this user was created on.
  *
  * @param {function} callback (err, {Date} createDate) Callback with the result.
  */
-Game.prototype.getCreateDate = function(callback) {
+UserModel.prototype.getCreateDate = function(callback) {
     this.layerFetchField('create_date', callback);
 };
 
 // Export the user class
-module.exports = Game;
+module.exports = UserModel;

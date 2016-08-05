@@ -21,12 +21,12 @@
  ******************************************************************************/
 
 /**
- * GameManager class.
+ * GameModelManager class.
  *
  * @class
  * @constructor
  */
-var GameManager = function() {};
+var GameModelManager = function() {};
 
 // Return the created class
-module.exports = GameManager;
+module.exports = GameModelManager;

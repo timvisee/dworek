@@ -23,7 +23,7 @@
 var util = require('util');
 var SessionDatabase = require('./SessionDatabase');
 var ObjectCache = require('../../cache/ObjectCache');
-var User = require('../user/User');
+var User = require('../user/UserModel');
 var ObjectId = require('mongodb').ObjectId;
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
 
@@ -32,9 +32,9 @@ var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
  *
  * @param {ObjectId} id Session ID object.
  *
- * @returns {Session} Session instance.
+ * @returns {SessionModel} Session instance.
  */
-var Session = function(id) {
+var SessionModel = function(id) {
     /**
      * Set the API application ID.
      *
@@ -84,14 +84,14 @@ var Session = function(id) {
 };
 
 // Inherit the database object layer
-util.inherits(Session, DatabaseObjectLayer);
+util.inherits(SessionModel, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the session.
  *
  * @returns {ObjectId} Session ID object.
  */
-Session.prototype.getId = function() {
+SessionModel.prototype.getId = function() {
     return this._id;
 };
 
@@ -100,7 +100,7 @@ Session.prototype.getId = function() {
  *
  * @returns {*} Session ID as hexadecimal string.
  */
-Session.prototype.getIdHex = function() {
+SessionModel.prototype.getIdHex = function() {
     return this.getId().toString();
 };
 
@@ -109,7 +109,7 @@ Session.prototype.getIdHex = function() {
  *
  * @param {function} callback ({User} user) Callback with the result.
  */
-Session.prototype.getUser = function(callback) {
+SessionModel.prototype.getUser = function(callback) {
     this.layerFetchField('user', callback);
 };
 
@@ -118,7 +118,7 @@ Session.prototype.getUser = function(callback) {
  *
  * @param {function} callback ({string} token) Callback with the result.
  */
-Session.prototype.getToken = function(callback) {
+SessionModel.prototype.getToken = function(callback) {
     this.layerFetchField('token', callback);
 };
 
@@ -127,7 +127,7 @@ Session.prototype.getToken = function(callback) {
  *
  * @param {function} callback ({Date} createDate) Callback with the result.
  */
-Session.prototype.getCreateDate = function(callback) {
+SessionModel.prototype.getCreateDate = function(callback) {
     this.layerFetchField('create_date', callback);
 };
 
@@ -136,7 +136,7 @@ Session.prototype.getCreateDate = function(callback) {
  *
  * @param {function} callback ({string} createIp) Callback with the result.
  */
-Session.prototype.getCreateIp = function(callback) {
+SessionModel.prototype.getCreateIp = function(callback) {
     this.layerFetchField('create_ip', callback);
 };
 
@@ -145,7 +145,7 @@ Session.prototype.getCreateIp = function(callback) {
  *
  * @param {function} callback ({Date} lastUseDate) Callback with the result.
  */
-Session.prototype.getLastUseDate = function(callback) {
+SessionModel.prototype.getLastUseDate = function(callback) {
     // TODO: Make sure this uses the last-usage cache
     this.layerFetchField('last_use_date', callback);
 };
@@ -155,7 +155,7 @@ Session.prototype.getLastUseDate = function(callback) {
  *
  * @param {function} callback ({Date} expireDate) Callback with the result.
  */
-Session.prototype.getExpireDate = function(callback) {
+SessionModel.prototype.getExpireDate = function(callback) {
     this.layerFetchField('expire_date', callback);
 };
 
@@ -166,7 +166,7 @@ Session.prototype.getExpireDate = function(callback) {
  * @param {function} callback (err) Callback.
  */
 // TODO: Create this function.
-Session.prototype.delete = function(callback) {
+SessionModel.prototype.delete = function(callback) {
     // Delete the session from the database
     this.layerDeleteFromDatabase(function(err) {
         // Handle errors
@@ -184,4 +184,4 @@ Session.prototype.delete = function(callback) {
 };
 
 // Return the created class
-module.exports = Session;
+module.exports = SessionModel;
