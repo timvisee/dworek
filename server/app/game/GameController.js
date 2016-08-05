@@ -44,5 +44,23 @@ GameController.prototype.getGameCount = function() {
     return this.games.length;
 };
 
+/**
+ * Load all active games, that aren't loaded yet.
+ *
+ * @param {GameController~loadActiveGamesCallback} [callback] Callback called when done loading.
+ */
+GameController.prototype.loadActiveGames = function(callback) {
+    // TODO: Load all active games here, that aren't loaded yet!
+
+    // Call the callback
+    if(callback !== undefined)
+        callback(null);
+};
+
+/**
+ * @callback GameController~loadActiveGamesCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
 // Export the class
 module.exports = GameController;
