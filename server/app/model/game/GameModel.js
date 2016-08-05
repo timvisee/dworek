@@ -31,9 +31,9 @@ var ObjectId = require('mongodb').ObjectId;
  *
  * @param {ObjectId} id Game ID object.
  *
- * @returns {Game} Game instance.
+ * @returns {GameModel} Game instance.
  */
-var Game = function(id) {
+var GameModel = function(id) {
     /**
      * Set the API application ID.
      *
@@ -70,14 +70,14 @@ var Game = function(id) {
 };
 
 // Inherit the database object layer
-util.inherits(Game, DatabaseObjectLayer);
+util.inherits(GameModel, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the game.
  *
  * @returns {ObjectId} Game ID object.
  */
-Game.prototype.getId = function() {
+GameModel.prototype.getId = function() {
     return this._id;
 };
 
@@ -86,7 +86,7 @@ Game.prototype.getId = function() {
  *
  * @returns {*} Game ID as hexadecimal string.
  */
-Game.prototype.getIdHex = function() {
+GameModel.prototype.getIdHex = function() {
     return this.getId().toString();
 };
 
@@ -95,7 +95,7 @@ Game.prototype.getIdHex = function() {
  *
  * @param {function} callback ({User} user) Callback with the result.
  */
-Game.prototype.getUser = function(callback) {
+GameModel.prototype.getUser = function(callback) {
     this.layerFetchField('user', callback);
 };
 
@@ -104,7 +104,7 @@ Game.prototype.getUser = function(callback) {
  *
  * @param {function} callback (err, {string} name) Callback with the result.
  */
-Game.prototype.getName = function(callback) {
+GameModel.prototype.getName = function(callback) {
     this.layerFetchField('name', callback);
 };
 
@@ -113,9 +113,9 @@ Game.prototype.getName = function(callback) {
  *
  * @param {function} callback (err, {Date} createDate) Callback with the result.
  */
-Game.prototype.getCreateDate = function(callback) {
+GameModel.prototype.getCreateDate = function(callback) {
     this.layerFetchField('create_date', callback);
 };
 
 // Export the user class
-module.exports = Game;
+module.exports = GameModel;
