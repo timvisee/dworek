@@ -97,20 +97,24 @@ Core.isInit = function() {
  *
  * @private
  */
-Core._initGameController = function() {
+Core._initGameController = function(callback) {
     // Initialize the game controller
     Core.gameController = Object.create(GameController);
 
     // Load all active games
-    Core.gameController.loadActiveGames();
+    Core.gameController.loadActiveGames(function(err) {
+        // We're done, call the callback
+        callback(err);
+    });
 };
 
 /**
  * Initialize the express app.
  *
+ * @param {function} callback Called when finished initializing, or when an error occurred.
  * @private
  */
-Core._initExpressApp = function() {
+Core._initExpressApp = function(callback) {
     // Create an Express application instance
     Core.expressApp = express();
 
@@ -178,6 +182,9 @@ Core._initExpressApp = function() {
 
     // Show a status message
     console.log('Router started');
+
+    // We're done, call the callback
+    callback(null);
 };
 
 /**
@@ -188,7 +195,7 @@ Core._initExpressApp = function() {
  */
 Core._initDatabase = function(callback) {
     // Connect to the database
-    MongoUtils.connect(function(err, db) {
+    MongoUtils.connect(function(err) {
         // Handle errors
         if(err != null)
             throw new Error('Failed to connect to MongoDB. Quitting server.');
@@ -197,7 +204,7 @@ Core._initDatabase = function(callback) {
 
         // Callback
         if(callback !== undefined)
-            callback(null, db);
+            callback(null);
     });
 };
 
