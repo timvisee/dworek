@@ -73,6 +73,9 @@ Core.init = function() {
     // Initialize the express application
     this._initExpressApp();
 
+    // Initialize the router
+    this._initRouter();
+
     // Initialize the database
     this._initDatabase();
 
@@ -103,7 +106,7 @@ Core._initGameController = function(callback) {
 
     // Load all active games
     Core.gameController.loadActiveGames(function(err) {
-        // We're done, call the callback
+        // We're done, call back if a callback is defined
         callback(err);
     });
 };
@@ -111,7 +114,7 @@ Core._initGameController = function(callback) {
 /**
  * Initialize the express app.
  *
- * @param {function} callback Called when finished initializing, or when an error occurred.
+ * @param {function} [callback] Called when finished initializing, or when an error occurred.
  * @private
  */
 Core._initExpressApp = function(callback) {
@@ -121,8 +124,18 @@ Core._initExpressApp = function(callback) {
     // Disable express branding in HTTP responses
     Core.expressApp.disable('x-powered-by');
 
-    // TODO: Move the following code to a router class
+    // We're done, call back if a callback is defined
+    if(callback !== undefined)
+        callback(null);
+};
 
+/**
+ * Initialize the router.
+ *
+ * @param {function} [callback] Called when the router has been initialized.
+ * @private
+ */
+Core._initRouter = function(callback) {
     // Show a status message
     console.log('Starting router...');
 
@@ -183,8 +196,9 @@ Core._initExpressApp = function(callback) {
     // Show a status message
     console.log('Router started');
 
-    // We're done, call the callback
-    callback(null);
+    // We're done, call back if a callback is defined
+    if(callback !== undefined)
+        callback(null);
 };
 
 /**
@@ -202,7 +216,7 @@ Core._initDatabase = function(callback) {
 
         // TODO: Retry on connection failure
 
-        // Callback
+        // We're done, call back if a callback is defined
         if(callback !== undefined)
             callback(null);
     });
@@ -217,7 +231,9 @@ Core._initDatabase = function(callback) {
 Core._initRedis = function(callback) {
     // Connect to Redis
     RedisUtils.connect(function(err) {
-        callback(err);
+        // We're done, call back if a callback is defined// We're done, call back if a callback is defined
+        if(callback !== undefined)
+            callback(err);
     });
 };
 
