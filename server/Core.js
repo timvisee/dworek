@@ -22,17 +22,11 @@
 
 var async = require('async');
 var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 
-var appInfo = require('./appInfo');
-var routes = require('./app/route/index');
 var GameController = require('./app/game/GameController');
 var MongoUtils = require('./app/mongo/MongoUtils');
 var RedisUtils = require('./app/redis/RedisUtils');
+var Router = require('./app/router/Router');
 
 /**
  * Core class.
@@ -164,65 +158,8 @@ Core._initExpressApp = function(callback) {
  * @param {function} [callback] Called when the router has been initialized.
  */
 Core._initRouter = function(callback) {
-    // Show a status message
-    console.log('Starting router...');
-
-    // Configure the view engine
-    this.expressApp.set('views', path.join(__dirname, './views'));
-    this.expressApp.set('view engine', 'jade');
-
-    // Configure the favicon
-    // TODO: Configure static all favicons here, instead of the default one
-    this.expressApp.use(favicon(path.join(__dirname, '..', 'public', 'favicon.ico')));
-    this.expressApp.use(logger('dev'));
-    this.expressApp.use(bodyParser.json());
-    this.expressApp.use(bodyParser.urlencoded({extended: false}));
-    this.expressApp.use(cookieParser());
-    this.expressApp.use(express.static(path.join(__dirname, '../public')));
-
-    // Configuring route
-    console.log("Configuring router...");
-
-    // Add application branding in HTTP responses
-    this.expressApp.use(function(req, res, next) {
-        // Set the HTTP X-Powered-By header
-        res.header('X-Powered-By', appInfo.APP_NAME + ' Server/' + appInfo.VERSION_NAME);
-
-        // Route to the next handler
-        next();
-    });
-
-    // Configure the router
-    this.expressApp.use('/', routes);
-
-    // Catch 404 errors, and forward them to the error handler
-    this.expressApp.use(function(req, res, next) {
-        // Create an error, and set the status code
-        var error = new Error('Not Found');
-        error.status = 404;
-
-        // Forward the error
-        next(error);
-    });
-
-    // Store this instance
-    var instance = this;
-
-    // Error handler
-    this.expressApp.use(function(err, req, res, next) {
-        // Determine whether we're in development mode
-        var dev = instance.expressApp.get('env') === 'development';
-
-        // Show an error page, render the stack trace if we're in development mode
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: dev ? err : {}
-        });
-    });
-
-    // Show a status message
-    console.log('Router started');
+    // Initialize the router
+    Router.init();
 
     // We're done, call back if a callback is defined
     if(callback !== undefined)
