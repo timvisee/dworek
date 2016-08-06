@@ -39,14 +39,16 @@ var App = function(init) {
 /**
  * Initialize the application.
  * This will start the application and it's core, initiating things like the database, Redis and the router.
+ *
+ * @param {function} callback Called when finished initializing, or when an error occurred.
  */
-App.prototype.init = function() {
+App.prototype.init = function(callback) {
     // Make sure the core hasn't been initialized yet
     if(Core.isInit())
         return;
 
     // Initialize the core
-    Core.init();
+    Core.init(callback);
 };
 
 // Export the class

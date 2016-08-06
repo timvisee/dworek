@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var async = require('async');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -65,25 +66,56 @@ Core.expressApp = null;
 
 /**
  * Initialize the Core.
+ *
+ * @param {function} initCallback Called when successfully initialized, or when an error occurred.
  */
-Core.init = function() {
-    // Initialize the game controller
-    this._initGameController();
+Core.init = function(initCallback) {
+    // Initialize various components in parallel
+    async.parallel([
+        function(callback) {
+            // Initialize the game controller
+            Core._initGameController(callback)
+        },
 
-    // Initialize the express application
-    this._initExpressApp();
+        function(callback) {
+            // Initialize the express application
+            Core._initExpressApp(callback)
+        },
 
-    // Initialize the router
-    this._initRouter();
+        function(callback) {
+            // Initialize the database
+            Core._initDatabase(callback)
+        },
 
-    // Initialize the database
-    this._initDatabase();
+        function(callback) {
+            // Initialize Redis
+            Core._initRedis(callback)
+        }
 
-    // Initialize Redis
-    this._initRedis();
+    ], function(err) {
+        // Make sure everything went right
+        if(err !== null)
+            initCallback(err);
 
-    // Set the initialization status
-    Core._init = true;
+        // Initialize the router
+        //noinspection JSAccessibilityCheck
+        Core._initRouter(function(err) {
+            // Call back any errors, or throw it if no callback was defined
+            if(err !== null) {
+                if(initCallback !== undefined)
+                    initCallback(err);
+                else
+                    throw err;
+            }
+
+            // Set the initialization status
+            Core._init = true;
+
+            // Call back
+            if(initCallback !== undefined)
+                initCallback(null);
+        });
+    });
 };
 
 /**
@@ -97,12 +129,10 @@ Core.isInit = function() {
 
 /**
  * Initialize the game controller.
- *
- * @private
  */
 Core._initGameController = function(callback) {
     // Initialize the game controller
-    Core.gameController = Object.create(GameController);
+    Core.gameController = new GameController();
 
     // Load all active games
     Core.gameController.loadActiveGames(function(err) {
@@ -115,7 +145,6 @@ Core._initGameController = function(callback) {
  * Initialize the express app.
  *
  * @param {function} [callback] Called when finished initializing, or when an error occurred.
- * @private
  */
 Core._initExpressApp = function(callback) {
     // Create an Express application instance
@@ -133,7 +162,6 @@ Core._initExpressApp = function(callback) {
  * Initialize the router.
  *
  * @param {function} [callback] Called when the router has been initialized.
- * @private
  */
 Core._initRouter = function(callback) {
     // Show a status message
@@ -205,7 +233,6 @@ Core._initRouter = function(callback) {
  * Initialize the database and connect.
  *
  * @param {function} [callback] Called when a connection has been made, or if an error occurred.
- * @private
  */
 Core._initDatabase = function(callback) {
     // Connect to the database
@@ -226,7 +253,6 @@ Core._initDatabase = function(callback) {
  * Initialize Redis and connect.
  *
  * @param {function} [callback] Called when a connection has been made, or if an error occurred.
- * @private
  */
 Core._initRedis = function(callback) {
     // Connect to Redis

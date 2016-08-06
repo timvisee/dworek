@@ -25,6 +25,7 @@ var appInfo = require('./appInfo');
 var debug = require('debug')(config.debug.name);
 var http = require('http');
 var App = require('./App');
+var Core = require('./Core');
 var PortUtils = require('./app/util/PortUtils');
 
 /**
@@ -51,25 +52,26 @@ function init() {
     console.log('Starting ' + appInfo.APP_NAME + ' v' + appInfo.VERSION_NAME + ' (' + appInfo.VERSION_CODE + ')' + '...');
 
     // Initialize the application
-    app.init();
+    app.init(function(err) {
+        // Handle errors
+        if(err !== null)
+            throw err;
 
-    // Start the web server
-    startWebServer();
+        // Start the web server
+        startWebServer();
+    });
 }
 
 /**
  * Start the web server.
  */
 function startWebServer() {
-    // Get the express application
-    var expressApp = app.getExpressApp();
-
     // Set the web listening port
     webPort = PortUtils.normalizePort(config.web.port);
-    expressApp.set('port', webPort);
+    Core.expressApp.set('port', webPort);
 
     // Create the HTTP server
-    server = http.createServer(expressApp);
+    server = http.createServer(Core.expressApp);
 
     // Listen on provided port, on all network interfaces.
     server.listen(webPort);
