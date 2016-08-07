@@ -66,4 +66,3 @@ App.prototype.init = function(callback) {
 
 // Export the class
 module.exports = App;
-

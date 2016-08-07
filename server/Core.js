@@ -27,6 +27,7 @@ var GameController = require('./app/game/GameController');
 var MongoUtils = require('./app/mongo/MongoUtils');
 var RedisUtils = require('./app/redis/RedisUtils');
 var Router = require('./app/router/Router');
+var PathLibrary = require('./PathLibrary');
 
 /**
  * Core class.
@@ -77,6 +78,12 @@ Core.prototype.init = function(initCallback) {
 
     // Initialize various components in parallel
     async.parallel([
+        function(callback) {
+            // Print the library paths, and call back
+            PathLibrary.printPaths();
+            callback(null);
+        },
+
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
         function(callback) {
             // Initialize the game controller

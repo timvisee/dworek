@@ -83,5 +83,15 @@ PathLibrary.getServerPath = function() {
     return this._serverPath;
 };
 
+/**
+ * Print the paths to the console.
+ */
+PathLibrary.printPaths = function() {
+    // Print the base and public directory
+    console.log('Root directory: ' + this.getBasePath());
+    console.log('Server directory: ' + this.getServerPath());
+    console.log('Public directory: ' + this.getPublicPath());
+};
+
 // Export the class
 module.exports = PathLibrary;
