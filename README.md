@@ -3,3 +3,6 @@
 # Dworek
 Create virtual drug labs in real-world locations with your cartel.
 Conquer labs owned by other cartels to become the drug production MVP.
+
+# Development progress
+An overview of the development progress is available at: https://trello.com/b/5Qvorw1e
