@@ -63,20 +63,24 @@ Router.prototype.init = function(callback) {
     // Show a status message
     console.log('Starting router...');
 
-    // TODO: Fix all these horrible relative directories! (../../..)
+    // Determine the base, server and public directory
+    // TODO: Fix the horrible relative directory path! (../../..)
+    const baseDir = path.join(__dirname, '..', '..', '..');
+    const serverDir = path.join(baseDir, 'server');
+    const publicDir = path.join(baseDir, 'public');
 
     // Configure the view engine
-    this._core.expressApp.set('views', path.join(__dirname, '../../views'));
+    this._core.expressApp.set('views', path.join(serverDir, 'views'));
     this._core.expressApp.set('view engine', 'jade');
 
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
-    this._core.expressApp.use(favicon(path.join(__dirname, '..', '..', '..', 'public', 'favicon.ico')));
+    this._core.expressApp.use(favicon(path.join(publicDir, 'favicon.ico')));
     this._core.expressApp.use(logger('dev'));
     this._core.expressApp.use(bodyParser.json());
     this._core.expressApp.use(bodyParser.urlencoded({extended: false}));
     this._core.expressApp.use(cookieParser());
-    this._core.expressApp.use(express.static(path.join(__dirname, '../../../public')));
+    this._core.expressApp.use(express.static(publicDir));
 
     // Configuring route
     console.log("Configuring router...");
