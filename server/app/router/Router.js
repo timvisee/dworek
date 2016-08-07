@@ -36,34 +36,53 @@ var Core = require('../../Core');
  *
  * @class
  * @constructor
+ *
+ * @param {Core} core Core instance.
+ * @param {boolean} [init] True to initialize immediately, false if not.
  */
-var Router = function() {};
+function Router(core, init) {
+    /**
+     * Core instance.
+     *
+     * @type {Core}
+     * @private
+     */
+    this._core = core;
+
+    // Initialize
+    if(init === true)
+        this.init();
+}
 
 /**
  * Initialize the router.
+ *
+ * @param {function} [callback] Called when finished initializing.
  */
-Router.init = function() {
+Router.prototype.init = function(callback) {
     // Show a status message
     console.log('Starting router...');
 
+    // TODO: Fix all these horrible relative directories! (../../..)
+
     // Configure the view engine
-    Core.expressApp.set('views', path.join(__dirname, './views'));
-    Core.expressApp.set('view engine', 'jade');
+    this._core.expressApp.set('views', path.join(__dirname, '../../views'));
+    this._core.expressApp.set('view engine', 'jade');
 
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
-    Core.expressApp.use(favicon(path.join(__dirname, '..', 'public', 'favicon.ico')));
-    Core.expressApp.use(logger('dev'));
-    Core.expressApp.use(bodyParser.json());
-    Core.expressApp.use(bodyParser.urlencoded({extended: false}));
-    Core.expressApp.use(cookieParser());
-    Core.expressApp.use(express.static(path.join(__dirname, '../public')));
+    this._core.expressApp.use(favicon(path.join(__dirname, '..', '..', '..', 'public', 'favicon.ico')));
+    this._core.expressApp.use(logger('dev'));
+    this._core.expressApp.use(bodyParser.json());
+    this._core.expressApp.use(bodyParser.urlencoded({extended: false}));
+    this._core.expressApp.use(cookieParser());
+    this._core.expressApp.use(express.static(path.join(__dirname, '../../../public')));
 
     // Configuring route
     console.log("Configuring router...");
 
     // Add application branding in HTTP responses
-    Core.expressApp.use(function(req, res, next) {
+    this._core.expressApp.use(function(req, res, next) {
         // Set the HTTP X-Powered-By header
         res.header('X-Powered-By', appInfo.APP_NAME + ' Server/' + appInfo.VERSION_NAME);
 
@@ -72,10 +91,10 @@ Router.init = function() {
     });
 
     // Configure the router
-    Core.expressApp.use('/', routes);
+    this._core.expressApp.use('/', routes);
 
     // Catch 404 errors, and forward them to the error handler
-    Core.expressApp.use(function(req, res, next) {
+    this._core.expressApp.use(function(req, res, next) {
         // Create an error, and set the status code
         var error = new Error('Not Found');
         error.status = 404;
@@ -88,9 +107,9 @@ Router.init = function() {
     var instance = this;
 
     // Error handler
-    Core.expressApp.use(function(err, req, res, next) {
+    this._core.expressApp.use(function(err, req, res, next) {
         // Determine whether we're in development mode
-        var dev = instance.expressApp.get('env') === 'development';
+        var dev = instance._core.expressApp.get('env') === 'development';
 
         // Show an error page, render the stack trace if we're in development mode
         res.status(err.status || 500);

@@ -31,6 +31,13 @@ var Core = require('./Core');
  * @param {boolean} [init] True to immediately initialize.
  */
 var App = function(init) {
+    /**
+     * Core instance.
+     *
+     * @type {Core}
+     */
+    this.core = null;
+
     // Initialize
     if(init != undefined && init)
         this.init();
@@ -40,15 +47,21 @@ var App = function(init) {
  * Initialize the application.
  * This will start the application and it's core, initiating things like the database, Redis and the router.
  *
- * @param {function} callback Called when finished initializing, or when an error occurred.
+ * @param {function} [callback] Called when finished initializing, or when an error occurred.
  */
 App.prototype.init = function(callback) {
-    // Make sure the core hasn't been initialized yet
-    if(Core.isInit())
+    // Create a core instance if it hasn't been instantiated yet
+    if(this.core === null)
+        this.core = new Core();
+
+    // Call back if the core is already initialized
+    if(this.core.isInit()) {
+        callback(null);
         return;
+    }
 
     // Initialize the core
-    Core.init(callback);
+    this.core.init(callback);
 };
 
 // Export the class

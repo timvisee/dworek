@@ -68,10 +68,10 @@ function init() {
 function startWebServer() {
     // Set the web listening port
     webPort = PortUtils.normalizePort(config.web.port);
-    Core.expressApp.set('port', webPort);
+    app.core.expressApp.set('port', webPort);
 
     // Create the HTTP server
-    server = http.createServer(Core.expressApp);
+    server = http.createServer(app.core.expressApp);
 
     // Listen on provided port, on all network interfaces.
     server.listen(webPort);
