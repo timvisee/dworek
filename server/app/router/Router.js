@@ -45,9 +45,8 @@ function Router(core, init) {
      * Core instance.
      *
      * @type {Core}
-     * @private
      */
-    this._core = core;
+    this.core = core;
 
     // Initialize
     if(init === true)
@@ -70,23 +69,23 @@ Router.prototype.init = function(callback) {
     const publicDir = path.join(baseDir, 'public');
 
     // Configure the view engine
-    this._core.expressApp.set('views', path.join(serverDir, 'views'));
-    this._core.expressApp.set('view engine', 'jade');
+    this.core.expressApp.set('views', path.join(serverDir, 'views'));
+    this.core.expressApp.set('view engine', 'jade');
 
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
-    this._core.expressApp.use(favicon(path.join(publicDir, 'favicon.ico')));
-    this._core.expressApp.use(logger('dev'));
-    this._core.expressApp.use(bodyParser.json());
-    this._core.expressApp.use(bodyParser.urlencoded({extended: false}));
-    this._core.expressApp.use(cookieParser());
-    this._core.expressApp.use(express.static(publicDir));
+    this.core.expressApp.use(favicon(path.join(publicDir, 'favicon.ico')));
+    this.core.expressApp.use(logger('dev'));
+    this.core.expressApp.use(bodyParser.json());
+    this.core.expressApp.use(bodyParser.urlencoded({extended: false}));
+    this.core.expressApp.use(cookieParser());
+    this.core.expressApp.use(express.static(publicDir));
 
     // Configuring route
     console.log("Configuring router...");
 
     // Add application branding in HTTP responses
-    this._core.expressApp.use(function(req, res, next) {
+    this.core.expressApp.use(function(req, res, next) {
         // Set the HTTP X-Powered-By header
         res.header('X-Powered-By', appInfo.APP_NAME + ' Server/' + appInfo.VERSION_NAME);
 
@@ -95,10 +94,10 @@ Router.prototype.init = function(callback) {
     });
 
     // Configure the router
-    this._core.expressApp.use('/', routes);
+    this.core.expressApp.use('/', routes);
 
     // Catch 404 errors, and forward them to the error handler
-    this._core.expressApp.use(function(req, res, next) {
+    this.core.expressApp.use(function(req, res, next) {
         // Create an error, and set the status code
         var error = new Error('Not Found');
         error.status = 404;
@@ -111,9 +110,9 @@ Router.prototype.init = function(callback) {
     var instance = this;
 
     // Error handler
-    this._core.expressApp.use(function(err, req, res, next) {
+    this.core.expressApp.use(function(err, req, res, next) {
         // Determine whether we're in development mode
-        var dev = instance._core.expressApp.get('env') === 'development';
+        var dev = instance.core.expressApp.get('env') === 'development';
 
         // Show an error page, render the stack trace if we're in development mode
         res.status(err.status || 500);
