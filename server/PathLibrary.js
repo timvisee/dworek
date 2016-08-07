@@ -25,6 +25,8 @@ var path = require('path');
 /**
  * PathLibrary class.
  *
+ * Warning: This class must be updated when the project structure changes, to prevent invalid relative paths.
+ *
  * @class
  * @constructor
  */

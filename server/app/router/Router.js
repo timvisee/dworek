@@ -30,6 +30,7 @@ var bodyParser = require('body-parser');
 var appInfo = require('../../appInfo');
 var routes = require('../route/index');
 var Core = require('../../Core');
+var PathLibrary = require('../../PathLibrary');
 
 /**
  * Router class.
@@ -62,24 +63,21 @@ Router.prototype.init = function(callback) {
     // Show a status message
     console.log('Starting router...');
 
-    // Determine the base, server and public directory
-    // TODO: Fix the horrible relative directory path! (../../..)
-    const baseDir = path.join(__dirname, '..', '..', '..');
-    const serverDir = path.join(baseDir, 'server');
-    const publicDir = path.join(baseDir, 'public');
-
     // Configure the view engine
-    this.core.expressApp.set('views', path.join(serverDir, 'views'));
+    this.core.expressApp.set('views', path.join(PathLibrary.getServerPath(), 'views'));
     this.core.expressApp.set('view engine', 'jade');
+
+    // Get the public path
+    const publicPath = PathLibrary.getPublicPath();
 
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
-    this.core.expressApp.use(favicon(path.join(publicDir, 'favicon.ico')));
+    this.core.expressApp.use(favicon(path.join(publicPath, 'favicon.ico')));
     this.core.expressApp.use(logger('dev'));
     this.core.expressApp.use(bodyParser.json());
     this.core.expressApp.use(bodyParser.urlencoded({extended: false}));
     this.core.expressApp.use(cookieParser());
-    this.core.expressApp.use(express.static(publicDir));
+    this.core.expressApp.use(express.static(publicPath));
 
     // Configuring route
     console.log("Configuring router...");
