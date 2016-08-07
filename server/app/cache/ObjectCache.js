@@ -51,7 +51,7 @@ ObjectCache.prototype.hasCache = function(field) {
  * @param {string} field Field.
  * @returns {*} Cached value.
  */
-ObjectCache.prototype.layerGetLocalCache = function(field) {
+ObjectCache.prototype.getCache = function(field) {
     return this._cache[field];
 };
 
