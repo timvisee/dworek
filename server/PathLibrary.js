@@ -33,11 +33,11 @@ var path = require('path');
 var PathLibrary = function() {};
 
 /**
- * Get the base application path.
+ * Get the root application path.
  *
- * @return {String} Base path.
+ * @return {String} Root path.
  */
-PathLibrary.getBasePath = function() {
+PathLibrary.getRootPath = function() {
     // Return the cached base path if available
     if(this._basePath !== undefined)
         return this._basePath;
@@ -60,7 +60,7 @@ PathLibrary.getPublicPath = function() {
         return this._publicPath;
 
     // Determine the public path
-    this._publicPath = path.join(this.getBasePath(), 'public');
+    this._publicPath = path.join(this.getRootPath(), 'public');
 
     // Return the public path
     return this._publicPath;
@@ -77,7 +77,7 @@ PathLibrary.getServerPath = function() {
         return this._serverPath;
 
     // Determine the server path
-    this._serverPath = path.join(this.getBasePath(), 'server');
+    this._serverPath = path.join(this.getRootPath(), 'server');
 
     // Return the server path
     return this._serverPath;
@@ -88,7 +88,7 @@ PathLibrary.getServerPath = function() {
  */
 PathLibrary.printPaths = function() {
     // Print the base and public directory
-    console.log('Root directory: ' + this.getBasePath());
+    console.log('Root directory: ' + this.getRootPath());
     console.log('Server directory: ' + this.getServerPath());
     console.log('Public directory: ' + this.getPublicPath());
 };
