@@ -179,16 +179,6 @@ BaseModel.prototype.cacheFlush = function(field) {
     this._cache.cacheFlush(field);
 };
 
-
-
-
-
-
-
-
-
-
-
 /**
  * Check whether Redis for the given field is enabled.
  *
@@ -313,16 +303,13 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     // Get the Redis connection instance
     const redis = RedisUtils.getRedis();
 
-    // Store the class instance
-    const instance = this;
-
     // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.to');
+    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
 
     // Convert the value
     if(hasConversionFunction) {
         // Get the conversion function
-        var conversionFunction = instance._modelConfig.fields[field].redis.to;
+        var conversionFunction = this._modelConfig.fields[field].redis.to;
 
         // Convert the value
         value = conversionFunction(value);
