@@ -242,13 +242,13 @@ BaseModel.prototype.redisGetField = function(field, callback) {
     // Get the Redis key
     var key = this.redisGetKey(field);
 
-    // TODO: Get the value from cache
-
     // Get the Redis connection instance
     const redis = RedisUtils.getRedis();
 
+    // Store the class instance
+    const instance = this;
 
-
+    // Fetch the value from Redis
     redis.get(key, function(err, value) {
         // Handle errors
         // TODO: Is it possible to only check for null, and not for undefined?
@@ -261,56 +261,27 @@ BaseModel.prototype.redisGetField = function(field, callback) {
             return;
         }
 
-        // If the value isn't null, return it
-        if(value != null) {
-            // Get the value through the cache getter if configured
-            const cacheGetter = instance._fieldConfig[fieldName].fromRedis;
-            if(cacheGetter != undefined)
-                value = cacheGetter(value);
-
-            // Add the value to the output
-            addOutput(fieldName, value);
-
-            // Resolve the callback
-            callbackLatch.resolve();
+        // Call back if the value is null
+        if(value === null) {
+            callback(null, value);
             return;
         }
 
-        // Unable to retrieve data from cache, get it form the database
-        execDbQuery = dbFindProjection[dbFieldName] = true;
-
-        // Resolve the callback
-        callbackLatch.resolve();
-    });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.from');
-
-    // Convert the value
-    if(hasConversionFunction) {
-        // Get the conversion function
-        var conversionFunction = this._modelConfig.fields[field].redis.from;
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.from');
 
         // Convert the value
-        value = conversionFunction(value);
-    }
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = instance._modelConfig.fields[field].redis.from;
 
-    // Return the result value
-    return value;
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Call back the value
+        callback(null, value);
+    });
 };
 
 
