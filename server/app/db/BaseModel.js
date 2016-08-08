@@ -288,8 +288,24 @@ BaseModel.prototype.redisGetField = function(field, callback) {
  * Called when a field value is fetched from Redis, or if an error occurred.
  *
  * @callback BaseModel~redisGetFieldCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Error|null} Error instance if an error occurred, null on success.
  * @param {*} Field value, or undefined if failed to fetch the field.
+ */
+
+/**
+ * Set a field value in Redis.
+ *
+ * @param {string} field Name of the field.
+ * @param {*} value Value of the field.
+ * @param {BaseModel~redisSetFieldCallback} callback Called when the value is set, or when an error occurred.
+ */
+BaseModel.prototype.redisSetField = function(field, value, callback) { };
+
+/**
+ * Called when the value is set, or when an error occurred.
+ *
+ * @callback BaseModel~redisSetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
 // Export the class
