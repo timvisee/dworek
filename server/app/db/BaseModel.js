@@ -171,7 +171,7 @@ BaseModel.prototype.cacheHasField = function(field) {
 
 /**
  * Flush the cached fields.
- * If a field name is given, only that specific field is flushed.
+ * If a field name is given, only that specific field is flushed if it exists.
  *
  * @param {String} [field=undefined] Name of the field to flush, undefined to flush all cache.
  */
@@ -210,7 +210,7 @@ BaseModel.prototype.redisGetKeyRoot = function() {
  *
  * @param {string} field Name of the field.
  *
- * @return {string} Redis key for the given field.
+s * @return {string} Redis key for the given field.
  */
 BaseModel.prototype.redisGetKey = function(field) {
     return this.redisGetKeyRoot() + ':' + field;
@@ -360,6 +360,24 @@ BaseModel.prototype.redisHasField = function(field, callback) {
         callback(null, result === 1);
     });
 };
+
+/**
+ * Flush the fields from Redis.
+ * If a field name is given, only that specific field is flushed if it exists.
+ *
+ * @param {String} [field=undefined] Name of the field to flush, undefined to flush all fields in Redis.
+ * @param {BaseModel~redisFlushCallback} callback Called when the fields are flushed, or when an error occurred.
+ */
+BaseModel.prototype.redisFlush = function(field, callback) {
+
+};
+
+/**
+ * Called when the fields are flushed, or when an error occurred.
+ *
+ * @callback BaseModel~redisFlushCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Called with the result, or when an error occurred.
