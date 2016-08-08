@@ -330,6 +330,46 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
 };
 
 /**
+ * Check whether the given field is available in Redis.
+ *
+ * @param {String} field Name of the field.
+ * @param {BaseModel~redisHasFieldCallback} callback Called with the result, or when an error occurred.
+ *
+ * @return {boolean} True if the field is in Redis, false if not.
+ */
+BaseModel.prototype.redisHasField = function(field, callback) {
+    // Return false if Redis isn't enabled for this field
+    if(!this.redisIsFieldEnabled(field))
+        return false;
+
+    // Get the Redis key
+    var key = this.redisGetKey(field);
+
+    // Get the Redis connection instance
+    var redis = RedisUtils.getRedis();
+
+    // Check whether the field is available in Redis
+    redis.exists(key, function(err, result) {
+        // Call back if an error occurred
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back with the result
+        callback(null, result === 1);
+    });
+};
+
+/**
+ * Called with the result, or when an error occurred.
+ *
+ * @callback BaseModel~redisHasFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} The result, true if Redis has the field, false if not.
+ */
+
+/**
  * Called when the value is set, or when an error occurred.
  *
  * @callback BaseModel~redisSetFieldCallback
