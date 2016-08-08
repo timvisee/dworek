@@ -230,7 +230,7 @@ BaseModel.prototype.redisGetKey = function(field) {
  * Get a field from Redis.
  *
  * @param {String} field Name of the field.
- * @param {function} callback Called when the value is fetched, or when an error occurred.
+ * @param {BaseModel~redisGetFieldCallback} callback Called when the value is fetched, or when an error occurred.
  */
 BaseModel.prototype.redisGetField = function(field, callback) {
     // Return undefined if Redis is disabled for this field
@@ -284,6 +284,13 @@ BaseModel.prototype.redisGetField = function(field, callback) {
     });
 };
 
+/**
+ * Called when a field value is fetched from Redis, or if an error occurred.
+ *
+ * @callback BaseModel~redisGetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*} Field value, or undefined if failed to fetch the field.
+ */
 
 // Export the class
 module.exports = BaseModel;
