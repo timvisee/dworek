@@ -22,10 +22,10 @@
 
 var util = require('util');
 var async = require('async');
-var SmartCallback = require('./SmartCallback');
+var SmartCallback = require('../util/SmartCallback');
 var ObjectCache = require('../cache/ObjectCache');
-var MongoUtils = require('./MongoUtils');
-var RedisUtils = require('./RedisUtils');
+var MongoUtils = require('../mongo/MongoUtils');
+var RedisUtils = require('../redis/RedisUtils');
 
 /**
  * Time in seconds for a cached database field to expire.
@@ -335,7 +335,7 @@ DatabaseObjectLayer.prototype.layerFetchFields = function(fieldNames, callback) 
             });
 
         } else
-            // Add the field to the database find query
+        // Add the field to the database find query
             execDbQuery = dbFindProjection[dbFieldName] = true;
 
         // Finish the iteration
@@ -418,9 +418,282 @@ DatabaseObjectLayer.prototype.layerFetchFields = function(fieldNames, callback) 
             });
 
         } else
-            // Callback the output
+        // Callback the output
             callback(null, out);
     });
+};
+
+/**
+ * TODO: Update this description!
+ *
+ * Fetch the value for the given field. Proper caching is handled automatically.
+ *
+ * The value will be fetched from all cache stacks it's available in, this is to reduce performance and processing time.
+ * The field fetched from the database are cached dynamically in the best suitable cache stack to improve performance for
+ * later usage. The cache stack that is used will be determined by the head of the field within a given period
+ * of time.
+ *
+ * Data that is frequently requested and/or updated will have a great performance benefit. Fetching the data through
+ * this method well be more than 10 times faster than a single database call for frequent usage.
+ *
+ * Cache stacks that are unavailable at the moment of execution will be ignored. If all cache stacks are offline,
+ * we'll fall back to the database.
+ *
+ * @param {String} fieldName Name of the field to get as configured.
+ * @param {*} fieldValue Value of the field.
+ * @param {function} [callback] (err) Called when the value has been set, or when an error occurred.
+ *
+ * @protected
+ */
+DatabaseObjectLayer.prototype.layerSetField = function(fieldName, fieldValue, callback) {
+    // Create a data object containing the field name and value
+    var data = {};
+    data[fieldName] = fieldValue;
+
+    // Set the actual field, call back the result
+    this.layerSetFields(data, callback);
+};
+
+/**
+ * TODO: Update this description!
+ *
+ * Fetch the values for the given list of fields. Proper caching is handled automatically.
+ *
+ * The values will be fetched from all cache stacks it's available in, this is to reduce performance and processing time.
+ * Fields fetched from the database are cached dynamically in the best suitable cache stack to improve performance for
+ * later usage. The cache stack that is used will be determined by the head of the field within a given period of time.
+ *
+ * Data that is frequently requested and/or updated will have a great performance benefit. Fetching the data through
+ * this method well be more than 10 times faster than a single database call for frequent usage.
+ *
+ * Cache stacks that are unavailable at the moment of execution will be ignored. If all cache stacks are offline,
+ * we'll fall back to the database.
+ *
+ * @param {Object} data Object with the fields and values to set.
+ * @param {function} callback (err) Called when the values have been set, or when an error occurred.
+ *
+ * @protected
+ */
+DatabaseObjectLayer.prototype.layerSetFields = function(data, callback) {
+    // Get the field names
+    var fieldNames = Object.keys(data);
+
+    // Return immediately if no keys are configured
+    if(fieldNames.length === 0) {
+        callback(null);
+        return;
+    }
+
+    // Make sure the fields are valid
+    if(!this.layerHasFields(fieldNames))
+        throw new Error('Unknown database field, field is not configured!');
+
+    // Store the current instance, create a callback latch and get the redis instance
+    const instance = this;
+    const redis = RedisUtils.getRedis();
+    const callbackLatch = new SmartCallback();
+
+    // Create an object with field to database field translations
+    var dbFieldNames = {};
+    fieldNames.forEach(function(field) {
+        dbFieldNames[field] = instance._fieldConfig.field || field;
+    });
+
+    // TODO: Create a list of database field names (use the above variable).
+
+    // TODO: Update the value in cache, but only if the values should be cached!
+    // // Loop through all requested field names in parallel
+    // callbackLatch.add();
+    // async.forEachOf(data, function(fieldName, i, finishIteration) {
+    //     // Get the custom field name if configured, use the same field name otherwise
+    //     //noinspection JSUnresolvedVariable
+    //     var dbFieldName = instance._fieldConfig[fieldName].field || fieldName;
+    //
+    //     // Push the field name into the field names array
+    //     dbFieldNames[i] = dbFieldName;
+    //
+    //     // If the value is cached, add it to the output.
+    //     // TODO: Should we also make this configurable, to ensure we aren't caching passwords?
+    //     if(instance._localCache.hasCache(dbFieldName)) {
+    //         // Add it to the output
+    //         addOutput(fieldName, instance._localCache.layerGetLocalCache(dbFieldName));
+    //
+    //         // Finish the iteration
+    //         finishIteration();
+    //         return;
+    //     }
+    //
+    //     // Check whether this field can be cached with Redis
+    //     var cacheable = instance._fieldConfig[fieldName].cache;
+    //     if(cacheable == undefined)
+    //         cacheable = true;
+    //
+    //     // Try to fetch the data from Redis cache if ready and if the field is cacheable
+    //     if(cacheable && RedisUtils.isReady()) {
+    //         // Add a callback
+    //         callbackLatch.add();
+    //
+    //         // Get the cached value if available
+    //         // FIXME: Inspection: Private member is not accessible
+    //         redis.get(instance._getCacheKeyField(dbFieldName), function(err, value) {
+    //             // Handle errors
+    //             if(err != undefined) {
+    //                 // Print the error to the console
+    //                 console.warn('Redis error: ' + err);
+    //
+    //                 // Route the error
+    //                 callback(err);
+    //                 return;
+    //             }
+    //
+    //             // If the value isn't null, return it
+    //             if(value != null) {
+    //                 // Get the value through the cache getter if configured
+    //                 const cacheGetter = instance._fieldConfig[fieldName].fromRedis;
+    //                 if(cacheGetter != undefined)
+    //                     value = cacheGetter(value);
+    //
+    //                 // Add the value to the output
+    //                 addOutput(fieldName, value);
+    //
+    //                 // Resolve the callback
+    //                 callbackLatch.resolve();
+    //                 return;
+    //             }
+    //
+    //             // Unable to retrieve data from cache, get it form the database
+    //             execDbQuery = dbFindProjection[dbFieldName] = true;
+    //
+    //             // Resolve the callback
+    //             callbackLatch.resolve();
+    //         });
+    //
+    //     } else
+    //         // Add the field to the database find query
+    //         execDbQuery = dbFindProjection[dbFieldName] = true;
+    //
+    //     // Finish the iteration
+    //     finishIteration();
+    //
+    // }, function() {
+    //     // Resolve the callback
+    //     callbackLatch.resolve();
+    // });
+
+    var dbData = {};
+
+    // Loop through all field names in parallel
+    async.forEachOf(data, function(value, key, finishIteration) {
+        // Get the database field name for this property
+        var dbFieldName = dbFieldNames[key];
+
+        // Parse it with the database parser if configured
+        const dbParser = instance._fieldConfig[key].fromDb;
+        if(dbParser != null)
+            value = dbParser(value);
+
+        // Add the value to the output
+        addOutput(fieldName, value);
+
+        // TODO: Store the value in local cache?
+
+        // Check whether this field can be cached with Redis
+        var cacheable = instance._fieldConfig[fieldName].cache;
+        if(cacheable == undefined)
+            cacheable = true;
+
+        // Queue the field to be cached in Redis if Redis is ready
+        if(cacheable && RedisUtils.isReady()) {
+            // FIXME: Inspection: Private member is not accessible
+            DatabaseObjectLayer._LAYER_REDIS_CACHE_QUEUE.push({
+                value: value,
+                // FIXME: Inspection: Private member is not accessible
+                cacheKey: instance._getCacheKeyField(dbFieldName),
+                parserToRedis: instance._fieldConfig[fieldName].toRedis
+            });
+        }
+
+        // Finish the iteration
+        finishIteration();
+
+    }, function() {
+        // Callback the output
+        callback(null, out);
+    });
+
+
+
+    //
+    callbackLatch.then(function() {
+        // Construct the find query
+        //noinspection JSUnresolvedFunction
+        const dbFindQuery = {
+            _id: instance.getId()
+        };
+
+        // Create the update object
+        const updateObject = {
+            $set: data
+        };
+
+        // TODO: Translate all data to make it compatible with the database!
+
+        // Execute the database update query
+        DatabaseObjectLayer.layerSetFieldsToDatabase(instance._dbCollectionName, dbFindQuery, updateObject, function(err) {
+            // Handle errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the fetched data for this object
+            var data = result[0];
+
+            // Loop through all field names in parallel
+            async.forEachOf(data, function(fieldName, i, finishIteration) {
+                // Get the database field name for this property
+                var dbFieldName = dbFieldNames[i];
+
+                // Get the raw database value
+                var value = data[dbFieldName];
+
+                // Parse it with the database parser if configured
+                const dbParser = instance._fieldConfig[fieldName].fromDb;
+                if(dbParser != null)
+                    value = dbParser(value);
+
+                // Add the value to the output
+                addOutput(fieldName, value);
+
+                // TODO: Store the value in local cache?
+
+                // Check whether this field can be cached with Redis
+                var cacheable = instance._fieldConfig[fieldName].cache;
+                if(cacheable == undefined)
+                    cacheable = true;
+
+                // Queue the field to be cached in Redis if Redis is ready
+                if(cacheable && RedisUtils.isReady()) {
+                    // FIXME: Inspection: Private member is not accessible
+                    DatabaseObjectLayer._LAYER_REDIS_CACHE_QUEUE.push({
+                        value: value,
+                        // FIXME: Inspection: Private member is not accessible
+                        cacheKey: instance._getCacheKeyField(dbFieldName),
+                        parserToRedis: instance._fieldConfig[fieldName].toRedis
+                    });
+                }
+
+                // Finish the iteration
+                finishIteration();
+
+            }, function() {
+                // Callback the output
+                callback(null, out);
+            });
+        });
+    });
+
+    // TODO: Update cache!
 };
 
 /**
@@ -475,6 +748,28 @@ DatabaseObjectLayer.layerFetchFieldsFromDatabase = function(collectionName, quer
 
     // Return some user data
     db.collection(collectionName).find(query, projection).toArray(callback);
+};
+
+/**
+ * Do an update query on the database collection.
+ *
+ * @param {string} collectionName Database collection name.
+ * @param {object} query MongoDB query parameter.
+ * @param {object} update MongoDB update parameter.
+ * @param {function} callback (err) Callback.
+ *
+ * @protected
+ */
+// TODO: Move this to a global database objects class
+DatabaseObjectLayer.layerSetFieldsToDatabase = function(collectionName, query, update, callback) {
+    // Get the database instance
+    var db = MongoUtils.getConnection();
+
+    // Return some user data
+    db.collection(collectionName).updateOne(query, update, function(err, results) {
+        // Call back
+        callback(err);
+    });
 };
 
 /**
