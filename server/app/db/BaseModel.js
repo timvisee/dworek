@@ -294,12 +294,53 @@ BaseModel.prototype.redisGetField = function(field, callback) {
 
 /**
  * Set a field value in Redis.
+ * The field won't be set if Redis is disabled for this field, the success callback is called in that case.
  *
  * @param {string} field Name of the field.
  * @param {*} value Value of the field.
  * @param {BaseModel~redisSetFieldCallback} callback Called when the value is set, or when an error occurred.
  */
-BaseModel.prototype.redisSetField = function(field, value, callback) { };
+BaseModel.prototype.redisSetField = function(field, value, callback) {
+    // Return undefined if Redis is disabled for this field
+    if(!this.redisIsFieldEnabled(field)) {
+        callback(null);
+        return;
+    }
+
+    // Get the Redis key
+    var key = this.redisGetKey(field);
+
+    // Get the Redis connection instance
+    const redis = RedisUtils.getRedis();
+
+    // Store the class instance
+    const instance = this;
+
+    // Check whether a conversion function is configured
+    var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.to');
+
+    // Convert the value
+    if(hasConversionFunction) {
+        // Get the conversion function
+        var conversionFunction = instance._modelConfig.fields[field].redis.to;
+
+        // Convert the value
+        value = conversionFunction(value);
+    }
+
+    // Set the value
+    redis.set(key, value, function(err) {
+        // Call back if an error occurred
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Configure the expiration time of the field in Redis
+        //noinspection JSValidateTypes
+        redis.expire(key, CACHE_FIELD_EXPIRE, (err) => callback(err));
+    });
+};
 
 /**
  * Called when the value is set, or when an error occurred.
