@@ -426,11 +426,8 @@ BaseModel.prototype.redisFlush = function(field, callback) {
             return;
         }
 
-        // Create a query for the keys to delete
-        var keyQuery = keys.join(' ');
-
         // Delete the keys from Redis
-        redis.del(keyQuery, function(err, reply) {
+        redis.del(keys, function(err, reply) {
             // Call back if an error occurred
             if(err !== null) {
                 callback(err, 0);
