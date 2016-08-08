@@ -316,7 +316,6 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     }
 
     // Set the value
-    // TODO: Should we also take the reply callback parameter in account?
     redis.set(key, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
