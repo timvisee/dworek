@@ -316,6 +316,7 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     }
 
     // Set the value
+    // TODO: Should we also take the reply callback parameter in account?
     redis.set(key, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
@@ -349,7 +350,7 @@ BaseModel.prototype.redisHasField = function(field, callback) {
     var redis = RedisUtils.getRedis();
 
     // Check whether the field is available in Redis
-    redis.exists(key, function(err, result) {
+    redis.exists(key, function(err, reply) {
         // Call back if an error occurred
         if(err !== null) {
             callback(err);
@@ -357,9 +358,17 @@ BaseModel.prototype.redisHasField = function(field, callback) {
         }
 
         // Call back with the result
-        callback(null, result === 1);
+        callback(null, reply === 1);
     });
 };
+
+/**
+ * Called with the result, or when an error occurred.
+ *
+ * @callback BaseModel~redisHasFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} The result, true if Redis has the field, false if not.
+ */
 
 /**
  * Flush the fields from Redis.
@@ -369,7 +378,69 @@ BaseModel.prototype.redisHasField = function(field, callback) {
  * @param {BaseModel~redisFlushCallback} callback Called when the fields are flushed, or when an error occurred.
  */
 BaseModel.prototype.redisFlush = function(field, callback) {
+    // Get the Redis instance
+    var redis = RedisUtils.getRedis();
 
+    // Create a latch
+    var latch = new SmartCallback();
+
+    // Create an array of keys to delete
+    var keys = [];
+
+    // Add a latch to fetch the list of keys to delete
+    latch.add();
+
+    // Flush a specific field if a field is given
+    if(field !== undefined && field !== null) {
+        // Get the Redis key, and put it in the keys array
+        keys.push(this.redisGetKey(field));
+
+        // Resolve the latch
+        latch.resolve();
+
+    } else {
+        // Get the base wildcard key for this model object
+        var baseWildcardKey = this.redisGetKeyRoot() + ':*';
+
+        // Fetch all keys for this model object
+        redis.keys(baseWildcardKey, function(err, replyKeys) {
+            // Call back if an error occurred
+            if(err !== null) {
+                callback(null, 0);
+                return;
+            }
+
+            // Add the fetched keys to the keys array
+            keys.concat(replyKeys);
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
+
+    // Delete the keys after the keys that have to be deleted are fetched
+    latch.then(function() {
+        // Call back if there are no keys to delete
+        if(keys.length === 0) {
+            callback(null, 0);
+            return;
+        }
+
+        // Create a query for the keys to delete
+        var keyQuery = keys.join(' ');
+
+        // Delete the keys from Redis
+        redis.del(keyQuery, function(err, reply) {
+            // Call back if an error occurred
+            if(err !== null) {
+                callback(err, 0);
+                return;
+            }
+
+            // Call back with the result
+            callback(null, reply);
+        });
+    });
 };
 
 /**
@@ -377,14 +448,7 @@ BaseModel.prototype.redisFlush = function(field, callback) {
  *
  * @callback BaseModel~redisFlushCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
- */
-
-/**
- * Called with the result, or when an error occurred.
- *
- * @callback BaseModel~redisHasFieldCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {boolean=} The result, true if Redis has the field, false if not.
+ * @param {Number} Number of keys that were deleted from Redis.
  */
 
 /**
