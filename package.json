@@ -30,6 +30,8 @@
 
     "bcrypt": "0.8.5",
 
-    "websocket": "1.0.23"
+    "websocket": "1.0.23",
+
+    "lodash": "4.14.1"
   }
 }
