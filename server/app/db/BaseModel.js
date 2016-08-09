@@ -208,17 +208,57 @@ BaseModel.prototype.mongoSetField = function(field, value, callback) {
  */
 
 /**
- * TODO: Is this required when using MongoDB?
+ * TODO: Untested function.
  *
  * Check whether the given field is in MongoDB.
  *
  * @param {String} field Field name.
+ * @param {BaseModel~mongoHasFieldCallback} callback Called with the result, or when an error occurred.
  *
  * @return {boolean} True if the field is in MongoDB, false if not.
  */
-BaseModel.prototype.mongoHasField = function(field) {
-    // TODO: Create function body!
+BaseModel.prototype.mongoHasField = function(field, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Get the MongoDB field name
+    var mongoField = field;
+    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
+        mongoField = this._modelConfig.fields[field].mongo.field || field;
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+    queryObject[mongoField] = {
+        $exists: true
+    };
+
+    // Create the projection object
+    var projectionObject = {
+        _id: true
+    };
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err), false);
+            return;
+        }
+
+        // Determine and return the result
+        callback(null, data.length > 0);
+    });
 };
+
+/**
+ * Called with the result, or when an error occurred.
+ *
+ * @callback BaseModel~mongoHasFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the field exists, false if not.
+ */
 
 /**
  * TODO: Should flushing all the fields delete the model document from MongoDB?
