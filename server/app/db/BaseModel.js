@@ -261,16 +261,72 @@ BaseModel.prototype.mongoHasField = function(field, callback) {
  */
 
 /**
- * TODO: Should flushing all the fields delete the model document from MongoDB?
+ * TODO: Untested function.
  *
  * Flush fields from MongoDB.
  * If a field name is given, only that specific field is flushed if it exists.
  *
  * @param {String} [field=undefined] Name of the field to flush, undefined to flush all the fields.
+ * @param {BaseModel~mongoFlushCallback} callback Called on success, or when an error occurred.
  */
-BaseModel.prototype.mongoFlush = function(field) {
-    // TODO: Create function body!
+BaseModel.prototype.mongoFlush = function(field, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+
+    // Check whether to delete the whole document for this model object
+    if(field === undefined) {
+        // Delete the document
+        // Delete the document from MongoDB
+        mongo.collection(this._modelConfig.db.collection).deleteOne(queryObject, function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(new Error(err));
+                return;
+            }
+
+            // Call back with success
+            callback(null);
+        });
+
+        return;
+    }
+
+    // Delete a specific field
+    // Get the MongoDB field name
+    var mongoField = field;
+    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
+        mongoField = this._modelConfig.fields[field].mongo.field || field;
+
+    // Create the update object
+    var updateObject = {
+        $unset: {}
+    };
+    updateObject.$unset[mongoField] = '';
+
+    // Delete the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject, function(err) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err));
+            return;
+        }
+
+        // Call back with success
+        callback(null);
+    });
 };
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback BaseModel~mongoFlushCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Check whether cache for the given field is enabled.
