@@ -78,6 +78,54 @@ var BaseModel = function(instance, modelConfig) {
 };
 
 /**
+ * TODO: What is returned if the field isn't available? undefined?
+ *
+ * Get a field from MongoDB.
+ *
+ * @param {String} field Name of the field.
+ *
+ * @return {*} Field value.
+ */
+BaseModel.prototype.mongoGetField = function(field) {
+    // TODO: Create function body!
+};
+
+/**
+ * Set a field in MongoDB.
+ *
+ * @param {String} field Name of the field.
+ * @param {*} value Field value.
+ */
+BaseModel.prototype.mongoSetField = function(field, value) {
+    // TODO: Create function body!
+};
+
+/**
+ * TODO: Is this required when using MongoDB?
+ *
+ * Check whether the given field is in MongoDB.
+ *
+ * @param {String} field Field name.
+ *
+ * @return {boolean} True if the field is in MongoDB, false if not.
+ */
+BaseModel.prototype.mongoHasField = function(field) {
+    // TODO: Create function body!
+};
+
+/**
+ * TODO: Should flushing all the fields delete the model document from MongoDB?
+ *
+ * Flush fields from MongoDB.
+ * If a field name is given, only that specific field is flushed if it exists.
+ *
+ * @param {String} [field=undefined] Name of the field to flush, undefined to flush all the fields.
+ */
+BaseModel.prototype.mongoFlush = function(field) {
+    // TODO: Create function body!
+};
+
+/**
  * Check whether cache for the given field is enabled.
  *
  * @param {string} field Field name.
@@ -123,7 +171,6 @@ BaseModel.prototype.cacheGetField = function(field) {
     // Return the result value
     return value;
 };
-
 
 /**
  * Set a field in cache.
