@@ -98,16 +98,16 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
         mongoField = this._modelConfig.fields[field].mongo.field || field;
 
     // Create the query object
-    var query = {
+    var queryObject = {
         _id: this._instance.getId()
     };
 
     // Create the projection object
-    var projection = {};
-    projection[mongoField] = true;
+    var projectionObject = {};
+    projectionObject[mongoField] = true;
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(query, projection).toArray(function(err, data) {
+    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err), undefined);
@@ -153,10 +153,59 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
  *
  * @param {String} field Name of the field.
  * @param {*} value Field value.
+ * @param {BaseModel~mongoSetFieldCallback} callback Called when the value is set, or if an error occurred.
  */
-BaseModel.prototype.mongoSetField = function(field, value) {
-    // TODO: Create function body!
+BaseModel.prototype.mongoSetField = function(field, value, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Check whether a conversion function is configured
+    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.mongo.to');
+
+    // Convert the value
+    if(hasConversionFunction) {
+        // Get the conversion function
+        var conversionFunction = this._modelConfig.fields[field].mongo.to;
+
+        // Convert the value
+        value = conversionFunction(value);
+    }
+
+    // Get the MongoDB field name
+    var mongoField = field;
+    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
+        mongoField = this._modelConfig.fields[field].mongo.field || field;
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+
+    // Create the update object
+    var updateObject = {
+        $set: {}
+    };
+    updateObject.$set[mongoField] = value;
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject).toArray(function(err) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err));
+            return;
+        }
+
+        // Call back with success
+        callback(null);
+    });
 };
+
+/**
+ * Called when the value is set, or if an error occurred.
+ *
+ * @callback BaseModel~mongoSetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * TODO: Is this required when using MongoDB?
