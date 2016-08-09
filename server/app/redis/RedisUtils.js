@@ -129,7 +129,7 @@ RedisUtils.connect = function(callback) {
  *
  * @returns {RedisClient} RedisClient instance.
  */
-RedisUtils.getRedis = function() {
+RedisUtils.getConnection = function() {
     return redisClient;
 };
 

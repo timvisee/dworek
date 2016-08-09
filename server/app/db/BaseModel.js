@@ -280,7 +280,7 @@ BaseModel.prototype.redisGetField = function(field, callback) {
     var key = this.redisGetKey(field);
 
     // Get the Redis connection instance
-    const redis = RedisUtils.getRedis();
+    const redis = RedisUtils.getConnection();
 
     // Store the class instance
     const instance = this;
@@ -348,7 +348,7 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     var key = this.redisGetKey(field);
 
     // Get the Redis connection instance
-    const redis = RedisUtils.getRedis();
+    const redis = RedisUtils.getConnection();
 
     // Check whether a conversion function is configured
     var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
@@ -393,7 +393,7 @@ BaseModel.prototype.redisHasField = function(field, callback) {
     var key = this.redisGetKey(field);
 
     // Get the Redis connection instance
-    var redis = RedisUtils.getRedis();
+    var redis = RedisUtils.getConnection();
 
     // Check whether the field is available in Redis
     redis.exists(key, function(err, reply) {
@@ -425,7 +425,7 @@ BaseModel.prototype.redisHasField = function(field, callback) {
  */
 BaseModel.prototype.redisFlush = function(field, callback) {
     // Get the Redis instance
-    var redis = RedisUtils.getRedis();
+    var redis = RedisUtils.getConnection();
 
     // Create a latch
     var latch = new SmartCallback();

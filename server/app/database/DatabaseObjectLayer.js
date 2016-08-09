@@ -95,7 +95,7 @@ DatabaseObjectLayer._LAYER_REDIS_CACHE_QUEUE = async.queue(function(task, callba
 
     // Get the Redis instance
     // TODO: Store this globally?
-    const redis = RedisUtils.getRedis();
+    const redis = RedisUtils.getConnection();
 
     // Set the cached value through the cache setter
     var cacheValue = task.value;
@@ -244,7 +244,7 @@ DatabaseObjectLayer.prototype.layerFetchFields = function(fieldNames, callback) 
 
     // Store the current instance, create a callback latch and get the redis instance
     const instance = this;
-    const redis = RedisUtils.getRedis();
+    const redis = RedisUtils.getConnection();
     const callbackLatch = new SmartCallback();
 
     // Define the output object
@@ -490,7 +490,7 @@ DatabaseObjectLayer.prototype.layerSetFields = function(data, callback) {
 
     // Store the current instance, create a callback latch and get the redis instance
     const instance = this;
-    const redis = RedisUtils.getRedis();
+    const redis = RedisUtils.getConnection();
     const callbackLatch = new SmartCallback();
 
     // Create an object with field to database field translations
@@ -802,7 +802,7 @@ DatabaseObjectLayer.prototype.layerDeleteFromDatabase = function(callback) {
         // Remove all database object layer cache entries for this object
         if(RedisUtils.isReady()) {
             // Get the Redis instance
-            const redis = RedisUtils.getRedis();
+            const redis = RedisUtils.getConnection();
 
             // Find all keys for cached entries of this object
             redis.keys(instance._getCacheKeyRoot() + '*', function(err, keys) {

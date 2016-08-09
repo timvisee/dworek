@@ -101,7 +101,7 @@ SessionManager.getSessionByTokenIfValid = function(token, callback) {
     // Determine the cache key and get the Redis client
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':sessionId';
-    var redis = RedisUtil.getRedis();
+    var redis = RedisUtil.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(userId) {
@@ -203,7 +203,7 @@ SessionManager.getSessionUserByTokenIfValid = function(token, callback) {
     // Determine the cache key and get the Redis client
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':userId';
-    var redis = RedisUtil.getRedis();
+    var redis = RedisUtil.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(userId) {
@@ -302,7 +302,7 @@ SessionManager.isValidSessionToken = function(token, callback) {
     // Determine the cache key and get the Redis client
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':valid';
-    var redis = RedisUtil.getRedis();
+    var redis = RedisUtil.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(valid) {
