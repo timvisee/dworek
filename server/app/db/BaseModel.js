@@ -78,17 +78,75 @@ var BaseModel = function(instance, modelConfig) {
 };
 
 /**
- * TODO: What is returned if the field isn't available? undefined?
- *
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
+ * @param {BaseModel~mongoGetFieldCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
  *
- * @return {*} Field value.
+ * @return {*} Field value. Undefined is returned if the field couln't be fetched from MongoDB.
  */
-BaseModel.prototype.mongoGetField = function(field) {
-    // TODO: Create function body!
+BaseModel.prototype.mongoGetField = function(field, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Store the class instance
+    const instance = this;
+
+    // Get the MongoDB field name
+    var mongoField = field;
+    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
+        mongoField = this._modelConfig.fields[field].mongo.field || field;
+
+    // Create the query object
+    var query = {
+        _id: this._instance.getId()
+    };
+
+    // Create the projection object
+    var projection = {};
+    projection[mongoField] = true;
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).find(query, projection).toArray(function(err, data) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err), undefined);
+            return;
+        }
+
+        // Call back undefined if no results were found
+        if(data.length === 0) {
+            callback(null, undefined);
+            return;
+        }
+
+        // Get the value
+        var value = data[0][mongoField];
+
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.mongo.from');
+
+        // Convert the value
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = instance._modelConfig.fields[field].mongo.from;
+
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Call back with the result
+        callback(null, value);
+    });
 };
+
+/**
+ * Called when the data is fetched from MongoDB, or when an error occurred.
+ *
+ * @callback BaseModel~mongoGetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {*} Fetched field value.
+ */
 
 /**
  * Set a field in MongoDB.
