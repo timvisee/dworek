@@ -702,6 +702,39 @@ BaseModel.prototype.cacheSetField = function(field, value) {
 };
 
 /**
+ * Set a list of fields in cache.
+ * A given field value won't be stored in cache if cache is disabled for that specific field.
+ *
+ * @param {Object} fields Object containing the field names as keys, and the values as their values.
+ */
+BaseModel.prototype.cacheSetFields = function(fields) {
+    // Loop through the fields
+    for(var field in fields) {
+        // Return if cache is disabled for this field
+        if(!this.cacheIsFieldEnabled(field))
+            return;
+
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.to');
+
+        // Get the field value
+        var value = fields[field];
+
+        // Convert the value
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = this._modelConfig.fields[field].cache.to;
+
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Set the cache
+        this._cache.setCache(field, value);
+    }
+};
+
+/**
  * Check whether the given field is cached.
  *
  * @param {String} field Field name.
