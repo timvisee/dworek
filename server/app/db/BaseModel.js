@@ -856,10 +856,37 @@ BaseModel.prototype.redisGetKeyRoot = function() {
  *
  * @param {string} field Name of the field.
  *
-s * @return {string} Redis key for the given field.
+ * @return {string} Redis key for the given field.
  */
 BaseModel.prototype.redisGetKey = function(field) {
     return this.redisGetKeyRoot() + ':' + field;
+};
+
+/**
+ * Get the Redis keys for the given fields.
+ *
+ * @param {Array|string} fields Array of field names, or the name of a single field.
+ *
+ * @return {Object} Object with the Redis keys for the given fields, with the field name as key and the Redis key as value.
+ */
+BaseModel.prototype.redisGetKeys = function(fields) {
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
+
+    // Create a results object
+    var results = {};
+
+    // Store the current instance
+    const instance = this;
+
+    // Loop through the list of fields
+    fields.forEach(function(field) {
+        results[field] = instance.redisGetKey(field);
+    });
+
+    // Return the results
+    return results;
 };
 
 /**
