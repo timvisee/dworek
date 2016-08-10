@@ -769,6 +769,27 @@ BaseModel.prototype.cacheHasField = function(field) {
 };
 
 /**
+ * Check whether the list of given fields are cached.
+ *
+ * @param {Array} fields List of fields.
+ *
+ * @return {boolean} True if all given fields are cached, false otherwise.
+ */
+BaseModel.prototype.cacheHasFields = function(fields) {
+    // Return false if cache isn't enabled for any of the fields
+    if(!this.cacheAreFieldsEnabled(fields))
+        return false;
+
+    // Loop through all the fields, make sure cache is enabled
+    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
+        if(!this._cache.hasCache(fields[i]))
+            return false;
+
+    // All fields seem to be cached, return true
+    return true;
+};
+
+/**
  * Flush the cached fields.
  * If a field name is given, only that specific field is flushed if it exists.
  *
