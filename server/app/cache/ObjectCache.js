@@ -84,19 +84,24 @@ ObjectCache.prototype.setCacheMultiple = function(values) {
 
 /**
  * Flush the data that is currently cached in this object.
- * All cache will be flushed unless a specific field is given.
+ * All cache will be flushed unless specific fields are given.
  *
- * @param {string} [field] Field to flush.
+ * @param {Array|string} [fields] Array of fields or a specific field as a string to flush.
  */
-ObjectCache.prototype.flushCache = function(field) {
+ObjectCache.prototype.flushCache = function(fields) {
     // Flush all if no field is given
-    if(field == undefined) {
+    if(fields === undefined) {
         this._cache = {};
         return;
     }
 
-    // Flush the given field, if available
-    delete this._cache[field];
+    // Convert the fields parameter to an array, if it isn't in array format
+    if(!Array.isArray(fields))
+        fields = [fields];
+
+    // Loop through the list of fields, and delete them one by one
+    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
+        delete this._cache[fields[i]];
 };
 
 // Export the user class
