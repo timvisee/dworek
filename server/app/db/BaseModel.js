@@ -417,6 +417,70 @@ BaseModel.prototype.mongoHasField = function(field, callback) {
 /**
  * TODO: Untested function.
  *
+ * Check whether the given fields are in MongoDB.
+ *
+ * @param {Array} fields List of field names.
+ * @param {BaseModel~mongoHasFieldsCallback} callback Called with the result, or when an error occurred.
+ *
+ * @return {boolean} True if the field is in MongoDB, false if not.
+ */
+BaseModel.prototype.mongoHasFields = function(fields, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Store the current instance
+    const instance = this;
+
+    // Create a list of field name translations to MongoDB
+    var mongoFields = {};
+    fields.forEach(function(field) {
+        // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
+        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        else
+            mongoFields[field] = field;
+    });
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+
+    // Add the fields to the query object
+    for(var field in mongoFields)
+        queryObject[mongoFields[field]] = {
+            $exists: true
+        };
+
+    // Create the projection object
+    var projectionObject = {
+        _id: true
+    };
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err), false);
+            return;
+        }
+
+        // Determine and return the result
+        callback(null, data.length > 0);
+    });
+};
+
+/**
+ * Called with the result, or when an error occurred.
+ *
+ * @callback BaseModel~mongoHasFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if all the fields exist in MongoDB, false otherwise.
+ */
+
+/**
+ * TODO: Untested function.
+ *
  * Flush fields from MongoDB.
  * If a field name is given, only that specific field is flushed if it exists.
  *
