@@ -791,12 +791,12 @@ BaseModel.prototype.cacheHasFields = function(fields) {
 
 /**
  * Flush the cached fields.
- * If a field name is given, only that specific field is flushed if it exists.
+ * If field names are given, only those specific fields will be flushed.
  *
- * @param {String} [field=undefined] Name of the field to flush, undefined to flush all cache.
+ * @param {Array|String} [fields=undefined] An array with field names or a specific field name to flush, undefined to flush all cache.
  */
-BaseModel.prototype.cacheFlush = function(field) {
-    this._cache.cacheFlush(field);
+BaseModel.prototype.cacheFlush = function(fields) {
+    this._cache.flushCache(fields);
 };
 
 /**
