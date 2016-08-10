@@ -765,7 +765,7 @@ BaseModel.prototype.cacheHasField = function(field) {
         return false;
 
     // Check whether this field is cached, return the result
-    return this._cache.cacheHasField(field);
+    return this._cache.hasCache(field);
 };
 
 /**
