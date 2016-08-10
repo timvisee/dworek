@@ -727,7 +727,7 @@ BaseModel.prototype.cacheSetFields = function(fields) {
 
         // Return if cache is disabled for this field
         if(!this.cacheIsFieldEnabled(field))
-            return;
+            continue;
 
         // Check whether a conversion function is configured
         var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.to');
