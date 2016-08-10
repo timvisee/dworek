@@ -368,8 +368,6 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
  *
  * @param {String} field Field name.
  * @param {BaseModel~mongoHasFieldCallback} callback Called with the result, or when an error occurred.
- *
- * @return {boolean} True if the field is in MongoDB, false if not.
  */
 BaseModel.prototype.mongoHasField = function(field, callback) {
     // Get the MongoDB connection instance
@@ -421,8 +419,6 @@ BaseModel.prototype.mongoHasField = function(field, callback) {
  *
  * @param {Array} fields List of field names.
  * @param {BaseModel~mongoHasFieldsCallback} callback Called with the result, or when an error occurred.
- *
- * @return {boolean} True if the field is in MongoDB, false if not.
  */
 BaseModel.prototype.mongoHasFields = function(fields, callback) {
     // Get the MongoDB connection instance
