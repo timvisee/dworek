@@ -82,8 +82,6 @@ var BaseModel = function(instance, modelConfig) {
  *
  * @param {String} field Name of the field.
  * @param {BaseModel~mongoGetFieldCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
- *
- * @return {*} Field value. Undefined is returned if the field couldn't be fetched from MongoDB.
  */
 BaseModel.prototype.mongoGetField = function(field, callback) {
     // Get the MongoDB connection instance
@@ -153,8 +151,6 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
  *
  * @param {Array} fields Array of field names to get.
  * @param {BaseModel~mongoGetFieldsCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
- *
- * @return {Object} Object with field values. Undefined is returned if the field couldn't be fetched from MongoDB.
  */
 BaseModel.prototype.mongoGetFields = function(fields, callback) {
     // Get the MongoDB connection instance
