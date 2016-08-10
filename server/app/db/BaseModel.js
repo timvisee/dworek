@@ -177,7 +177,9 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
     // Create the projection object
     var projectionObject = {};
     for(var field in mongoFields)
-        projectionObject[mongoFields[field]] = true;
+        // Make sure the object owns the key
+        if(fields.hasOwnProperty(field))
+            projectionObject[mongoFields[field]] = true;
 
     // Create a results object
     var results = {};
@@ -307,6 +309,10 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
 
     // Loop through the fields, convert them to MongoDB fields and convert their values
     for(var field in fields) {
+        // Make sure the object owns the key
+        if(!fields.hasOwnProperty(field))
+            continue;
+
         // Get the MongoDB field name
         var mongoField = field;
         if(_.has(this._modelConfig.fields, field + '.mongo.field'))
@@ -530,7 +536,9 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
     // Create an object of fields to update
     var updateFieldsObject = {};
     for(var field in mongoFields)
-        updateFieldsObject[mongoFields[field]] = '';
+        // Make sure the object owns the key
+        if(mongoFields.hasOwnProperty(field))
+            updateFieldsObject[mongoFields[field]] = '';
 
     // Create the update object
     var updateObject = {
@@ -710,6 +718,10 @@ BaseModel.prototype.cacheSetField = function(field, value) {
 BaseModel.prototype.cacheSetFields = function(fields) {
     // Loop through the fields
     for(var field in fields) {
+        // Make sure the object owns the key
+        if(!fields.hasOwnProperty(field))
+            continue;
+
         // Return if cache is disabled for this field
         if(!this.cacheIsFieldEnabled(field))
             return;
