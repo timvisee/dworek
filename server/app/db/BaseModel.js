@@ -574,6 +574,37 @@ BaseModel.prototype.cacheIsFieldEnabled = function(field) {
 };
 
 /**
+ * Check whether cache is enabled for the given fields.
+ *
+ * @param {Array|String} fields Array of field names, or a single field name as a string.
+ *
+ * @return {boolean} True if all fields are enabled, false otherwise.
+ */
+BaseModel.prototype.cacheAreFieldsEnabled = function(fields) {
+    // Convert the fields parameter to an array if it isn't an array
+    if(!Array.isArray(fields))
+        fields = [fields];
+
+    // Create a variable to put the result in
+    var result = true;
+
+    // Loop through the list of fields
+    fields.forEach(function(field) {
+        // The result must still be true
+        if(!result)
+            return;
+
+        // Make sure the cache is enabled for this field
+        if(_.has(this._modelConfig.fields, field + '.cache.enable'))
+            if(!this._modelConfig.fields[field].cache.enable)
+                result = false;
+    });
+
+    // Return the result
+    return result;
+};
+
+/**
  * Get a field from cache.
  *
  * @param {String} field Name of the field.
