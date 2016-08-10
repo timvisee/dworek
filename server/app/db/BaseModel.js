@@ -478,12 +478,12 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
  * TODO: Untested function.
  *
  * Flush fields from MongoDB.
- * If a field name is given, only that specific field is flushed if it exists.
+ * If field names are given, only those specific fields are flushed if they exists.
  *
- * @param {String} [field=undefined] Name of the field to flush, undefined to flush all the fields.
+ * @param {Array|String} [fields=undefined] Array of field names or name of the field to flush, undefined to flush all the fields.
  * @param {BaseModel~mongoFlushCallback} callback Called on success, or when an error occurred.
  */
-BaseModel.prototype.mongoFlush = function(field, callback) {
+BaseModel.prototype.mongoFlush = function(fields, callback) {
     // Get the MongoDB connection instance
     const mongo = MongoUtils.getConnection();
 
@@ -493,7 +493,7 @@ BaseModel.prototype.mongoFlush = function(field, callback) {
     };
 
     // Check whether to delete the whole document for this model object
-    if(field === undefined) {
+    if(fields === undefined || (Array.isArray(fields) && fields.length === 0)) {
         // Delete the document
         // Delete the document from MongoDB
         mongo.collection(this._modelConfig.db.collection).deleteOne(queryObject, function(err) {
@@ -511,16 +511,31 @@ BaseModel.prototype.mongoFlush = function(field, callback) {
     }
 
     // Delete a specific field
-    // Get the MongoDB field name
-    var mongoField = field;
-    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
-        mongoField = this._modelConfig.fields[field].mongo.field || field;
+    // Convert the fields to an array if it's a string
+    fields = [fields];
+
+    // Store this instance
+    const instance = this;
+
+    // Create a list of field name translations to MongoDB
+    var mongoFields = {};
+    fields.forEach(function(field) {
+        // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
+        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        else
+            mongoFields[field] = field;
+    });
+
+    // Create an object of fields to update
+    var updateFieldsObject = {};
+    for(var field in mongoFields)
+        updateFieldsObject[mongoFields[field]] = '';
 
     // Create the update object
     var updateObject = {
-        $unset: {}
+        $unset: updateFieldsObject
     };
-    updateObject.$unset[mongoField] = '';
 
     // Delete the field from MongoDB
     mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject, function(err) {
