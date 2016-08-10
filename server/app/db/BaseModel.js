@@ -716,6 +716,9 @@ BaseModel.prototype.cacheSetField = function(field, value) {
  * @param {Object} fields Object containing the field names as keys, and the values as their values.
  */
 BaseModel.prototype.cacheSetFields = function(fields) {
+    // Create an object with the cache values to set
+    var cacheObject = {};
+
     // Loop through the fields
     for(var field in fields) {
         // Make sure the object owns the key
@@ -741,9 +744,12 @@ BaseModel.prototype.cacheSetFields = function(fields) {
             value = conversionFunction(value);
         }
 
-        // Set the cache
-        this._cache.setCache(field, value);
+        // Add the value to the cache object
+        cacheObject[field] = value;
     }
+
+    // Push the cache object to the object's cache
+    this._cache.setCacheMultiple(cacheObject);
 };
 
 /**
