@@ -107,7 +107,7 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
     projectionObject[mongoField] = true;
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
+    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err), undefined);
@@ -115,13 +115,13 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
         }
 
         // Call back undefined if no results were found
-        if(data.length === 0) {
+        if(reply.length === 0) {
             callback(null, undefined);
             return;
         }
 
         // Get the value
-        var value = data[0][mongoField];
+        var value = reply[0][mongoField];
 
         // Check whether a conversion function is configured
         var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.mongo.from');
@@ -146,6 +146,95 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
  * @callback BaseModel~mongoGetFieldCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  * @param {*} Fetched field value.
+ */
+
+/**
+ * Get a list of fields from MongoDB.
+ *
+ * @param {Array} fields Array of field names to get.
+ * @param {BaseModel~mongoGetFieldsCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
+ *
+ * @return {Object} Object with field values. Undefined is returned if the field couldn't be fetched from MongoDB.
+ */
+BaseModel.prototype.mongoGetFields = function(fields, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Store the class instance
+    const instance = this;
+
+    // Create a list of field name translations to MongoDB
+    var mongoFields = {};
+    fields.forEach(function(field) {
+        // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
+        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        else
+            mongoFields[field] = field;
+    });
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+
+    // Create the projection object
+    var projectionObject = {};
+    for(var field in mongoFields)
+        projectionObject[mongoFields[field]] = true;
+
+    // Create a results object
+    var results = {};
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err), undefined);
+            return;
+        }
+
+        // Call back undefined if no results were found
+        if(reply.length === 0) {
+            callback(null, undefined);
+            return;
+        }
+
+        // Get the data object
+        var data = reply[0];
+
+        // Loop through the fields, convert it's values and add it to the result object
+        for(var field in mongoFields) {
+            // Get the value for the mongo field
+            var value = data[mongoFields[field]];
+
+            // Check whether a conversion function is configured
+            var hasConversionFunction = _.has(instance._modelConfig.fields, fields + '.mongo.from');
+
+            // Convert the value
+            if(hasConversionFunction) {
+                // Get the conversion function
+                var conversionFunction = instance._modelConfig.fields[fields].mongo.from;
+
+                // Convert the value
+                value = conversionFunction(value);
+            }
+
+            // Add the value to the results object
+            results[field] = value;
+        }
+
+        // Call back with the result
+        callback(null, results);
+    });
+};
+
+/**
+ * Called when the data is fetched from MongoDB, or when an error occurred.
+ *
+ * @callback BaseModel~mongoGetFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Object} Object with field values.
  */
 
 /**
