@@ -631,6 +631,49 @@ BaseModel.prototype.cacheGetField = function(field) {
 };
 
 /**
+ * Get a list of fields from cache.
+ *
+ * @param {Array} fields List of the field names to get from cache.
+ *
+ * @return {Object} Object with the fields and values.
+ * Values will be undefined if they aren't available in cache or if cache is disabled for that specific field.
+ */
+BaseModel.prototype.cacheGetFields = function(fields) {
+    // Create a results object
+    var results = {};
+
+    // Loop through all the fields, fetch and convert their value and add it to the results object
+    fields.forEach(function(field) {
+        // Set the value to undefined if cache isn't enabled for this field
+        if(!this.cacheIsFieldEnabled(field)) {
+            results[field] = undefined;
+            return;
+        }
+
+        // Get the field from cache
+        var value = this._cache.getCache(field);
+
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.from');
+
+        // Convert the value
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = this._modelConfig.fields[field].cache.from;
+
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Add the value to the results object
+        results[field] = value;
+    });
+
+    // Return the result object
+    return results;
+};
+
+/**
  * Set a field in cache.
  * If cache is disabled for this field, the function will return immediately without actually storing the value in cache.
  *
