@@ -293,6 +293,75 @@ BaseModel.prototype.mongoSetField = function(field, value, callback) {
  */
 
 /**
+ * Set a list of fields in MongoDB.
+ *
+ * @param {Object} fields Object with fields and values to set.
+ * @param {BaseModel~mongoSetFieldsCallback} callback Called when the values are set, or when an error occurred.
+ */
+BaseModel.prototype.mongoSetFields = function(fields, callback) {
+    // Get the MongoDB connection instance
+    const mongo = MongoUtils.getConnection();
+
+    // Create a data object
+    var data = {};
+
+    // Loop through the fields, convert them to MongoDB fields and convert their values
+    for(var field in fields) {
+        // Get the MongoDB field name
+        var mongoField = field;
+        if(_.has(this._modelConfig.fields, field + '.mongo.field'))
+            mongoField = this._modelConfig.fields[field].mongo.field || field;
+
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.mongo.to');
+
+        // Get the value
+        var value = fields[field];
+
+        // Convert the value
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = this._modelConfig.fields[field].mongo.to;
+
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Add the value to the data object
+        data[mongoField] = value;
+    }
+
+    // Create the query object
+    var queryObject = {
+        _id: this._instance.getId()
+    };
+
+    // Create the update object
+    var updateObject = {
+        $set: data
+    };
+
+    // Fetch the field from MongoDB
+    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject).toArray(function(err) {
+        // Call back errors
+        if(err !== null) {
+            callback(new Error(err));
+            return;
+        }
+
+        // Call back with success
+        callback(null);
+    });
+};
+
+/**
+ * Called when the value is set, or if an error occurred.
+ *
+ * @callback BaseModel~mongoSetFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * TODO: Untested function.
  *
  * Check whether the given field is in MongoDB.
