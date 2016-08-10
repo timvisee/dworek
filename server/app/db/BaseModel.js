@@ -816,6 +816,32 @@ BaseModel.prototype.redisIsFieldEnabled = function(field) {
 };
 
 /**
+ * Check whether Redis is enabled for the given fields.
+ *
+ * @param {Array|string} fields Array of field names, or a single field name as a string.
+ *
+ * @return {boolean} True if all fields are enabled, false otherwise.
+ */
+BaseModel.prototype.redisAreFieldsEnabled = function(fields) {
+    // Convert the fields parameter to an array if it isn't an array
+    if(!Array.isArray(fields))
+        fields = [fields];
+
+    // Loop through all the fields, check whether Redis is enabled
+    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++) {
+        // Get the current field
+        var field = fields[i];
+
+        // Redis must be enabled for this field, if it´s configured. Return false if that's not the case
+        if(_.has(this._modelConfig.fields, field + '.redis.enable') && !this._modelConfig.fields[field].redis.enable)
+            return false;
+    }
+
+    // Redis seems to be enabled for all fields, return true
+    return true;
+};
+
+/**
  * Get the Redis root key for this model.
  *
  * @return {string} Redis root key.
