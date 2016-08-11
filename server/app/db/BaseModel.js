@@ -705,6 +705,29 @@ BaseModel.prototype.hasFields = function(fields, callback) {
  */
 
 /**
+ * Flush the model. This flushes all storage systems for this model, also the persistent storage systems.
+ * If no specific fields are given, all fields are flushed for the model.
+ *
+ * @param {Array|string|undefined} fields An array of field names or a specific field name to flush those fields.
+ * Undefined to flush all fields.
+ * @param {BaseModel~flushCallback} callback Called when the data is flushed, or when an error occurred.
+ */
+BaseModel.prototype.flush = function(fields, callback) {
+    // Flush the cache and MongoDB, call back when we're done
+    async.parallel([
+        (completeTask) => this.flushCache(fields, completeTask),
+        (completeTask) => this.mongoFlush(fields, completeTask)
+    ], (err) => callback(err));
+};
+
+/**
+ * Called when the data is flushed, or when an error occurred.
+ *
+ * @callback BaseModel~flushCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Flush the model cache. This flushes all non-persistent storage systems for this model.
  * If no specific fields are given, all fields are flushed for the model.
  *
