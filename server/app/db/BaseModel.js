@@ -108,7 +108,7 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
 /**
  * Get a list of fields from MongoDB.
  *
- * @param {Array} fields Array of field names to get.
+ * @param {Array|String} fields Array of field names to get.
  * @param {BaseModel~mongoGetFieldsCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
  */
 BaseModel.prototype.mongoGetFields = function(fields, callback) {
