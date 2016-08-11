@@ -361,7 +361,7 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
 };
 
 /**
- * Called when the value is set, or if an error occurred.
+ * Called when the values are set, or when an error occurred.
  *
  * @callback BaseModel~mongoSetFieldsCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
@@ -1096,6 +1096,7 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
 
         // Configure the expiration time of the field in Redis
         //noinspection JSValidateTypes
+        // TODO: Should we cast RedisError to Error?
         redis.expire(key, CACHE_FIELD_EXPIRE, (err) => callback(err));
     });
 };
@@ -1104,6 +1105,92 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
  * Called when the value is set, or when an error occurred.
  *
  * @callback BaseModel~redisSetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Set a list of fields in Redis.
+ * A field won't be set if Redis is disabled for that specific field.
+ *
+ * @param {Object} fields Object with the fields and values to set.
+ * @param {BaseModel~redisSetFieldsCallback} callback Called when the values are set, or when an error occurred.
+ */
+BaseModel.prototype.redisSetFields = function(fields, callback) {
+    // Get the Redis connection instance
+    const redis = RedisUtils.getConnection();
+
+    // Create an array of Redis data (sequences of key name and data)
+    var redisData = [];
+
+    // Loop through the fields
+    for(var field in fields) {
+        // Make sure the object owns this field
+        if(!fields.hasOwnProperty(field))
+            continue;
+
+        // Make sure Redis is enabled for this field
+        if(!this.redisIsFieldEnabled(field))
+            continue;
+
+        // Check whether a conversion function is configured
+        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
+
+        // Get the value
+        var value = fields[field];
+
+        // Convert the value
+        if(hasConversionFunction) {
+            // Get the conversion function
+            var conversionFunction = this._modelConfig.fields[field].redis.to;
+
+            // Convert the value
+            value = conversionFunction(value);
+        }
+
+        // Get and add the Redis key and value to the redis data array
+        redisData.push(this.redisGetKey(field));
+        redisData.push(value);
+    }
+
+    // Set the Redis data
+    redis.mset(redisData, function(err) {
+        // Call back if an error occurred
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Create a callback latch for the expire commands
+        var latch = new SmartCallback();
+
+        // Keep track of errors
+        var commandError = null;
+
+        // Set the TTL for all set keys since we're done setting them
+        for(var i = 0, redisDataLength = redisData.length; i < redisDataLength; i += 2) {
+            // Use the expire command, add a latch
+            latch.add();
+            redis.expire(redisData[i], CACHE_FIELD_EXPIRE, function(err) {
+                // Catch errors
+                if(err !== null && err !== undefined && commandError === null)
+                    commandError = new Error(err);
+
+                // Resolve the callback latch
+                latch.resolve();
+            });
+        }
+
+        // Call back when we're done, pass along errors
+        latch.then(function() {
+            callback(commandError);
+        });
+    });
+};
+
+/**
+ * Called when the values are set, or when an error occurred.
+ *
+ * @callback BaseModel~redisSetFieldsCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
