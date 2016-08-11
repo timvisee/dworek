@@ -223,6 +223,12 @@ BaseModel.prototype.getFields = function(fields, callback) {
             }
         }
 
+        // Call back if the field queue is empty, since we successfully fetched all data
+        if(fieldQueue.length === 0) {
+            callback(null, results);
+            return;
+        }
+
         // Try to fetch the field from Mongo
         instance.mongoGetFields(fieldQueue, function(err, values) {
             // Call back errors
