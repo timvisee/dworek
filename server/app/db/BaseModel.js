@@ -96,24 +96,35 @@ BaseModel.prototype.getField = function(field, callback) {
     // Store the current instance
     const instance = this;
 
+    // Create an array of cache tasks
+    var cacheTasks = [];
+
     // Try to fetch the field from Redis
     this.redisGetField(field, function(err, value) {
         // Show a console warning if an error occurred
         if(err !== undefined) {
             console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
             console.warn(err);
-        }
 
-        // Call back the value if it isn't undefined, and if no error occurred
-        if(err === null && value !== undefined) {
-            // Call back
-            callback(null, value);
+        } else {
+            // Call back the value if it isn't undefined, and if no error occurred
+            if(value !== undefined) {
+                // Call back
+                callback(null, value);
 
-            // Cache the value
-            instance.cacheSetField(field, value);
+                // Create a task to cache the value in the local object cache
+                cacheTasks.push(function(completeTask) {
+                    // Set the fields in cache
+                    instance.cacheSetField(field, value);
 
-            // We're done, return
-            return;
+                    // Complete the task
+                    completeTask();
+                });
+
+                // Run the cache tasks asynchronously and return
+                async.parallel(cacheTasks);
+                return;
+            }
         }
 
         // Try to fetch the field from Mongo
@@ -127,29 +138,30 @@ BaseModel.prototype.getField = function(field, callback) {
             // Call back the value
             callback(null, value);
 
-            // Cache the value if it isn't undefined
-            if(value !== undefined) {
-                async.parallel([
-                    function(completeTask) {
-                        instance.redisSetField(field, value, function(err) {
-                            if(err !== null) {
-                                console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                                console.warn(err);
-                            }
-
-                            // Complete the task
-                            completeTask();
-                        });
-                    },
-                    function(completeTask) {
-                        // Cache the value
-                        instance.cacheSetField(field, value);
-
-                        // Complete the task
-                        completeTask();
+            // Add a task to cache the values in Redis
+            cacheTasks.push(function(completeTask) {
+                instance.redisSetField(field, value, function(err) {
+                    if(err !== null) {
+                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                        console.warn(err);
                     }
-                ]);
-            }
+
+                    // Complete the task
+                    completeTask();
+                });
+            });
+
+            // Add a task to cache the values in the local object cache
+            cacheTasks.push(function(completeTask) {
+                // Cache the value
+                instance.cacheSetField(field, value);
+
+                // Complete the task
+                completeTask();
+            });
+
+            // Run the cache tasks asynchronously
+            async.parallel(cacheTasks);
         });
     });
 };
