@@ -298,7 +298,7 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
  */
 BaseModel.prototype.mongoHasField = function(field, callback) {
     // Get the result through the bulk function
-    this.mongoHasFields([field], callback);
+    this.mongoHasFields(field, callback);
 };
 
 /**
@@ -314,7 +314,7 @@ BaseModel.prototype.mongoHasField = function(field, callback) {
  *
  * Check whether the given fields are in MongoDB.
  *
- * @param {Array} fields List of field names.
+ * @param {Array|String} fields List of field names, or a single field name.
  * @param {BaseModel~mongoHasFieldsCallback} callback Called with the result, or when an error occurred.
  */
 BaseModel.prototype.mongoHasFields = function(fields, callback) {
@@ -323,6 +323,10 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
 
     // Store the current instance
     const instance = this;
+
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
 
     // Create a list of field name translations to MongoDB
     var mongoFields = {};
