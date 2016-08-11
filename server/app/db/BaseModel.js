@@ -920,7 +920,7 @@ BaseModel.prototype.redisGetField = function(field, callback) {
             console.warn('Redis error: ' + err);
 
             // Route the error
-            callback(err);
+            callback(new Error(err));
             return;
         }
 
@@ -995,7 +995,7 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
                 console.warn('Redis error: ' + err);
 
                 // Route the error
-                callback(err);
+                callback(new Error(err));
                 return;
             }
 
@@ -1090,7 +1090,7 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     redis.set(key, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(err);
+            callback(new Error(err));
             return;
         }
 
@@ -1156,7 +1156,7 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
     redis.mset(redisData, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(err);
+            callback(new Error(err));
             return;
         }
 
@@ -1217,7 +1217,7 @@ BaseModel.prototype.redisHasField = function(field, callback) {
     redis.exists(key, function(err, reply) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(err);
+            callback(new Error(err));
             return;
         }
 
@@ -1294,7 +1294,7 @@ BaseModel.prototype.redisFlush = function(field, callback) {
         redis.del(keys, function(err, reply) {
             // Call back if an error occurred
             if(err !== null) {
-                callback(err, 0);
+                callback(new Error(err), 0);
                 return;
             }
 
