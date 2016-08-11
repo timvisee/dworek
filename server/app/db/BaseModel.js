@@ -1207,8 +1207,6 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
  *
  * @param {String} field Name of the field.
  * @param {BaseModel~redisHasFieldCallback} callback Called with the result, or when an error occurred.
- *
- * @return {boolean} True if the field is in Redis, false if not.
  */
 BaseModel.prototype.redisHasField = function(field, callback) {
     // Return false if Redis isn't enabled for this field
@@ -1247,8 +1245,6 @@ BaseModel.prototype.redisHasField = function(field, callback) {
  *
  * @param {Array} fields Array of field names.
  * @param {BaseModel~redisHasFieldsCallback} callback Called with the result, or when an error occurred.
- *
- * @return {boolean} True if the field is in Redis, false if not.
  */
 BaseModel.prototype.redisHasFields = function(fields, callback) {
     // Return false if Redis isn't enabled for all fields
