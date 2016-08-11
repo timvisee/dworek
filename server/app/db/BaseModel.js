@@ -80,7 +80,7 @@ var BaseModel = function(instance, modelConfig) {
 /**
  * Get a model field.
  *
- * @param {String} field Name of the field.
+ * @param {String} field Field name.
  * @param {BaseModel~getFieldCallback} callback Called when the result is fetched, or when an error occurred.
  */
 BaseModel.prototype.getField = function(field, callback) {
@@ -320,6 +320,76 @@ BaseModel.prototype.getFields = function(fields, callback) {
  * @callback BaseModel~getFieldsCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Object =} Object with field values.
+ */
+
+/**
+ * Set a model field.
+ *
+ * @param {String} field Field name..
+ * @param {*} value Field value.
+ * @param {BaseModel~setFieldCallback} callback Called when the fields are set, or when an error occurred.
+ */
+BaseModel.prototype.setField = function(field, value, callback) {
+    // Create a callback latch to set the fields
+    var latch = new SmartCallback();
+
+    // Store the current instance
+    const instance = this;
+
+    // Set the field in MongoDB
+    latch.add();
+    this.mongoSetField(field, value, function(err) {
+        // Call back if an error occurred
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Set the field in Redis
+    this.redisSetField(field, value, function(err) {
+        // Resolve the latch on success
+        if(err === null) {
+            latch.resolve();
+            return;
+        }
+
+        // Show a warning
+        console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
+        console.warn(err);
+
+        // Flush the field as fallback
+        instance.redisFlush(field, function(err) {
+            // Call back if an error occurred
+            if(err !== null) {
+                // Show a warning
+                console.warn('Fallback flushing fields failed.');
+
+                // Call back the error
+                callback(err);
+                return;
+            }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    });
+
+    // Call back if the latch is fully resolved
+    latch.then(() => callback(null));
+
+    // Set the field in the local object cache
+    this.cacheSetField(field, value);
+};
+
+/**
+ * Called when the fields are set, or when an error occurred.
+ *
+ * @callback BaseModel~setFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
 /**
