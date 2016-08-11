@@ -913,6 +913,13 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
         if(!fields.hasOwnProperty(field))
             continue;
 
+        // Get the value
+        var value = fields[field];
+
+        // Skip undefined values
+        if(value === undefined)
+            continue;
+
         // Get the MongoDB field name
         var mongoField = field;
         if(_.has(this._modelConfig.fields, field + '.mongo.field'))
@@ -920,9 +927,6 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
 
         // Check whether a conversion function is configured
         var hasConversionFunction = _.has(this._modelConfig.fields, field + '.mongo.to');
-
-        // Get the value
-        var value = fields[field];
 
         // Convert the value
         if(hasConversionFunction) {
@@ -935,6 +939,13 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
 
         // Add the value to the data object
         data[mongoField] = value;
+    }
+
+    // Call back if the object doesn't contain any keys
+    if(Object.keys(data).length === 0) {
+        // Call back
+        callback(null);
+        return;
     }
 
     // Create the query object
@@ -1266,15 +1277,19 @@ BaseModel.prototype.cacheSetFields = function(fields) {
         if(!fields.hasOwnProperty(field))
             continue;
 
+        // Get the field value
+        var value = fields[field];
+
+        // Skip if the value is undefined
+        if(value === undefined)
+            continue;
+
         // Return if cache is disabled for this field
         if(!this.cacheIsFieldEnabled(field))
             continue;
 
         // Check whether a conversion function is configured
         var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.to');
-
-        // Get the field value
-        var value = fields[field];
 
         // Convert the value
         if(hasConversionFunction) {
@@ -1611,6 +1626,13 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
  * @param {BaseModel~redisSetFieldCallback} callback Called when the value is set, or when an error occurred.
  */
 BaseModel.prototype.redisSetField = function(field, value, callback) {
+    // Skip if the value is undefined
+    if(value === undefined) {
+        // Call back and return
+        callback(null);
+        return;
+    }
+
     // Return undefined if Redis is disabled for this field
     if(!this.redisIsFieldEnabled(field)) {
         callback(null);
@@ -1675,15 +1697,19 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         if(!fields.hasOwnProperty(field))
             continue;
 
+        // Get the value
+        var value = fields[field];
+
+        // Skip undefined values
+        if(value === undefined)
+            continue;
+
         // Make sure Redis is enabled for this field
         if(!this.redisIsFieldEnabled(field))
             continue;
 
         // Check whether a conversion function is configured
         var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
-
-        // Get the value
-        var value = fields[field];
 
         // Convert the value
         if(hasConversionFunction) {
@@ -1697,6 +1723,13 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         // Get and add the Redis key and value to the redis data array
         redisData.push(this.redisGetKey(field));
         redisData.push(value);
+    }
+
+    // Call back if the Redis data array is empty
+    if(redisData.length === 0) {
+        // Call back
+        callback(null);
+        return;
     }
 
     // Set the Redis data
