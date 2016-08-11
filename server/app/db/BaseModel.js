@@ -948,6 +948,14 @@ BaseModel.prototype.redisGetField = function(field, callback) {
 };
 
 /**
+ * Called when the field is fetched from Redis, or when an error occurred.
+ *
+ * @callback BaseModel~redisGetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {*=} Field value, or undefined if Redis is disabled for the given field.
+ */
+
+/**
  * Get a list of fields from Redis.
  *
  * @param {Array} fields Array of field names to get.
