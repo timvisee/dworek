@@ -962,18 +962,16 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
         value = conversionFunction(value);
     }
 
-    // Set the value
-    redis.set(key, value, function(err) {
+    // Set the field and it's TTL
+    redis.setex(key, CACHE_FIELD_EXPIRE, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
             callback(new Error(err));
             return;
         }
 
-        // Configure the expiration time of the field in Redis
-        //noinspection JSValidateTypes
-        // TODO: Should we cast RedisError to Error?
-        redis.expire(key, CACHE_FIELD_EXPIRE, (err) => callback(err));
+        // Call back
+        callback(null);
     });
 };
 
