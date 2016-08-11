@@ -85,7 +85,7 @@ var BaseModel = function(instance, modelConfig) {
  */
 BaseModel.prototype.mongoGetField = function(field, callback) {
     // Get the field through the bulk function
-    this.mongoGetFields([field], function(err, data) {
+    this.mongoGetFields(field, function(err, data) {
         // Call back errors
         if(err !== null) {
             callback(err);
@@ -117,6 +117,10 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
 
     // Store the class instance
     const instance = this;
+
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
 
     // Create a list of field name translations to MongoDB
     var mongoFields = {};
@@ -511,13 +515,13 @@ BaseModel.prototype.cacheAreFieldsEnabled = function(fields) {
  */
 BaseModel.prototype.cacheGetField = function(field) {
     // Get and return the field through the bulk function
-    return this.cacheGetFields([field])[field];
+    return this.cacheGetFields(field)[field];
 };
 
 /**
  * Get a list of fields from cache.
  *
- * @param {Array} fields List of the field names to get from cache.
+ * @param {Array|String} fields List of the field names or a single field name to get from cache.
  *
  * @return {Object} Object with the fields and values.
  * Values will be undefined if they aren't available in cache or if cache is disabled for that specific field.
@@ -525,6 +529,10 @@ BaseModel.prototype.cacheGetField = function(field) {
 BaseModel.prototype.cacheGetFields = function(fields) {
     // Create a results object
     var results = {};
+
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
 
     // Loop through all the fields, fetch and convert their value and add it to the results object
     fields.forEach(function(field) {
@@ -625,17 +633,21 @@ BaseModel.prototype.cacheSetFields = function(fields) {
  */
 BaseModel.prototype.cacheHasField = function(field) {
     // Get and return the field result the bulk function
-    return this.cacheHasFields([field]);
+    return this.cacheHasFields(field);
 };
 
 /**
  * Check whether the list of given fields are cached.
  *
- * @param {Array} fields List of fields.
+ * @param {Array|String} fields List of fields, or a single field name.
  *
  * @return {boolean} True if all given fields are cached, false otherwise.
  */
 BaseModel.prototype.cacheHasFields = function(fields) {
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
+
     // Return false if cache isn't enabled for any of the fields
     if(!this.cacheAreFieldsEnabled(fields))
         return false;
