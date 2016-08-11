@@ -948,11 +948,109 @@ BaseModel.prototype.redisGetField = function(field, callback) {
 };
 
 /**
- * Called when a field value is fetched from Redis, or if an error occurred.
+ * Get a list of fields from Redis.
  *
- * @callback BaseModel~redisGetFieldCallback
+ * @param {Array} fields Array of field names to get.
+ * @param {BaseModel~redisGetFieldsCallback} callback Called when the data is fetched from Redis, or when an error occurred.
+ */
+BaseModel.prototype.redisGetFields = function(fields, callback) {
+    // Get the Redis connection instance
+    const redis = RedisUtils.getConnection();
+
+    // Store the class instance
+    const instance = this;
+
+    // Create a results object
+    var results = {};
+
+    // Create a list of field names and Redis keys to fetch
+    var redisFields = [];
+    var redisKeys = [];
+    fields.forEach(function(field) {
+        // Make sure Redis is enabled for this field, add it as undefined to the results object if not
+        if(!instance.redisIsFieldEnabled(field)) {
+            results[field] = undefined;
+            return;
+        }
+
+        // Get the key, and add it to the redis keys array
+        redisFields.push(field);
+        redisKeys.push(instance.redisGetKey(field));
+    });
+
+    // Create a callback latch
+    var latch = new SmartCallback();
+
+    // Check whether there are enough keys to fetch from cache
+    if(redisKeys.length > 0) {
+        // Add a latch for the Redis command
+        latch.add();
+
+        // Fetch the values from Redis
+        redis.mget(redisKeys, function(err, reply) {
+            // Handle errors
+            // TODO: Is it possible to only check for null, and not for undefined?
+            if(err !== undefined && err !== null) {
+                // Print the error to the console
+                console.warn('Redis error: ' + err);
+
+                // Route the error
+                callback(err);
+                return;
+            }
+
+            // Call back if the value is null
+            if(reply === null) {
+                callback(new Error('Failed to fetch model fields from Redis.'));
+                return;
+            }
+
+            // Make sure the reply is an array
+            if(!Array.isArray(reply)) {
+                callback(new Error('Got invalid reply data from Redis, should be an array.'));
+                return;
+            }
+
+            // Loop through the fetched values
+            for(var i = 0, length = reply.length; i < length; i++) {
+                // Get the field and value
+                var value = reply[i];
+                var field = redisFields[i];
+
+                // Check whether a conversion function is configured
+                var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.from');
+
+                // Convert the value
+                if(hasConversionFunction) {
+                    // Get the conversion function
+                    var conversionFunction = instance._modelConfig.fields[field].redis.from;
+
+                    // Convert the value
+                    reply = conversionFunction(reply);
+                }
+
+                // Push the result in the results object
+                results[field] = value;
+            }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
+
+    // Call back when we're done
+    latch.then(function() {
+        // Call back with the results
+        callback(null, results);
+    });
+};
+
+/**
+ * Called when the data is fetched from Redis, or when an error occurred.
+ *
+ * @callback BaseModel~redisGetFieldsCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
- * @param {*} Field value, or undefined if failed to fetch the field.
+ * @param {Object=} Object with field values. Values that cache is disabled for, are set to undefined.
  */
 
 /**
