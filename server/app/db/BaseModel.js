@@ -1101,6 +1101,13 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
 };
 
 /**
+ * Called when the value is set, or when an error occurred.
+ *
+ * @callback BaseModel~redisSetFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Check whether the given field is available in Redis.
  *
  * @param {String} field Name of the field.
@@ -1216,13 +1223,6 @@ BaseModel.prototype.redisFlush = function(field, callback) {
  * @callback BaseModel~redisFlushCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  * @param {Number} Number of keys that were deleted from Redis.
- */
-
-/**
- * Called when the value is set, or when an error occurred.
- *
- * @callback BaseModel~redisSetFieldCallback
- * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
 // Export the class
