@@ -821,7 +821,7 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
     var results = {};
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
+    mongo.collection(this._modelConfig.mongo.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err), undefined);
@@ -959,7 +959,7 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     };
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject).toArray(function(err) {
+    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject).toArray(function(err) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err));
@@ -1043,7 +1043,7 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
     };
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
+    mongo.collection(this._modelConfig.mongo.collection).find(queryObject, projectionObject).toArray(function(err, data) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err), false);
@@ -1085,7 +1085,7 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
     if(fields === undefined || (Array.isArray(fields) && fields.length === 0)) {
         // Delete the document
         // Delete the document from MongoDB
-        mongo.collection(this._modelConfig.db.collection).deleteOne(queryObject, function(err) {
+        mongo.collection(this._modelConfig.mongo.collection).deleteOne(queryObject, function(err) {
             // Call back errors
             if(err !== null) {
                 callback(new Error(err));
@@ -1129,7 +1129,7 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
     };
 
     // Delete the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject, function(err) {
+    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err));
@@ -1400,7 +1400,7 @@ BaseModel.prototype.redisAreFieldsEnabled = function(fields) {
  */
 BaseModel.prototype.redisGetKeyRoot = function() {
     // TODO: Use the model type name here, instead of the database collection name
-    return CACHE_KEY_PREFIX + this._modelConfig.db.collection + ':' + this._instance.getIdHex();
+    return CACHE_KEY_PREFIX + this._modelConfig.mongo.collection + ':' + this._instance.getIdHex();
 };
 
 /**
