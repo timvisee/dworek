@@ -530,6 +530,181 @@ BaseModel.prototype.hasField = function(field, callback) {
  */
 
 /**
+ * Check whether the given model fields are available.
+ *
+ * @param {Array|string} fields Array of field names or a single field name.
+ * @param {BaseModel~hasFieldsCallback} callback Called when the result is fetched, or when an error occurred.
+ */
+BaseModel.prototype.hasFields = function(fields, callback) {
+    // Check the fields all together in all storage systems first
+    // Check whether the field is available in local cache
+    if(this.cacheHasFields(fields)) {
+        callback(null, true);
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new SmartCallback();
+
+    // Check in MongoDB
+    latch.add();
+    this.mongoHasFields(fields, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back if the result is true
+        if(result) {
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Check in Redis
+    latch.add();
+    this.redisHasFields(fields, function(err, result) {
+        // Show a warning if an error occurred
+        if(err !== null) {
+            // Show the warning
+            console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+            console.warn(err);
+
+        } else if(result === true) {
+            // Call back if the result is true
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Store the current instance
+    const instance = this;
+
+    // Check all fields one by one on all storage systems if the previous checks failed
+    latch.then(function() {
+        // Create a result variable
+        var result = true;
+
+        // Create an array of tasks
+        var tasks = [];
+
+        // Loop through the fields and create the proper tasks
+        fields.forEach(function(field) {
+            // Create a local object cache task
+            tasks.push(function(completeTask) {
+                // Skip the task if the result is set to false
+                if(result === false)
+                    return;
+
+                // Check whether the field exists
+                var exists = instance.cacheHasField(field);
+
+                // Process the result if the result is false
+                if(exists === false) {
+                    // Set the result flag
+                    result = false;
+
+                    // Call back
+                    callback(null, false);
+                }
+
+                // Complete the task
+                completeTask(null, exists);
+            });
+
+            // Create a Redis task
+            tasks.push(function(completeTask) {
+                // Skip the task if the result is set to false
+                if(result === false)
+                    return;
+
+                // Check whether the field exists in Redis
+                instance.redisHasField(field, function(err, exists) {
+                    // Show a warning if Redis failed
+                    if(err !== null) {
+                        console.warn('A Redis error occurred while checking if a model field exists, falling back.');
+                        console.warn(err);
+
+                    } else {
+                        // Process the result if the result is false
+                        if(exists === false) {
+                            // Set the result flag
+                            result = false;
+
+                            // Call back
+                            callback(null, false);
+                        }
+                    }
+
+                    // Complete the task
+                    completeTask(null, exists && err !== null);
+                });
+            });
+
+            // Create a MongoDB task
+            tasks.push(function(completeTask) {
+                // Skip the task if the result is set to false
+                if(result === false)
+                    return;
+
+                // Check whether the field exists in MongoDB
+                instance.mongoHasField(field, function(err, exists) {
+                    // Call back errors
+                    if(err !== null) {
+                        completeTask(err, false);
+                        return;
+                    }
+
+                    // Process the result if the result is false
+                    if(exists === false) {
+                        // Set the result flag
+                        result = false;
+
+                        // Call back
+                        callback(null, false);
+                    }
+
+                    // Complete the task
+                    completeTask(null, exists);
+                });
+            });
+        });
+
+        // Invoke the tasks
+        //noinspection JSUnusedLocalSymbols
+        async.parallelLimit(tasks, 6, function(err, results) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Return if the result is false, because that means we already called back
+            if(result === false)
+                return;
+
+            // Call back true, everything seems to exist
+            callback(null, true);
+        });
+    });
+};
+
+/**
+ * Called when the result is fetched, or when an error occurred
+ *
+ * @callback BaseModel~hasFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if all the given fields exist, false otherwise.
+ */
+
+/**
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
