@@ -1243,6 +1243,52 @@ BaseModel.prototype.redisHasField = function(field, callback) {
  */
 
 /**
+ * Check whether the given fields are available in Redis.
+ *
+ * @param {Array} fields Array of field names.
+ * @param {BaseModel~redisHasFieldsCallback} callback Called with the result, or when an error occurred.
+ *
+ * @return {boolean} True if the field is in Redis, false if not.
+ */
+BaseModel.prototype.redisHasFields = function(fields, callback) {
+    // Return false if Redis isn't enabled for all fields
+    if(!this.redisAreFieldsEnabled(fields))
+        return false;
+
+    // Store the current instance
+    const instance = this;
+
+    // Create an array of Redis keys
+    var keys = [];
+    fields.forEach(function(field) {
+        keys.push(instance.redisGetKey(field));
+    });
+
+    // Get the Redis connection instance
+    var redis = RedisUtils.getConnection();
+
+    // Check whether the keys are available in Redis
+    redis.exists(keys, function(err, reply) {
+        // Call back if an error occurred
+        if(err !== null) {
+            callback(new Error(err));
+            return;
+        }
+
+        // Call back with the result
+        callback(null, reply === fields.length);
+    });
+};
+
+/**
+ * Called with the result, or when an error occurred.
+ *
+ * @callback BaseModel~redisHasFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} The result, true if all the given fields exist in Redis, false if not.
+ */
+
+/**
  * Flush the fields from Redis.
  * If a field name is given, only that specific field is flushed if it exists.
  *
