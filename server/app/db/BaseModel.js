@@ -350,6 +350,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
     });
 
     // Set the field in Redis
+    latch.add();
     this.redisSetField(field, value, function(err) {
         // Resolve the latch on success
         if(err === null) {
