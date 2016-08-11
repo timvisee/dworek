@@ -696,14 +696,10 @@ BaseModel.prototype.redisAreFieldsEnabled = function(fields) {
         fields = [fields];
 
     // Loop through all the fields, check whether Redis is enabled
-    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++) {
-        // Get the current field
-        var field = fields[i];
-
+    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
         // Redis must be enabled for this field, if it´s configured. Return false if that's not the case
-        if(_.has(this._modelConfig.fields, field + '.redis.enable') && !this._modelConfig.fields[field].redis.enable)
+        if(this.redisIsFieldEnabled(fields[i]))
             return false;
-    }
 
     // Redis seems to be enabled for all fields, return true
     return true;
