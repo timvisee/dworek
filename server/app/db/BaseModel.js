@@ -131,7 +131,11 @@ BaseModel.prototype.getField = function(field, callback) {
         instance.mongoGetField(field, function(err, value) {
             // Call back errors
             if(err !== null) {
+                // Call back
                 callback(err);
+
+                // Run the cache tasks asynchronously and return
+                async.parallel(cacheTasks);
                 return;
             }
 
@@ -262,6 +266,9 @@ BaseModel.prototype.getFields = function(fields, callback) {
             // Call back errors
             if(err !== null) {
                 callback(err);
+
+                // Run the cache tasks asynchronously and return
+                async.parallel(cacheTasks);
                 return;
             }
 
