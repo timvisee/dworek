@@ -510,27 +510,8 @@ BaseModel.prototype.cacheAreFieldsEnabled = function(fields) {
  * @return {*} Field value, undefined is returned the field isn't cached.
  */
 BaseModel.prototype.cacheGetField = function(field) {
-    // Return undefined if cache is disabled for this field
-    if(!this.cacheIsFieldEnabled(field))
-        return undefined;
-
-    // Get the field from cache
-    var value = this._cache.getCache(field);
-
-    // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.from');
-
-    // Convert the value
-    if(hasConversionFunction) {
-        // Get the conversion function
-        var conversionFunction = this._modelConfig.fields[field].cache.from;
-
-        // Convert the value
-        value = conversionFunction(value);
-    }
-
-    // Return the result value
-    return value;
+    // Get and return the field through the bulk function
+    return this.cacheGetFields([field])[field];
 };
 
 /**
@@ -584,24 +565,12 @@ BaseModel.prototype.cacheGetFields = function(fields) {
  * @param {*} value Field value.
  */
 BaseModel.prototype.cacheSetField = function(field, value) {
-    // Return if cache is disabled for this field
-    if(!this.cacheIsFieldEnabled(field))
-        return;
+    // Create the fields object
+    var fields = {};
+    fields[field] = value;
 
-    // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.to');
-
-    // Convert the value
-    if(hasConversionFunction) {
-        // Get the conversion function
-        var conversionFunction = this._modelConfig.fields[field].cache.to;
-
-        // Convert the value
-        value = conversionFunction(value);
-    }
-
-    // Set the cache
-    this._cache.setCache(field, value);
+    // Set the field through the bulk function
+    this.cacheSetFields(fields);
 };
 
 /**
@@ -655,12 +624,8 @@ BaseModel.prototype.cacheSetFields = function(fields) {
  * @return {boolean} True if the field is cached, false if not.
  */
 BaseModel.prototype.cacheHasField = function(field) {
-    // Return false if cache isn't enabled for this field
-    if(!this.cacheIsFieldEnabled(field))
-        return false;
-
-    // Check whether this field is cached, return the result
-    return this._cache.hasCache(field);
+    // Get and return the field result the bulk function
+    return this.cacheHasFields([field]);
 };
 
 /**
