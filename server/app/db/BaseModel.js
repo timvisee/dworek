@@ -106,7 +106,13 @@ BaseModel.prototype.getField = function(field, callback) {
 
         // Call back the value if it isn't undefined, and if no error occurred
         if(err === null && value !== undefined) {
+            // Call back
             callback(null, value);
+
+            // Cache the value
+            instance.cacheSetField(field, value);
+
+            // We're done, return
             return;
         }
 
@@ -122,13 +128,28 @@ BaseModel.prototype.getField = function(field, callback) {
             callback(null, value);
 
             // Cache the value if it isn't undefined
-            if(value !== undefined)
-                instance.redisSetField(field, value, function(err) {
-                    if(err !== null) {
-                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                        console.warn(err);
+            if(value !== undefined) {
+                async.parallel([
+                    function(completeTask) {
+                        instance.redisSetField(field, value, function(err) {
+                            if(err !== null) {
+                                console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                                console.warn(err);
+                            }
+
+                            // Complete the task
+                            completeTask();
+                        });
+                    },
+                    function(completeTask) {
+                        // Cache the value
+                        instance.cacheSetField(field, value);
+
+                        // Complete the task
+                        completeTask();
                     }
-                });
+                ]);
+            }
         });
     });
 };
