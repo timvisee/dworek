@@ -1286,16 +1286,16 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
 
 /**
  * Flush the fields from Redis.
- * If a field name is given, only that specific field is flushed if it exists.
+ * If specific fields are given, only those fields are flushed from Redis if they exist.
  *
- * @param {String} [field=undefined] Name of the field to flush, undefined to flush all fields in Redis.
+ * @param {Array|String} [fields=undefined] Array of field names, or name of the field to flush, undefined to flush all fields in Redis.
  * @param {BaseModel~redisFlushCallback} callback Called when the fields are flushed, or when an error occurred.
  */
-BaseModel.prototype.redisFlush = function(field, callback) {
+BaseModel.prototype.redisFlush = function(fields, callback) {
     // Get the Redis instance
     var redis = RedisUtils.getConnection();
 
-    // Create a latch
+    // Create a callback latch
     var latch = new SmartCallback();
 
     // Create an array of keys to delete
@@ -1305,9 +1305,16 @@ BaseModel.prototype.redisFlush = function(field, callback) {
     latch.add();
 
     // Flush a specific field if a field is given
-    if(field !== undefined && field !== null) {
-        // Get the Redis key, and put it in the keys array
-        keys.push(this.redisGetKey(field));
+    if(fields !== undefined && fields !== null) {
+        // Convert the fields to an array
+        if(!Array.isArray(fields))
+            fields = [fields];
+
+        // Loop through the fields, and push their Redis keys to the keys array
+        fields.forEach(function(field) {
+            // Get the Redis key, and put it in the keys array
+            keys.push(this.redisGetKey(field));
+        });
 
         // Resolve the latch
         latch.resolve();
