@@ -142,6 +142,107 @@ BaseModel.prototype.getField = function(field, callback) {
  */
 
 /**
+ * Get a list of model fields.
+ *
+ * @param {Array|String} fields Array of field names or a single field name.
+ * @param {BaseModel~getFieldsCallback} callback Called when the result is fetched, or when an error occurred.
+ */
+BaseModel.prototype.getFields = function(fields, callback) {
+    // Get the fields from local cache and put it in the results object
+    var results = this.cacheGetField(fields);
+
+    // Create an array of fields that still need to be fetched
+    var fieldQueue = [];
+
+    // Loop through the results object and add the fields that still need to be fetched to the array
+    for(var field in results) {
+        // Make sure the results object contains the field
+        if(!results.hasOwnProperty(field))
+            continue;
+
+        // Add the field to the array if it's undefined
+        if(results[field] === undefined)
+            fieldQueue = field;
+    }
+
+    // Call back if the field queue is empty, since we successfully fetched all data
+    if(fieldQueue.length === 0) {
+        callback(null, results);
+        return;
+    }
+
+    // Store the current instance
+    const instance = this;
+
+    // Try to fetch the fields from Redis
+    this.redisGetFields(fieldQueue, function(err, values) {
+        // Show a console warning if an error occurred
+        if(err !== undefined) {
+            console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
+            console.warn(err);
+
+        } else {
+            // Process the fetched fields. Put the values in the results object, and update the fieldQueue array
+            // Clear the field queue array
+            fieldQueue = [];
+
+            // Loop through the result object
+            for(var field in values) {
+                // Make sure values contains the field
+                if(!values.hasOwnProperty(field))
+                    continue;
+
+                // Put the field in the results if it's fetched
+                if(values[field] !== undefined)
+                    results[field] = values[field];
+
+                else
+                    // Push the field in the fieldQueue array if it wasn't fetched
+                    fieldQueue.push(field);
+            }
+        }
+
+        // Try to fetch the field from Mongo
+        instance.mongoGetFields(fieldQueue, function(err, values) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Put the values in the results object
+            for(var field in values) {
+                // Make sure the values contain the field
+                if(!values.hasOwnProperty(field))
+                    continue;
+
+                // Put the field in the results
+                results[field] = values[field];
+            }
+
+            // Call back the results
+            callback(null, results);
+
+            // Cache the value if it isn't undefined
+            instance.redisSetFields(values, function(err) {
+                if(err !== null) {
+                    console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                    console.warn(err);
+                }
+            });
+        });
+    });
+};
+
+/**
+ * Called when the result is fetched, or when an error occurred.
+ *
+ * @callback BaseModel~getFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Object =} Object with field values.
+ */
+
+/**
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
