@@ -192,6 +192,9 @@ BaseModel.prototype.getFields = function(fields, callback) {
         return;
     }
 
+    // Create an array of cache tasks
+    var cacheTasks = [];
+
     // Store the current instance
     const instance = this;
 
@@ -221,11 +224,24 @@ BaseModel.prototype.getFields = function(fields, callback) {
                     // Push the field in the fieldQueue array if it wasn't fetched
                     fieldQueue.push(field);
             }
+
+            // Create a task to cache the values in the local object cache
+            cacheTasks.push(function(completeTask) {
+                // Set the fields in cache
+                instance.cacheSetFields(values);
+
+                // Complete the task
+                completeTask();
+            });
         }
 
         // Call back if the field queue is empty, since we successfully fetched all data
         if(fieldQueue.length === 0) {
+            // Call back
             callback(null, results);
+
+            // Run the cache tasks asynchronously and return
+            async.parallel(cacheTasks);
             return;
         }
 
@@ -250,13 +266,31 @@ BaseModel.prototype.getFields = function(fields, callback) {
             // Call back the results
             callback(null, results);
 
-            // Cache the value if it isn't undefined
-            instance.redisSetFields(values, function(err) {
-                if(err !== null) {
-                    console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                    console.warn(err);
-                }
+            // Create a cache task to cache the values in Redis
+            cacheTasks.push(function(completeTask) {
+                instance.redisSetFields(values, function(err) {
+                    // Show a warning if an error occurred
+                    if(err !== null) {
+                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                        console.warn(err);
+                    }
+
+                    // Complete the task
+                    completeTask();
+                });
             });
+
+            // Create a cache task to cache the values in the local object cache
+            cacheTasks.push(function(completeTask) {
+                // Set the fields in cache
+                instance.cacheSetFields(values);
+
+                // Complete the task
+                completeTask();
+            });
+
+            // Invoke the cache tasks asynchronously
+            async.parallel(cacheTasks);
         });
     });
 };
