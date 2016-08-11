@@ -705,6 +705,29 @@ BaseModel.prototype.hasFields = function(fields, callback) {
  */
 
 /**
+ * Flush the model cache. This flushes all non-persistent storage systems for this model.
+ * If no specific fields are given, all fields are flushed for the model.
+ *
+ * @param {Array|string|undefined} fields An array of field names or a specific field name to flush those fields.
+ * Undefined to flush all fields.
+ * @param {BaseModel~flushCacheCallback} callback Called when the data is flushed, or when an error occurred.
+ */
+BaseModel.prototype.flushCache = function(fields, callback) {
+    // Flush the Redis cache
+    this.redisFlush(fields, callback);
+
+    // Flush the local object cache
+    this.cacheFlush(fields);
+};
+
+/**
+ * Called when the data is flushed, or when an error occurred.
+ *
+ * @callback BaseModel~flushCacheCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
