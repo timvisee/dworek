@@ -493,14 +493,10 @@ BaseModel.prototype.cacheAreFieldsEnabled = function(fields) {
         fields = [fields];
 
     // Loop through all the fields, check whether cache is enabled
-    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++) {
-        // Get the current field
-        var field = fields[i];
-
+    for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
         // Cache must be enabled for this field, if it's configured. Return false if that's not the case
-        if(_.has(this._modelConfig.fields, field + '.cache.enable') && !this._modelConfig.fields[field].cache.enable)
+        if(!this.cacheIsFieldEnabled(fields[i]))
             return false;
-    }
 
     // Cache seems to be enabled for all fields, return true
     return true;
