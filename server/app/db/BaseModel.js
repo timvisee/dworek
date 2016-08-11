@@ -842,17 +842,10 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
             // Get the value for the mongo field
             var value = data[mongoFields[field]];
 
-            // Check whether a conversion function is configured
-            var hasConversionFunction = _.has(instance._modelConfig.fields, fields + '.mongo.from');
-
             // Convert the value
-            if(hasConversionFunction) {
-                // Get the conversion function
-                var conversionFunction = instance._modelConfig.fields[fields].mongo.from;
-
+            if(_.has(instance._modelConfig.fields, fields + '.mongo.from'))
                 // Convert the value
-                value = conversionFunction(value);
-            }
+                value = instance._modelConfig.fields[fields].mongo.from(value);
 
             // Add the value to the results object
             results[field] = value;
@@ -925,17 +918,10 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
         if(_.has(this._modelConfig.fields, field + '.mongo.field'))
             mongoField = this._modelConfig.fields[field].mongo.field || field;
 
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.mongo.to');
-
         // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = this._modelConfig.fields[field].mongo.to;
-
+        if(_.has(this._modelConfig.fields, field + '.mongo.to'))
             // Convert the value
-            value = conversionFunction(value);
-        }
+            value = this._modelConfig.fields[field].mongo.to(value);
 
         // Add the value to the data object
         data[mongoField] = value;
@@ -1225,17 +1211,10 @@ BaseModel.prototype.cacheGetFields = function(fields) {
         // Get the field from cache
         var value = this._cache.getCache(field);
 
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.from');
-
         // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = this._modelConfig.fields[field].cache.from;
-
+        if(_.has(this._modelConfig.fields, field + '.cache.from'))
             // Convert the value
-            value = conversionFunction(value);
-        }
+            value = this._modelConfig.fields[field].cache.from(value);
 
         // Add the value to the results object
         results[field] = value;
@@ -1288,17 +1267,10 @@ BaseModel.prototype.cacheSetFields = function(fields) {
         if(!this.cacheIsFieldEnabled(field))
             continue;
 
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.cache.to');
-
         // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = this._modelConfig.fields[field].cache.to;
-
+        if(_.has(this._modelConfig.fields, field + '.cache.to'))
             // Convert the value
-            value = conversionFunction(value);
-        }
+            value = this._modelConfig.fields[field].cache.to(value);
 
         // Add the value to the cache object
         cacheObject[field] = value;
@@ -1482,17 +1454,10 @@ BaseModel.prototype.redisGetField = function(field, callback) {
             return;
         }
 
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.from');
-
         // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = instance._modelConfig.fields[field].redis.from;
-
+        if(_.has(instance._modelConfig.fields, field + '.redis.from'))
             // Convert the value
-            value = conversionFunction(value);
-        }
+            value = instance._modelConfig.fields[field].redis.from(value);
 
         // Call back the value
         callback(null, value);
@@ -1581,17 +1546,10 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
                 var value = reply[i];
                 var field = redisFields[i];
 
-                // Check whether a conversion function is configured
-                var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.redis.from');
-
                 // Convert the value
-                if(hasConversionFunction) {
-                    // Get the conversion function
-                    var conversionFunction = instance._modelConfig.fields[field].redis.from;
-
+                if(_.has(instance._modelConfig.fields, field + '.redis.from'))
                     // Convert the value
-                    reply = conversionFunction(reply);
-                }
+                    reply = instance._modelConfig.fields[field].redis.from(reply);
 
                 // Push the result in the results object
                 results[field] = value;
@@ -1645,17 +1603,10 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     // Get the Redis connection instance
     const redis = RedisUtils.getConnection();
 
-    // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
-
     // Convert the value
-    if(hasConversionFunction) {
-        // Get the conversion function
-        var conversionFunction = this._modelConfig.fields[field].redis.to;
-
+    if(_.has(this._modelConfig.fields, field + '.redis.to'))
         // Convert the value
-        value = conversionFunction(value);
-    }
+        value = this._modelConfig.fields[field].redis.to(value);
 
     // Set the field and it's TTL
     redis.setex(key, CACHE_FIELD_EXPIRE, value, function(err) {
@@ -1708,17 +1659,10 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         if(!this.redisIsFieldEnabled(field))
             continue;
 
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(this._modelConfig.fields, field + '.redis.to');
-
         // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = this._modelConfig.fields[field].redis.to;
-
+        if(_.has(this._modelConfig.fields, field + '.redis.to'))
             // Convert the value
-            value = conversionFunction(value);
-        }
+            value = this._modelConfig.fields[field].redis.to(value);
 
         // Get and add the Redis key and value to the redis data array
         redisData.push(this.redisGetKey(field));
