@@ -822,7 +822,7 @@ BaseModel.prototype.redisGetField = function(field, callback) {
 /**
  * Get a list of fields from Redis.
  *
- * @param {Array} fields Array of field names to get.
+ * @param {Array|String} fields Array of field names or a single field name to get.
  * @param {BaseModel~redisGetFieldsCallback} callback Called when the data is fetched from Redis, or when an error occurred.
  */
 BaseModel.prototype.redisGetFields = function(fields, callback) {
@@ -834,6 +834,10 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
 
     // Create a results object
     var results = {};
+
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
 
     // Create a list of field names and Redis keys to fetch
     var redisFields = [];
@@ -1073,27 +1077,8 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
  * @param {BaseModel~redisHasFieldCallback} callback Called with the result, or when an error occurred.
  */
 BaseModel.prototype.redisHasField = function(field, callback) {
-    // Return false if Redis isn't enabled for this field
-    if(!this.redisIsFieldEnabled(field))
-        return false;
-
-    // Get the Redis key
-    var key = this.redisGetKey(field);
-
-    // Get the Redis connection instance
-    var redis = RedisUtils.getConnection();
-
-    // Check whether the field is available in Redis
-    redis.exists(key, function(err, reply) {
-        // Call back if an error occurred
-        if(err !== null) {
-            callback(new Error(err));
-            return;
-        }
-
-        // Call back with the result
-        callback(null, reply === 1);
-    });
+    // Get the field result through the bulk function
+    this.redisHasFields(field, callback);
 };
 
 /**
@@ -1107,7 +1092,7 @@ BaseModel.prototype.redisHasField = function(field, callback) {
 /**
  * Check whether the given fields are available in Redis.
  *
- * @param {Array} fields Array of field names.
+ * @param {Array|String} fields Array of field names or a single field name.
  * @param {BaseModel~redisHasFieldsCallback} callback Called with the result, or when an error occurred.
  */
 BaseModel.prototype.redisHasFields = function(fields, callback) {
@@ -1117,6 +1102,10 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
 
     // Store the current instance
     const instance = this;
+
+    // Convert the fields parameter to an array
+    if(!Array.isArray(fields))
+        fields = [fields];
 
     // Create an array of Redis keys
     var keys = [];
