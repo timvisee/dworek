@@ -464,6 +464,72 @@ BaseModel.prototype.setFields = function(fields, callback) {
  */
 
 /**
+ * Check whether a field is available.
+ *
+ * @param {string} field Field name.
+ * @param {BaseModel~hasFieldCallback} callback Called when the result is fetched, or when an error occurred.
+ */
+BaseModel.prototype.hasField = function(field, callback) {
+    // Check whether the field is available in local cache
+    if(this.cacheHasField(field)) {
+        callback(null, true);
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new SmartCallback();
+
+    // Check in MongoDB
+    latch.add();
+    this.mongoHasField(field, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back if the result is true
+        if(result) {
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Check in Redis
+    latch.add();
+    this.redisHasField(field, function(err, result) {
+        // Show a warning if an error occurred
+        if(err !== null) {
+            // Show the warning
+            console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+            console.warn(err);
+
+        } else if(result === true) {
+            // Call back if the result is true
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // If the latch is resolved, call back false. If true was called back it wouldn't reach this point
+    latch.then(() => callback(null, false));
+};
+
+/**
+ * Called when the result is fetched, or when an error occurred
+ *
+ * @callback BaseModel~hasFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the field exists, false if not.
+ */
+
+/**
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
