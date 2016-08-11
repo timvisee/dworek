@@ -84,57 +84,16 @@ var BaseModel = function(instance, modelConfig) {
  * @param {BaseModel~mongoGetFieldCallback} callback Called when the data is fetched from MongoDB, or when an error occurred.
  */
 BaseModel.prototype.mongoGetField = function(field, callback) {
-    // Get the MongoDB connection instance
-    const mongo = MongoUtils.getConnection();
-
-    // Store the class instance
-    const instance = this;
-
-    // Get the MongoDB field name
-    var mongoField = field;
-    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
-        mongoField = this._modelConfig.fields[field].mongo.field || field;
-
-    // Create the query object
-    var queryObject = {
-        _id: this._instance.getId()
-    };
-
-    // Create the projection object
-    var projectionObject = {};
-    projectionObject[mongoField] = true;
-
-    // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
+    // Get the field through the bulk function
+    this.mongoGetFields([field], function(err, data) {
         // Call back errors
         if(err !== null) {
-            callback(new Error(err), undefined);
+            callback(err);
             return;
         }
 
-        // Call back undefined if no results were found
-        if(reply.length === 0) {
-            callback(null, undefined);
-            return;
-        }
-
-        // Get the value
-        var value = reply[0][mongoField];
-
-        // Check whether a conversion function is configured
-        var hasConversionFunction = _.has(instance._modelConfig.fields, field + '.mongo.from');
-
-        // Convert the value
-        if(hasConversionFunction) {
-            // Get the conversion function
-            var conversionFunction = instance._modelConfig.fields[field].mongo.from;
-
-            // Convert the value
-            value = conversionFunction(value);
-        }
-
-        // Call back with the result
-        callback(null, value);
+        // Call back with the field value
+        callback(null, data[field]);
     });
 };
 
@@ -143,7 +102,7 @@ BaseModel.prototype.mongoGetField = function(field, callback) {
  *
  * @callback BaseModel~mongoGetFieldCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
- * @param {*} Fetched field value.
+ * @param {*=} Fetched field value.
  */
 
 /**
@@ -243,48 +202,12 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
  * @param {BaseModel~mongoSetFieldCallback} callback Called when the value is set, or if an error occurred.
  */
 BaseModel.prototype.mongoSetField = function(field, value, callback) {
-    // Get the MongoDB connection instance
-    const mongo = MongoUtils.getConnection();
+    // Create a fields object
+    var fields = {};
+    fields[field] = value;
 
-    // Check whether a conversion function is configured
-    var hasConversionFunction = _.has(this._modelConfig.fields, field + '.mongo.to');
-
-    // Convert the value
-    if(hasConversionFunction) {
-        // Get the conversion function
-        var conversionFunction = this._modelConfig.fields[field].mongo.to;
-
-        // Convert the value
-        value = conversionFunction(value);
-    }
-
-    // Get the MongoDB field name
-    var mongoField = field;
-    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
-        mongoField = this._modelConfig.fields[field].mongo.field || field;
-
-    // Create the query object
-    var queryObject = {
-        _id: this._instance.getId()
-    };
-
-    // Create the update object
-    var updateObject = {
-        $set: {}
-    };
-    updateObject.$set[mongoField] = value;
-
-    // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).updateOne(queryObject, updateObject).toArray(function(err) {
-        // Call back errors
-        if(err !== null) {
-            callback(new Error(err));
-            return;
-        }
-
-        // Call back with success
-        callback(null);
-    });
+    // Set the field through the bulk function
+    this.mongoSetFields(fields, callback);
 };
 
 /**
@@ -368,46 +291,14 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
  */
 
 /**
- * TODO: Untested function.
- *
  * Check whether the given field is in MongoDB.
  *
  * @param {String} field Field name.
  * @param {BaseModel~mongoHasFieldCallback} callback Called with the result, or when an error occurred.
  */
 BaseModel.prototype.mongoHasField = function(field, callback) {
-    // Get the MongoDB connection instance
-    const mongo = MongoUtils.getConnection();
-
-    // Get the MongoDB field name
-    var mongoField = field;
-    if(_.has(this._modelConfig.fields, field + '.mongo.field'))
-        mongoField = this._modelConfig.fields[field].mongo.field || field;
-
-    // Create the query object
-    var queryObject = {
-        _id: this._instance.getId()
-    };
-    queryObject[mongoField] = {
-        $exists: true
-    };
-
-    // Create the projection object
-    var projectionObject = {
-        _id: true
-    };
-
-    // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.db.collection).find(queryObject, projectionObject).toArray(function(err, data) {
-        // Call back errors
-        if(err !== null) {
-            callback(new Error(err), false);
-            return;
-        }
-
-        // Determine and return the result
-        callback(null, data.length > 0);
-    });
+    // Get the result through the bulk function
+    this.mongoHasFields([field], callback);
 };
 
 /**
