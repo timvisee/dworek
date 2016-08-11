@@ -78,6 +78,70 @@ var BaseModel = function(instance, modelConfig) {
 };
 
 /**
+ * Get a model field.
+ *
+ * @param {String} field Name of the field.
+ * @param {BaseModel~getFieldCallback} callback Called when the result is fetched, or when an error occurred.
+ */
+BaseModel.prototype.getField = function(field, callback) {
+    // Get the fields from cache
+    var value = this.cacheGetField(field);
+
+    // Call back the value if it isn't undefined
+    if(value !== undefined) {
+        callback(null, value);
+        return;
+    }
+
+    // Store the current instance
+    const instance = this;
+
+    // Try to fetch the field from Redis
+    this.redisGetField(field, function(err, value) {
+        // Show a console warning if an error occurred
+        if(err !== undefined) {
+            console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
+            console.warn(err);
+        }
+
+        // Call back the value if it isn't undefined, and if no error occurred
+        if(err === null && value !== undefined) {
+            callback(null, value);
+            return;
+        }
+
+        // Try to fetch the field from Mongo
+        instance.mongoGetField(field, function(err, value) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back the value
+            callback(null, value);
+
+            // Cache the value if it isn't undefined
+            if(value !== undefined)
+                instance.redisSetField(field, value, function(err) {
+                    if(err !== null) {
+                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                        console.warn(err);
+                    }
+                });
+        });
+    });
+};
+
+/**
+ * Called when the result is fetched, or when an error occurred.
+ *
+ * @callback BaseModel~getFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*=} Field value.
+ */
+
+/**
  * Get a field from MongoDB.
  *
  * @param {String} field Name of the field.
