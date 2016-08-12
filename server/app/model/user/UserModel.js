@@ -227,7 +227,7 @@ UserModel.prototype.getCreateDate = (callback) => this.getField('create_date', c
  *
  * @callback UserModel~getCreateDateCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Date}
+ * @param {Date} Creation date.
  */
 
 /**

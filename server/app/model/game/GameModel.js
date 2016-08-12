@@ -140,16 +140,16 @@ GameModel.prototype.getIdHex = function() {
  * Get the given field from the model.
  *
  * @param {String} field Field names.
- * @param {SessionModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ * @param {GameModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
  */
-SessionModel.prototype.getField = function(field, callback) {
+GameModel.prototype.getField = function(field, callback) {
     this._baseModel.getField(field, callback);
 };
 
 /**
  * Called with the result of a model field, or when an error occurred.
  *
- * @callback SessionModel~getFieldCallback
+ * @callback GameModel~getFieldCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {*=} Field value.
  */
@@ -159,16 +159,16 @@ SessionModel.prototype.getField = function(field, callback) {
  *
  * @param {String} field Field name.
  * @param {*} value Field value.
- * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ * @param {GameModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
-SessionModel.prototype.setField = function(field, value, callback) {
+GameModel.prototype.setField = function(field, value, callback) {
     this._baseModel.setField(field, value, callback);
 };
 
 /**
  * Called on success, or when an error occurred.
  *
- * @callback SessionModel~setFieldCallback
+ * @callback GameModel~setFieldCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
