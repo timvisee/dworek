@@ -94,7 +94,7 @@ BaseModel.prototype.getField = function(field, callback) {
     }
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Create an array of cache tasks
     var cacheTasks = [];
@@ -121,7 +121,7 @@ BaseModel.prototype.getField = function(field, callback) {
                     // Create a task to cache the value in the local object cache
                     cacheTasks.push(function(completeTask) {
                         // Set the fields in cache
-                        instance.cacheSetField(field, value);
+                        self.cacheSetField(field, value);
 
                         // Complete the task
                         completeTask();
@@ -141,7 +141,7 @@ BaseModel.prototype.getField = function(field, callback) {
     // Get the field from MongoDB when ready
     latch.then(function() {
         // Try to fetch the field from Mongo
-        instance.mongoGetField(field, function(err, value) {
+        self.mongoGetField(field, function(err, value) {
             // Call back errors
             if(err !== null) {
                 // Call back
@@ -158,7 +158,7 @@ BaseModel.prototype.getField = function(field, callback) {
             // Add a task to cache the values in Redis if ready
             if(RedisUtils.isReady()) {
                 cacheTasks.push(function(completeTask) {
-                    instance.redisSetField(field, value, function(err) {
+                    self.redisSetField(field, value, function(err) {
                         if(err !== null) {
                             console.warn('A Redis error occurred while caching model data, which will be ignored.');
                             console.warn(err);
@@ -173,7 +173,7 @@ BaseModel.prototype.getField = function(field, callback) {
             // Add a task to cache the values in the local object cache
             cacheTasks.push(function(completeTask) {
                 // Cache the value
-                instance.cacheSetField(field, value);
+                self.cacheSetField(field, value);
 
                 // Complete the task
                 completeTask();
@@ -227,7 +227,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
     var cacheTasks = [];
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Create a callback latch
     var latch = new CallbackLatch();
@@ -264,7 +264,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
                 // Create a task to cache the values in the local object cache
                 cacheTasks.push(function(completeTask) {
                     // Set the fields in cache
-                    instance.cacheSetFields(values);
+                    self.cacheSetFields(values);
 
                     // Complete the task
                     completeTask();
@@ -289,7 +289,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
     // Try to fetch the field from Mongo when ready
     latch.then(function() {
         // Try to fetch the field from Mongo
-        instance.mongoGetFields(fieldQueue, function(err, values) {
+        self.mongoGetFields(fieldQueue, function(err, values) {
             // Call back errors
             if(err !== null) {
                 callback(err);
@@ -315,7 +315,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
             // Create a cache task to cache the values in Redis if ready
             if(RedisUtils.isReady()) {
                 cacheTasks.push(function(completeTask) {
-                    instance.redisSetFields(values, function(err) {
+                    self.redisSetFields(values, function(err) {
                         // Show a warning if an error occurred
                         if(err !== null) {
                             console.warn('A Redis error occurred while caching model data, which will be ignored.');
@@ -331,7 +331,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
             // Create a cache task to cache the values in the local object cache
             cacheTasks.push(function(completeTask) {
                 // Set the fields in cache
-                instance.cacheSetFields(values);
+                self.cacheSetFields(values);
 
                 // Complete the task
                 completeTask();
@@ -363,7 +363,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
     var latch = new CallbackLatch();
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Set the field in MongoDB
     latch.add();
@@ -396,7 +396,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
             console.warn(err);
 
             // Flush the field as fallback
-            instance.redisFlush(field, function(err) {
+            self.redisFlush(field, function(err) {
                 // Call back if an error occurred
                 if(err !== null) {
                     // Show a warning
@@ -442,7 +442,7 @@ BaseModel.prototype.setFields = function(fields, callback) {
     var latch = new CallbackLatch();
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Set the fields in MongoDB
     latch.add();
@@ -475,7 +475,7 @@ BaseModel.prototype.setFields = function(fields, callback) {
             console.warn(err);
 
             // Flush the field as fallback
-            instance.redisFlush(Object.keys(fields), function(err) {
+            self.redisFlush(Object.keys(fields), function(err) {
                 // Call back if an error occurred
                 if(err !== null) {
                     // Show a warning
@@ -636,7 +636,7 @@ BaseModel.prototype.hasFields = function(fields, callback) {
     }
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Check all fields one by one on all storage systems if the previous checks failed
     latch.then(function() {
@@ -655,7 +655,7 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                     return;
 
                 // Check whether the field exists
-                var exists = instance.cacheHasField(field);
+                var exists = self.cacheHasField(field);
 
                 // Process the result if the result is false
                 if(exists === false) {
@@ -678,7 +678,7 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                         return;
 
                     // Check whether the field exists in Redis
-                    instance.redisHasField(field, function(err, exists) {
+                    self.redisHasField(field, function(err, exists) {
                         // Show a warning if Redis failed
                         if(err !== null) {
                             console.warn('A Redis error occurred while checking if a model field exists, falling back.');
@@ -708,7 +708,7 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                     return;
 
                 // Check whether the field exists in MongoDB
-                instance.mongoHasField(field, function(err, exists) {
+                self.mongoHasField(field, function(err, exists) {
                     // Call back errors
                     if(err !== null) {
                         completeTask(err, false);
@@ -767,12 +767,12 @@ BaseModel.prototype.hasFields = function(fields, callback) {
  */
 BaseModel.prototype.flush = function(fields, callback) {
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Flush the cache and MongoDB, call back when we're done
     async.parallel([
-        (completeTask) => instance.flushCache(fields, completeTask),
-        (completeTask) => instance.mongoFlush(fields, completeTask)
+        (completeTask) => self.flushCache(fields, completeTask),
+        (completeTask) => self.mongoFlush(fields, completeTask)
     ], function(err) {
         if(callback !== undefined)
             callback(err);
@@ -853,7 +853,7 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
     const mongo = MongoUtils.getConnection();
 
     // Store the class instance
-    const instance = this;
+    const self = this;
 
     // Convert the fields parameter to an array
     if(!Array.isArray(fields))
@@ -863,8 +863,8 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
     var mongoFields = {};
     fields.forEach(function(field) {
         // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
-        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
-            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        if(_.has(self._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = self._modelConfig.fields[fields].mongo.field || fields;
         else
             mongoFields[field] = field;
     });
@@ -907,9 +907,9 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
             var value = data[mongoFields[field]];
 
             // Convert the value
-            if(_.has(instance._modelConfig.fields, fields + '.mongo.from'))
+            if(_.has(self._modelConfig.fields, fields + '.mongo.from'))
                 // Convert the value
-                value = instance._modelConfig.fields[fields].mongo.from(value);
+                value = self._modelConfig.fields[fields].mongo.from(value);
 
             // Add the value to the results object
             results[field] = value;
@@ -1068,7 +1068,7 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
     const mongo = MongoUtils.getConnection();
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Convert the fields parameter to an array
     if(!Array.isArray(fields))
@@ -1078,8 +1078,8 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
     var mongoFields = {};
     fields.forEach(function(field) {
         // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
-        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
-            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        if(_.has(self._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = self._modelConfig.fields[fields].mongo.field || fields;
         else
             mongoFields[field] = field;
     });
@@ -1170,14 +1170,14 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
     fields = [fields];
 
     // Store this instance
-    const instance = this;
+    const self = this;
 
     // Create a list of field name translations to MongoDB
     var mongoFields = {};
     fields.forEach(function(field) {
         // Get the MongoDB field name and add it to the array, use the field name if nothing is configured
-        if(_.has(instance._modelConfig.fields, fields + '.mongo.field'))
-            mongoFields[field] = instance._modelConfig.fields[fields].mongo.field || fields;
+        if(_.has(self._modelConfig.fields, fields + '.mongo.field'))
+            mongoFields[field] = self._modelConfig.fields[fields].mongo.field || fields;
         else
             mongoFields[field] = field;
     });
@@ -1289,23 +1289,23 @@ BaseModel.prototype.cacheGetFields = function(fields) {
         fields = [fields];
 
     // Store this
-    const instance = this;
+    const self = this;
 
     // Loop through all the fields, fetch and convert their value and add it to the results object
     fields.forEach(function(field) {
         // Set the value to undefined if cache isn't enabled for this field
-        if(!instance.cacheIsFieldEnabled(field)) {
+        if(!self.cacheIsFieldEnabled(field)) {
             results[field] = undefined;
             return;
         }
 
         // Get the field from cache
-        var value = instance._cache.getCache(field);
+        var value = self._cache.getCache(field);
 
         // Convert the value
-        if(_.has(instance._modelConfig.fields, field + '.cache.from'))
+        if(_.has(self._modelConfig.fields, field + '.cache.from'))
             // Convert the value
-            value = instance._modelConfig.fields[field].cache.from(value);
+            value = self._modelConfig.fields[field].cache.from(value);
 
         // Add the value to the results object
         results[field] = value;
@@ -1499,11 +1499,11 @@ BaseModel.prototype.redisGetKeys = function(fields) {
     var results = {};
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Loop through the list of fields
     fields.forEach(function(field) {
-        results[field] = instance.redisGetKey(field);
+        results[field] = self.redisGetKey(field);
     });
 
     // Return the results
@@ -1530,7 +1530,7 @@ BaseModel.prototype.redisGetField = function(field, callback) {
     const redis = RedisUtils.getConnection();
 
     // Store the class instance
-    const instance = this;
+    const self = this;
 
     // Fetch the value from Redis
     redis.get(key, function(err, value) {
@@ -1552,9 +1552,9 @@ BaseModel.prototype.redisGetField = function(field, callback) {
         }
 
         // Convert the value
-        if(_.has(instance._modelConfig.fields, field + '.redis.from'))
+        if(_.has(self._modelConfig.fields, field + '.redis.from'))
             // Convert the value
-            value = instance._modelConfig.fields[field].redis.from(value);
+            value = self._modelConfig.fields[field].redis.from(value);
 
         // Call back the value
         callback(null, value);
@@ -1586,7 +1586,7 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
     const redis = RedisUtils.getConnection();
 
     // Store the class instance
-    const instance = this;
+    const self = this;
 
     // Create a results object
     var results = {};
@@ -1600,14 +1600,14 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
     var redisKeys = [];
     fields.forEach(function(field) {
         // Make sure Redis is enabled for this field, add it as undefined to the results object if not
-        if(!instance.redisIsFieldEnabled(field)) {
+        if(!self.redisIsFieldEnabled(field)) {
             results[field] = undefined;
             return;
         }
 
         // Get the key, and add it to the redis keys array
         redisFields.push(field);
-        redisKeys.push(instance.redisGetKey(field));
+        redisKeys.push(self.redisGetKey(field));
     });
 
     // Create a callback latch
@@ -1650,9 +1650,9 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
                 var field = redisFields[i];
 
                 // Convert the value
-                if(_.has(instance._modelConfig.fields, field + '.redis.from'))
+                if(_.has(self._modelConfig.fields, field + '.redis.from'))
                     // Convert the value
-                    reply = instance._modelConfig.fields[field].redis.from(reply);
+                    reply = self._modelConfig.fields[field].redis.from(reply);
 
                 // Push the result in the results object
                 results[field] = value;
@@ -1896,7 +1896,7 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
     }
 
     // Store the current instance
-    const instance = this;
+    const self = this;
 
     // Convert the fields parameter to an array
     if(!Array.isArray(fields))
@@ -1905,7 +1905,7 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
     // Create an array of Redis keys
     var keys = [];
     fields.forEach(function(field) {
-        keys.push(instance.redisGetKey(field));
+        keys.push(self.redisGetKey(field));
     });
 
     // Get the Redis connection instance
