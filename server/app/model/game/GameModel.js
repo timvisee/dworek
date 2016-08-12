@@ -21,10 +21,12 @@
  ******************************************************************************/
 
 var util = require('util');
-var GameDatabase = require('./GameDatabase');
-var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
-var User = require('../user/UserModel');
 var ObjectId = require('mongodb').ObjectId;
+var GameDatabase = require('./GameDatabase');
+var BaseModel = require('../../db/BaseModel');
+var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
+var UserModel = require('../user/UserModel');
+var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
  * Constructor.
@@ -41,36 +43,80 @@ var GameModel = function(id) {
      */
     this._id = id;
 
-    // Apply the database object layer to this object
-    this.layerApply(this, GameDatabase.DB_COLLECTION_NAME, {
-        user: {
-            field: 'user_id',
-            toOutput: function(userId) {
-                return new User(userId);
+    // Create and configure the base model instance for this model
+    this._baseModel = new BaseModel(this, {
+        mongo: {
+            collection: GameDatabase.DB_COLLECTION_NAME
+        },
+        fields: {
+            user: {
+                mongo: {
+                    field: 'user_id',
+
+                    /**
+                     * Convert an ID to an User model.
+                     *
+                     * @param {ObjectId} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(id),
+
+                    /**
+                     * Convert an User model to an ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {ObjectId} ID.
+                     */
+                    to: (user) => user.getId()
+                },
+                cache: {
+                    /**
+                     * Convert a hexadecimal ID to a User model.
+                     *
+                     * @param {String} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(new ObjectId(id)),
+
+                    /**
+                     * Convert an User model to a hexadecimal ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (user) => user.getIdHex()
+                },
+                redis: {
+                    /**
+                     * Convert a hexadecimal ID to a User model.
+                     *
+                     * @param {String} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(new ObjectId(id)),
+
+                    /**
+                     * Convert an User model to a hexadecimal ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (user) => user.getIdHex()
+                }
             },
-            fromDb: function(userId) {
-                return userId;
-            },
-            toRedis: function(userId) {
-                return userId.toString();
-            },
-            fromRedis: function(userIdHex) {
-                return new ObjectId(userIdHex);
+            name: {},
+            create_date: {
+                redis: {
+                    from: ConversionFunctions.dateFromRedis,
+                    to: ConversionFunctions.dateToRedis
+                }
             }
-        },
-        name: {
-            field: 'name'
-        },
-        create_date: {
-            field: 'create_date',
-            toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-            fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
         }
     });
 };
-
-// Inherit the database object layer
-util.inherits(GameModel, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the game.
@@ -91,31 +137,85 @@ GameModel.prototype.getIdHex = function() {
 };
 
 /**
+ * Get the given field from the model.
+ *
+ * @param {String} field Field names.
+ * @param {SessionModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ */
+SessionModel.prototype.getField = function(field, callback) {
+    this._baseModel.getField(field, callback);
+};
+
+/**
+ * Called with the result of a model field, or when an error occurred.
+ *
+ * @callback SessionModel~getFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*=} Field value.
+ */
+
+/**
+ * Set the given field to the given value for this model.
+ *
+ * @param {String} field Field name.
+ * @param {*} value Field value.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setField = function(field, value, callback) {
+    this._baseModel.setField(field, value, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback SessionModel~setFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the user that created this game.
  *
- * @param {function} callback ({User} user) Callback with the result.
+ * @param {GameModel~getUserCallback} callback Called with the user or when an error occurred.
  */
-GameModel.prototype.getUser = function(callback) {
-    this.layerFetchField('user', callback);
-};
+GameModel.prototype.getUser = (callback) => this.getField('user', callback);
+
+/**
+ * Called with the user or when an error occurred.
+ *
+ * @callback GameModel~getUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {User} User.
+ */
 
 /**
  * Get the name of the game.
  *
- * @param {function} callback (err, {string} name) Callback with the result.
+ * @param {GameModel~getNameCallback} callback Called with the name or when an error occurred.
  */
-GameModel.prototype.getName = function(callback) {
-    this.layerFetchField('name', callback);
-};
+GameModel.prototype.getName = (callback) => this.getField('name', callback);
+
+/**
+ * Called with the name or when an error occurred.
+ *
+ * @callback GameModel~getNameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Game name.
+ */
 
 /**
  * Get the date this game was created on.
  *
- * @param {function} callback (err, {Date} createDate) Callback with the result.
+ * @param {GameModel~getCreateDateCallback} callback Called with the creation date or when an error occurred.
  */
-GameModel.prototype.getCreateDate = function(callback) {
-    this.layerFetchField('create_date', callback);
-};
+GameModel.prototype.getCreateDate = (callback) => this.getField('create_date', callback);
+
+/**
+ * Called with the creation date or when an error occurred.
+ *
+ * @callback GameModel~getCreateDateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Date} Game creation date.
+ */
 
 // Export the user class
 module.exports = GameModel;
