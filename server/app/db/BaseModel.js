@@ -1772,9 +1772,11 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
         return;
     }
 
-    // Return false if Redis isn't enabled for all fields
-    if(!this.redisAreFieldsEnabled(fields))
-        return false;
+    // Call back false if Redis isn't enabled for all fields
+    if(!this.redisAreFieldsEnabled(fields)) {
+        callback(null, false);
+        return;
+    }
 
     // Store the current instance
     const instance = this;
