@@ -356,7 +356,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
  *
  * @param {String} field Field name..
  * @param {*} value Field value.
- * @param {BaseModel~setFieldCallback} callback Called when the field is set, or when an error occurred.
+ * @param {BaseModel~setFieldCallback} [callback] Called when the field is set, or when an error occurred.
  */
 BaseModel.prototype.setField = function(field, value, callback) {
     // Create a callback latch to set the fields
@@ -370,7 +370,10 @@ BaseModel.prototype.setField = function(field, value, callback) {
     this.mongoSetField(field, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(err);
+            if(callback !== undefined)
+                callback(err);
+            else
+                throw err;
             return;
         }
 
@@ -400,7 +403,10 @@ BaseModel.prototype.setField = function(field, value, callback) {
                     console.warn('Fallback flushing fields failed.');
 
                     // Call back the error
-                    callback(err);
+                    if(callback !== undefined)
+                        callback(err);
+                    else
+                        throw err;
                     return;
                 }
 
@@ -411,7 +417,8 @@ BaseModel.prototype.setField = function(field, value, callback) {
     }
 
     // Call back if the latch is fully resolved
-    latch.then(() => callback(null));
+    if(callback !== undefined)
+        latch.then(() => callback(null));
 
     // Set the field in the local object cache
     this.cacheSetField(field, value);
@@ -428,7 +435,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
  * Set fields of a model.
  *
  * @param {Object} fields Object of fields and their values.
- * @param {BaseModel~setFieldsCallback} callback Called when the fields are set, or when an error occurred.
+ * @param {BaseModel~setFieldsCallback} [callback] Called when the fields are set, or when an error occurred.
  */
 BaseModel.prototype.setFields = function(fields, callback) {
     // Create a callback latch to set the fields
@@ -442,7 +449,10 @@ BaseModel.prototype.setFields = function(fields, callback) {
     this.mongoSetFields(fields, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(err);
+            if(callback !== undefined)
+                callback(err);
+            else
+                throw err;
             return;
         }
 
@@ -472,7 +482,10 @@ BaseModel.prototype.setFields = function(fields, callback) {
                     console.warn('Fallback flushing fields failed.');
 
                     // Call back the error
-                    callback(err);
+                    if(callback !== undefined)
+                        callback(err);
+                    else
+                        throw err;
                     return;
                 }
 
@@ -483,7 +496,8 @@ BaseModel.prototype.setFields = function(fields, callback) {
     }
 
     // Call back if the latch is fully resolved
-    latch.then(() => callback(null));
+    if(callback !== undefined)
+        latch.then(() => callback(null));
 
     // Set the field in the local object cache
     this.cacheSetFields(fields);
@@ -749,14 +763,22 @@ BaseModel.prototype.hasFields = function(fields, callback) {
  *
  * @param {Array|string|undefined} fields An array of field names or a specific field name to flush those fields.
  * Undefined to flush all fields.
- * @param {BaseModel~flushCallback} callback Called when the data is flushed, or when an error occurred.
+ * @param {BaseModel~flushCallback} [callback] Called when the data is flushed, or when an error occurred.
  */
 BaseModel.prototype.flush = function(fields, callback) {
+    // Store the current instance
+    const instance = this;
+
     // Flush the cache and MongoDB, call back when we're done
     async.parallel([
-        (completeTask) => this.flushCache(fields, completeTask),
-        (completeTask) => this.mongoFlush(fields, completeTask)
-    ], (err) => callback(err));
+        (completeTask) => instance.flushCache(fields, completeTask),
+        (completeTask) => instance.mongoFlush(fields, completeTask)
+    ], function(err) {
+        if(callback !== undefined)
+            callback(err);
+        else
+            throw err;
+    });
 };
 
 /**
@@ -772,13 +794,13 @@ BaseModel.prototype.flush = function(fields, callback) {
  *
  * @param {Array|string|undefined} fields An array of field names or a specific field name to flush those fields.
  * Undefined to flush all fields.
- * @param {BaseModel~flushCacheCallback} callback Called when the data is flushed, or when an error occurred.
+ * @param {BaseModel~flushCacheCallback} [callback] Called when the data is flushed, or when an error occurred.
  */
 BaseModel.prototype.flushCache = function(fields, callback) {
     // Flush the Redis cache if ready, call back otherwise
     if(RedisUtils.isReady())
         this.redisFlush(fields, callback);
-    else
+    else if(callback !== undefined)
         callback(null);
 
     // Flush the local object cache
@@ -911,7 +933,7 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
  *
  * @param {String} field Name of the field.
  * @param {*} value Field value.
- * @param {BaseModel~mongoSetFieldCallback} callback Called when the value is set, or if an error occurred.
+ * @param {BaseModel~mongoSetFieldCallback} [callback] Called when the value is set, or if an error occurred.
  */
 BaseModel.prototype.mongoSetField = function(field, value, callback) {
     // Set the field through the bulk function
@@ -931,7 +953,7 @@ BaseModel.prototype.mongoSetField = function(field, value, callback) {
  * Set a list of fields in MongoDB.
  *
  * @param {Object} fields Object with fields and values to set.
- * @param {BaseModel~mongoSetFieldsCallback} callback Called when the values are set, or when an error occurred.
+ * @param {BaseModel~mongoSetFieldsCallback} [callback] Called when the values are set, or when an error occurred.
  */
 BaseModel.prototype.mongoSetFields = function(fields, callback) {
     // Get the MongoDB connection instance
@@ -970,7 +992,8 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     // Call back if the object doesn't contain any keys
     if(Object.keys(data).length === 0) {
         // Call back
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
@@ -988,12 +1011,21 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err) {
         // Call back errors
         if(err !== null) {
-            callback(new Error(err));
+            // Encapsulate the error
+            const error = new Error(err);
+
+            // Call back or throw the error
+            if(callback !== undefined)
+                callback(error);
+            else
+                throw error;
+
             return;
         }
 
         // Call back with success
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
     });
 };
 
@@ -1096,7 +1128,7 @@ BaseModel.prototype.mongoHasFields = function(fields, callback) {
  * If field names are given, only those specific fields are flushed if they exists.
  *
  * @param {Array|String} [fields=undefined] Array of field names or name of the field to flush, undefined to flush all the fields.
- * @param {BaseModel~mongoFlushCallback} callback Called on success, or when an error occurred.
+ * @param {BaseModel~mongoFlushCallback} [callback] Called on success, or when an error occurred.
  */
 BaseModel.prototype.mongoFlush = function(fields, callback) {
     // Get the MongoDB connection instance
@@ -1114,12 +1146,20 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
         mongo.collection(this._modelConfig.mongo.collection).deleteOne(queryObject, function(err) {
             // Call back errors
             if(err !== null) {
-                callback(new Error(err));
+                // Encapsulate the error
+                const error = new Error(err);
+
+                // Call back or throw the error
+                if(callback !== undefined)
+                    callback(error);
+                else
+                    throw error;
                 return;
             }
 
             // Call back with success
-            callback(null);
+            if(callback !== undefined)
+                callback(null);
         });
 
         return;
@@ -1158,12 +1198,20 @@ BaseModel.prototype.mongoFlush = function(fields, callback) {
     mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err) {
         // Call back errors
         if(err !== null) {
-            callback(new Error(err));
+            // Encapsulate the error
+            const error = new Error(err);
+
+            // Call back or throw the error
+            if(callback !== undefined)
+                callback(error);
+            else
+                throw error;
             return;
         }
 
         // Call back with success
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
     });
 };
 
@@ -1636,25 +1684,28 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
  *
  * @param {string} field Name of the field.
  * @param {*} value Value of the field.
- * @param {BaseModel~redisSetFieldCallback} callback Called when the value is set, or when an error occurred.
+ * @param {BaseModel~redisSetFieldCallback} [callback] Called when the value is set, or when an error occurred.
  */
 BaseModel.prototype.redisSetField = function(field, value, callback) {
     // Call back if Redis isn't ready
     if(!RedisUtils.isReady()) {
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
     // Skip if the value is undefined
     if(value === undefined) {
         // Call back and return
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
     // Return undefined if Redis is disabled for this field
     if(!this.redisIsFieldEnabled(field)) {
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
@@ -1673,12 +1724,20 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
     redis.setex(key, CACHE_FIELD_EXPIRE, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(new Error(err));
+            // Encapsulate the error
+            const error = new Error(err);
+
+            // Call back or throw the error
+            if(callback !== undefined)
+                callback(error);
+            else
+                throw error;
             return;
         }
 
         // Call back
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
     });
 };
 
@@ -1694,12 +1753,13 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
  * A field won't be set if Redis is disabled for that specific field.
  *
  * @param {Object} fields Object with the fields and values to set.
- * @param {BaseModel~redisSetFieldsCallback} callback Called when the values are set, or when an error occurred.
+ * @param {BaseModel~redisSetFieldsCallback} [callback] Called when the values are set, or when an error occurred.
  */
 BaseModel.prototype.redisSetFields = function(fields, callback) {
     // Call back if Redis isn't ready
     if(!RedisUtils.isReady()) {
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
@@ -1739,7 +1799,8 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
     // Call back if the Redis data array is empty
     if(redisData.length === 0) {
         // Call back
-        callback(null);
+        if(callback !== undefined)
+            callback(null);
         return;
     }
 
@@ -1747,7 +1808,14 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
     redis.mset(redisData, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            callback(new Error(err));
+            // Encapsulate the error
+            const error = new Error(err);
+
+            // Call back or throw the error
+            if(callback !== undefined)
+                callback(error);
+            else
+                throw error;
             return;
         }
 
@@ -1773,7 +1841,11 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
 
         // Call back when we're done, pass along errors
         latch.then(function() {
-            callback(commandError);
+            if(callback !== undefined)
+                callback(commandError);
+
+            else if(commandError !== null)
+                throw commandError;
         });
     });
 };
@@ -1865,12 +1937,13 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
  * If specific fields are given, only those fields are flushed from Redis if they exist.
  *
  * @param {Array|String} [fields=undefined] Array of field names, or name of the field to flush, undefined to flush all fields in Redis.
- * @param {BaseModel~redisFlushCallback} callback Called when the fields are flushed, or when an error occurred.
+ * @param {BaseModel~redisFlushCallback} [callback] Called when the fields are flushed, or when an error occurred.
  */
 BaseModel.prototype.redisFlush = function(fields, callback) {
     // Call back if Redis isn't ready
     if(!RedisUtils.isReady()) {
-        callback(null, 0);
+        if(callback !== undefined)
+            callback(null, 0);
         return;
     }
 
@@ -1909,7 +1982,8 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
         redis.keys(baseWildcardKey, function(err, replyKeys) {
             // Call back if an error occurred
             if(err !== null) {
-                callback(null, 0);
+                if(callback !== undefined)
+                    callback(null, 0);
                 return;
             }
 
@@ -1925,7 +1999,8 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
     latch.then(function() {
         // Call back if there are no keys to delete
         if(keys.length === 0) {
-            callback(null, 0);
+            if(callback !== undefined)
+                callback(null, 0);
             return;
         }
 
@@ -1933,12 +2008,20 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
         redis.del(keys, function(err, reply) {
             // Call back if an error occurred
             if(err !== null) {
-                callback(new Error(err), 0);
+                // Encapsulate the error
+                const error = new Error(err);
+
+                // Call back or throw the error
+                if(callback !== undefined)
+                    callback(error, 0);
+                else
+                    throw error;
                 return;
             }
 
             // Call back with the result
-            callback(null, reply);
+            if(callback !== undefined)
+                callback(null, reply);
         });
     });
 };
