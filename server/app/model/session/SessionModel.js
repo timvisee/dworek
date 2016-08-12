@@ -21,9 +21,12 @@
  ******************************************************************************/
 
 var util = require('util');
+var ObjectId = require('mongodb').ObjectId;
 var SessionDatabase = require('./SessionDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
+var UserModel = require('../user/UserModel');
+var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
  * Constructor.
@@ -49,62 +52,84 @@ var SessionModel = function(id) {
             user: {
                 mongo: {
                     field: 'user_id',
-                    from: function(value) {
-                        return value;
-                    },
-                    to: function(value) {
-                        return value;
-                    }
+
+                    /**
+                     * Convert an ID to an User model.
+                     *
+                     * @param {ObjectId} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(id),
+
+                    /**
+                     * Convert an User model to an ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {ObjectId} ID.
+                     */
+                    to: (user) => user.getId()
                 },
                 cache: {
                     enable: true,
-                    from: function(value) {
-                        return value;
-                    },
-                    to: function(value) {
-                        return value;
-                    }
+
+                    /**
+                     * Convert a hexadecimal ID to a User model.
+                     *
+                     * @param {String} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(new ObjectId(id)),
+
+                    /**
+                     * Convert an User model to a hexadecimal ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (user) => user.getIdHex()
                 },
                 redis: {
                     enable: true,
-                    from: function(value) {
-                        return value;
-                    },
-                    to: function(value) {
-                        return value;
-                    }
+
+                    /**
+                     * Convert a hexadecimal ID to a User model.
+                     *
+                     * @param {String} id
+                     * @return {UserModel} User.
+                     */
+                    // TODO: Get the user from the user manager instead of instantiating it directly
+                    from: (id) => new UserModel(new ObjectId(id)),
+
+                    /**
+                     * Convert an User model to a hexadecimal ID.
+                     *
+                     * @param {UserModel} user User.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (user) => user.getIdHex()
                 }
             },
-            token: {
-                mongo: {
-                    field: 'token'
-                }
-            },
+            token: {},
             create_date: {
-                mongo: {
-                    field: 'create_date'
-                },
-                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
-            },
-            create_ip: {
-                mongo: {
-                    field: 'create_ip'
+                redis: {
+                    from: ConversionFunctions.dateFromRedis,
+                    to: ConversionFunctions.dateToRedis
                 }
             },
+            create_ip: {},
             last_use_date: {
-                mongo: {
-                    field: 'last_use_date'
-                },
-                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
+                redis: {
+                    from: ConversionFunctions.dateFromRedis,
+                    to: ConversionFunctions.dateToRedis
+                }
             },
             expire_date: {
-                mongo: {
-                    field: 'expire_date'
-                },
-                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
+                redis: {
+                    from: ConversionFunctions.dateFromRedis,
+                    to: ConversionFunctions.dateToRedis
+                }
             }
         }
     });
@@ -172,13 +197,13 @@ SessionModel.prototype.getUser = (callback) => this.getField('user', callback);
  *
  * @callback SessionModel~getUserCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {User=} User.
+ * @param {UserModel=} User.
  */
 
 /**
  * Set the user that owns this session.
  *
- * @param {User} user User.
+ * @param {UserModel} user User.
  * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 SessionModel.prototype.setUser = (user, callback) => this.setField('user', user, callback);
