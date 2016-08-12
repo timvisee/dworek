@@ -190,7 +190,7 @@ SessionManager.getSessionByTokenIfValid = function(token, callback) {
  * Get the session user by the given session token if the session is valid.
  *
  * @param token The session token.
- * @param {function} callback (err, {User|null} user) Callback with the session user, or null.
+ * @param {function} callback (err, {UserModel|null} user) Callback with the session user, or null.
  */
 SessionManager.getSessionUserByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
