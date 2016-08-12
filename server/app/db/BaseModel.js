@@ -33,7 +33,7 @@ var RedisUtils = require('../redis/RedisUtils');
  * Time in seconds for a cached field to expire.
  * @type {number} Time in seconds.
  */
-const CACHE_FIELD_EXPIRE = 60;
+const CACHE_FIELD_EXPIRE = 60 * 5;
 
 /**
  * Cache key prefix for database object layer instances.
