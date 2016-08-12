@@ -135,6 +135,14 @@ SessionModel.prototype.getField = function(field, callback) {
 };
 
 /**
+ * Called with the result of a model field, or when an error occurred.
+ *
+ * @callback SessionModel~getFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*=} Field value.
+ */
+
+/**
  * Set the given field to the given value for this model.
  *
  * @param {String} field Field name.
@@ -150,14 +158,6 @@ SessionModel.prototype.setField = function(field, value, callback) {
  *
  * @callback SessionModel~setFieldCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
- */
-
-/**
- * Called with the result of a model field, or when an error occurred.
- *
- * @callback SessionModel~getFieldCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {*=} Field value.
  */
 
 /**
