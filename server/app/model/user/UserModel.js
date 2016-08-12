@@ -22,7 +22,9 @@
 
 var util = require('util');
 var UserDatabase = require('./UserDatabase');
-var DatabaseObjectLayer = require('./../../database/DatabaseObjectLayer');
+var BaseModel = require('../../db/BaseModel');
+var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
+var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
  * UserModel class.
@@ -40,32 +42,32 @@ var UserModel = function(id) {
      */
     this._id = id;
 
-    // Apply the database object layer to this object
-    this.layerApply(this, UserDatabase.DB_COLLECTION_NAME, {
-        username: {
-            field: 'username'
+    // Create and configure the base model instance for this model
+    this._baseModel = new BaseModel(this, {
+        mongo: {
+            collection: UserDatabase.DB_COLLECTION_NAME
         },
-        password_hash: {
-            // TODO: Do not automatically cache this!
-            field: 'password_hash',
-            cache: false
-        },
-        full_name: {
-            field: 'full_name'
-        },
-        nickname: {
-            field: 'nickname'
-        },
-        create_date: {
-            field: 'create_date',
-            toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-            fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
+        fields: {
+            username: {},
+            password_hash: {
+                cache: {
+                    enabled: false
+                },
+                redis: {
+                    enabled: false
+                }
+            },
+            full_name: {},
+            nickname: {},
+            create_date: {
+                redis: {
+                    from: ConversionFunctions.dateFromRedis,
+                    to: ConversionFunctions.dateToRedis
+                }
+            }
         }
     });
 };
-
-// Inherit the database object layer
-util.inherits(UserModel, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the user.
@@ -86,49 +88,115 @@ UserModel.prototype.getIdHex = function() {
 };
 
 /**
+ * Get the given field from the model.
+ *
+ * @param {String} field Field names.
+ * @param {UserModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ */
+UserModel.prototype.getField = function(field, callback) {
+    this._baseModel.getField(field, callback);
+};
+
+/**
+ * Called with the result of a model field, or when an error occurred.
+ *
+ * @callback UserModel~getFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*=} Field value.
+ */
+
+/**
+ * Set the given field to the given value for this model.
+ *
+ * @param {String} field Field name.
+ * @param {*} value Field value.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setField = function(field, value, callback) {
+    this._baseModel.setField(field, value, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback UserModel~setFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the username of the user.
  *
- * @param {function} callback (err, {string} username) Callback with the result.
+ * @param {UserModel~getUsernameCallback} callback Called with the username or when an error occurred.
  */
-UserModel.prototype.getUsername = function(callback) {
-    this.layerFetchField('username', callback);
-};
+UserModel.prototype.getUsername = (callback) => this.getField('username', callback);
+
+/**
+ * Called with the username or when an error occurred.
+ *
+ * @callback UserModel~getUsernameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Username of the user.
+ */
 
 /**
  * Get the password hash of the user.
  *
- * @param {function} callback (err, {string} passwordHash) Callback with the result.
+ * @param {UserModel~getPasswordHashCallback} callback Called with the password hash or when an error occurred.
  */
-UserModel.prototype.getPasswordHash = function(callback) {
-    this.layerFetchField('password_hash', callback);
-};
+UserModel.prototype.getPasswordHash = (callback) => this.getField('password_hash', callback);
+
+/**
+ * Called with the password hash or when an error occurred.
+ *
+ * @callback UserModel~getPasswordHashCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Password hash of the user.
+ */
 
 /**
  * Get the full name of the user.
  *
- * @param {function} callback (err, {string} fullName) Callback with the result.
+ * @param {UserModel~getFullNameCallback} callback Called with the full name of the user or when an error occurred.
  */
-UserModel.prototype.getFullName = function(callback) {
-    this.layerFetchField('full_name', callback);
-};
+UserModel.prototype.getFullName = (callback) => this.getField('full_name', callback);
+
+/**
+ * Called with the full name of the user or when an error occurred.
+ *
+ * @callback UserModel~getFullNameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Full name of the user.
+ */
 
 /**
  * Get the nickname of the user.
  *
- * @param {function} callback (err, {string} nickname) Callback with the result.
+ * @param {UserModel~getNicknameCallback} callback Called with the nickname of the user or when an error occurred.
  */
-UserModel.prototype.getNickname = function(callback) {
-    this.layerFetchField('nickname', callback);
-};
+UserModel.prototype.getNickname = (callback) => this.getField('nickname', callback);
+
+/**
+ * Called with the nickname of the user or when an error occurred.
+ *
+ * @callback UserModel~getNicknameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Nickname of the user.
+ */
 
 /**
  * Get the date this user was created on.
  *
- * @param {function} callback (err, {Date} createDate) Callback with the result.
+ * @param {UserModel~getCreateDateCallback} callback Called with the date the user was created on or when an error occurred.
  */
-UserModel.prototype.getCreateDate = function(callback) {
-    this.layerFetchField('create_date', callback);
-};
+UserModel.prototype.getCreateDate = (callback) => this.getField('create_date', callback);
+
+/**
+ * Called with the date the user was created on or when an error occurred.
+ *
+ * @callback UserModel~getCreateDateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Date}
+ */
 
 // Export the user class
 module.exports = UserModel;
