@@ -298,33 +298,19 @@ SessionModel.prototype.getExpireDate = (callback) => this.getField('expire_date'
  */
 SessionModel.prototype.setExpireDate = (expireDate, callback) => this.setField('expire_date', expireDate, callback);
 
-
-
-// TODO: Rework this!
+/**
+ * Delete t he session.
+ *
+ * @param {BaseModel~deleteCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.delete = (callback) => this._baseModel.flush(undefined, callback);
 
 /**
- * Delete the session.
- * This will also remove all cached instances of this session.
+ * Called on success, or when an error occurred.
  *
- * @param {function} callback (err) Callback.
+ * @callback BaseModel~deleteCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
  */
-// TODO: Create this function.
-SessionModel.prototype.delete = function(callback) {
-    // Delete the session from the database
-    this.layerDeleteFromDatabase(function(err) {
-        // Handle errors
-        if(err != null) {
-            callback(err);
-            return;
-        }
-
-        // FIXME: Delete "api:session:TOKEN_HERE:sessionId" key
-        // FIXME: Delete all cached entries for this Session (database object layer entries are already deleted)
-
-        // Call back
-        callback(null);
-    });
-};
 
 // Return the created class
 module.exports = SessionModel;
