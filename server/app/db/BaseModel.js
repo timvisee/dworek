@@ -1331,6 +1331,10 @@ BaseModel.prototype.cacheFlush = function(fields) {
  * @return {boolean} True if enabled, false if not.
  */
 BaseModel.prototype.redisIsFieldEnabled = function(field) {
+    // Return false if Redis isn't ready
+    if(!RedisUtils.isReady())
+        return false;
+
     // If configured, return whether cache is enabled
     if(_.has(this._modelConfig.fields, field + '.redis.enable'))
         return this._modelConfig.fields[field].redis.enable;
@@ -1347,6 +1351,10 @@ BaseModel.prototype.redisIsFieldEnabled = function(field) {
  * @return {boolean} True if all fields are enabled, false otherwise.
  */
 BaseModel.prototype.redisAreFieldsEnabled = function(fields) {
+    // Return false if Redis isn't ready
+    if(!RedisUtils.isReady())
+        return false;
+
     // Convert the fields parameter to an array if it isn't an array
     if(!Array.isArray(fields))
         fields = [fields];
@@ -1475,6 +1483,12 @@ BaseModel.prototype.redisGetField = function(field, callback) {
  * @param {BaseModel~redisGetFieldsCallback} callback Called when the data is fetched from Redis, or when an error occurred.
  */
 BaseModel.prototype.redisGetFields = function(fields, callback) {
+    // Call back if Redis isn't ready
+    if(!RedisUtils.isReady()) {
+        callback(null);
+        return;
+    }
+
     // Get the Redis connection instance
     const redis = RedisUtils.getConnection();
 
@@ -1580,6 +1594,12 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
  * @param {BaseModel~redisSetFieldCallback} callback Called when the value is set, or when an error occurred.
  */
 BaseModel.prototype.redisSetField = function(field, value, callback) {
+    // Call back if Redis isn't ready
+    if(!RedisUtils.isReady()) {
+        callback(null);
+        return;
+    }
+
     // Skip if the value is undefined
     if(value === undefined) {
         // Call back and return
@@ -1632,6 +1652,12 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
  * @param {BaseModel~redisSetFieldsCallback} callback Called when the values are set, or when an error occurred.
  */
 BaseModel.prototype.redisSetFields = function(fields, callback) {
+    // Call back if Redis isn't ready
+    if(!RedisUtils.isReady()) {
+        callback(null);
+        return;
+    }
+
     // Get the Redis connection instance
     const redis = RedisUtils.getConnection();
 
@@ -1740,6 +1766,12 @@ BaseModel.prototype.redisHasField = function(field, callback) {
  * @param {BaseModel~redisHasFieldsCallback} callback Called with the result, or when an error occurred.
  */
 BaseModel.prototype.redisHasFields = function(fields, callback) {
+    // Call back if Redis isn't ready
+    if(!RedisUtils.isReady()) {
+        callback(null);
+        return;
+    }
+
     // Return false if Redis isn't enabled for all fields
     if(!this.redisAreFieldsEnabled(fields))
         return false;
@@ -1789,6 +1821,12 @@ BaseModel.prototype.redisHasFields = function(fields, callback) {
  * @param {BaseModel~redisFlushCallback} callback Called when the fields are flushed, or when an error occurred.
  */
 BaseModel.prototype.redisFlush = function(fields, callback) {
+    // Call back if Redis isn't ready
+    if(!RedisUtils.isReady()) {
+        callback(null, 0);
+        return;
+    }
+
     // Get the Redis instance
     var redis = RedisUtils.getConnection();
 
