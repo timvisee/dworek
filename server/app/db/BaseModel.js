@@ -873,8 +873,9 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
  */
 BaseModel.prototype.mongoSetField = function(field, value, callback) {
     // Create a fields object
-    var fields = {};
-    fields[field] = value;
+    var fields = {
+        field
+    };
 
     // Set the field through the bulk function
     this.mongoSetFields(fields, callback);
@@ -1233,8 +1234,9 @@ BaseModel.prototype.cacheGetFields = function(fields) {
  */
 BaseModel.prototype.cacheSetField = function(field, value) {
     // Create the fields object
-    var fields = {};
-    fields[field] = value;
+    var fields = {
+        field
+    };;
 
     // Set the field through the bulk function
     this.cacheSetFields(fields);
