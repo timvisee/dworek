@@ -71,8 +71,6 @@ var SessionModel = function(id) {
                     to: (user) => user.getId()
                 },
                 cache: {
-                    enable: true,
-
                     /**
                      * Convert a hexadecimal ID to a User model.
                      *
@@ -91,8 +89,6 @@ var SessionModel = function(id) {
                     to: (user) => user.getIdHex()
                 },
                 redis: {
-                    enable: true,
-
                     /**
                      * Convert a hexadecimal ID to a User model.
                      *
