@@ -155,18 +155,20 @@ BaseModel.prototype.getField = function(field, callback) {
             // Call back the value
             callback(null, value);
 
-            // Add a task to cache the values in Redis
-            cacheTasks.push(function(completeTask) {
-                instance.redisSetField(field, value, function(err) {
-                    if(err !== null) {
-                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                        console.warn(err);
-                    }
+            // Add a task to cache the values in Redis if ready
+            if(RedisUtils.isReady()) {
+                cacheTasks.push(function(completeTask) {
+                    instance.redisSetField(field, value, function(err) {
+                        if(err !== null) {
+                            console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                            console.warn(err);
+                        }
 
-                    // Complete the task
-                    completeTask();
+                        // Complete the task
+                        completeTask();
+                    });
                 });
-            });
+            }
 
             // Add a task to cache the values in the local object cache
             cacheTasks.push(function(completeTask) {
@@ -310,19 +312,21 @@ BaseModel.prototype.getFields = function(fields, callback) {
             // Call back the results
             callback(null, results);
 
-            // Create a cache task to cache the values in Redis
-            cacheTasks.push(function(completeTask) {
-                instance.redisSetFields(values, function(err) {
-                    // Show a warning if an error occurred
-                    if(err !== null) {
-                        console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                        console.warn(err);
-                    }
+            // Create a cache task to cache the values in Redis if ready
+            if(RedisUtils.isReady()) {
+                cacheTasks.push(function(completeTask) {
+                    instance.redisSetFields(values, function(err) {
+                        // Show a warning if an error occurred
+                        if(err !== null) {
+                            console.warn('A Redis error occurred while caching model data, which will be ignored.');
+                            console.warn(err);
+                        }
 
-                    // Complete the task
-                    completeTask();
+                        // Complete the task
+                        completeTask();
+                    });
                 });
-            });
+            }
 
             // Create a cache task to cache the values in the local object cache
             cacheTasks.push(function(completeTask) {
