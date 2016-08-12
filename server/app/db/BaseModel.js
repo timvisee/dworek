@@ -872,13 +872,10 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
  * @param {BaseModel~mongoSetFieldCallback} callback Called when the value is set, or if an error occurred.
  */
 BaseModel.prototype.mongoSetField = function(field, value, callback) {
-    // Create a fields object
-    var fields = {
-        field
-    };
-
     // Set the field through the bulk function
-    this.mongoSetFields(fields, callback);
+    this.mongoSetFields({
+        [field]: value
+    }, callback);
 };
 
 /**
@@ -1233,13 +1230,10 @@ BaseModel.prototype.cacheGetFields = function(fields) {
  * @param {*} value Field value.
  */
 BaseModel.prototype.cacheSetField = function(field, value) {
-    // Create the fields object
-    var fields = {
-        field
-    };;
-
     // Set the field through the bulk function
-    this.cacheSetFields(fields);
+    this.cacheSetFields({
+        [field]: value
+    });
 };
 
 /**
