@@ -531,24 +531,26 @@ BaseModel.prototype.hasField = function(field, callback) {
         latch.resolve();
     });
 
-    // Check in Redis
-    latch.add();
-    this.redisHasField(field, function(err, result) {
-        // Show a warning if an error occurred
-        if(err !== null) {
-            // Show the warning
-            console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
-            console.warn(err);
+    // Check in Redis if ready
+    if(RedisUtils.isReady()) {
+        latch.add();
+        this.redisHasField(field, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null) {
+                // Show the warning
+                console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+                console.warn(err);
 
-        } else if(result === true) {
-            // Call back if the result is true
-            callback(null, true);
-            return;
-        }
+            } else if(result === true) {
+                // Call back if the result is true
+                callback(null, true);
+                return;
+            }
 
-        // Resolve the latch
-        latch.resolve();
-    });
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
 
     // If the latch is resolved, call back false. If true was called back it wouldn't reach this point
     latch.then(() => callback(null, false));
@@ -598,24 +600,26 @@ BaseModel.prototype.hasFields = function(fields, callback) {
         latch.resolve();
     });
 
-    // Check in Redis
-    latch.add();
-    this.redisHasFields(fields, function(err, result) {
-        // Show a warning if an error occurred
-        if(err !== null) {
-            // Show the warning
-            console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
-            console.warn(err);
+    // Check in Redis if ready
+    if(RedisUtils.isReady()) {
+        latch.add();
+        this.redisHasFields(fields, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null) {
+                // Show the warning
+                console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+                console.warn(err);
 
-        } else if(result === true) {
-            // Call back if the result is true
-            callback(null, true);
-            return;
-        }
+            } else if(result === true) {
+                // Call back if the result is true
+                callback(null, true);
+                return;
+            }
 
-        // Resolve the latch
-        latch.resolve();
-    });
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
 
     // Store the current instance
     const instance = this;
@@ -652,34 +656,36 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                 completeTask(null, exists);
             });
 
-            // Create a Redis task
-            tasks.push(function(completeTask) {
-                // Skip the task if the result is set to false
-                if(result === false)
-                    return;
+            // Create a Redis task if ready
+            if(RedisUtils.isReady()) {
+                tasks.push(function(completeTask) {
+                    // Skip the task if the result is set to false
+                    if(result === false)
+                        return;
 
-                // Check whether the field exists in Redis
-                instance.redisHasField(field, function(err, exists) {
-                    // Show a warning if Redis failed
-                    if(err !== null) {
-                        console.warn('A Redis error occurred while checking if a model field exists, falling back.');
-                        console.warn(err);
+                    // Check whether the field exists in Redis
+                    instance.redisHasField(field, function(err, exists) {
+                        // Show a warning if Redis failed
+                        if(err !== null) {
+                            console.warn('A Redis error occurred while checking if a model field exists, falling back.');
+                            console.warn(err);
 
-                    } else {
-                        // Process the result if the result is false
-                        if(exists === false) {
-                            // Set the result flag
-                            result = false;
+                        } else {
+                            // Process the result if the result is false
+                            if(exists === false) {
+                                // Set the result flag
+                                result = false;
 
-                            // Call back
-                            callback(null, false);
+                                // Call back
+                                callback(null, false);
+                            }
                         }
-                    }
 
-                    // Complete the task
-                    completeTask(null, exists && err !== null);
+                        // Complete the task
+                        completeTask(null, exists && err !== null);
+                    });
                 });
-            });
+            }
 
             // Create a MongoDB task
             tasks.push(function(completeTask) {
