@@ -775,8 +775,11 @@ BaseModel.prototype.flush = function(fields, callback) {
  * @param {BaseModel~flushCacheCallback} callback Called when the data is flushed, or when an error occurred.
  */
 BaseModel.prototype.flushCache = function(fields, callback) {
-    // Flush the Redis cache
-    this.redisFlush(fields, callback);
+    // Flush the Redis cache if ready, call back otherwise
+    if(RedisUtils.isReady())
+        this.redisFlush(fields, callback);
+    else
+        callback(null);
 
     // Flush the local object cache
     this.cacheFlush(fields);
