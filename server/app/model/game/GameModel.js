@@ -177,7 +177,9 @@ GameModel.prototype.setField = function(field, value, callback) {
  *
  * @param {GameModel~getUserCallback} callback Called with the user or when an error occurred.
  */
-GameModel.prototype.getUser = (callback) => this.getField('user', callback);
+GameModel.prototype.getUser = function(callback) {
+    this.getField('user', callback);
+};
 
 /**
  * Called with the user or when an error occurred.
@@ -193,14 +195,18 @@ GameModel.prototype.getUser = (callback) => this.getField('user', callback);
  * @param {User} User.
  * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameModel.prototype.setUser = (user, callback) => this.setField('user', user, callback);
+GameModel.prototype.setUser = function(user, callback) {
+    this.setField('user', user, callback);
+};
 
 /**
  * Get the name of the game.
  *
  * @param {GameModel~getNameCallback} callback Called with the name or when an error occurred.
  */
-GameModel.prototype.getName = (callback) => this.getField('name', callback);
+GameModel.prototype.getName = function(callback) {
+    this.getField('name', callback);
+};
 
 /**
  * Called with the name or when an error occurred.
@@ -216,14 +222,18 @@ GameModel.prototype.getName = (callback) => this.getField('name', callback);
  * @param {String} name Game name.
  * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameModel.prototype.setName = (name, callback) => this.setField('name', name, callback);
+GameModel.prototype.setName = function(name, callback) {
+    this.setField('name', name, callback);
+};
 
 /**
  * Get the date this game was created on.
  *
  * @param {GameModel~getCreateDateCallback} callback Called with the creation date or when an error occurred.
  */
-GameModel.prototype.getCreateDate = (callback) => this.getField('create_date', callback);
+GameModel.prototype.getCreateDate = function(callback) {
+    this.getField('create_date', callback);
+};
 
 /**
  * Called with the creation date or when an error occurred.
@@ -239,7 +249,9 @@ GameModel.prototype.getCreateDate = (callback) => this.getField('create_date', c
  * @param {Date} createDate Game creation date.
  * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameModel.prototype.setCreateDate = (createDate, callback) => this.setField('create_date', createDate, callback);
+GameModel.prototype.setCreateDate = function(createDate, callback) {
+    this.setField('create_date', createDate, callback);
+};
 
 // Export the user class
 module.exports = GameModel;
