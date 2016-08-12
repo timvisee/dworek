@@ -108,7 +108,7 @@ BaseModel.prototype.getField = function(field, callback) {
         latch.add();
         this.redisGetField(field, function(err, value) {
             // Show a console warning if an error occurred
-            if(err !== undefined) {
+            if(err !== null) {
                 console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
                 console.warn(err);
 
@@ -1240,21 +1240,24 @@ BaseModel.prototype.cacheGetFields = function(fields) {
     if(!Array.isArray(fields))
         fields = [fields];
 
+    // Store this
+    const instance = this;
+
     // Loop through all the fields, fetch and convert their value and add it to the results object
     fields.forEach(function(field) {
         // Set the value to undefined if cache isn't enabled for this field
-        if(!this.cacheIsFieldEnabled(field)) {
+        if(!instance.cacheIsFieldEnabled(field)) {
             results[field] = undefined;
             return;
         }
 
         // Get the field from cache
-        var value = this._cache.getCache(field);
+        var value = instance._cache.getCache(field);
 
         // Convert the value
-        if(_.has(this._modelConfig.fields, field + '.cache.from'))
+        if(_.has(instance._modelConfig.fields, field + '.cache.from'))
             // Convert the value
-            value = this._modelConfig.fields[field].cache.from(value);
+            value = instance._modelConfig.fields[field].cache.from(value);
 
         // Add the value to the results object
         results[field] = value;
