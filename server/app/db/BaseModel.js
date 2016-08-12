@@ -24,7 +24,7 @@ var util = require('util');
 var async = require('async');
 var _ = require('lodash');
 
-var SmartCallback = require('../util/SmartCallback');
+var CallbackLatch = require('../util/CallbackLatch');
 var ObjectCache = require('../cache/ObjectCache');
 var MongoUtils = require('../mongo/MongoUtils');
 var RedisUtils = require('../redis/RedisUtils');
@@ -331,7 +331,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
  */
 BaseModel.prototype.setField = function(field, value, callback) {
     // Create a callback latch to set the fields
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Store the current instance
     const instance = this;
@@ -401,7 +401,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
  */
 BaseModel.prototype.setFields = function(fields, callback) {
     // Create a callback latch to set the fields
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Store the current instance
     const instance = this;
@@ -477,7 +477,7 @@ BaseModel.prototype.hasField = function(field, callback) {
     }
 
     // Create a callback latch
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Check in MongoDB
     latch.add();
@@ -544,7 +544,7 @@ BaseModel.prototype.hasFields = function(fields, callback) {
     }
 
     // Create a callback latch
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Check in MongoDB
     latch.add();
@@ -1508,7 +1508,7 @@ BaseModel.prototype.redisGetFields = function(fields, callback) {
     });
 
     // Create a callback latch
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Check whether there are enough keys to fetch from cache
     if(redisKeys.length > 0) {
@@ -1685,7 +1685,7 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         }
 
         // Create a callback latch for the expire commands
-        var latch = new SmartCallback();
+        var latch = new CallbackLatch();
 
         // Keep track of errors
         var commandError = null;
@@ -1797,7 +1797,7 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
     var redis = RedisUtils.getConnection();
 
     // Create a callback latch
-    var latch = new SmartCallback();
+    var latch = new CallbackLatch();
 
     // Create an array of keys to delete
     var keys = [];

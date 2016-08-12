@@ -23,7 +23,7 @@
 /**
  * Constructor.
  *
- * @returns {SmartCallback} SmartCallback instance.
+ * @returns {CallbackLatch} CallbackLatch instance.
  */
 var SmartCallback = function() {
 

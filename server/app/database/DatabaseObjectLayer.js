@@ -22,7 +22,7 @@
 
 var util = require('util');
 var async = require('async');
-var SmartCallback = require('../util/SmartCallback');
+var SmartCallback = require('../util/CallbackLatch');
 var ObjectCache = require('../cache/ObjectCache');
 var MongoUtils = require('../mongo/MongoUtils');
 var RedisUtils = require('../redis/RedisUtils');
