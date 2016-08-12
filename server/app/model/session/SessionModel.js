@@ -115,18 +115,14 @@ var SessionModel = function(id) {
  *
  * @returns {ObjectId} Session ID object.
  */
-SessionModel.prototype.getId = function() {
-    return this._id;
-};
+SessionModel.prototype.getId = () => this._id;
 
 /**
  * Get the hexadecimal ID representation of the session.
  *
  * @returns {*} Session ID as hexadecimal string.
  */
-SessionModel.prototype.getIdHex = function() {
-    return this.getId().toString();
-};
+SessionModel.prototype.getIdHex = () => this.getId().toString();
 
 /**
  * Get the given field from the model.
@@ -151,9 +147,7 @@ SessionModel.prototype.getField = function(field, callback) {
  *
  * @param {SessionModel~getUserCallback} callback Called with the user, or when an error occurred.
  */
-SessionModel.prototype.getUser = function(callback) {
-    this.getField('user', callback);
-};
+SessionModel.prototype.getUser = (callback) => this.getField('user', callback);
 
 /**
  * Called with the user, or when an error occurred.
@@ -168,9 +162,7 @@ SessionModel.prototype.getUser = function(callback) {
  *
  * @param {SessionModel~getTokenCallback} callback Called with the token, or when an error occurred.
  */
-SessionModel.prototype.getToken = function(callback) {
-    this.getField('token', callback);
-};
+SessionModel.prototype.getToken = (callback) => this.getField('token', callback);
 
 /**
  * Called with the token, or when an error occurred.
@@ -185,9 +177,7 @@ SessionModel.prototype.getToken = function(callback) {
  *
  * @param {SessionModel~getCreateDateCallback} callback Called with the creation date, or when an error occurred.
  */
-SessionModel.prototype.getCreateDate = function(callback) {
-    this.getField('create_date', callback);
-};
+SessionModel.prototype.getCreateDate = (callback) => this.getField('create_date', callback);
 
 /**
  * Called with the creation date, or when an error occurred.
@@ -202,9 +192,7 @@ SessionModel.prototype.getCreateDate = function(callback) {
  *
  * @param {SessionModel~getCreateIpCallback} callback Called with the IP this session was created with, or when an error occurred.
  */
-SessionModel.prototype.getCreateIp = function(callback) {
-    this.getField('create_ip', callback);
-};
+SessionModel.prototype.getCreateIp = (callback) => this.getField('create_ip', callback);
 
 /**
  * Called with the IP this session was created with, or when an error occurred.
@@ -219,9 +207,7 @@ SessionModel.prototype.getCreateIp = function(callback) {
  *
  * @param {SessionModel~getLastUseDateCallback} callback Called with the date the session was last used on, or when an error occurred.
  */
-SessionModel.prototype.getLastUseDate = function(callback) {
-    this.getField('last_use_date', callback);
-};
+SessionModel.prototype.getLastUseDate = (callback) => this.getField('last_use_date', callback);
 
 /**
  * Called with the date the session was last used on, or when an error occurred.
@@ -236,9 +222,7 @@ SessionModel.prototype.getLastUseDate = function(callback) {
  *
  * @param {SessionModel~getExpireDateCallback} callback Called with the date the session expires on, or when an error occurred.
  */
-SessionModel.prototype.getExpireDate = function(callback) {
-    this.getField('expire_date', callback);
-};
+SessionModel.prototype.getExpireDate = (callback) => this.getField('expire_date', callback);
 
 /**
  * Called with the date the session expires on, or when an error occurred.
