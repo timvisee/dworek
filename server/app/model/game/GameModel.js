@@ -188,6 +188,14 @@ GameModel.prototype.getUser = (callback) => this.getField('user', callback);
  */
 
 /**
+ * Set the user that created this game.
+ *
+ * @param {User} User.
+ * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameModel.prototype.setUser = (user, callback) => this.setField('user', user, callback);
+
+/**
  * Get the name of the game.
  *
  * @param {GameModel~getNameCallback} callback Called with the name or when an error occurred.
@@ -203,6 +211,14 @@ GameModel.prototype.getName = (callback) => this.getField('name', callback);
  */
 
 /**
+ * Set the name of the game.
+ *
+ * @param {String} name Game name.
+ * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameModel.prototype.setName = (name, callback) => this.setField('name', name, callback);
+
+/**
  * Get the date this game was created on.
  *
  * @param {GameModel~getCreateDateCallback} callback Called with the creation date or when an error occurred.
@@ -216,6 +232,14 @@ GameModel.prototype.getCreateDate = (callback) => this.getField('create_date', c
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Date} Game creation date.
  */
+
+/**
+ * Set the date this game was created on.
+ *
+ * @param {Date} createDate Game creation date.
+ * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameModel.prototype.setCreateDate = (createDate, callback) => this.setField('create_date', createDate, callback);
 
 // Export the user class
 module.exports = GameModel;
