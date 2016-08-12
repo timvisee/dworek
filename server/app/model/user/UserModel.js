@@ -139,6 +139,14 @@ UserModel.prototype.getUsername = (callback) => this.getField('username', callba
  */
 
 /**
+ * Set the username of the user.
+ *
+ * @param {String} username Username.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setUsername = (username, callback) => this.setField('username', username, callback);
+
+/**
  * Get the password hash of the user.
  *
  * @param {UserModel~getPasswordHashCallback} callback Called with the password hash or when an error occurred.
@@ -152,6 +160,14 @@ UserModel.prototype.getPasswordHash = (callback) => this.getField('password_hash
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {String} Password hash of the user.
  */
+
+/**
+ * Set the password hash of the user.
+ *
+ * @param {String} passwordHash Password hash.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setPasswordHash = (passwordHash, callback) => this.setField('password_hash', passwordHash, callback);
 
 /**
  * Get the full name of the user.
@@ -169,6 +185,14 @@ UserModel.prototype.getFullName = (callback) => this.getField('full_name', callb
  */
 
 /**
+ * Set the full name of the user.
+ *
+ * @param {String} fullName Full name.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setFullName = (fullName, callback) => this.setField('full_name', fullName, callback);
+
+/**
  * Get the nickname of the user.
  *
  * @param {UserModel~getNicknameCallback} callback Called with the nickname of the user or when an error occurred.
@@ -184,6 +208,14 @@ UserModel.prototype.getNickname = (callback) => this.getField('nickname', callba
  */
 
 /**
+ * Set the nickname of the user.
+ *
+ * @param {String} nickname Nickname.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setNickname = (nickname, callback) => this.setField('nickname', nickname, callback);
+
+/**
  * Get the date this user was created on.
  *
  * @param {UserModel~getCreateDateCallback} callback Called with the date the user was created on or when an error occurred.
@@ -197,6 +229,14 @@ UserModel.prototype.getCreateDate = (callback) => this.getField('create_date', c
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Date}
  */
+
+/**
+ * Set the date this user was created on.
+ *
+ * @param {Date} createDate Creation date.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setCreateDate = (createDate, callback) => this.setField('create_date', createDate, callback);
 
 // Export the user class
 module.exports = UserModel;
