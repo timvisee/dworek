@@ -99,34 +99,47 @@ BaseModel.prototype.getField = function(field, callback) {
     // Create an array of cache tasks
     var cacheTasks = [];
 
-    // Try to fetch the field from Redis
-    this.redisGetField(field, function(err, value) {
-        // Show a console warning if an error occurred
-        if(err !== undefined) {
-            console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
-            console.warn(err);
+    // Create a callback latch
+    var latch = new CallbackLatch();
 
-        } else {
-            // Call back the value if it isn't undefined, and if no error occurred
-            if(value !== undefined) {
-                // Call back
-                callback(null, value);
+    // Try to fetch the field from Redis if ready
+    if(RedisUtils.isReady()) {
+        // Add a latch and get the field
+        latch.add();
+        this.redisGetField(field, function(err, value) {
+            // Show a console warning if an error occurred
+            if(err !== undefined) {
+                console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
+                console.warn(err);
 
-                // Create a task to cache the value in the local object cache
-                cacheTasks.push(function(completeTask) {
-                    // Set the fields in cache
-                    instance.cacheSetField(field, value);
+            } else {
+                // Call back the value if it isn't undefined, and if no error occurred
+                if(value !== undefined) {
+                    // Call back
+                    callback(null, value);
 
-                    // Complete the task
-                    completeTask();
-                });
+                    // Create a task to cache the value in the local object cache
+                    cacheTasks.push(function(completeTask) {
+                        // Set the fields in cache
+                        instance.cacheSetField(field, value);
 
-                // Run the cache tasks asynchronously and return
-                async.parallel(cacheTasks);
-                return;
+                        // Complete the task
+                        completeTask();
+                    });
+
+                    // Run the cache tasks asynchronously and return
+                    async.parallel(cacheTasks);
+                    return;
+                }
             }
-        }
 
+            // We're done, resolve the latch
+            latch.resolve();
+        });
+    }
+
+    // Get the field from MongoDB when ready
+    latch.then(function() {
         // Try to fetch the field from Mongo
         instance.mongoGetField(field, function(err, value) {
             // Call back errors
@@ -214,53 +227,65 @@ BaseModel.prototype.getFields = function(fields, callback) {
     // Store the current instance
     const instance = this;
 
-    // Try to fetch the fields from Redis
-    this.redisGetFields(fieldQueue, function(err, values) {
-        // Show a console warning if an error occurred
-        if(err !== undefined) {
-            console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
-            console.warn(err);
+    // Create a callback latch
+    var latch = new CallbackLatch();
 
-        } else {
-            // Process the fetched fields. Put the values in the results object, and update the fieldQueue array
-            // Clear the field queue array
-            fieldQueue = [];
+    // Try to fetch the fields from Redis if ready
+    if(RedisUtils.isReady()) {
+        latch.add();
+        this.redisGetFields(fieldQueue, function(err, values) {
+            // Show a console warning if an error occurred
+            if(err !== undefined) {
+                console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
+                console.warn(err);
 
-            // Loop through the result object
-            for(var field in values) {
-                // Make sure values contains the field
-                if(!values.hasOwnProperty(field))
-                    continue;
+            } else {
+                // Process the fetched fields. Put the values in the results object, and update the fieldQueue array
+                // Clear the field queue array
+                fieldQueue = [];
 
-                // Put the field in the results if it's fetched
-                if(values[field] !== undefined)
-                    results[field] = values[field];
+                // Loop through the result object
+                for(var field in values) {
+                    // Make sure values contains the field
+                    if(!values.hasOwnProperty(field))
+                        continue;
 
-                else
+                    // Put the field in the results if it's fetched
+                    if(values[field] !== undefined)
+                        results[field] = values[field];
+
+                    else
                     // Push the field in the fieldQueue array if it wasn't fetched
-                    fieldQueue.push(field);
+                        fieldQueue.push(field);
+                }
+
+                // Create a task to cache the values in the local object cache
+                cacheTasks.push(function(completeTask) {
+                    // Set the fields in cache
+                    instance.cacheSetFields(values);
+
+                    // Complete the task
+                    completeTask();
+                });
             }
 
-            // Create a task to cache the values in the local object cache
-            cacheTasks.push(function(completeTask) {
-                // Set the fields in cache
-                instance.cacheSetFields(values);
+            // Call back if the field queue is empty, since we successfully fetched all data
+            if(fieldQueue.length === 0) {
+                // Call back
+                callback(null, results);
 
-                // Complete the task
-                completeTask();
-            });
-        }
+                // Run the cache tasks asynchronously and return
+                async.parallel(cacheTasks);
+                return;
+            }
 
-        // Call back if the field queue is empty, since we successfully fetched all data
-        if(fieldQueue.length === 0) {
-            // Call back
-            callback(null, results);
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
 
-            // Run the cache tasks asynchronously and return
-            async.parallel(cacheTasks);
-            return;
-        }
-
+    // Try to fetch the field from Mongo when ready
+    latch.then(function() {
         // Try to fetch the field from Mongo
         instance.mongoGetFields(fieldQueue, function(err, values) {
             // Call back errors
