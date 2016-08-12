@@ -135,6 +135,24 @@ SessionModel.prototype.getField = function(field, callback) {
 };
 
 /**
+ * Set the given field to the given value for this model.
+ *
+ * @param {String} field Field name.
+ * @param {*} value Field value.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setField = function(field, value, callback) {
+    this._baseModel.setField(field, value, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback SessionModel~setFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Called with the result of a model field, or when an error occurred.
  *
  * @callback SessionModel~getFieldCallback
@@ -158,6 +176,14 @@ SessionModel.prototype.getUser = (callback) => this.getField('user', callback);
  */
 
 /**
+ * Set the user that owns this session.
+ *
+ * @param {User} user User.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setUser = (user, callback) => this.setField('user', user, callback);
+
+/**
  * Get the token of the session.
  *
  * @param {SessionModel~getTokenCallback} callback Called with the token, or when an error occurred.
@@ -171,6 +197,14 @@ SessionModel.prototype.getToken = (callback) => this.getField('token', callback)
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {String=} Token.
  */
+
+/**
+ * Set the token for this session.
+ *
+ * @param {String} token Token.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setToken = (token, callback) => this.setField('token', token, callback);
 
 /**
  * Get the creation date of the session.
@@ -188,6 +222,14 @@ SessionModel.prototype.getCreateDate = (callback) => this.getField('create_date'
  */
 
 /**
+ * Set the creation date for this session.
+ *
+ * @param {Date} createDate Creation date.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setCreateDate = (createDate, callback) => this.setField('create_date', createDate, callback);
+
+/**
  * Get the IP address this session was created on.
  *
  * @param {SessionModel~getCreateIpCallback} callback Called with the IP this session was created with, or when an error occurred.
@@ -201,6 +243,14 @@ SessionModel.prototype.getCreateIp = (callback) => this.getField('create_ip', ca
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {String=} IP address this session was created with.
  */
+
+/**
+ * Set the IP this session was created with.
+ *
+ * @param {String} createIp IP address.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setCreateIp = (createIp, callback) => this.setField('create_ip', createIp, callback);
 
 /**
  * Get the date this session was last used on.
@@ -218,6 +268,14 @@ SessionModel.prototype.getLastUseDate = (callback) => this.getField('last_use_da
  */
 
 /**
+ * Set the date this session was last used on.
+ *
+ * @param {Date} date Date.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setLastUseDate = (date, callback) => this.setField('last_use_date', date, callback);
+
+/**
  * Get the expiration date of the session.
  *
  * @param {SessionModel~getExpireDateCallback} callback Called with the date the session expires on, or when an error occurred.
@@ -231,6 +289,14 @@ SessionModel.prototype.getExpireDate = (callback) => this.getField('expire_date'
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Date=} The session expiration date.
  */
+
+/**
+ * Set the expiration date of the session.
+ *
+ * @param {Date} expireDate Expiration date.
+ * @param {SessionModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setExpireDate = (expireDate, callback) => this.setField('expire_date', expireDate, callback);
 
 
 
