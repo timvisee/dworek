@@ -114,7 +114,7 @@ BaseModel.prototype.getField = function(field, callback) {
 
             } else {
                 // Call back the value if it isn't undefined, and if no error occurred
-                if(value !== undefined) {
+                if(value !== null) {
                     // Call back
                     callback(null, value);
 
@@ -253,7 +253,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
                         continue;
 
                     // Put the field in the results if it's fetched
-                    if(values[field] !== undefined)
+                    if(values[field] !== null)
                         results[field] = values[field];
 
                     else
@@ -985,7 +985,7 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     };
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject).toArray(function(err) {
+    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err) {
         // Call back errors
         if(err !== null) {
             callback(new Error(err));
@@ -1914,7 +1914,7 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
             }
 
             // Add the fetched keys to the keys array
-            keys.concat(replyKeys);
+            keys = keys.concat(replyKeys);
 
             // Resolve the latch
             latch.resolve();
