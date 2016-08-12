@@ -378,35 +378,37 @@ BaseModel.prototype.setField = function(field, value, callback) {
         latch.resolve();
     });
 
-    // Set the field in Redis
-    latch.add();
-    this.redisSetField(field, value, function(err) {
-        // Resolve the latch on success
-        if(err === null) {
-            latch.resolve();
-            return;
-        }
-
-        // Show a warning
-        console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
-        console.warn(err);
-
-        // Flush the field as fallback
-        instance.redisFlush(field, function(err) {
-            // Call back if an error occurred
-            if(err !== null) {
-                // Show a warning
-                console.warn('Fallback flushing fields failed.');
-
-                // Call back the error
-                callback(err);
+    // Set the field in Redis if ready
+    if(RedisUtils.isReady()) {
+        latch.add();
+        this.redisSetField(field, value, function(err) {
+            // Resolve the latch on success
+            if(err === null) {
+                latch.resolve();
                 return;
             }
 
-            // Resolve the latch
-            latch.resolve();
+            // Show a warning
+            console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
+            console.warn(err);
+
+            // Flush the field as fallback
+            instance.redisFlush(field, function(err) {
+                // Call back if an error occurred
+                if(err !== null) {
+                    // Show a warning
+                    console.warn('Fallback flushing fields failed.');
+
+                    // Call back the error
+                    callback(err);
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
         });
-    });
+    }
 
     // Call back if the latch is fully resolved
     latch.then(() => callback(null));
@@ -448,35 +450,37 @@ BaseModel.prototype.setFields = function(fields, callback) {
         latch.resolve();
     });
 
-    // Set the fields in Redis
-    latch.add();
-    this.redisSetFields(fields, function(err) {
-        // Resolve the latch on success
-        if(err === null) {
-            latch.resolve();
-            return;
-        }
-
-        // Show a warning
-        console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
-        console.warn(err);
-
-        // Flush the field as fallback
-        instance.redisFlush(Object.keys(fields), function(err) {
-            // Call back if an error occurred
-            if(err !== null) {
-                // Show a warning
-                console.warn('Fallback flushing fields failed.');
-
-                // Call back the error
-                callback(err);
+    // Set the fields in Redis if ready
+    if(RedisUtils.isReady()) {
+        latch.add();
+        this.redisSetFields(fields, function(err) {
+            // Resolve the latch on success
+            if(err === null) {
+                latch.resolve();
                 return;
             }
 
-            // Resolve the latch
-            latch.resolve();
+            // Show a warning
+            console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
+            console.warn(err);
+
+            // Flush the field as fallback
+            instance.redisFlush(Object.keys(fields), function(err) {
+                // Call back if an error occurred
+                if(err !== null) {
+                    // Show a warning
+                    console.warn('Fallback flushing fields failed.');
+
+                    // Call back the error
+                    callback(err);
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
         });
-    });
+    }
 
     // Call back if the latch is fully resolved
     latch.then(() => callback(null));
