@@ -22,9 +22,7 @@
 
 var util = require('util');
 var SessionDatabase = require('./SessionDatabase');
-var ObjectCache = require('../../cache/ObjectCache');
-var User = require('../user/UserModel');
-var ObjectId = require('mongodb').ObjectId;
+var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
 
 /**
@@ -42,49 +40,75 @@ var SessionModel = function(id) {
      */
     this._id = id;
 
-    // Apply the database object layer to this object
-    this.layerApply(this, SessionDatabase.DB_COLLECTION_NAME, {
-        user: {
-            field: 'user_id',
-            toOutput: function(userId) {
-                return new User(userId);
+    // Create and configure the base model instance for this model
+    this._baseModel = new BaseModel(this, {
+        mongo: {
+            collection: SessionDatabase.DB_COLLECTION_NAME
+        },
+        fields: {
+            user: {
+                mongo: {
+                    field: 'user_id',
+                    from: function(value) {
+                        return value;
+                    },
+                    to: function(value) {
+                        return value;
+                    }
+                },
+                cache: {
+                    enable: true,
+                    from: function(value) {
+                        return value;
+                    },
+                    to: function(value) {
+                        return value;
+                    }
+                },
+                redis: {
+                    enable: true,
+                    from: function(value) {
+                        return value;
+                    },
+                    to: function(value) {
+                        return value;
+                    }
+                }
             },
-            fromDb: function(userId) {
-                return userId;
+            token: {
+                mongo: {
+                    field: 'token'
+                }
             },
-            toRedis: function(userId) {
-                return userId.toString();
+            create_date: {
+                mongo: {
+                    field: 'create_date'
+                },
+                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
+                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
             },
-            fromRedis: function(userIdHex) {
-                return new ObjectId(userIdHex);
+            create_ip: {
+                mongo: {
+                    field: 'create_ip'
+                }
+            },
+            last_use_date: {
+                mongo: {
+                    field: 'last_use_date'
+                },
+                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
+                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
+            },
+            expire_date: {
+                mongo: {
+                    field: 'expire_date'
+                },
+                toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
+                fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
             }
-        },
-        token: {
-            field: 'token'
-        },
-        create_date: {
-            field: 'create_date',
-            toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-            fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
-        },
-        create_ip: {
-            field: 'create_ip'
-        },
-        last_use_date: {
-            field: 'last_use_date',
-            toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-            fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
-        },
-        expire_date: {
-            field: 'expire_date',
-            toRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_TO_REDIS,
-            fromRedis: DatabaseObjectLayer.LAYER_PARSER_DATE_FROM_REDIS
         }
     });
 };
-
-// Inherit the database object layer
-util.inherits(SessionModel, DatabaseObjectLayer);
 
 /**
  * Get the ID object of the session.
@@ -105,59 +129,128 @@ SessionModel.prototype.getIdHex = function() {
 };
 
 /**
+ * Get the given field from the model.
+ *
+ * @param {String} field Field names.
+ * @param {SessionModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ */
+SessionModel.prototype.getField = function(field, callback) {
+    this._baseModel.getField(field, callback);
+};
+
+/**
+ * Called with the result of a model field, or when an error occurred.
+ *
+ * @callback SessionModel~getFieldCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {*=} Field value.
+ */
+
+/**
  * Get the user that owns this session.
  *
- * @param {function} callback ({User} user) Callback with the result.
+ * @param {SessionModel~getUserCallback} callback Called with the user, or when an error occurred.
  */
 SessionModel.prototype.getUser = function(callback) {
-    this.layerFetchField('user', callback);
+    this.getField('user', callback);
 };
+
+/**
+ * Called with the user, or when an error occurred.
+ *
+ * @callback SessionModel~getUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {User=} User.
+ */
 
 /**
  * Get the token of the session.
  *
- * @param {function} callback ({string} token) Callback with the result.
+ * @param {SessionModel~getTokenCallback} callback Called with the token, or when an error occurred.
  */
 SessionModel.prototype.getToken = function(callback) {
-    this.layerFetchField('token', callback);
+    this.getField('token', callback);
 };
 
 /**
- * Get the create date of the session.
+ * Called with the token, or when an error occurred.
  *
- * @param {function} callback ({Date} createDate) Callback with the result.
+ * @callback SessionModel~getTokenCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String=} Token.
+ */
+
+/**
+ * Get the creation date of the session.
+ *
+ * @param {SessionModel~getCreateDateCallback} callback Called with the creation date, or when an error occurred.
  */
 SessionModel.prototype.getCreateDate = function(callback) {
-    this.layerFetchField('create_date', callback);
+    this.getField('create_date', callback);
 };
+
+/**
+ * Called with the creation date, or when an error occurred.
+ *
+ * @callback SessionModel~getCreateDateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Date=} Creation date.
+ */
 
 /**
  * Get the IP address this session was created on.
  *
- * @param {function} callback ({string} createIp) Callback with the result.
+ * @param {SessionModel~getCreateIpCallback} callback Called with the IP this session was created with, or when an error occurred.
  */
 SessionModel.prototype.getCreateIp = function(callback) {
-    this.layerFetchField('create_ip', callback);
+    this.getField('create_ip', callback);
 };
+
+/**
+ * Called with the IP this session was created with, or when an error occurred.
+ *
+ * @callback SessionModel~getCreateIpCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String=} IP address this session was created with.
+ */
 
 /**
  * Get the date this session was last used on.
  *
- * @param {function} callback ({Date} lastUseDate) Callback with the result.
+ * @param {SessionModel~getLastUseDateCallback} callback Called with the date the session was last used on, or when an error occurred.
  */
 SessionModel.prototype.getLastUseDate = function(callback) {
-    // TODO: Make sure this uses the last-usage cache
-    this.layerFetchField('last_use_date', callback);
+    this.getField('last_use_date', callback);
 };
+
+/**
+ * Called with the date the session was last used on, or when an error occurred.
+ *
+ * @callback SessionModel~getLastUseDateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Date=} Date the session was last used on.
+ */
 
 /**
  * Get the expiration date of the session.
  *
- * @param {function} callback ({Date} expireDate) Callback with the result.
+ * @param {SessionModel~getExpireDateCallback} callback Called with the date the session expires on, or when an error occurred.
  */
 SessionModel.prototype.getExpireDate = function(callback) {
-    this.layerFetchField('expire_date', callback);
+    this.getField('expire_date', callback);
 };
+
+/**
+ * Called with the date the session expires on, or when an error occurred.
+ *
+ * @callback SessionModel~getExpireDateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Date=} The session expiration date.
+ */
+
+
+
+// TODO: Rework this!
 
 /**
  * Delete the session.
