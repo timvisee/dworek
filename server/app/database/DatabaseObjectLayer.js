@@ -46,6 +46,7 @@ const CACHE_KEY_PREFIX = 'dbLayer:';
  * @returns {DatabaseObjectLayer} DatabaseObjectLayer instance.
  *
  * @private
+ * @deprecated
  */
 var DatabaseObjectLayer = function() {
     // Instantiated directly, show a warning
