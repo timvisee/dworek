@@ -28,5 +28,12 @@
  */
 var Core = function() {};
 
+/**
+ * Express app instance.
+ *
+ * @type {*} Express app.
+ */
+Core.expressApp = null;
+
 // Export the class
 module.exports = Core;

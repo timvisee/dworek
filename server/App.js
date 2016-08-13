@@ -61,13 +61,6 @@ var App = function(init) {
      */
     this.gameController = null;
 
-    /**
-     * Express app instance.
-     *
-     * @type {*} Express app.
-     */
-    this.expressApp = null;
-
     // Initialize
     if(init != undefined && init)
         this.init();
@@ -173,10 +166,10 @@ App.prototype._initGameController = function(callback) {
  */
 App.prototype._initExpressApp = function(callback) {
     // Create an Express application instance
-    this.expressApp = express();
+    Core.expressApp = express();
 
     // Disable express branding in HTTP responses
-    this.expressApp.disable('x-powered-by');
+    Core.expressApp.disable('x-powered-by');
 
     // We're done, call back if a callback is defined
     if(callback !== undefined)
