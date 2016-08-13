@@ -38,17 +38,9 @@ var PathLibrary = require('../../PathLibrary');
  * @class
  * @constructor
  *
- * @param {Core} core Core instance.
  * @param {boolean} [init] True to initialize immediately, false if not.
  */
-function Router(core, init) {
-    /**
-     * Core instance.
-     *
-     * @type {Core}
-     */
-    this.core = core;
-
+function Router(init) {
     // Initialize
     if(init === true)
         this.init();
@@ -104,13 +96,10 @@ Router.prototype.init = function(callback) {
         next(error);
     });
 
-    // Store this instance
-    var instance = this;
-
     // Error handler
     Core.expressApp.use(function(err, req, res, next) {
         // Determine whether we're in development mode
-        var dev = instance.core.expressApp.get('env') === 'development';
+        var dev = Core.expressApp.get('env') === 'development';
 
         // Show an error page, render the stack trace if we're in development mode
         res.status(err.status || 500);

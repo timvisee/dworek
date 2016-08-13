@@ -48,13 +48,6 @@ var App = function(init) {
     this._init = false;
 
     /**
-     * Router instance.
-     *
-     * @type {Router}
-     */
-    this.router = null;
-
-    /**
      * Game controller instance.
      *
      * @type {GameController|null} Game controller instance, or null if the core hasn't been initialized.
@@ -183,10 +176,10 @@ App.prototype._initExpressApp = function(callback) {
  */
 App.prototype._initRouter = function(callback) {
     // Set the router instance, and initialize
-    this.router = new Router(this, false);
+    Core.router = new Router(false);
 
     // Initialize
-    this.router.init(callback);
+    Core.router.init(callback);
 };
 
 /**

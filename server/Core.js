@@ -35,5 +35,12 @@ var Core = function() {};
  */
 Core.expressApp = null;
 
+/**
+ * Router instance.
+ *
+ * @type {Router}
+ */
+Core.router = null;
+
 // Export the class
 module.exports = Core;
