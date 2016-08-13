@@ -58,7 +58,8 @@ var UserModel = function(id) {
                 }
             },
             mail: {},
-            full_name: {},
+            first_name: {},
+            last_name: {},
             nickname: {},
             create_date: {
                 redis: {
@@ -206,30 +207,57 @@ UserModel.prototype.setMail = function(mail, callback) {
 };
 
 /**
- * Get the full name of the user.
+ * Get the first name of the user.
  *
- * @param {UserModel~getFullNameCallback} callback Called with the full name of the user or when an error occurred.
+ * @param {UserModel~getFirstNameCallback} callback Called with the first name of the user or when an error occurred.
  */
-UserModel.prototype.getFullName = function(callback) {
-    this.getField('full_name', callback);
+UserModel.prototype.getFirstName = function(callback) {
+    this.getField('first_name', callback);
 };
 
 /**
- * Called with the full name of the user or when an error occurred.
+ * Called with the first name of the user or when an error occurred.
  *
- * @callback UserModel~getFullNameCallback
+ * @callback UserModel~getFirstNameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {String} Full name of the user.
+ * @param {String} First name of the user.
  */
 
 /**
- * Set the full name of the user.
+ * Set the first name of the user.
  *
- * @param {String} fullName Full name.
+ * @param {String} firstName First name.
  * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
-UserModel.prototype.setFullName = function(fullName, callback) {
-    this.setField('full_name', fullName, callback);
+UserModel.prototype.setFirstName = function(firstName, callback) {
+    this.setField('first_name', firstName, callback);
+};
+
+/**
+ * Get the last name of the user.
+ *
+ * @param {UserModel~getLastNameCallback} callback Called with the last name of the user or when an error occurred.
+ */
+UserModel.prototype.getLastName = function(callback) {
+    this.getField('last_name', callback);
+};
+
+/**
+ * Called with the last name of the user or when an error occurred.
+ *
+ * @callback UserModel~getLastNameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Last name of the user.
+ */
+
+/**
+ * Set the last name of the user.
+ *
+ * @param {String} lastName Last name.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setLastName = function(lastName, callback) {
+    this.setField('last_name', lastName, callback);
 };
 
 /**

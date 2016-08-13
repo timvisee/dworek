@@ -6,5 +6,6 @@ username : String               User username.
 password_hash : String          User password hash.
 mail : String                   User email.
 nickname : String               User display name.
-full_name : String              User's full name.
+first_name : String             User's first name.
+last_name : String              User's last name.
 create_date : Date              User creation date and time.
