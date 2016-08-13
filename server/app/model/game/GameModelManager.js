@@ -28,14 +28,14 @@ var ModelInstanceManager = require('../ModelInstanceManager');
  * @class
  * @constructor
  */
-var GameModelManager = function() {};
-
-/**
- * Model instance manager.
- *
- * @type {ModelInstanceManager}
- */
-GameModelManager._instanceManager = new ModelInstanceManager(GameModelManager);
+var GameModelManager = function() {
+    /**
+     * Model instance manager.
+     *
+     * @type {ModelInstanceManager}
+     */
+    this._instanceManager = new ModelInstanceManager(GameModelManager);
+};
 
 // Return the created class
 module.exports = GameModelManager;
