@@ -31,14 +31,14 @@ var ModelInstanceManager = require('../ModelInstanceManager');
  * @class
  * @constructor
  */
-var UserModelManager = function() {};
-
-/**
- * Model instance manager.
- *
- * @type {ModelInstanceManager}
- */
-UserModelManager._instanceManager = new ModelInstanceManager(UserModelManager);
+var UserModelManager = function() {
+    /**
+     * Model instance manager.
+     *
+     * @type {ModelInstanceManager}
+     */
+    this._instanceManager = new ModelInstanceManager(UserModelManager);
+};
 
 /**
  * Get a user by it's username.
@@ -46,7 +46,7 @@ UserModelManager._instanceManager = new ModelInstanceManager(UserModelManager);
  * @param username Username of the user.
  * @param {UserModelManager~getUserByUsername} callback Callback with the user.
  */
-UserModelManager.getUserByUsername = function(username, callback) {
+UserModelManager.prototype.getUserByUsername = function(username, callback) {
     // Return some user data
     UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true}, function(err, data) {
         // Pass along errors
@@ -85,7 +85,7 @@ UserModelManager.getUserByUsername = function(username, callback) {
  * @param password Password of the user. (not hashed)
  * @param {UserModelManager~getUserByCredentialsCallback} callback Callback with the user, or null if the credentials were invalid.
  */
-UserModelManager.getUserByCredentials = function(username, password, callback) {
+UserModelManager.prototype.getUserByCredentials = function(username, password, callback) {
     // Make sure all fields are given
     if(username === undefined || password === undefined || callback === undefined) {
         // Call the callback with nullif available
