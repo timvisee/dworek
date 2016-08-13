@@ -59,9 +59,9 @@ var App = function(init) {
  * Initialize the application.
  * This will start the application and it's core, initiating things like the database, Redis and the router.
  *
- * @param {function} [initCallback] Called when finished initializing, or when an error occurred.
+ * @param {function} [callback] Called when finished initializing, or when an error occurred.
  */
-App.prototype.init = function(initCallback) {
+App.prototype.init = function(callback) {
     // Create a core instance if it hasn't been instantiated yet
     if(this.core === null)
         this.core = new Core();
@@ -71,41 +71,32 @@ App.prototype.init = function(initCallback) {
 
     // Initialize various components in parallel
     async.parallel([
-        (callback) => {
-            // Print the library paths, and call back
+        // Print the library paths, and call back
+        (initComplete) => {
             PathLibrary.printPaths();
-            callback(null);
+            initComplete(null);
         },
 
-        (callback) =>
-            // Instantiate the model managers
-            instance._initModelManagers(callback),
+        // Instantiate the model managers
+        (initComplete) => instance._initModelManagers(initComplete),
 
-        // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        (callback) =>
-            // Initialize the game controller
-            instance._initGameController(callback),
+        // Initialize the game controller
+        (initComplete) => instance._initGameController(initComplete),
 
-        // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        (callback) =>
-            // Initialize the express application
-            instance._initExpressApp(callback),
+        // Initialize the express application
+        (initComplete) => instance._initExpressApp(initComplete),
 
-        // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        (callback) =>
-            // Initialize the database
-            instance._initDatabase(callback),
+        // Initialize the database
+        (initComplete) => instance._initDatabase(initComplete),
 
-        // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        (callback) =>
-            // Initialize Redis
-            instance._initRedis(callback)
+        // Initialize Redis
+        (initComplete) => instance._initRedis(initComplete)
 
-        ], function(err) {
+    ], function(err) {
         // Make sure everything went right, callback or throw an error instead
         if(err !== null) {
-            if(initCallback !== undefined)
-                initCallback(err);
+            if(callback !== undefined)
+                callback(err);
             else
                 throw err;
             return;
@@ -116,8 +107,8 @@ App.prototype.init = function(initCallback) {
         instance._initRouter(function(err) {
             // Call back any errors, or throw it if no callback was defined
             if(err !== null) {
-                if(initCallback !== undefined)
-                    initCallback(err);
+                if(callback !== undefined)
+                    callback(err);
                 else
                     throw err;
             }
@@ -126,8 +117,8 @@ App.prototype.init = function(initCallback) {
             instance._init = true;
 
             // Call back
-            if(initCallback !== undefined)
-                initCallback(null);
+            if(callback !== undefined)
+                callback(null);
         });
     });
 };
