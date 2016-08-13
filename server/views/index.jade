@@ -6,6 +6,9 @@ block content
   p Application front page.
 
   p
-    a(href='/login', title='Login') Login#[br]
-    a(href='/register', title='Register') Register#[br]
-    a(href='/about', title='About this application') About
+    fieldset(data-role='controlgroup', data-type='vertical')
+      a.ui-btn.ui-shadow(href='/login', title='Login') Login#[br]
+      a.ui-btn.ui-shadow(href='/register', title='Register') Register#[br]
+
+    fieldset(data-role='controlgroup', data-type='vertical')
+      a.ui-btn.ui-shadow(href='/about', title='About this application') About
