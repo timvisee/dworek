@@ -32,6 +32,8 @@
 
     "websocket": "1.0.23",
 
-    "lodash": "4.14.1"
+    "lodash": "4.14.1",
+
+    "validator": "5.5.0"
   }
 }
