@@ -47,13 +47,6 @@ var App = function(init) {
      */
     this._init = false;
 
-    /**
-     * Game controller instance.
-     *
-     * @type {GameController|null} Game controller instance, or null if the core hasn't been initialized.
-     */
-    this.gameController = null;
-
     // Initialize
     if(init != undefined && init)
         this.init();
@@ -146,10 +139,10 @@ App.prototype.isInit = function() {
  */
 App.prototype._initGameController = function(callback) {
     // Initialize the game controller
-    this.gameController = new GameController();
+    Core.gameController = new GameController();
 
     // Load all active games
-    this.gameController.loadActiveGames(callback);
+    Core.gameController.loadActiveGames(callback);
 };
 
 /**
