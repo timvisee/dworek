@@ -46,7 +46,6 @@ UserDatabase.DB_COLLECTION_NAME = 'user';
  * @param {String} lastName Last name.
  * @param {function} callback (err, {ObjectId} userId) Callback.
  */
-// FIXME: username, password_hash, mail, nickname, full_name, create_date
 UserDatabase.addUser = function(username, password, mail, firstName, lastName, callback) {
     // Get the database instance
     var db = MongoUtil.getConnection();
