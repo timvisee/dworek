@@ -64,7 +64,7 @@ ModelInstanceManager.prototype.create = function(id) {
         return this._instances.get(id);
 
     // Create a new model instance
-    var model = this._modelConstructor(new ObjectId(id));
+    var model = new this._modelConstructor(new ObjectId(id));
 
     // Put the object in the instances map
     this._instances.set(id, model);
