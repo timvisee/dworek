@@ -21,6 +21,8 @@
  ******************************************************************************/
 
 var MongoUtil = require('../../mongo/MongoUtils');
+var HashUtils = require('../../hash/HashUtils');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Constructor.
@@ -33,6 +35,72 @@ var UserDatabase = function() {};
  * Database collection name.
  */
 UserDatabase.DB_COLLECTION_NAME = 'user';
+
+/**
+ * Add an user to the database.
+ *
+ * @param {String} username Username.
+ * @param {String} password Password.
+ * @param {String} mail Mail address.
+ * @param {String} firstName First name.
+ * @param {String} lastName Last name.
+ * @param {function} callback (err, {ObjectId} userId) Callback.
+ */
+// FIXME: username, password_hash, mail, nickname, full_name, create_date
+UserDatabase.addUser = function(username, password, mail, firstName, lastName, callback) {
+    // Get the database instance
+    var db = MongoUtil.getConnection();
+
+    // TODO: Validate input!
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the current, and expire date
+    var createDate = new Date();
+
+    // Hash the password
+    latch.add();
+    HashUtils.hash(password, function(err, hash) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the password
+        password = hash;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Add the user to the database when we're ready
+    latch.then(function() {
+        // Insert the session into the database
+        db.collection(UserDatabase.DB_COLLECTION_NAME).insert({
+            username,
+            password_hash: password,
+            mail,
+            first_name: firstName,
+            last_name: lastName,
+            nickname: '',
+            create_date: createDate
+
+        }, function(err, data) {
+            // Handle errors
+            if(err != null) {
+                // Show a warning and call back with the error
+                console.warn('Failed insert new user into the database.');
+                callback(err, null);
+                return;
+            }
+
+            // Call back with the inserted ID
+            callback(null, data._id);
+        });
+    });
+};
 
 /**
  * Do a find query on the API token database. Parse the result as an array through a callback.
