@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var ModelInstanceManager = require('../ModelInstanceManager');
+
 /**
  * GameModelManager class.
  *
@@ -27,6 +29,13 @@
  * @constructor
  */
 var GameModelManager = function() {};
+
+/**
+ * Model instance manager.
+ *
+ * @type {ModelInstanceManager}
+ */
+GameModelManager._instanceManager = new ModelInstanceManager(GameModelManager);
 
 // Return the created class
 module.exports = GameModelManager;

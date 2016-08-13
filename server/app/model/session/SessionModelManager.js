@@ -27,6 +27,7 @@ var User = require('../user/UserModel');
 var RedisUtil = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
 var ObjectId = require('mongodb').ObjectId;
+var ModelInstanceManager = require('../ModelInstanceManager');
 
 /**
  * Time in seconds for token validity to expire in cache.
@@ -50,6 +51,13 @@ const SESSION_TOKEN_MAX_LENGTH = Math.max(config.session.tokenLength, 64);
  * @returns {SessionManager} SessionManager instance.
  */
 var SessionManager = function() {};
+
+/**
+ * Model instance manager.
+ *
+ * @type {ModelInstanceManager}
+ */
+SessionManager._instanceManager = new ModelInstanceManager(SessionManager);
 
 /**
  * Create a new session for the given user.

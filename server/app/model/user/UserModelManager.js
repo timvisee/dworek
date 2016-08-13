@@ -23,6 +23,7 @@
 var UserDatabase = require('./UserDatabase');
 var User = require('./UserModel');
 var HashUtils = require('../../hash/HashUtils');
+var ModelInstanceManager = require('../ModelInstanceManager');
 
 /**
  * UserModelManager class.
@@ -31,6 +32,13 @@ var HashUtils = require('../../hash/HashUtils');
  * @constructor
  */
 var UserModelManager = function() {};
+
+/**
+ * Model instance manager.
+ *
+ * @type {ModelInstanceManager}
+ */
+UserModelManager._instanceManager = new ModelInstanceManager(UserModelManager);
 
 /**
  * Get a user by it's username.
