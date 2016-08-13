@@ -21,12 +21,10 @@
  ******************************************************************************/
 
 var util = require('util');
-var ObjectId = require('mongodb').ObjectId;
 var Core = require('../../../Core');
 var SessionDatabase = require('./SessionDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
-var UserModel = require('../user/UserModel');
 var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
@@ -77,7 +75,6 @@ var SessionModel = function(id) {
                      * @param {String} id
                      * @return {UserModel} User.
                      */
-                    // TODO: Get the user from the user manager instead of instantiating it directly
                     from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
@@ -95,7 +92,6 @@ var SessionModel = function(id) {
                      * @param {String} id
                      * @return {UserModel} User.
                      */
-                    // TODO: Get the user from the user manager instead of instantiating it directly
                     from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
