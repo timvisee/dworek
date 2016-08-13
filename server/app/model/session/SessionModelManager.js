@@ -48,16 +48,16 @@ const SESSION_TOKEN_MAX_LENGTH = Math.max(config.session.tokenLength, 64);
 /**
  * Constructor.
  *
- * @returns {SessionManager} SessionManager instance.
+ * @returns {SessionModelManager} SessionModelManager instance.
  */
-var SessionManager = function() {};
+var SessionModelManager = function() {};
 
 /**
  * Model instance manager.
  *
  * @type {ModelInstanceManager}
  */
-SessionManager._instanceManager = new ModelInstanceManager(SessionManager);
+SessionModelManager._instanceManager = new ModelInstanceManager(SessionModelManager);
 
 /**
  * Create a new session for the given user.
@@ -66,7 +66,7 @@ SessionManager._instanceManager = new ModelInstanceManager(SessionManager);
  * @param {string} ip IP address of the client.
  * @param {function} callback (err, {ObjectId) [sessionId], {string} [token]) Callback with the result as boolean.
  */
-SessionManager.createSession = function(user, ip, callback) {
+SessionModelManager.createSession = function(user, ip, callback) {
     // Generate a session token
     TokenGenerator.generateToken(config.security.tokenLength, function(err, token) {
         // Handle errors
@@ -98,9 +98,9 @@ SessionManager.createSession = function(user, ip, callback) {
  * @param token The session token.
  * @param {function} callback (err, {SessionModel|null} user) Callback with the session, or null.
  */
-SessionManager.getSessionByTokenIfValid = function(token, callback) {
+SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
-    if(!SessionManager.isAllowedSessionToken(token)) {
+    if(!SessionModelManager.isAllowedSessionToken(token)) {
         // Call back
         callback(null);
         return;
@@ -200,9 +200,9 @@ SessionManager.getSessionByTokenIfValid = function(token, callback) {
  * @param token The session token.
  * @param {function} callback (err, {UserModel|null} user) Callback with the session user, or null.
  */
-SessionManager.getSessionUserByTokenIfValid = function(token, callback) {
+SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
-    if(!SessionManager.isAllowedSessionToken(token)) {
+    if(!SessionModelManager.isAllowedSessionToken(token)) {
         // Call back
         callback(null, null);
         return;
@@ -299,9 +299,9 @@ SessionManager.getSessionUserByTokenIfValid = function(token, callback) {
  * @param token The session token.
  * @param {function} callback (err, {boolean} valid) Callback with the result as boolean.
  */
-SessionManager.isValidSessionToken = function(token, callback) {
+SessionModelManager.isValidSessionToken = function(token, callback) {
     // Make sure this token is allowed
-    if(!SessionManager.isAllowedSessionToken(token)) {
+    if(!SessionModelManager.isAllowedSessionToken(token)) {
         // Call back
         callback(null, false);
         return;
@@ -390,7 +390,7 @@ SessionManager.isValidSessionToken = function(token, callback) {
  * @param token Token.
  * @returns {boolean} True if allowed, false if not.
  */
-SessionManager.isAllowedSessionToken = function(token) {
+SessionModelManager.isAllowedSessionToken = function(token) {
     // Make sure the length is allowed
     if(token.length < SESSION_TOKEN_MIN_LENGTH || token.length > SESSION_TOKEN_MAX_LENGTH)
         return false;
@@ -405,7 +405,7 @@ SessionManager.isAllowedSessionToken = function(token) {
  * @param {UserModel} user User to get the session tokens for.
  * @param {function} callback (err, {array} Array of sessions.) Callback with the an array of sessions.
  */
-SessionManager.getUserSessions = function(user, callback) {
+SessionModelManager.getUserSessions = function(user, callback) {
     // Make sure the user is valid
     if(user == null) {
         // Call back with an error, and return
@@ -445,4 +445,4 @@ SessionManager.getUserSessions = function(user, callback) {
 };
 
 // Return the created class
-module.exports = SessionManager;
+module.exports = SessionModelManager;
