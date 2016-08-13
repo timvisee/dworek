@@ -27,11 +27,12 @@
  */
 var ObjectCache = function() {
     /**
-     * JSON object of cached data.
+     * Map of cached data.
      *
+     * @type {WeakMap}
      * @private
      */
-    this._cache = {};
+    this._cache = new WeakMap();
 };
 
 /**
@@ -42,17 +43,17 @@ var ObjectCache = function() {
  * @returns {boolean} True if this field is available, false if not.
  */
 ObjectCache.prototype.hasCache = function(field) {
-    return this._cache.hasOwnProperty(field);
+    return this._cache.has(field);
 };
 
 /**
  * Get the cached value for the given field.
  *
- * @param {string} field Field.
- * @returns {*} Cached value.
+ * @param {String} field Field.
+ * @returns {*|undefined} Cached value, or undefined if the field is unknown.
  */
 ObjectCache.prototype.getCache = function(field) {
-    return this._cache[field];
+    return this._cache.get(field);
 };
 
 /**
@@ -62,7 +63,7 @@ ObjectCache.prototype.getCache = function(field) {
  * @param {*} value Value to cache.
  */
 ObjectCache.prototype.setCache = function(field, value) {
-    this._cache[field] = value;
+    this._cache.set(field, value);
 };
 
 /**
@@ -91,7 +92,7 @@ ObjectCache.prototype.setCacheMultiple = function(values) {
 ObjectCache.prototype.flushCache = function(fields) {
     // Flush all if no field is given
     if(fields === undefined) {
-        this._cache = {};
+        this._cache = new WeakMap();
         return;
     }
 
@@ -101,7 +102,7 @@ ObjectCache.prototype.flushCache = function(fields) {
 
     // Loop through the list of fields, and delete them one by one
     for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
-        delete this._cache[fields[i]];
+        this._cache.delete(fields[i]);
 };
 
 // Export the user class
