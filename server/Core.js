@@ -78,35 +78,31 @@ Core.prototype.init = function(initCallback) {
 
     // Initialize various components in parallel
     async.parallel([
-        function(callback) {
+        (callback) => {
             // Print the library paths, and call back
             PathLibrary.printPaths();
             callback(null);
         },
 
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        function(callback) {
+        (callback) =>
             // Initialize the game controller
-            instance._initGameController(callback)
-        },
+            instance._initGameController(callback),
 
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        function(callback) {
+        (callback) =>
             // Initialize the express application
-            instance._initExpressApp(callback)
-        },
+            instance._initExpressApp(callback),
 
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        function(callback) {
+        (callback) =>
             // Initialize the database
-            instance._initDatabase(callback)
-        },
+            instance._initDatabase(callback),
 
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
-        function(callback) {
+        (callback) =>
             // Initialize Redis
             instance._initRedis(callback)
-        }
 
     ], function(err) {
         // Make sure everything went right, callback or throw an error instead
