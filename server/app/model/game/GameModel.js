@@ -186,13 +186,13 @@ GameModel.prototype.getUser = function(callback) {
  *
  * @callback GameModel~getUserCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {User} User.
+ * @param {UserModel} User.
  */
 
 /**
  * Set the user that created this game.
  *
- * @param {User} user User.
+ * @param {UserModel} user User.
  * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
  */
 GameModel.prototype.setUser = function(user, callback) {

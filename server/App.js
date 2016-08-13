@@ -66,8 +66,8 @@ App.prototype.init = function(callback) {
     if(this.core === null)
         this.core = new Core();
 
-    // Store the instance
-    const instance = this;
+    // Store the current instance
+    const self = this;
 
     // Initialize various components in parallel
     async.parallel([
@@ -78,19 +78,19 @@ App.prototype.init = function(callback) {
         },
 
         // Instantiate the model managers
-        (initComplete) => instance._initModelManagers(initComplete),
+        (initComplete) => self._initModelManagers(initComplete),
 
         // Initialize the game controller
-        (initComplete) => instance._initGameController(initComplete),
+        (initComplete) => self._initGameController(initComplete),
 
         // Initialize the express application
-        (initComplete) => instance._initExpressApp(initComplete),
+        (initComplete) => self._initExpressApp(initComplete),
 
         // Initialize the database
-        (initComplete) => instance._initDatabase(initComplete),
+        (initComplete) => self._initDatabase(initComplete),
 
         // Initialize Redis
-        (initComplete) => instance._initRedis(initComplete)
+        (initComplete) => self._initRedis(initComplete)
 
     ], function(err) {
         // Make sure everything went right, callback or throw an error instead
@@ -104,7 +104,7 @@ App.prototype.init = function(callback) {
 
         // Initialize the router
         //noinspection JSAccessibilityCheck
-        instance._initRouter(function(err) {
+        self._initRouter(function(err) {
             // Call back any errors, or throw it if no callback was defined
             if(err !== null) {
                 if(callback !== undefined)
@@ -114,7 +114,7 @@ App.prototype.init = function(callback) {
             }
 
             // Set the initialization status
-            instance._init = true;
+            self._init = true;
 
             // Call back
             if(callback !== undefined)
