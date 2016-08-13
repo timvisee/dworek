@@ -22,11 +22,8 @@
 
 var config = require('../../../config');
 var SessionDatabase = require('./SessionDatabase');
-var Session = require('./SessionModel');
-var User = require('../user/UserModel');
 var RedisUtil = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
-var ObjectId = require('mongodb').ObjectId;
 var ModelInstanceManager = require('../ModelInstanceManager');
 
 /**
@@ -107,6 +104,7 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
     }
 
     // Determine the cache key and get the Redis client
+    // TODO: Update this caching method!
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':sessionId';
     var redis = RedisUtil.getConnection();
@@ -119,6 +117,9 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
             redis.expire(cacheKey, CACHE_TOKEN_VALID_EXPIRE);
         }
     };
+
+    // Store the current instance
+    const self = this;
 
     // Function to retrieve the value from the database
     var getFromDatabase = function() {
@@ -146,8 +147,8 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
                 // TODO: Delete the session from the database?
             }
 
-            // Create a session with it's ID
-            var session = new Session(rawSessionData._id);
+            // Create a session with it's ID through the instance manager
+            var session = self._instanceManager.create(rawSessionData._id);
 
             // Cache the database results in the session object
             session.layerCacheDatabaseResult(rawSessionData);
@@ -161,7 +162,7 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
     // Get the result from cache if cache is available
     if(RedisUtil.isReady()) {
         // Try to fetch the validity data from cache
-        redis.get(cacheKey, function(err, value) {
+        redis.get(cacheKey, function(err, id) {
             // Handle errors
             if(err != undefined) {
                 // Print the error to the console
@@ -173,15 +174,15 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
             }
 
             // If the value isn't null, return it
-            if(value != null) {
+            if(id != null) {
                 // Callback with null if the value is zero
-                if(value == 0) {
+                if(id == 0) {
                     callback(null, null);
                     return;
                 }
 
-                // Convert the hex ID into an object, and call it back
-                callback(null, new Session(new ObjectId(value)));
+                // Get the session ID, create a session instance through the instance manager, and call it back
+                callback(null, self._instanceManager.create(id));
                 return;
             }
 
@@ -251,8 +252,8 @@ SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
             // Get the user ID
             var userId = rawSessionData.user_id;
 
-            // Get the user and call it back and cache the result
-            callback(null, new User(userId));
+            // Get the user, create an instance through the instance manager and call it back and cache the result
+            callback(null, Core.model.userModelManager._instanceManager.create(userId));
             cacheResult(userId.toString());
         });
     };
@@ -260,7 +261,7 @@ SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
     // Get the result from cache if cache is available
     if(RedisUtil.isReady()) {
         // Try to fetch the validity data from cache
-        redis.get(cacheKey, function(err, value) {
+        redis.get(cacheKey, function(err, userId) {
             // Handle errors
             if(err != undefined) {
                 // Print the error to the console
@@ -272,15 +273,15 @@ SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
             }
 
             // If the value isn't null, return it
-            if(value != null) {
+            if(userId != null) {
                 // Callback with null if the value is zero
-                if(value == 0) {
+                if(userId == 0) {
                     callback(null, null);
                     return;
                 }
 
-                // Convert the hex ID into an object, and call it back
-                callback(null, new User(new ObjectId(value)));
+                // Get the user ID, create and instance through the instance manager and call it back
+                callback(null, Core.model.userModelManager._instanceManager.create(userId));
                 return;
             }
 
@@ -414,6 +415,9 @@ SessionModelManager.prototype.getUserSessions = function(user, callback) {
         return;
     }
 
+    // Store the current instance
+    const self = this;
+
     // Return some user data
     // TODO: Do not list sessions that are expired!
     // TODO: Make additional fields configurable!
@@ -430,8 +434,8 @@ SessionModelManager.prototype.getUserSessions = function(user, callback) {
 
         // Loop through each result and add it's token to the array
         data.forEach(function(entry) {
-            // Construct the session
-            const session = new Session(entry._id);
+            // Create a new session through the instance manager
+            const session = self._instanceManager.create(entry._id);
 
             // Put the session in the list of sessions
             sessions.push(session);
