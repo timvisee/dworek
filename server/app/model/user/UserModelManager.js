@@ -21,7 +21,6 @@
  ******************************************************************************/
 
 var UserDatabase = require('./UserDatabase');
-var User = require('./UserModel');
 var HashUtils = require('../../hash/HashUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
 
@@ -47,6 +46,9 @@ var UserModelManager = function() {
  * @param {UserModelManager~getUserByUsername} callback Callback with the user.
  */
 UserModelManager.prototype.getUserByUsername = function(username, callback) {
+    // Store the current instance
+    const self = this;
+
     // Return some user data
     UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true}, function(err, data) {
         // Pass along errors
@@ -62,8 +64,8 @@ UserModelManager.prototype.getUserByUsername = function(username, callback) {
         // Get the user data
         var rawUserData = data[0];
 
-        // Get the user ID and create an user instance
-        var user = new User(rawUserData._id);
+        // Get the user ID and create an user instance through the instance manager
+        var user = self._instanceManager.create(rawUserData._id);
 
         // Get the user and call it back
         callback(null, user);
@@ -95,6 +97,9 @@ UserModelManager.prototype.getUserByCredentials = function(username, password, c
         // Return
         return;
     }
+
+    // Store the current instance
+    const self = this;
 
     // Return some user data
     UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true, password_hash: true}, function(err, data) {
@@ -134,9 +139,9 @@ UserModelManager.prototype.getUserByCredentials = function(username, password, c
                 return;
             }
 
-            // Get the user and call it back
+            // Create a user instance through the instance manager and call it back
             if(callback != undefined)
-                callback(null, new User(rawUserData._id));
+                callback(null, self._instanceManager.create(rawUserData._id));
         });
     });
 };
