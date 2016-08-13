@@ -78,7 +78,7 @@ var SessionModel = function(id) {
                      * @return {UserModel} User.
                      */
                     // TODO: Get the user from the user manager instead of instantiating it directly
-                    from: (id) => new UserModel(new ObjectId(id)),
+                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an User model to a hexadecimal ID.
@@ -96,7 +96,7 @@ var SessionModel = function(id) {
                      * @return {UserModel} User.
                      */
                     // TODO: Get the user from the user manager instead of instantiating it directly
-                    from: (id) => new UserModel(new ObjectId(id)),
+                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an User model to a hexadecimal ID.
