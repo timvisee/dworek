@@ -29,6 +29,34 @@
 var Core = function() {};
 
 /**
+ * Model manager root.
+ *
+ * @type {Object}
+ */
+Core.model = {};
+
+/**
+ * User model manager.
+ *
+ * @type {UserModelManager|null} User model manager, or null if it isn't instantiated yet.
+ */
+Core.model.userModelManager = null;
+
+/**
+ * Session model manager.
+ *
+ * @type {SessionModelManager|null} Session model manager, or null if it isn't instantiated yet.
+ */
+Core.model.sessionModelManager = null;
+
+/**
+ * Game model manager.
+ *
+ * @type {GameModelManager|null} Game model manager, or null if it isn't instantiated yet.
+ */
+Core.model.gameModelManager = null;
+
+/**
  * Express app instance.
  *
  * @type {*} Express app.

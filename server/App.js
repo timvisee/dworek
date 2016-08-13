@@ -29,6 +29,9 @@ var MongoUtils = require('./app/mongo/MongoUtils');
 var RedisUtils = require('./app/redis/RedisUtils');
 var Router = require('./app/router/Router');
 var PathLibrary = require('./PathLibrary');
+var UserModelManager = require('./app/model/user/UserModelManager');
+var SessionModelManager = require('./app/model/session/SessionModelManager');
+var GameModelManager = require('./app/model/game/GameModelManager');
 
 /**
  * Constructor.
@@ -74,6 +77,10 @@ App.prototype.init = function(initCallback) {
             callback(null);
         },
 
+        (callback) =>
+            // Instantiate the model managers
+            instance._initModelManagers(callback),
+
         // TODO: Can we rename this parameter, to make the init() parameter consistent?
         (callback) =>
             // Initialize the game controller
@@ -94,7 +101,7 @@ App.prototype.init = function(initCallback) {
             // Initialize Redis
             instance._initRedis(callback)
 
-    ], function(err) {
+        ], function(err) {
         // Make sure everything went right, callback or throw an error instead
         if(err !== null) {
             if(initCallback !== undefined)
@@ -203,6 +210,22 @@ App.prototype._initDatabase = function(callback) {
 App.prototype._initRedis = function(callback) {
     // Connect to Redis
     RedisUtils.connect(callback);
+};
+
+/**
+ * Initialize all model managers.
+ *
+ * @param {function} [callback] Called when finished, or when an error occurred.
+ */
+App.prototype._initModelManagers = function(callback) {
+    // Instantiate the model managers
+    Core.model.userModelManager = new UserModelManager();
+    Core.model.sessionModelManager = new SessionModelManager();
+    Core.model.gameModelManager = new GameModelManager();
+
+    // Call back
+    if(callback !== undefined)
+        callback(null);
 };
 
 // Export the class
