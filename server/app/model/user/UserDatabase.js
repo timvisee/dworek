@@ -20,9 +20,11 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var Core = require('../../../Core');
 var MongoUtil = require('../../mongo/MongoUtils');
 var HashUtils = require('../../hash/HashUtils');
 var CallbackLatch = require('../../util/CallbackLatch');
+var Validator = require('../../validator/Validator');
 
 /**
  * Constructor.
@@ -39,24 +41,44 @@ UserDatabase.DB_COLLECTION_NAME = 'user';
 /**
  * Add an user to the database.
  *
- * @param {String} username Username.
- * @param {String} password Password.
  * @param {String} mail Mail address.
+ * @param {String} password Password.
  * @param {String} firstName First name.
  * @param {String} lastName Last name.
  * @param {function} callback (err, {ObjectId} userId) Callback.
  */
-UserDatabase.addUser = function(username, password, mail, firstName, lastName, callback) {
+UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
     // Get the database instance
     var db = MongoUtil.getConnection();
 
-    // TODO: Validate input!
+    // Validate the mail address
+    if(!Validator.isValidMail(mail)) {
+        // Call back with an error
+        callback(new Error('Unable to create user, invalid mail address given.'));
+        return;
+    }
+
+    // Validate the password
+    if(!Validator.isValidPassword(password)) {
+        // Call back with an error
+        callback(new Error('Unable to create user, invalid password given.'));
+        return;
+    }
+
+    // Validate the first and last name
+    if(!Validator.isValidFirstName(firstName) || !Validator.isValidLastName(lastName)) {
+        // Call back with an error
+        callback(new Error('Unable to create user, invalid name given.'));
+        return;
+    }
+
+    // Format everything
+    mail = Validator.formatMail(mail);
+    firstName = Validator.formatFirstName(firstName);
+    lastName = Validator.formatLastName(lastName);
 
     // Create a callback latch
     var latch = new CallbackLatch();
-
-    // Determine the current, and expire date
-    var createDate = new Date();
 
     // Hash the password
     latch.add();
@@ -74,13 +96,15 @@ UserDatabase.addUser = function(username, password, mail, firstName, lastName, c
         latch.resolve();
     });
 
+    // Determine the current, and expire date
+    var createDate = new Date();
+
     // Add the user to the database when we're ready
     latch.then(function() {
         // Insert the session into the database
         db.collection(UserDatabase.DB_COLLECTION_NAME).insert({
-            username,
-            password_hash: password,
             mail,
+            password_hash: password,
             first_name: firstName,
             last_name: lastName,
             nickname: '',
@@ -90,13 +114,13 @@ UserDatabase.addUser = function(username, password, mail, firstName, lastName, c
             // Handle errors
             if(err != null) {
                 // Show a warning and call back with the error
-                console.warn('Failed insert new user into the database.');
+                console.warn('Unable to create new user, failed to insert user into database.');
                 callback(err, null);
                 return;
             }
 
             // Call back with the inserted ID
-            callback(null, data._id);
+            callback(null, Core.model.userModelManager.create(data._id));
         });
     });
 };
