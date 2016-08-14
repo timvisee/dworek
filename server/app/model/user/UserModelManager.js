@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var Validator = require('../../validator/Validator');
 var UserDatabase = require('./UserDatabase');
 var HashUtils = require('../../hash/HashUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
@@ -40,17 +41,27 @@ var UserModelManager = function() {
 };
 
 /**
- * Get a user by it's username.
+ * Get a user by it's mail address.
  *
- * @param username Username of the user.
- * @param {UserModelManager~getUserByUsername} callback Callback with the user.
+ * @param mail Mail address of the user.
+ * @param {UserModelManager~getUserByMailCallback} callback Callback with the user.
  */
-UserModelManager.prototype.getUserByUsername = function(username, callback) {
+UserModelManager.prototype.getUserByMail = function(mail, callback) {
     // Store the current instance
     const self = this;
 
+    // Make sure the mail address is valid
+    if(!Validator.isValidMail(mail)) {
+        // Call back
+        callback(new Error('Invalid mail address given.'));
+        return;
+    }
+
+    // Format the mail address
+    mail = Validator.formatMail(mail);
+
     // Return some user data
-    UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true}, function(err, data) {
+    UserDatabase.layerFetchFieldsFromDatabase({mail}, {_id: true}, function(err, data) {
         // Pass along errors
         if(err !== null)
             callback(err, null);
@@ -73,47 +84,57 @@ UserModelManager.prototype.getUserByUsername = function(username, callback) {
 };
 
 /**
- * @callback UserManager~getUserByUsername
+ * Called with the user, or when an error occurred.
+ *
+ * @callback UserManager~getUserByMailCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {UserModel|null} User instance, or null if no user was found.
  */
 
 /**
  * Get the user by it's credentials.
- * This may be used to validate user credentials such as it's username and password.
+ * This may be used to validate user credentials such as it's mail address and password.
  * If one of the fields is missing, null will be returned.
  *
- * @param username Username of the user.
+ * @param mail Mail address of the user.
  * @param password Password of the user. (not hashed)
  * @param {UserModelManager~getUserByCredentialsCallback} callback Callback with the user, or null if the credentials were invalid.
  */
-UserModelManager.prototype.getUserByCredentials = function(username, password, callback) {
+UserModelManager.prototype.getUserByCredentials = function(mail, password, callback) {
     // Make sure all fields are given
-    if(username === undefined || password === undefined || callback === undefined) {
+    if(mail === undefined || password === undefined || callback === undefined) {
         // Call the callback with nullif available
         if(callback !== undefined)
-            callback(null, null);
+            callback(new Error('Invalid user credentials given.'), null);
 
         // Return
         return;
     }
 
+    // Make sure the mail is valid
+    if(!Validator.isValidMail(mail)) {
+        // Call back with an error
+        callback(new Error('Invalid mail address given.'));
+        return;
+    }
+
+    // Format the mail address
+    mail = Validator.formatMail(mail);
+
     // Store the current instance
     const self = this;
 
     // Return some user data
-    UserDatabase.layerFetchFieldsFromDatabase({username: username}, {_id: true, password_hash: true}, function(err, data) {
+    UserDatabase.layerFetchFieldsFromDatabase({mail}, {_id: true, password_hash: true}, function(err, data) {
         // Handle errors
         if(err != null) {
-            if(callback != undefined)
-                callback(err, null);
+            callback(err, null);
             return;
         }
 
         // Make sure any is returned, if not return false through the callback
         if(data.length == 0) {
-            if(callback != undefined)
-                callback(null, null);
+            callback(null, null);
             return;
         }
 
@@ -127,21 +148,18 @@ UserModelManager.prototype.getUserByCredentials = function(username, password, c
         HashUtils.compare(password, passwordHash, function(err, matched) {
             // Handle errors
             if(err != null) {
-                if(callback != undefined)
-                    callback(err, null);
+                callback(err, null);
                 return;
             }
 
             // Make sure the password is valid
             if(!matched) {
-                if(callback != undefined)
-                    callback(null, null);
+                callback(null, null);
                 return;
             }
 
             // Create a user instance through the instance manager and call it back
-            if(callback != undefined)
-                callback(null, self._instanceManager.create(rawUserData._id));
+            callback(null, self._instanceManager.create(rawUserData._id));
         });
     });
 };
