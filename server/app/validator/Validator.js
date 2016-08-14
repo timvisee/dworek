@@ -60,7 +60,11 @@ Validator.isValidMail = (mail) => validator.trim().isEmail(mail);
  * @return {boolean} True if the password is valid/allowed, false if not.
  */
 Validator.isValidPassword = function(password) {
-    // TODO: Validate the password length
+    // Count the number of characters
+    var charCount = password.length;
+
+    // Make sure the length is within bounds
+    return charCount >= config.validation.passwordMinLength && charCount <= config.validation.passwordMaxLength;
 };
 
 /**
@@ -89,7 +93,11 @@ Validator.isValidFirstName = function(firstName) {
     // Trim the first name
     firstName = firstName.trim();
 
-    // TODO: Validate the first name length.
+    // Count the number of characters
+    var charCount = firstName.length;
+
+    // Make sure the length is within bounds
+    return charCount >= config.validation.nameMinLength && charCount <= config.validation.nameMaxLength;
 };
 
 /**
@@ -123,7 +131,11 @@ Validator.isValidLastName = function(lastName) {
     // Trim the last name
     lastName = lastName.trim();
 
-    // TODO: Validate the last name length
+    // Count the number of characters
+    var charCount = lastName.length;
+
+    // Make sure the length is within bounds
+    return charCount >= config.validation.nameMinLength && charCount <= config.validation.nameMaxLength;
 };
 
 // Export the class

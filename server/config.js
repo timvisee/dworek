@@ -32,6 +32,7 @@ config.web = {};
 config.user = {};
 config.security = {};
 config.session = {};
+config.validation = {};
 
 
 /******************************************************************************
@@ -170,6 +171,35 @@ config.session.expire = 60 * 60 * 24 * 365;
  * @type {number}
  */
 config.session.expireUnused = 60 * 60 * 24 * 16;
+
+
+/******************************************************************************
+ * Validation configuration.                                                  *
+ ******************************************************************************/
+
+/**
+ * Minimum number of password characters.
+ * @type {int}
+ */
+config.validation.passwordMinLength = 4;
+
+/**
+ * Maximum number of password characters.
+ * @type {int}
+ */
+config.validation.passwordMaxLength = 128;
+
+/**
+ * Minimum number of name characters.
+ * @type {int}
+ */
+config.validation.nameMinLength = 2;
+
+/**
+ * Maximum number of name characters.
+ * @type {int}
+ */
+config.validation.nameMaxLength = 128;
 
 
 // Export the configuration
