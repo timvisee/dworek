@@ -43,7 +43,7 @@ var UserModelManager = function() {
 /**
  * Get a user by it's mail address.
  *
- * @param mail Mail address of the user.
+ * @param {string} mail Mail address of the user.
  * @param {UserModelManager~getUserByMailCallback} callback Callback with the user.
  */
 UserModelManager.prototype.getUserByMail = function(mail, callback) {
@@ -63,8 +63,10 @@ UserModelManager.prototype.getUserByMail = function(mail, callback) {
     // Return some user data
     UserDatabase.layerFetchFieldsFromDatabase({mail}, {_id: true}, function(err, data) {
         // Pass along errors
-        if(err !== null)
+        if(err !== null) {
             callback(err, null);
+            return;
+        }
 
         // Make sure any is returned, if not return false through the callback
         if(data.length == 0) {
@@ -89,6 +91,44 @@ UserModelManager.prototype.getUserByMail = function(mail, callback) {
  * @callback UserManager~getUserByMailCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {UserModel|null} User instance, or null if no user was found.
+ */
+
+/**
+ * Check whether a user with the given mail address exists.
+ *
+ * @param {string} mail Mail address of the user.
+ * @param {UserModelManager~isUserWithMailCallback} callback Callback with the result or when an error occurred.
+ */
+UserModelManager.prototype.isUserWithMail = function(mail, callback) {
+    // Make sure the mail address is valid
+    if(!Validator.isValidMail(mail)) {
+        // Call back
+        callback(new Error('Invalid mail address given.'), false);
+        return;
+    }
+
+    // Format the mail address
+    mail = Validator.formatMail(mail);
+
+    // Return some user data
+    UserDatabase.layerFetchFieldsFromDatabase({mail}, {_id: true}, function(err, data) {
+        // Pass along errors
+        if(err !== null) {
+            callback(err, null);
+            return;
+        }
+
+        // Call back the result
+        callback(null, data.length > 0);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback UserManager~isUserWithMailCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the mail address is used and exists, false if not.
  */
 
 /**
