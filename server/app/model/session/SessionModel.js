@@ -68,23 +68,6 @@ var SessionModel = function(id) {
                      */
                     to: (user) => user.getId()
                 },
-                cache: {
-                    /**
-                     * Convert a hexadecimal ID to a User model.
-                     *
-                     * @param {String} id
-                     * @return {UserModel} User.
-                     */
-                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
-
-                    /**
-                     * Convert an User model to a hexadecimal ID.
-                     *
-                     * @param {UserModel} user User.
-                     * @return {String} Hexadecimal ID.
-                     */
-                    to: (user) => user.getIdHex()
-                },
                 redis: {
                     /**
                      * Convert a hexadecimal ID to a User model.
