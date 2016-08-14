@@ -48,7 +48,7 @@ var UserModel = function(id) {
             collection: UserDatabase.DB_COLLECTION_NAME
         },
         fields: {
-            username: {},
+            mail: {},
             password_hash: {
                 cache: {
                     enabled: false
@@ -57,7 +57,6 @@ var UserModel = function(id) {
                     enabled: false
                 }
             },
-            mail: {},
             first_name: {},
             last_name: {},
             nickname: {},
@@ -126,30 +125,30 @@ UserModel.prototype.setField = function(field, value, callback) {
  */
 
 /**
- * Get the username of the user.
+ * Get the mail address for a user.
  *
- * @param {UserModel~getUsernameCallback} callback Called with the username or when an error occurred.
+ * @param {UserModel~getMailCallback} callback Called with mail address or when an error occurred.
  */
-UserModel.prototype.getUsername = function(callback) {
-    this.getField('username', callback);
+UserModel.prototype.getMail = function(callback) {
+    this.getField('mail', callback);
 };
 
 /**
- * Called with the username or when an error occurred.
+ * Called with the mail address or when an error occurred.
  *
- * @callback UserModel~getUsernameCallback
+ * @callback UserModel~getMailCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {String} Username of the user.
+ * @param {String} Mail address of the user.
  */
 
 /**
- * Set the username of the user.
+ * Set the mail address of the user.
  *
- * @param {String} username Username.
+ * @param {String} mail Mail address.
  * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
-UserModel.prototype.setUsername = function(username, callback) {
-    this.setField('username', username, callback);
+UserModel.prototype.setMail = function(mail, callback) {
+    this.setField('mail', mail, callback);
 };
 
 /**
@@ -177,33 +176,6 @@ UserModel.prototype.getPasswordHash = function(callback) {
  */
 UserModel.prototype.setPasswordHash = function(passwordHash, callback) {
     this.setField('password_hash', passwordHash, callback);
-};
-
-/**
- * Get the mail address for a user.
- *
- * @param {UserModel~getMailCallback} callback Called with mail address or when an error occurred.
- */
-UserModel.prototype.getMail = function(callback) {
-    this.getField('mail', callback);
-};
-
-/**
- * Called with the mail address or when an error occurred.
- *
- * @callback UserModel~getMailCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {String} Mail address of the user.
- */
-
-/**
- * Set the mail address of the user.
- *
- * @param {String} mail Mail address.
- * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
- */
-UserModel.prototype.setMail = function(mail, callback) {
-    this.setField('mail', mail, callback);
 };
 
 /**

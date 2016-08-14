@@ -2,10 +2,9 @@
 # This collection contains all the registered users.
 
 _id : ID                        User ID.
-username : String               User username.
-password_hash : String          User password hash.
 mail : String                   User email.
-nickname : String               User display name.
+password_hash : String          User password hash.
 first_name : String             User's first name.
 last_name : String              User's last name.
+nickname : String               User display name.
 create_date : Date              User creation date and time.
