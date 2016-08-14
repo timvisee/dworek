@@ -33,13 +33,13 @@ var config = require('../../config');
 var Validator = function() {};
 
 /**
- * Parse the given mail address.
+ * Format the given mail address.
  *
  * @param {string} mail Mail address.
  *
- * @return {string} Parsed mail address.
+ * @return {string} Formatted mail address.
  */
-Validator.parseMail = (mail) => mail.trim().toLowerCase();
+Validator.formatMail = (mail) => mail.trim().toLowerCase();
 
 /**
  * Check whether the given mail address is valid.
@@ -64,13 +64,13 @@ Validator.isValidPassword = function(password) {
 };
 
 /**
- * Parse the the given first name.
+ * Format the the given first name.
  *
  * @param {string} firstName First name of a user.
  *
- * @return {string} The parsed first name.
+ * @return {string} The formatted first name.
  */
-Validator.parseFirstName = function(firstName) {
+Validator.formatFirstName = function(firstName) {
     // Trim the first name
     firstName = firstName.trim();
 
@@ -90,13 +90,13 @@ Validator.isValidFirstName = function(firstName) {
 };
 
 /**
- * Parse the given last name.
+ * Format the given last name.
  *
  * @param {string} lastName
  *
- * @return {string} The parsed last name.
+ * @return {string} The formatted last name.
  */
-Validator.parseLastName = function(lastName) {
+Validator.formatLastName = function(lastName) {
     // Trim the last name
     lastName = lastName.trim();
 
