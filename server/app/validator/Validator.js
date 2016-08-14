@@ -49,7 +49,7 @@ Validator.formatMail = (mail) => mail.trim().toLowerCase();
  *
  * @return {boolean} True if the mail address is valid, false if not.
  */
-Validator.isValidMail = (mail) => validator.isEmail(mail);
+Validator.isValidMail = (mail) => validator.trim().isEmail(mail);
 
 /**
  * Check whether the given password is valid/allowed.
@@ -86,6 +86,9 @@ Validator.formatFirstName = function(firstName) {
  * @return {boolean} True if the first name is valid, false if not.
  */
 Validator.isValidFirstName = function(firstName) {
+    // Trim the first name
+    firstName = firstName.trim();
+
     // TODO: Validate the first name length.
 };
 
@@ -117,6 +120,9 @@ Validator.formatLastName = function(lastName) {
  * @return {boolean} True if the last name is valid, false if not.
  */
 Validator.isValidLastName = function(lastName) {
+    // Trim the last name
+    lastName = lastName.trim();
+
     // TODO: Validate the last name length
 };
 
