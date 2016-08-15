@@ -30,46 +30,14 @@ var status = require('./status');
 
 var appInfo = require('../../appInfo');
 
-var Core = require('../../Core');
-var CallbackLatch = require('../util/CallbackLatch');
-var UserModel = require('../model/user/UserModel');
-
 // Index page
 router.get('/', function(req, res, next) {
-  var sessionToken = req.cookies.session_token;
-
-  var latch = new CallbackLatch();
-
-  var loggedIn = false;
-  var name = '';
-
-  if(sessionToken !== undefined) {
-    latch.add();
-    Core.model.sessionModelManager.getSessionUserByTokenIfValid(sessionToken, function(err, user) {
-      loggedIn = user !== null;
-
-      if(loggedIn) {
-        user.getFirstName(function(err, firstName) {
-          name = firstName;
-
-          latch.resolve();
-        });
-      } else {
-        latch.resolve();
-      }
-    });
-  }
-
-  latch.then(function() {
-
     res.render('index', {
-      title: appInfo.APP_NAME,
-      hideBackButton: true,
-      loggedIn,
-      name
+        title: appInfo.APP_NAME,
+        hideBackButton: true,
+        loggedIn: req.login.loggedIn,
+        name: req.login.loggedIn ? req.login.user.getIdHex() : '?'
     });
-
-  });
 });
 
 // Login page
