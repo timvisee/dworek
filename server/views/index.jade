@@ -6,9 +6,12 @@ block content
   p Application front page.
 
   p
-    fieldset(data-role='controlgroup', data-type='vertical')
-      a.ui-btn.ui-shadow(href='/login', title='Login') Login
-      a.ui-btn.ui-shadow(href='/register', title='Register') Register
+    unless loggedIn
+      fieldset(data-role='controlgroup', data-type='vertical')
+        a.ui-btn.ui-shadow(href='/login', title='Login') Login
+        a.ui-btn.ui-shadow(href='/register', title='Register') Register
+    else
+      p Welcome #{name}! You're logged in.
 
     fieldset(data-role='controlgroup', data-type='vertical')
       a.ui-btn.ui-shadow(href='/about', title='About this application') About
