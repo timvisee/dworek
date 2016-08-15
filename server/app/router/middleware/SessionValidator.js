@@ -68,7 +68,11 @@ SessionValidator.route = function(req, res, next) {
 
         // Continue if we're not logged in (if the session is invalid)
         if(!loggedIn) {
-            // TODO: Remove the session cookie from the client
+            // Clear the cookie, since it isn't valid anymore
+            // TODO: Use constant for this cookie name
+            res.clearCookie('session_token', {});
+
+            // Continue
             next();
             return;
         }
