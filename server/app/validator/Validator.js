@@ -49,7 +49,7 @@ Validator.formatMail = (mail) => mail.trim().toLowerCase();
  *
  * @return {boolean} True if the mail address is valid, false if not.
  */
-Validator.isValidMail = (mail) => validator.trim().isEmail(mail);
+Validator.isValidMail = (mail) => validator.isEmail(mail.trim());
 
 /**
  * Check whether the given password is valid/allowed.
