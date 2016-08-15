@@ -3,7 +3,7 @@ extends page
 block content
     p Enter your mail address and password to login.
 
-    form(method='POST', action='/login')
+    form(method='POST', action='/login/submit')
         input(type='text', name='mail', placeholder='Mail address')
         input(type='password', name='password', placeholder='Password')
 

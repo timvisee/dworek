@@ -4,7 +4,7 @@ block content
     unless success
         p Enter your preferred mail address and password to register.
 
-        form(method='POST', action='/register')
+        form(method='POST', action='/register/submit')
             input(type='text', name='mail', placeholder='Mail address')
             input(type='password', name='password', placeholder='Password')
             input(type='password', name='password_verify', placeholder='Password verification')
@@ -21,4 +21,4 @@ block content
 
         //- Show the dashboard button
         fieldset(data-role='controlgroup', data-type='vertical')
-            a.ui-btn.ui-icon-home.ui-btn-icon-left.ui-shadow(href='/', title='Go to your dashboard') Dashboard
+            a.ui-btn.ui-icon-home.ui-btn-icon-left.ui-shadow(href='/dashboard', title='Go to your dashboard') Dashboard
