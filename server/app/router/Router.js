@@ -104,8 +104,14 @@ Router.prototype.init = function(callback) {
         // Show an error page, render the stack trace if we're in development mode
         res.status(err.status || 500);
         res.render('error', {
-            message: err.message,
-            error: dev ? err : {}
+            title: 'Whoops!',
+            message: 'An internal server error has occurred.',
+            showStacktrace: dev,
+            stacktrace: !dev ? {} : {
+                message: err.message,
+                status: err.status,
+                stack: err.stack
+            }
         });
     });
 

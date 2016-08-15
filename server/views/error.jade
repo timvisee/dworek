@@ -1,9 +1,15 @@
 extends page
 
 block content
-  //- TODO: Change page title to Whoops?
-  //- ul(data-role='listview', data-inset='true', data-filter='true')
-  //-   li: a(href='#') Welcome to #{title}
-  p Error: #{message}
-  p Status: #{error.status}
-  p Stack: #{error.stack}
+  //- Print the error message
+  p= message
+
+  //- Show the back button
+  fieldset(data-role='controlgroup', data-type='vertical')
+    a.ui-btn.ui-icon-back.ui-btn-icon-left.ui-shadow(href='/', data-rel='back', data-direction='reverse', title='Go back') Go back
+
+  //- Show a stack trace if given
+  if showStacktrace
+    p Error: #{stacktrace.message}
+    p Status: #{stacktrace.status}
+    p Stack: #{stacktrace.stack}
