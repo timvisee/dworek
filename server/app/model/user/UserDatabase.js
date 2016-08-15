@@ -86,8 +86,8 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
     latch.add();
     HashUtils.hash(password, function(err, hash) {
         // Call back errors
-        if(err !== null) {
-            callback(err);
+        if(err !== null && err !== undefined) {
+            callback(new Error(err));
             return;
         }
 
@@ -122,7 +122,7 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
             }
 
             // Call back with the inserted ID
-            callback(null, Core.model.userModelManager.create(data._id));
+            callback(null, Core.model.userModelManager._instanceManager.create(data._id));
         });
     });
 };
