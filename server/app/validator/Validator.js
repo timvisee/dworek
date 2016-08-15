@@ -39,7 +39,7 @@ var Validator = function() {};
  *
  * @return {string} Formatted mail address.
  */
-Validator.formatMail = (mail) => mail.trim().toLowerCase();
+Validator.formatMail = (mail) => mail.trim().replace(/\s/g, '').toLowerCase();
 
 /**
  * Check whether the given mail address is valid.
@@ -49,7 +49,7 @@ Validator.formatMail = (mail) => mail.trim().toLowerCase();
  *
  * @return {boolean} True if the mail address is valid, false if not.
  */
-Validator.isValidMail = (mail) => validator.isEmail(mail.trim());
+Validator.isValidMail = (mail) => validator.isEmail(mail.trim().replace(/\s/g, ''));
 
 /**
  * Check whether the given password is valid/allowed.
