@@ -78,7 +78,7 @@ router.post('/', function(req, res, next) {
     // Validate password
     if(!Validator.isValidPassword(password)) {
         // Show a warning if the user hadn't filled in their password
-        if(mail.length === 0) {
+        if(password.length === 0) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
@@ -104,7 +104,7 @@ router.post('/', function(req, res, next) {
     // Validate first name
     if(!Validator.isValidFirstName(firstName)) {
         // Show a warning if the user hadn't filled in their first name
-        if(mail.length === 0) {
+        if(firstName.length === 0) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
@@ -124,7 +124,7 @@ router.post('/', function(req, res, next) {
     // Validate last name
     if(!Validator.isValidLastName(lastName)) {
         // Show a warning if the user hadn't filled in their password
-        if(mail.length === 0) {
+        if(lastName.length === 0) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
