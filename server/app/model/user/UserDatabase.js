@@ -72,6 +72,8 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
         return;
     }
 
+    // TODO: Make sure a user with this mail address doesn't already exist
+
     // Format everything
     mail = Validator.formatMail(mail);
     firstName = Validator.formatFirstName(firstName);
