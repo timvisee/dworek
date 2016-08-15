@@ -52,7 +52,7 @@ router.post('/', function(req, res, next) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
-                message: 'Your mail address is missing. Please go back and fill in your mail address.'
+                message: 'Your mail address is missing.\nPlease go back and fill in your mail address.'
             });
             return;
         }
@@ -60,7 +60,8 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The mail address you\'ve entered does not seem to be valid. Please go back and check your mail address.'
+            message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n' +
+            'Please go back and check your mail address.'
         });
         return;
     }
@@ -70,7 +71,7 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The passwords you\'ve entered do not equal. Please go back and check both passwords.'
+            message: 'The passwords you\'ve entered do not equal.\nPlease go back and check both passwords.'
         });
         return;
     }
@@ -82,7 +83,7 @@ router.post('/', function(req, res, next) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
-                message: 'Your password is missing. Please go back and fill in your password.'
+                message: 'Your password is missing.\nPlease go back and fill in your password.'
             });
             return;
         }
@@ -94,7 +95,7 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The password you\'ve entered does not meet our requirements.\n' +
+            message: 'The password you\'ve entered doesn\'t meet our requirements.\n' +
             'Your password must be between ' + min + ' and ' + max + ' characters long.\n' +
             'Please go back and choose a different password.'
         });
@@ -108,7 +109,7 @@ router.post('/', function(req, res, next) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
-                message: 'Your first name is missing. Please go back and fill in your first name.'
+                message: 'Your first name is missing.\nPlease go back and fill in your first name.'
             });
             return;
         }
@@ -116,7 +117,8 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The first name you\'ve entered does not seem to be valid. Please go back and enter your real first name.'
+            message: 'The first name you\'ve entered doesn\'t seem to be valid.\n' +
+            'Please go back and enter your real first name.'
         });
         return;
     }
@@ -128,7 +130,7 @@ router.post('/', function(req, res, next) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
-                message: 'Your first name is missing. Please go back and fill in your first name.'
+                message: 'Your last name is missing.\nPlease go back and fill in your last name.'
             });
             return;
         }
@@ -136,7 +138,8 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The last name you\'ve entered does not seem to be valid. Please go back and enter your real last name.'
+            message: 'The last name you\'ve entered doesn\'t seem to be valid.\n' +
+            'Please go back and enter your real last name.'
         });
         return;
     }
@@ -153,7 +156,8 @@ router.post('/', function(req, res, next) {
         if(result) {
             res.render('error', {
                 title: 'Whoops!',
-                message: 'It looks like you\'ve already registered with this mail address. Please go to the login page to login.',
+                message: 'It looks like you\'ve already registered with this mail address.\n' +
+                'Please go to the login page to login.',
                 hideBackButton: true,
                 showLoginButton: true
             });
