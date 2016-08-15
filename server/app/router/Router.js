@@ -31,6 +31,7 @@ var appInfo = require('../../appInfo');
 var routes = require('../route/index');
 var Core = require('../../Core');
 var PathLibrary = require('../../PathLibrary');
+var SessionValidator = require('./middleware/SessionValidator');
 
 /**
  * Router class.
@@ -72,7 +73,7 @@ Router.prototype.init = function(callback) {
     Core.expressApp.use(express.static(publicPath));
 
     // Configuring route
-    console.log("Configuring router...");
+    console.log('Configuring router...');
 
     // Add application branding in HTTP responses
     Core.expressApp.use(function(req, res, next) {
@@ -82,6 +83,10 @@ Router.prototype.init = function(callback) {
         // Route to the next handler
         next();
     });
+
+    // Attach the session validator middleware
+    console.log('Attaching session validation middleware...');
+    Core.expressApp.use(SessionValidator.route);
 
     // Configure the router
     Core.expressApp.use('/', routes);
