@@ -48,23 +48,25 @@ SessionDatabase.addSession = function(user, token, ip, callback) {
     var db = MongoUtil.getConnection();
 
     // Use a default IP address if it's undefined
-    if(ip == undefined)
+    if(ip === undefined)
         ip = '0.0.0.0';
 
     // Determine the current, and expire date
     var createDate = new Date();
     var expireDate = new Date(new Date(createDate).setSeconds(createDate.getSeconds() + config.session.expire));
 
-    // Insert the session into the database
-    db.collection(SessionDatabase.DB_COLLECTION_NAME).insert({
+    // Create the insert object
+    var insertObject = {
         user_id: user.getId(),
-        token: token,
+        token,
         create_date: createDate,
         create_ip: ip.toString(),
         last_use_date: null,
         expire_date: expireDate
+    };
 
-    }, function(err, data) {
+    // Insert the session into the database
+    db.collection(SessionDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err) {
         // Handle errors
         if(err != null) {
             // Show a warning and call back with the error
@@ -74,7 +76,7 @@ SessionDatabase.addSession = function(user, token, ip, callback) {
         }
 
         // Call back with the inserted ID
-        callback(null, data._id);
+        callback(null, insertObject._id);
     });
 };
 
