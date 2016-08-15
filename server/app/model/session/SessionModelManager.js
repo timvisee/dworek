@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var config = require('../../../config');
+var Core = require('../../../Core');
 var SessionDatabase = require('./SessionDatabase');
 var RedisUtil = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
@@ -96,7 +97,7 @@ SessionModelManager.prototype.createSession = function(user, ip, callback) {
  * @param token The session token.
  * @param {function} callback (err, {SessionModel|null} user) Callback with the session, or null.
  */
-SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
+SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
     if(!this.isAllowedSessionToken(token)) {
         // Call back
@@ -202,7 +203,7 @@ SessionModelManager.getSessionByTokenIfValid = function(token, callback) {
  * @param token The session token.
  * @param {function} callback (err, {UserModel|null} user) Callback with the session user, or null.
  */
-SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
+SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, callback) {
     // Make sure this token is allowed
     if(!this.isAllowedSessionToken(token)) {
         // Call back
@@ -301,7 +302,7 @@ SessionModelManager.getSessionUserByTokenIfValid = function(token, callback) {
  * @param token The session token.
  * @param {function} callback (err, {boolean} valid) Callback with the result as boolean.
  */
-SessionModelManager.isValidSessionToken = function(token, callback) {
+SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     // Make sure this token is allowed
     if(!this.isAllowedSessionToken(token)) {
         // Call back
