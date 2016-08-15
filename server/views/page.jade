@@ -2,7 +2,6 @@ extends layout
 
 block page
     //- Page block
-    //- TODO: Should we use the 'data-unload="false"' attribute to minimize internet usage on mobile
     div(data-role='page')
         //- Page header
         div(data-role='header')
@@ -20,4 +19,4 @@ block page
         //- Page footer
         div(data-role='footer')
             //- Footer title
-            h1: a(href='/about') Copyright © Tim Visée 2016
+            h1: a(href='/about', title='About') Copyright © Tim Visée 2016

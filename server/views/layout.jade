@@ -1,61 +1,64 @@
-doctype html
-html
-  //- Head
-  head
-    // Meta
-    meta(http-equiv='X-UA-Compatible', content='text/html', charset='UTF-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1')
-    meta(name='description', content='Create virtual drug labs in real-world locations with your cartel. Conquer labs owned by other cartels to become the drug production MVP.')
-    meta(name='keywords', content='Dworek')
-    meta(name='author', content='Tim Vis&eacute;e')
-    link(rel='copyright', href='/about')
-    meta(name='theme-color', content='#2A2A2A')
-    meta(name='application-name', content='Dworek')
-    meta(name='msapplication-TileColor', content='#2a2a2a')
-    meta(name='msapplication-config', content='/img/favicon/browserconfig.xml')
-    meta(property='og:title', content='Dworek')
-    meta(property='og:image', content='/img/favicon/favicon-194x194.png')
-    meta(property='og:description', content='Dworek by Tim Vis&eacute;e')
-    meta(name='twitter:card', content='summary')
-    meta(name='twitter:title', content='Dworek')
-    meta(name='twitter:image', content='/img/favicon/apple-touch-icon-120x120.png.png')
-    meta(name='twitter:description', content='Dworek by Tim Vis&eacute;e')
+extends base
 
-    // Favicon
-    //- Only send favicon resources for devices that need it, to prevent excess resource loading
-    link(rel='apple-touch-icon', sizes='57x57', href='/img/favicon/apple-touch-icon-57x57.png')
-    link(rel='apple-touch-icon', sizes='60x60', href='/img/favicon/apple-touch-icon-60x60.png')
-    link(rel='apple-touch-icon', sizes='72x72', href='/img/favicon/apple-touch-icon-72x72.png')
-    link(rel='apple-touch-icon', sizes='76x76', href='/img/favicon/apple-touch-icon-76x76.png')
-    link(rel='apple-touch-icon', sizes='114x114', href='/img/favicon/apple-touch-icon-114x114.png')
-    link(rel='apple-touch-icon', sizes='120x120', href='/img/favicon/apple-touch-icon-120x120.png')
-    link(rel='apple-touch-icon', sizes='144x144', href='/img/favicon/apple-touch-icon-144x144.png')
-    link(rel='apple-touch-icon', sizes='152x152', href='/img/favicon/apple-touch-icon-152x152.png')
-    link(rel='apple-touch-icon', sizes='180x180', href='/img/favicon/apple-touch-icon-180x180.png')
-    link(rel='icon', type='image/png', href='/img/favicon/favicon-32x32.png', sizes='32x32')
-    link(rel='icon', type='image/png', href='/img/favicon/favicon-194x194.png', sizes='194x194')
-    link(rel='icon', type='image/png', href='/img/favicon/favicon-96x96.png', sizes='96x96')
-    link(rel='icon', type='image/png', href='/img/favicon/android-chrome-192x192.png', sizes='192x192')
-    link(rel='icon', type='image/png', href='/img/favicon/favicon-16x16.png', sizes='16x16')
-    link(rel='manifest', href='/img/favicon/manifest.json')
-    link(rel='shortcut icon', href='/img/favicon/favicon.ico')
-    meta(name='apple-mobile-web-app-title', content='Dworek')
-    meta(name='msapplication-TileImage', content='/img/favicon/mstile-144x144.png')
+block layout
+  doctype html
+  html
+    //- Head
+    head
+      // Meta
+      meta(http-equiv='X-UA-Compatible', content='text/html', charset='UTF-8')
+      meta(name='viewport', content='width=device-width, initial-scale=1')
+      meta(name='description', content='Create virtual drug labs in real-world locations with your cartel. Conquer labs owned by other cartels to become the drug production MVP.')
+      meta(name='keywords', content='Dworek')
+      meta(name='author', content='Tim Vis&eacute;e')
+      link(rel='copyright', href='/about')
+      meta(name='theme-color', content='#2A2A2A')
+      meta(name='application-name', content='Dworek')
+      meta(name='msapplication-TileColor', content='#2a2a2a')
+      meta(name='msapplication-config', content='/img/favicon/browserconfig.xml')
+      meta(property='og:title', content='Dworek')
+      meta(property='og:image', content='/img/favicon/favicon-194x194.png')
+      meta(property='og:description', content='Dworek by Tim Vis&eacute;e')
+      meta(name='twitter:card', content='summary')
+      meta(name='twitter:title', content='Dworek')
+      meta(name='twitter:image', content='/img/favicon/apple-touch-icon-120x120.png.png')
+      meta(name='twitter:description', content='Dworek by Tim Vis&eacute;e')
 
-    //- Page title
-    title= title
+      // Favicon
+      //- Only send favicon resources for devices that need it, to prevent excess resource loading
+      link(rel='apple-touch-icon', sizes='57x57', href='/img/favicon/apple-touch-icon-57x57.png')
+      link(rel='apple-touch-icon', sizes='60x60', href='/img/favicon/apple-touch-icon-60x60.png')
+      link(rel='apple-touch-icon', sizes='72x72', href='/img/favicon/apple-touch-icon-72x72.png')
+      link(rel='apple-touch-icon', sizes='76x76', href='/img/favicon/apple-touch-icon-76x76.png')
+      link(rel='apple-touch-icon', sizes='114x114', href='/img/favicon/apple-touch-icon-114x114.png')
+      link(rel='apple-touch-icon', sizes='120x120', href='/img/favicon/apple-touch-icon-120x120.png')
+      link(rel='apple-touch-icon', sizes='144x144', href='/img/favicon/apple-touch-icon-144x144.png')
+      link(rel='apple-touch-icon', sizes='152x152', href='/img/favicon/apple-touch-icon-152x152.png')
+      link(rel='apple-touch-icon', sizes='180x180', href='/img/favicon/apple-touch-icon-180x180.png')
+      link(rel='icon', type='image/png', href='/img/favicon/favicon-32x32.png', sizes='32x32')
+      link(rel='icon', type='image/png', href='/img/favicon/favicon-194x194.png', sizes='194x194')
+      link(rel='icon', type='image/png', href='/img/favicon/favicon-96x96.png', sizes='96x96')
+      link(rel='icon', type='image/png', href='/img/favicon/android-chrome-192x192.png', sizes='192x192')
+      link(rel='icon', type='image/png', href='/img/favicon/favicon-16x16.png', sizes='16x16')
+      link(rel='manifest', href='/img/favicon/manifest.json')
+      link(rel='shortcut icon', href='/img/favicon/favicon.ico')
+      meta(name='apple-mobile-web-app-title', content='Dworek')
+      meta(name='msapplication-TileImage', content='/img/favicon/mstile-144x144.png')
 
-    //- Style
-    link(rel='stylesheet', href='/style/style.css')
+      //- Page title
+      title= title
 
-    //- jQuery
-    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
+      //- Style
+      link(rel='stylesheet', href='/style/style.css')
 
-    //- jQuery Mobile
-    script(type='text/javascript', src='/js/jquery.mobile.settings.js')
-    link(rel='stylesheet', href='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css')
-    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js')
+      //- jQuery
+      script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
 
-  //- Body
-  body
-    block page
+      //- jQuery Mobile
+      script(type='text/javascript', src='/js/jquery.mobile.settings.js')
+      link(rel='stylesheet', href='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css')
+      script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js')
+
+    //- Body
+    body
+      block page

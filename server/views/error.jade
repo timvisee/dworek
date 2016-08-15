@@ -2,7 +2,7 @@ extends page
 
 block content
     //- Print the error message
-    p !{message.replace(/\n/g, '<br />')}
+    p: +format(message)
 
     //- Show the back button
     unless hideBackButton
