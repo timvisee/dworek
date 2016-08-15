@@ -152,6 +152,13 @@ UserModelManager.prototype.getUserByCredentials = function(mail, password, callb
         return;
     }
 
+    // Make sure a password is given
+    if(password.length === 0) {
+        // Call back with an error
+        callback(new Error('No password given.'));
+        return;
+    }
+
     // Make sure the mail is valid
     if(!Validator.isValidMail(mail)) {
         // Call back with an error
@@ -166,7 +173,12 @@ UserModelManager.prototype.getUserByCredentials = function(mail, password, callb
     const self = this;
 
     // Return some user data
-    UserDatabase.layerFetchFieldsFromDatabase({mail}, {_id: true, password_hash: true}, function(err, data) {
+    UserDatabase.layerFetchFieldsFromDatabase({
+        mail
+    }, {
+        _id: true,
+        password_hash: true
+    }, function(err, data) {
         // Handle errors
         if(err != null) {
             callback(err, null);
