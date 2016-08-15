@@ -1,4 +1,4 @@
-/******************************************************************************
+/*!*****************************************************************************
  * Copyright (c) Dworek 2016. All rights reserved.                            *
  *                                                                            *
  * @author Tim Visee                                                          *
@@ -43,5 +43,10 @@ table.table-list tr td:first-child {
   padding-right: 16px;
   font-weight: bold;
   text-align: right; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: #333 linear-gradient(to right, #ccc, #333, #ccc); }
 
 /*# sourceMappingURL=style.css.map */

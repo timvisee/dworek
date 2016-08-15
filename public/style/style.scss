@@ -52,3 +52,9 @@ table.table-list tr td:first-child {
   font-weight: bold;
   text-align: right;
 }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: #333 linear-gradient(to right, #ccc, #333, #ccc);
+}

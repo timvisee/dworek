@@ -105,7 +105,10 @@ Router.prototype.init = function(callback) {
         res.status(err.status || 500);
         res.render('error', {
             title: 'Whoops!',
-            message: 'An internal server error has occurred.',
+            message: '<i>You broke the interwebs!</i>\n\n' +
+            'We can\'t load your page because some error occurred on our end.\n\n' +
+            'The web administrators are freaking out right now, running around, bashing buttons, rebooting systems...\n\n' +
+            'A team of wizards and magicians has been dispatched to deal with this situation.',
             showStacktrace: dev,
             stacktrace: !dev ? {} : {
                 message: err.message,
