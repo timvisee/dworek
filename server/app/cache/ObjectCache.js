@@ -32,7 +32,7 @@ var ObjectCache = function() {
      * @type {WeakMap}
      * @private
      */
-    this._cache = new WeakMap();
+    this._cache = new Map();
 };
 
 /**
