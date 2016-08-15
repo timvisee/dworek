@@ -102,7 +102,8 @@ Router.prototype.init = function(callback) {
         var dev = Core.expressApp.get('env') === 'development';
 
         // Show an error page, render the stack trace if we're in development mode
-        res.status(err.status || 500);
+        // TODO: Enable status code again
+        // res.status(err.status || 500);
         res.render('error', {
             title: 'Whoops!',
             message: '<i>You broke the interwebs!</i>\n\n' +
