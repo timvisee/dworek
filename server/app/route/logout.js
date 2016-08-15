@@ -23,37 +23,17 @@
 var express = require('express');
 var router = express.Router();
 
-var login = require('./login');
-var logout = require('./logout');
-var register = require('./register');
-var about = require('./about');
-var status = require('./status');
-
-var appInfo = require('../../appInfo');
-
-// Index page
+// Logout index
 router.get('/', function(req, res, next) {
-    res.render('index', {
-        title: appInfo.APP_NAME,
-        hideBackButton: true,
-        loggedIn: req.session.valid,
-        name: req.session.valid ? req.session.user.getIdHex() : '?'
-    });
+    // Clear the session cookie
+    // TODO: Use constant for this cookie name
+    res.clearCookie('session_token', {});
+
+    // TODO: Remove the session from the database (if the user has a session)
+    // TODO: Should we also remove the session from cache?
+
+    // Redirect the user to the front page
+    res.redirect('/');
 });
-
-// Login page
-router.use('/login', login);
-
-// Logout page
-router.use('/logout', logout);
-
-// Register page
-router.use('/register', register);
-
-// About page
-router.use('/about', about);
-
-// Status page
-router.use('/status', status);
 
 module.exports = router;
