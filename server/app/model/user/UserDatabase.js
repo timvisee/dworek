@@ -103,18 +103,20 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
 
     // Add the user to the database when we're ready
     latch.then(function() {
-        // Insert the session into the database
-        db.collection(UserDatabase.DB_COLLECTION_NAME).insertOne({
+        // Create the object to insert
+        var insertObject = {
             mail,
             password_hash: password,
             first_name: firstName,
             last_name: lastName,
             nickname: '',
             create_date: createDate
+        };
 
-        }, function(err, data) {
-            // Handle errors
-            if(err != null) {
+        // Insert the session into the database
+        db.collection(UserDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err, result) {
+            // Handle errors and make sure the status is ok
+            if(err !== null) {
                 // Show a warning and call back with the error
                 console.warn('Unable to create new user, failed to insert user into database.');
                 callback(err, null);
@@ -122,7 +124,7 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
             }
 
             // Call back with the inserted ID
-            callback(null, Core.model.userModelManager._instanceManager.create(data._id));
+            callback(null, Core.model.userModelManager._instanceManager.create(insertObject._id));
         });
     });
 };
