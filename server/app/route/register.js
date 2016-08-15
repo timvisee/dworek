@@ -166,16 +166,39 @@ router.post('/', function(req, res, next) {
 
         // Register the user
         UserDatabase.addUser(mail, password, firstName, lastName, function(err, user) {
-            // Throw errors
-            if(err !== null)
-                throw err;
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
 
-            // TODO: Do something with the user
+            // Get the IP address of the user
+            // TODO: Move this utility code somewhere else
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            // Create a session for the user
+            Core.model.sessionModelManager.createSession(user, ip, function(err, sessionId, token) {
+                // Call back errors
+                if(err !== null) {
+                    next(err);
+                    return;
+                }
+
+                // Put the token in the user's cookie
+                res.cookie('session_token', token, {
+                    maxAge: config.session.expire
+                });
+
+                // Show registration succes page
+                // TODO: Show registration success page
+                res.render('error', {
+                    title: 'test',
+                    message: 'Registration success',
+                    hideBackButton: true,
+                    showLoginButton: true
+                });
+            });
         });
-
-        // TODO: Create a session for the user?
-
-        // TODO: Show a success page
     });
 });
 
