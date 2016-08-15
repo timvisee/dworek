@@ -13,5 +13,8 @@ block content
     else
       p Welcome #{name}! You're logged in.
 
+      fieldset(data-role='controlgroup', data-type='vertical')
+          a.ui-btn.ui-shadow(href='/logout', title='Logout') Logout
+
     fieldset(data-role='controlgroup', data-type='vertical')
       a.ui-btn.ui-shadow(href='/about', title='About this application') About
