@@ -186,7 +186,7 @@ router.post('/', function(req, res, next) {
 
                 // Put the token in the user's cookie
                 res.cookie('session_token', token, {
-                    maxAge: config.session.expire
+                    maxAge: config.session.expire * 1000
                 });
 
                 // Show registration success page
