@@ -4,7 +4,7 @@ block content
     unless success
         p Enter your preferred mail address and password to register.
 
-        form(method='POST', action='/register/submit')
+        form(method='POST', action='/register/#')
             input(type='text', name='mail', placeholder='Mail address')
             input(type='password', name='password', placeholder='Password')
             input(type='password', name='password_verify', placeholder='Password verification')

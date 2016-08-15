@@ -44,8 +44,7 @@ router.get('/', function(req, res, next) {
 });
 
 // Register index
-// TODO: Move this to the root
-router.post('/submit', function(req, res, next) {
+router.post('/', function(req, res, next) {
     // Get the registration field values
     var mail = req.body.mail;
     var password = req.body.password;

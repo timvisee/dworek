@@ -43,8 +43,7 @@ router.get('/', function(req, res, next) {
 });
 
 // Login index
-// TODO: Move this to the root
-router.post('/submit', function(req, res, next) {
+router.post('/', function(req, res, next) {
     // Get the login field values
     var mail = req.body.mail;
     var password = req.body.password;
