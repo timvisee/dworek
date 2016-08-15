@@ -35,10 +35,10 @@ var ModelInstanceManager = function(modelConstructor) {
     /**
      * Weak map of model instances.
      *
-     * @type {WeakMap}
+     * @type {Map}
      * @private
      */
-    this._instances = new WeakMap();
+    this._instances = new Map();
 
     /**
      * Model constructor.
