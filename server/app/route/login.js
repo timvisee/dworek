@@ -23,10 +23,94 @@
 var express = require('express');
 var router = express.Router();
 
+var config = require('../../config');
+
+var Core = require('../../Core');
+var Validator = require('../validator/Validator');
+
 // Login index
 router.get('/', function(req, res, next) {
     res.render('login', {
         title: 'Login'
+    });
+});
+
+// Login index
+// TODO: Move this to the root
+router.post('/submit', function(req, res, next) {
+    // Get the login field values
+    var mail = req.body.mail;
+    var password = req.body.password;
+
+    // Validate mail address
+    if(!Validator.isValidMail(mail)) {
+        // Show a warning if the user hadn't filled in their mail address
+        if(mail.length === 0) {
+            // Show an error page
+            res.render('error', {
+                title: 'Whoops!',
+                message: 'Your mail address is missing.\nPlease go back and fill in your mail address.'
+            });
+            return;
+        }
+
+        // Show an error page
+        res.render('error', {
+            title: 'Whoops!',
+            message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n' +
+            'Please go back and check your mail address.'
+        });
+        return;
+    }
+
+    // Make sure a password is entered
+    if(password.length === 0) {
+        // Show an error page
+        res.render('error', {
+            title: 'Whoops!',
+            message: 'Your password is missing.\nPlease go back and fill in your password.'
+        });
+        return;
+    }
+
+    // Validate the given credentials
+    Core.model.userModelManager.getUserByCredentials(mail, password, function(err, user) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Show an error page if no user was found
+        if(user === null) {
+            res.render('error', {
+                title: 'Whoops!',
+                message: 'Your mail address and password combination is invalid.\n\n' +
+                    'Please go back, verify your user credentials, and try to login again.'
+            });
+            return;
+        }
+
+        // Get the IP address of the user
+        // TODO: Move this utility code somewhere else
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        // Create a session for the user
+        Core.model.sessionModelManager.createSession(user, ip, function(err, sessionId, token) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Put the token in the user's cookie
+            res.cookie('session_token', token, {
+                maxAge: config.session.expire * 1000
+            });
+
+            // Redirect the user
+            res.redirect('/');
+        });
     });
 });
 
