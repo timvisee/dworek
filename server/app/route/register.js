@@ -189,13 +189,14 @@ router.post('/', function(req, res, next) {
                     maxAge: config.session.expire
                 });
 
-                // Show registration succes page
-                // TODO: Show registration success page
-                res.render('error', {
-                    title: 'test',
-                    message: 'Registration success',
+                // Show registration success page
+                res.render('register', {
+                    title: 'Success',
+                    message: 'Welcome ' + firstName + '!\n\n' +
+                    'You\'ve successfully been registered.\n' +
+                    'Please click the button below to continue to your dashboard.',
                     hideBackButton: true,
-                    showLoginButton: true
+                    success: true
                 });
             });
         });
