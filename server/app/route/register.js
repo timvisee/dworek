@@ -28,6 +28,7 @@ var Core = require('../../Core');
 var Validator = require('../validator/Validator');
 var UserDatabase = require('../model/user/UserDatabase');
 var CallbackLatch = require('../util/CallbackLatch');
+var IpUtils = require('../util/IpUtils');
 
 // Register index
 router.get('/', function(req, res, next) {
@@ -185,8 +186,7 @@ router.post('/', function(req, res, next) {
             }
 
             // Get the IP address of the user
-            // TODO: Move this utility code somewhere else
-            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            const ip = IpUtils.getIp(req);
 
             // Create a session for the user
             Core.model.sessionModelManager.createSession(user, ip, function(err, sessionId, token) {
