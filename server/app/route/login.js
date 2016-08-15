@@ -55,7 +55,8 @@ router.post('/', function(req, res, next) {
             // Show an error page
             res.render('error', {
                 title: 'Whoops!',
-                message: 'Your mail address is missing.\nPlease go back and fill in your mail address.'
+                message: 'Your mail address is missing.\n\n' +
+                'Please go back and fill in your mail address.'
             });
             return;
         }
@@ -63,7 +64,7 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n' +
+            message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and check your mail address.'
         });
         return;
@@ -74,7 +75,8 @@ router.post('/', function(req, res, next) {
         // Show an error page
         res.render('error', {
             title: 'Whoops!',
-            message: 'Your password is missing.\nPlease go back and fill in your password.'
+            message: 'Your password is missing.\n\n' +
+            'Please go back and fill in your password.'
         });
         return;
     }
