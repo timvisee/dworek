@@ -35,8 +35,8 @@ router.get('/', function(req, res, next) {
     res.render('index', {
         title: appInfo.APP_NAME,
         hideBackButton: true,
-        loggedIn: req.login.loggedIn,
-        name: req.login.loggedIn ? req.login.user.getIdHex() : '?'
+        loggedIn: req.session.valid,
+        name: req.session.valid ? req.session.user.getIdHex() : '?'
     });
 });
 

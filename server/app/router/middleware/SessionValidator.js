@@ -40,9 +40,9 @@ var SessionValidator = function() {};
  */
 SessionValidator.route = function(req, res, next) {
     // Create a login object in the request
-    req.login = {
-        loggedIn: false,
-        sessionToken: undefined,
+    req.session = {
+        valid: false,
+        token: undefined,
         user: undefined
     };
 
@@ -78,9 +78,9 @@ SessionValidator.route = function(req, res, next) {
         }
 
         // Set the session token and user
-        req.login.loggedIn = loggedIn;
-        req.login.sessionToken = sessionToken;
-        req.login.user = user;
+        req.session.valid = loggedIn;
+        req.session.token = sessionToken;
+        req.session.user = user;
 
         // Continue
         next();
