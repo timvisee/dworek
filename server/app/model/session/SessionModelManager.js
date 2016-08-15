@@ -25,6 +25,7 @@ var SessionDatabase = require('./SessionDatabase');
 var RedisUtil = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
 var ModelInstanceManager = require('../ModelInstanceManager');
+var SessionModel = require('./SessionModel');
 
 /**
  * Time in seconds for token validity to expire in cache.
@@ -53,7 +54,7 @@ var SessionModelManager = function() {
      *
      * @type {ModelInstanceManager}
      */
-    this._instanceManager = new ModelInstanceManager(SessionModelManager);
+    this._instanceManager = new ModelInstanceManager(SessionModel);
 };
 
 /**

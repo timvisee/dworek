@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var ModelInstanceManager = require('../ModelInstanceManager');
+var GameModel = require('./GameModel');
 
 /**
  * GameModelManager class.
@@ -34,7 +35,7 @@ var GameModelManager = function() {
      *
      * @type {ModelInstanceManager}
      */
-    this._instanceManager = new ModelInstanceManager(GameModelManager);
+    this._instanceManager = new ModelInstanceManager(GameModel);
 };
 
 // Return the created class

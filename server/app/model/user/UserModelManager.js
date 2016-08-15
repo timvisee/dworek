@@ -24,6 +24,7 @@ var Validator = require('../../validator/Validator');
 var UserDatabase = require('./UserDatabase');
 var HashUtils = require('../../hash/HashUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
+var UserModel = require('./UserModel');
 
 /**
  * UserModelManager class.
@@ -37,7 +38,7 @@ var UserModelManager = function() {
      *
      * @type {ModelInstanceManager}
      */
-    this._instanceManager = new ModelInstanceManager(UserModelManager);
+    this._instanceManager = new ModelInstanceManager(UserModel);
 };
 
 /**
