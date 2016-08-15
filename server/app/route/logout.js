@@ -23,11 +23,12 @@
 var express = require('express');
 var router = express.Router();
 
+var config = require('../../config');
+
 // Logout index
 router.get('/', function(req, res, next) {
     // Clear the session cookie
-    // TODO: Use constant for this cookie name
-    res.clearCookie('session_token', {});
+    res.clearCookie(config.session.cookieName, {});
 
     // TODO: Remove the session from the database (if the user has a session)
     // TODO: Should we also remove the session from cache?

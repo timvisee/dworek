@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var config = require('../../../config');
 var Core = require('../../../Core');
 var UserModel = require('../../model/user/UserModel');
 
@@ -69,8 +70,7 @@ SessionValidator.route = function(req, res, next) {
         // Continue if we're not logged in (if the session is invalid)
         if(!loggedIn) {
             // Clear the cookie, since it isn't valid anymore
-            // TODO: Use constant for this cookie name
-            res.clearCookie('session_token', {});
+            res.clearCookie(config.session.cookieName, {});
 
             // Continue
             next();

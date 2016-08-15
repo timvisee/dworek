@@ -112,7 +112,7 @@ router.post('/', function(req, res, next) {
             }
 
             // Put the token in the user's cookie
-            res.cookie('session_token', token, {
+            res.cookie(config.session.cookieName, token, {
                 maxAge: config.session.expire * 1000
             });
 

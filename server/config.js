@@ -172,6 +172,12 @@ config.session.expire = 60 * 60 * 24 * 365;
  */
 config.session.expireUnused = 60 * 60 * 24 * 16;
 
+/**
+ * Name of the session token cookie.
+ * @type {string}
+ */
+config.session.cookieName = 'session_token';
+
 
 /******************************************************************************
  * Validation configuration.                                                  *
