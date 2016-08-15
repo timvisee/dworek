@@ -27,6 +27,7 @@ var config = require('../../config');
 var Core = require('../../Core');
 var Validator = require('../validator/Validator');
 var UserDatabase = require('../model/user/UserDatabase');
+var CallbackLatch = require('../util/CallbackLatch');
 
 // Register index
 router.get('/', function(req, res, next) {
@@ -140,21 +141,38 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    // TODO: Make sure a user with this mail address doens't already exist
+    // Make sure the mail address of the user isn't already used
+    Core.model.userModelManager.isUserWithMail(mail, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
 
+        // Show an error page if the mail address is already used
+        if(result) {
+            res.render('error', {
+                title: 'Whoops!',
+                message: 'It looks like you\'ve already registered with this mail address. Please go to the login page to login.',
+                hideBackButton: true,
+                showLoginButton: true
+            });
+            return;
+        }
 
-    // Register the user
-    UserDatabase.addUser(mail, password, firstName, lastName, function(err, user) {
-        // Throw errors
-        if(err !== null)
-            throw err;
+        // Register the user
+        UserDatabase.addUser(mail, password, firstName, lastName, function(err, user) {
+            // Throw errors
+            if(err !== null)
+                throw err;
 
-        // TODO: Do something with the user
+            // TODO: Do something with the user
+        });
+
+        // TODO: Create a session for the user?
+
+        // TODO: Show a success page
     });
-
-    // TODO: Create a session for the user?
-
-    // TODO: Show a success page
 });
 
 module.exports = router;
