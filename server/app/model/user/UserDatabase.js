@@ -104,7 +104,7 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
     // Add the user to the database when we're ready
     latch.then(function() {
         // Insert the session into the database
-        db.collection(UserDatabase.DB_COLLECTION_NAME).insert({
+        db.collection(UserDatabase.DB_COLLECTION_NAME).insertOne({
             mail,
             password_hash: password,
             first_name: firstName,
