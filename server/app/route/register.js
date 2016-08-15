@@ -31,6 +31,13 @@ var CallbackLatch = require('../util/CallbackLatch');
 
 // Register index
 router.get('/', function(req, res, next) {
+    // Redirect the user to the front page if already logged in
+    if(req.login.loggedIn) {
+        res.redirect('/');
+        return;
+    }
+
+    // Show the registration page
     res.render('register', {
         title: 'Register'
     });

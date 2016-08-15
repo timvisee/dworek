@@ -30,6 +30,13 @@ var Validator = require('../validator/Validator');
 
 // Login index
 router.get('/', function(req, res, next) {
+    // Redirect the user to the front page if already logged in
+    if(req.login.loggedIn) {
+        res.redirect('/');
+        return;
+    }
+
+    // Show the login page
     res.render('login', {
         title: 'Login'
     });
