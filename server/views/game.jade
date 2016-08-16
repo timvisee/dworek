@@ -1,0 +1,14 @@
+extends page
+
+block tabs
+    ul(data-role='nd2tabs' data-swipe=true)
+        li(data-tab='info') Info
+        li(data-tab='map') Map
+
+block content
+    div(data-role='nd2tab', data-tab='info')
+        p Game name: #{game.name}
+        p Specific game info here...
+
+    div(data-role='nd2tab', data-tab='map')
+        p Show map here...

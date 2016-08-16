@@ -2,15 +2,25 @@ extends page
 
 block tabs
     ul(data-role='nd2tabs' data-swipe=true)
-        li(data-tab='info') Info
-        li(data-tab='map') Map
+        li(data-tab='dashboard') Dashboard
+        li(data-tab='games') Games
 
 block content
-    div(data-role='nd2tab', data-tab='info')
+    div(data-role='nd2tab', data-tab='dashboard')
         p Welcome #{session.user.firstName}! You're logged in.
+
+        p Show some fancy game buttons...
 
         br
         a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
 
-    div(data-role='nd2tab', data-tab='map')
-        p Map...
+    div(data-role='nd2tab', data-tab='games')
+        ul(data-role='listview')
+            li(data-role='list-divider') Active games
+            li: i None
+
+            li(data-role='list-divider') Joined games
+            li: i None
+
+            li(data-role='list-divider') Open games
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame

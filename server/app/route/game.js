@@ -23,42 +23,50 @@
 var express = require('express');
 var router = express.Router();
 
-var login = require('./login');
-var logout = require('./logout');
-var register = require('./register');
-var game = require('./game');
-var about = require('./about');
-var status = require('./status');
-
-var appInfo = require('../../appInfo');
+var Core = require('../../Core');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 
-// Index page
+// Games overview
 router.get('/', function(req, res, next) {
-    // Show the index page if the user isn't logged in, show the dashboard if logged in
-    if(!req.session.valid)
-        LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME);
-
-    else
-        LayoutRenderer.render(req, res, next, 'dashboard', appInfo.APP_NAME);
+    // Redirect back to the front page
+    res.redirect('/');
 });
 
-// Login page
-router.use('/login', login);
+// Specific game
+router.get('/:gameId', function(req, res, next) {
+    // Get the game ID
+    var gameId = req.params.gameId;
 
-// Logout page
-router.use('/logout', logout);
+    // Validate the game ID
+    Core.model.gameModelManager.getGameById(gameId, function(err, game) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
 
-// Register page
-router.use('/register', register);
+        // Call back an error if the game ID is invalid
+        if(game === null) {
+            next(new Error('Invalid game ID.'));
+            return;
+        }
 
-// Game page
-router.use('/game', game);
+        // Fetch the game name
+        game.getName(function(err, gameName) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
 
-// About page
-router.use('/about', about);
-
-// Status page
-router.use('/status', status);
+            // Render the game page
+            LayoutRenderer.render(req, res, next, 'game', gameName, {
+                game: {
+                    name: gameName
+                }
+            });
+        });
+    });
+});
 
 module.exports = router;
