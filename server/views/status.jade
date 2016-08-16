@@ -1,13 +1,73 @@
 extends page
 
 block content
-    div(align='center')
+    div
         p The current application status is shown below.
 
-        table.ui-responsive.table-list
-            tr
-                td Web server
-                td: span(style='color: green;') Online
-            tr
-                td Uptime
-                td #{uptime} seconds
+        br
+
+        .table-list
+            h3 User session
+            table.ui-responsive
+                tr
+                    td Logged in
+                    td
+                        if session.valid
+                            span(style='color: green;') Yes
+                        else
+                            | No
+                if session.valid
+                    tr
+                        td Name
+                        td: i= session.user.firstName
+
+            h3 Real-time server
+            table.ui-responsive
+                tr
+                    td Status
+                    td
+                        if status.socketio.online
+                            span(style='color: green;') Online
+                        else
+                            span(style='color: red;') Offline
+
+            h3 Web server
+            table.ui-responsive
+                tr
+                    td Status
+                    td: span(style='color: green;') Online
+                tr
+                    td Uptime
+                    td #{status.web.uptime} seconds
+
+            h3 Database server
+            table.ui-responsive
+                tr
+                    td Status
+                    td
+                        if status.mongo.online
+                            span(style='color: green;') Online
+                        else
+                            span(style='color: red;') Offline
+
+            h3 Cache server
+            table.ui-responsive
+                tr
+                    td Status
+                    td
+                        if status.redis.online
+                            span(style='color: green;') Online
+                        else
+                            span(style='color: red;') Offline
+                tr
+                    td Uptime
+                    td #{status.redis.uptime} seconds
+                tr
+                    td Queries
+                    td= status.redis.commandCount
+                tr
+                    td Cached
+                    td #{status.redis.keyCount} items
+                tr
+                    td Used memory
+                    td= status.redis.memory

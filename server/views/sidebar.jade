@@ -21,7 +21,7 @@ div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fix
     ul(data-role='listview')
         li(data-role='list-divider') Pages
 
-        if !session.valid
+        unless session.valid
             li: a(href='/') Frontpage
             li: a.clr-primary(href='/login') Login
             li: a.clr-primary(href='/register') Register

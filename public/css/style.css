@@ -19,19 +19,28 @@
  * You should have received a copy of The MIT License (MIT) along with this   *
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
-.ui-header h1 a,
-.ui-footer h1 a {
-  color: inherit !important;
-  text-decoration: inherit; }
+.table-list {
+  text-align: center; }
 
-.ui-header h1 a:hover,
-.ui-footer h1 a:hover {
-  color: inherit !important;
-  text-decoration: underline; }
+.table-list table {
+  display: inline-block; }
 
-hr {
-  border: 0;
-  height: 1px;
-  background: #333 linear-gradient(to right, #ccc, #333, #ccc); }
+.table-list table tr td {
+  text-align: left;
+  line-height: 1.6em; }
+
+.table-list table tr td:first-child {
+  padding-right: 16px;
+  font-weight: bold;
+  text-align: right; }
+
+.table-list h3 {
+  margin: 16px 0 6px 0;
+  padding: 4px 0 0 0;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.54);
+  font-weight: 400;
+  font-size: 1.1em;
+  line-height: 1.2em; }
 
 /*# sourceMappingURL=style.css.map */

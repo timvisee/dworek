@@ -24,13 +24,68 @@ var express = require('express');
 var router = express.Router();
 var os = require('os');
 
+var config = require('../../config');
 var appInfo = require('../../appInfo');
 var LayoutRenderer = require('../layout/LayoutRenderer');
+var RedisUtils = require('../redis/RedisUtils');
+var CallbackLatch = require('../util/CallbackLatch');
 
 // Status index
 router.get('/', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'status', 'Application Status', {
-        uptime: Math.round(os.uptime())
+    // Layout options object
+    var options = {
+        status: {
+            web: {
+                online: true,
+                uptime: Math.round(os.uptime())
+            },
+            socketio: {
+                online: false
+            },
+            mongo: {
+                online: true
+            },
+            redis: {
+                online: RedisUtils.isReady()
+            }
+        }
+    };
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Get the redis status if ready
+    if(RedisUtils.isReady()) {
+        // Get the Redis connection
+        var redis = RedisUtils.getConnection();
+
+        // Call the Redis info command
+        latch.add();
+        redis.info(function(err) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Get the info section of the current Redis database
+            var redisInfo = redis.server_info;
+            var redisDbInfo = redisInfo['db' + config.redis.dbNumber];
+
+            // Get the data
+            options.status.redis.uptime = parseInt(redisInfo.uptime_in_seconds);
+            options.status.redis.commandCount = parseInt(redisInfo.total_commands_processed);
+            options.status.redis.keyCount = redisDbInfo != undefined ? redisDbInfo.keys : 0;
+            options.status.redis.memory = redisInfo.used_memory_peak_human;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
+
+    // Render the status page
+    latch.then(function() {
+        LayoutRenderer.render(req, res, next, 'status', 'Application Status', options);
     });
 });
 
