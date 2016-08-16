@@ -9,22 +9,19 @@ block content
         .table-list
             h3 User session
             table.ui-responsive
-                tr
-                    td Logged in
+                tr: td Logged in
                     td
                         if session.valid
                             span(style='color: green;') Yes
                         else
                             | No
                 if session.valid
-                    tr
-                        td Name
+                    tr: td Name
                         td: i= session.user.firstName
 
             h3 Real-time server
             table.ui-responsive
-                tr
-                    td Status
+                tr: td Status
                     td
                         if status.socketio.online
                             span(style='color: green;') Online
@@ -33,17 +30,14 @@ block content
 
             h3 Web server
             table.ui-responsive
-                tr
-                    td Status
+                tr: td Status
                     td: span(style='color: green;') Online
-                tr
-                    td Uptime
+                tr: td Uptime
                     td #{status.web.uptime} seconds
 
             h3 Database server
             table.ui-responsive
-                tr
-                    td Status
+                tr: td Status
                     td
                         if status.mongo.online
                             span(style='color: green;') Online
@@ -52,22 +46,17 @@ block content
 
             h3 Cache server
             table.ui-responsive
-                tr
-                    td Status
+                tr: td Status
                     td
                         if status.redis.online
                             span(style='color: green;') Online
                         else
                             span(style='color: red;') Offline
-                tr
-                    td Uptime
+                tr: td Uptime
                     td #{status.redis.uptime} seconds
-                tr
-                    td Queries
+                tr: td Queries
                     td= status.redis.commandCount
-                tr
-                    td Cached
+                tr: td Cached
                     td #{status.redis.keyCount} items
-                tr
-                    td Used memory
+                tr: td Used memory
                     td= status.redis.memory
