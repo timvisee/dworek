@@ -29,6 +29,7 @@ var Core = require('../../Core');
 var Validator = require('../validator/Validator');
 var IpUtils = require('../util/IpUtils');
 var LayoutRenderer = require('../layout/LayoutRenderer');
+var SessionValidator = require('../router/middleware/SessionValidator');
 
 // Login index
 router.get('/', function(req, res, next) {
@@ -111,8 +112,16 @@ router.post('/', function(req, res, next) {
                 maxAge: config.session.expire * 1000
             });
 
-            // Redirect the user
-            res.redirect('/');
+            // Update the session validator
+            SessionValidator.route(req, res, function(err) {
+                if(err !== null && err !== undefined) {
+                    next(err);
+                    return;
+                }
+
+                // Redirect the user
+                res.redirect('/');
+            });
         });
     });
 });

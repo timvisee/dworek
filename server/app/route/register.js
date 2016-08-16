@@ -30,6 +30,7 @@ var UserDatabase = require('../model/user/UserDatabase');
 var CallbackLatch = require('../util/CallbackLatch');
 var IpUtils = require('../util/IpUtils');
 var LayoutRenderer = require('../layout/LayoutRenderer');
+var SessionValidator = require('../router/middleware/SessionValidator');
 
 // Register index
 router.get('/', function(req, res, next) {
@@ -190,13 +191,21 @@ router.post('/', function(req, res, next) {
                     maxAge: config.session.expire * 1000
                 });
 
-                // Show registration success page
-                LayoutRenderer.render(req, res, next, 'register', 'Success', {
-                    message: 'Welcome ' + firstName + '!\n\n' +
-                    'You\'ve successfully been registered.\n\n' +
-                    'Please click the button below to continue to your dashboard.',
-                    hideBackButton: true,
-                    success: true
+                // Update the session validator
+                SessionValidator.route(req, res, function(err) {
+                    if(err !== null && err !== undefined) {
+                        next(err);
+                        return;
+                    }
+
+                    // Show registration success page
+                    LayoutRenderer.render(req, res, next, 'register', 'Success', {
+                        message: 'Welcome ' + firstName + '!\n\n' +
+                        'You\'ve successfully been registered.\n\n' +
+                        'Please click the button below to continue to your dashboard.',
+                        hideBackButton: true,
+                        success: true
+                    });
                 });
             });
         });

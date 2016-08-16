@@ -25,6 +25,8 @@ var router = express.Router();
 
 var config = require('../../config');
 
+var SessionValidator = require('../router/middleware/SessionValidator');
+
 // Logout index
 router.get('/', function(req, res, next) {
     // Clear the session cookie
@@ -33,8 +35,16 @@ router.get('/', function(req, res, next) {
     // TODO: Remove the session from the database (if the user has a session)
     // TODO: Should we also remove the session from cache?
 
-    // Redirect the user to the front page
-    res.redirect('/');
+    // Update the session validator
+    SessionValidator.route(req, res, function(err) {
+        if(err !== null && err !== undefined) {
+            next(err);
+            return;
+        }
+
+        // Redirect the user
+        res.redirect('/');
+    });
 });
 
 module.exports = router;
