@@ -688,16 +688,12 @@
             };
 
             _self.bindNavigationSwipe = function() {
-                console.log('Detaching swipe handler');
-
-                $(".ui-page:not('.nd2-no-menu-swipe')").off("swiperight swipeleft");
-
-                console.log('Attaching new swipe handler');
-
                 $(".ui-page:not('.nd2-no-menu-swipe')").on("swiperight swipeleft", function(e) {
-                    if($(".ui-page-active").jqmData("panel") !== "open")
-                        if(e.type === 'swiperight')
-                            $.mobile.activePage.find('.ui-panel.ui-panel-position-left:first').panel('open');
+                    if ($(".ui-page-active").jqmData("panel") !== "open") {
+                        if (e.type === "swiperight") {
+                            $(".ui-panel.ui-panel-position-left:first").panel("open");
+                        }
+                    }
                 });
             };
 
@@ -784,7 +780,10 @@
 
             };
 
-            _self.build();
+            //_self.build();
+
+            // Return self
+            return _self;
         };
 
     })($);
