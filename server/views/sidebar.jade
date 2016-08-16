@@ -2,7 +2,7 @@ include base
 
 div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fixed=true)
 
-    if session && session.valid
+    if session.valid
         .nd2-sidepanel-profile.wow.fadeInDown
             img.profile-background(src='//lorempixel.com/400/200/abstract/2/')
             .row
@@ -12,7 +12,7 @@ div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fix
 
                 .col-xs-8
                     .box.profile-text
-                        strong Tim Visée
+                        strong #{session.user.firstName}
                         span.subline Super Power User
 
     else
@@ -20,12 +20,13 @@ div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fix
 
     ul(data-role='listview')
         li(data-role='list-divider') Pages
-        li: a(href='/') Frontpage
 
-        unless session && session.valid
+        if !session.valid
+            li: a(href='/') Frontpage
             li: a.clr-primary(href='/login') Login
             li: a.clr-primary(href='/register') Register
         else
+            li: a(href='/') Dashboard
             li: a.clr-warning(href='/logout')
                 i.zmdi.zmdi-lock &nbsp;&nbsp;
                 span Logout
