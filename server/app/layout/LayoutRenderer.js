@@ -48,8 +48,8 @@ var LayoutRenderer = function() {};
  * @return {Object} Layout options object.
  */
 LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
-    // Create a base object
-    var base = {
+    // Create a layout configuration object
+    var config = {
         app: {
             name: appInfo.APP_NAME,
             version: {
@@ -78,7 +78,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
             }
 
             // Set the first name
-            base.session.user.firstName = firstName;
+            config.session.user.firstName = firstName;
 
             // Resolve the latch
             latch.resolve();
@@ -94,7 +94,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
             }
 
             // Set the last name
-            base.session.user.lastName = lastName;
+            config.session.user.lastName = lastName;
 
             // Resolve the latch
             latch.resolve();
@@ -117,11 +117,11 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
 
     // Render the page when we're done
     latch.then(function() {
-        // Merge the objects
-        base = merge(base, options);
+        // Merge the layout configuration objects
+        config = merge(config, options);
 
         // Render the page
-        res.render(jadeName, base);
+        res.render(jadeName, config);
     });
 };
 
