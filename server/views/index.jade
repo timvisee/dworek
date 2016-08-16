@@ -6,13 +6,13 @@ block content
   p
     unless loggedIn
       fieldset(data-role='controlgroup', data-type='vertical')
-        a.ui-btn.ui-shadow(href='/login', title='Login') Login
-        a.ui-btn.ui-shadow(href='/register', title='Register') Register
+        a(href='/login', data-role='button', title='Login') Login
+        a(href='/register', data-role='button', title='Register') Register
     else
       p Welcome #{name}! You're logged in.
 
       fieldset(data-role='controlgroup', data-type='vertical')
-          a.ui-btn.ui-shadow(href='/logout', title='Logout') Logout
+          a(href='/logout', data-role='button', data-icon='power', title='Logout') Logout
 
     fieldset(data-role='controlgroup', data-type='vertical')
-      a.ui-btn.ui-shadow(href='/about', title='About this application') About
+      a(href='/about', data-role='button', data-icon='info', title='About this application') About

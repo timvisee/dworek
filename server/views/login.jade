@@ -7,6 +7,6 @@ block content
         input(type='text', name='mail', placeholder='Mail address')
         input(type='password', name='password', placeholder='Password')
 
-        input.ui-btn.ui-icon-lock.ui-btn-icon-right(type='submit', value='Login')
+        input(type='submit', data-role='button', data-icon='lock', value='Login')
 
-        a.ui-btn.ui-shadow(href='/register') Register
+        a(href='/register', data-role='button', title='Register') Register

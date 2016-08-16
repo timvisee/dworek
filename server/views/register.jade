@@ -11,9 +11,9 @@ block content
             input(type='text', name='first_name', placeholder='First name')
             input(type='text', name='last_name', placeholder='Last name')
 
-            input.ui-btn.ui-icon-lock.ui-btn-icon-right(type='submit', value='Register')
+            input(type='submit', value='Register', data-role='button', data-icon='lock')
 
-            a.ui-btn.ui-shadow(href='/login') Login
+            a(href='/login', data-role='button', title='Login') Login
 
     else
         //- Print the success message
@@ -21,4 +21,4 @@ block content
 
         //- Show the dashboard button
         fieldset(data-role='controlgroup', data-type='vertical')
-            a.ui-btn.ui-icon-home.ui-btn-icon-left.ui-shadow(href='/dashboard', title='Go to your dashboard') Dashboard
+            a(href='/dashboard', data-role='button', data-icon='home', title='Go to your dashboard') Dashboard
