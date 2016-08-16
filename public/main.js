@@ -40,6 +40,7 @@ $(document).bind("pageinit", function() {
  * Called to show a toast to the user to tell a feature is not yet available.
  */
 function featureNotAvailable() {
+    // Show a toast notification
     new $.nd2Toast({
         message : 'Feature not available yet',
         action : {
@@ -49,4 +50,36 @@ function featureNotAvailable() {
         },
         ttl : 8000
     });
+
+    // Notification test
+    notifyMe();
+
+    // Vibrate the phone
+    if("vibrate" in navigator)
+        window.navigator.vibrate([500, 250, 500]);
+}
+
+function notifyMe() {
+    // Let's check if the browser supports notifications
+    if(!('Notification' in window))
+        alert('This browser does not support desktop notification');
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === 'granted') {
+        // If it's okay let's create a notification
+        var notification = new Notification('Feature not available yet');
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function (permission) {
+            // If the user accepts, let's create a notification
+            if(permission === 'granted') {
+                var notification = new Notification('Feature not available yet');
+            }
+        });
+    }
+
+    // At last, if the user has denied notifications, and you
+    // want to be respectful there is no need to bother them any more.
 }
