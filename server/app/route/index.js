@@ -35,11 +35,7 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 // Index page
 router.get('/', function(req, res, next) {
     LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME, {
-        hideBackButton: true,
-
-        // TODO: Move these properties to the LayoutOptionBuilder class
-        loggedIn: req.session.valid,
-        name: req.session.valid ? req.session.user.getIdHex() : '?'
+        hideBackButton: true
     });
 });
 
