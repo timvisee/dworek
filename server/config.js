@@ -115,6 +115,12 @@ config.redis.dbNumber = 1;
  */
 config.redis.url = 'redis://' + config.redis.host + ':' + config.redis.port + '/' + config.redis.dbNumber;
 
+/**
+ * Default number of seconds it takes for cached values to expire.
+ * @type {number}
+ */
+config.redis.cacheExpire = 60 * 5;
+
 
 /******************************************************************************
  * Web configuration.                                                         *

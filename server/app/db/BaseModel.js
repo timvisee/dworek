@@ -24,16 +24,12 @@ var util = require('util');
 var async = require('async');
 var _ = require('lodash');
 
+var config = require('../../config');
+
 var CallbackLatch = require('../util/CallbackLatch');
 var ObjectCache = require('../cache/ObjectCache');
 var MongoUtils = require('../mongo/MongoUtils');
 var RedisUtils = require('../redis/RedisUtils');
-
-/**
- * Time in seconds for a cached field to expire.
- * @type {number} Time in seconds.
- */
-const CACHE_FIELD_EXPIRE = 60 * 5;
 
 /**
  * Cache key prefix for database object layer instances.
@@ -1480,7 +1476,7 @@ BaseModel.prototype.redisGetKeyRoot = function() {
  * @return {string} Redis key for the given field.
  */
 BaseModel.prototype.redisGetKey = function(field) {
-    return this.redisGetKeyRoot() + ':' + field;
+    return this.redisGetKeyRoot() + ':fields:' + field;
 };
 
 /**
@@ -1721,7 +1717,7 @@ BaseModel.prototype.redisSetField = function(field, value, callback) {
         value = this._modelConfig.fields[field].redis.to(value);
 
     // Set the field and it's TTL
-    redis.setex(key, CACHE_FIELD_EXPIRE, value, function(err) {
+    redis.setex(key, config.redis.cacheExpire, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
             // Encapsulate the error
@@ -1829,7 +1825,7 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         for(var i = 0, redisDataLength = redisData.length; i < redisDataLength; i += 2) {
             // Use the expire command, add a latch
             latch.add();
-            redis.expire(redisData[i], CACHE_FIELD_EXPIRE, function(err) {
+            redis.expire(redisData[i], config.redis.cacheExpire, function(err) {
                 // Catch errors
                 if(err !== null && err !== undefined && commandError === null)
                     commandError = new Error(err);
