@@ -20,20 +20,26 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+// Native droid instance
+var nativeDroid = null;
+
+$(function() {
+    // Initialize NativeDroid, and store it's instance
+    nativeDroid = $.nd2();
+
+    // Build
+    nativeDroid.build();
+});
+
 // Initialize NativeDroid on page initialization
 $(document).bind("pageinit", function() {
-    // Initialize NativeDroid
-    $.nd2({
-        stats: {
-            // UA-Code
-            analyticsUA: null
-        },
-        advertising: {
-            active: false,
-            path: null,
-            extension: null
-        }
-    });
+    // Make sure the native droid instance is available
+    if(nativeDroid === null)
+        return;
+
+    // Build the page
+    console.log('Building page...');
+    nativeDroid.build();
 });
 
 /**
