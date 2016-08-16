@@ -53,9 +53,9 @@ var GameModelManager = function() {
  */
 GameModelManager.prototype.isValidGameId = function(id, callback) {
     // Validate the object ID
-    if(!ObjectId.isValid(id)) {
+    if(id === null || id === undefined || !ObjectId.isValid(id)) {
         // Call back
-        callback(null, null);
+        callback(null, false);
         return;
     }
 
