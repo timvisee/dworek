@@ -26,6 +26,7 @@ var os = require('os');
 
 var config = require('../../config');
 var appInfo = require('../../appInfo');
+var Core = require('../../Core');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 var RedisUtils = require('../redis/RedisUtils');
 var CallbackLatch = require('../util/CallbackLatch');
@@ -47,6 +48,10 @@ router.get('/', function(req, res, next) {
             },
             redis: {
                 online: RedisUtils.isReady()
+            },
+            cache: {
+                objectCount: 0,
+                fieldCount: 0
             }
         }
     };
@@ -81,6 +86,23 @@ router.get('/', function(req, res, next) {
             // Resolve the latch
             latch.resolve();
         });
+    }
+
+    // Go through the internal cache
+    for(var modelManagerName in Core.model) {
+        // make sure the manager is in Core.model
+        if(!Core.model.hasOwnProperty(modelManagerName))
+            continue;
+
+        // Get the model manager
+        var modelManager = Core.model[modelManagerName];
+
+        // Append the number of objects to the count
+        options.status.cache.objectCount += modelManager._instanceManager.count();
+
+        // Iterate through the objects
+        for(var object of modelManager._instanceManager._instances.values())
+            options.status.cache.fieldCount += object._baseModel._cache.getCacheCount();
     }
 
     // Render the status page

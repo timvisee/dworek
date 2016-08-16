@@ -111,6 +111,15 @@ ModelInstanceManager.prototype._parseId = function(id) {
 };
 
 /**
+ * Count the number of instances.
+ *
+ * @return {Number} Number of instances.
+ */
+ModelInstanceManager.prototype.count = function() {
+    return this._instances.size;
+};
+
+/**
  * Clear the list of instances.
  */
 ModelInstanceManager.prototype.clear = function() {

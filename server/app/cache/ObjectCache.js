@@ -57,6 +57,15 @@ ObjectCache.prototype.getCache = function(field) {
 };
 
 /**
+ * Get the number of cached fields.
+ *
+ * @returns {Number} Total number of cached fields.
+ */
+ObjectCache.prototype.getCacheCount = function() {
+    return this._cache.size;
+};
+
+/**
  * Set a cache field.
  *
  * @param {string} field Cache field name.

@@ -56,7 +56,14 @@ block content
                     td #{status.redis.uptime} seconds
                 tr: td Queries
                     td= status.redis.commandCount
-                tr: td Cached
-                    td #{status.redis.keyCount} items
+                tr: td Cached fields
+                    td= status.redis.keyCount
                 tr: td Used memory
                     td= status.redis.memory
+
+            h3 Internal cache
+            table.ui-responsive
+                tr: td Cached objects
+                    td= status.cache.objectCount
+                tr: td Cached fields
+                    td #{status.cache.fieldCount}
