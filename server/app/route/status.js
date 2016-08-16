@@ -29,9 +29,9 @@ var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
 
 // Status index
 router.get('/', function(req, res, next) {
-    res.render('status', LayoutOptionsBuilder.build(req, 'Application Status', {
+    LayoutOptionsBuilder.build(req, res, next, 'status', 'Application Status', {
         uptime: Math.round(os.uptime())
-    }));
+    });
 });
 
 module.exports = router;

@@ -28,7 +28,7 @@ var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
 
 // About index
 router.get('/', function(req, res, next) {
-    res.render('about', LayoutOptionsBuilder.build(req, 'About'));
+    LayoutOptionsBuilder.build(req, res, next, 'about');
 });
 
 module.exports = router;

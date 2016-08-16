@@ -39,7 +39,7 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the login page
-    res.render('login', LayoutOptionsBuilder.build(req, 'Login'));
+    res.render('login', LayoutOptionsBuilder.build(req, res, next, 'login'));
 });
 
 // Login index
@@ -53,28 +53,28 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their mail address
         if(mail.length === 0) {
             // Show an error page
-            res.render('error', LayoutOptionsBuilder.build(req, 'Whoops!', {
+            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
                 message: 'Your mail address is missing.\n\n' +
                 'Please go back and fill in your mail address.'
-            }));
+            });
             return;
         }
 
         // Show an error page
-        res.render('error', LayoutOptionsBuilder.build(req, 'Whoops!', {
+        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
             message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and check your mail address.'
-        }));
+        });
         return;
     }
 
     // Make sure a password is entered
     if(password.length === 0) {
         // Show an error page
-        res.render('error', LayoutOptionsBuilder.build(req, 'Whoops!', {
+        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
             message: 'Your password is missing.\n\n' +
             'Please go back and fill in your password.'
-        }));
+        });
         return;
     }
 
@@ -88,10 +88,10 @@ router.post('/', function(req, res, next) {
 
         // Show an error page if no user was found
         if(user === null) {
-            res.render('error', LayoutOptionsBuilder.build(req, 'Whoops!', {
+            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
                 message: 'Your mail address and password combination is invalid.\n\n' +
                 'Please go back, verify your user credentials, and try to login again.'
-            }));
+            });
             return;
         }
 

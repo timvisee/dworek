@@ -36,13 +36,16 @@ var LayoutOptionsBuilder = function() {};
 /**
  * Build the options for the layout.
  *
- * @param req Express request.
- * @param {string|undefined} pageTitle Preferred page title.
+ * @param req Express request object.
+ * @param res Express response object.
+ * @param {function} next Callback for the next page.
+ * @param {string} jadeName Jade name of the layout to render.
+ * @param {string|undefined} [pageTitle] Preferred page title.
  * @param {Object|undefined} [options] Additional options.
  *
  * @return {Object} Layout options object.
  */
-LayoutOptionsBuilder.build = function(req, pageTitle, options) {
+LayoutOptionsBuilder.build = function(req, res, next, jadeName, pageTitle, options) {
     // Create a base object
     var base = {
         app: {
@@ -53,7 +56,8 @@ LayoutOptionsBuilder.build = function(req, pageTitle, options) {
             }
         },
         session: {
-            valid: req.session.valid
+            valid: req.session.valid,
+            user: {}
         }
     };
 
@@ -65,8 +69,11 @@ LayoutOptionsBuilder.build = function(req, pageTitle, options) {
     if(pageTitle !== undefined)
         options.title = pageTitle;
 
-    // Merge the objects, and return the result
-    return merge(base, options);
+    // Merge the objects
+    base = merge(base, options);
+
+    // Render the page
+    res.render(jadeName, base);
 };
 
 // Export the class
