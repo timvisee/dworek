@@ -25,6 +25,8 @@ var merge = require('utils-merge');
 
 var appInfo = require('../../appInfo');
 
+var CallbackLatch = require('../util/CallbackLatch');
+
 /**
  * LayoutOptionsBuilder class.
  *
@@ -61,19 +63,66 @@ LayoutOptionsBuilder.build = function(req, res, next, jadeName, pageTitle, optio
         }
     };
 
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Get the user's name if we've a session
+    if(req.session.valid) {
+        // Get the first name
+        latch.add();
+        req.session.user.getFirstName(function(err, firstName) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Set the first name
+            base.session.user.firstName = firstName;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the last name
+        latch.add();
+        req.session.user.getLastName(function(err, lastName) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Set the last name
+            base.session.user.lastName = lastName;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
+
     // Make sure the options parameter is an object
     if(!_.isObject(options))
         options = {};
 
     // Set the page title
-    if(pageTitle !== undefined)
+    if(!options.hasOwnProperty('title')) {
+        // Determine the page title if it isn't set
+        if(pageTitle === undefined)
+            pageTitle = jadeName.charAt(0).toUpperCase() + jadeName.slice(1).toLowerCase();
+
+        // Set the title
         options.title = pageTitle;
+    }
 
-    // Merge the objects
-    base = merge(base, options);
+    // Render the page when we're done
+    latch.then(function() {
+        // Merge the objects
+        base = merge(base, options);
 
-    // Render the page
-    res.render(jadeName, base);
+        // Render the page
+        res.render(jadeName, base);
+    });
 };
 
 // Export the class
