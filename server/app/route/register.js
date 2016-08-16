@@ -29,7 +29,7 @@ var Validator = require('../validator/Validator');
 var UserDatabase = require('../model/user/UserDatabase');
 var CallbackLatch = require('../util/CallbackLatch');
 var IpUtils = require('../util/IpUtils');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Register index
 router.get('/', function(req, res, next) {
@@ -40,7 +40,7 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the registration page
-    LayoutOptionsBuilder.build(req, res, next, 'register', 'Registration');
+    LayoutRenderer.render(req, res, next, 'register', 'Registration');
 });
 
 // Register index
@@ -57,7 +57,7 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their mail address
         if(mail.length === 0) {
             // Show an error page
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your mail address is missing.\n\n' +
                 'Please go back and fill in your mail address.'
             });
@@ -65,7 +65,7 @@ router.post('/', function(req, res, next) {
         }
 
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and check your mail address.'
         });
@@ -75,7 +75,7 @@ router.post('/', function(req, res, next) {
     // Compare passwords
     if(password !== passwordVerify) {
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The passwords you\'ve entered do not equal.\n\n' +
             'Please go back and check both passwords.'
         });
@@ -87,7 +87,7 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their password
         if(password.length === 0) {
             // Show an error page
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your password is missing.\n\n' +
                 'Please go back and fill in your password.'
             });
@@ -99,7 +99,7 @@ router.post('/', function(req, res, next) {
         const max = config.validation.passwordMaxLength;
 
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The password you\'ve entered doesn\'t meet our requirements.\n\n' +
             'Your password must be between ' + min + ' and ' + max + ' characters long.\n\n' +
             'Please go back and choose a different password.'
@@ -112,7 +112,7 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their first name
         if(firstName.length === 0) {
             // Show an error page
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your first name is missing.\n\n' +
                 'Please go back and fill in your first name.'
             });
@@ -120,7 +120,7 @@ router.post('/', function(req, res, next) {
         }
 
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The first name you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and enter your real first name.'
         });
@@ -132,7 +132,7 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their password
         if(lastName.length === 0) {
             // Show an error page
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your last name is missing.\n\n' +
                 'Please go back and fill in your last name.'
             });
@@ -140,7 +140,7 @@ router.post('/', function(req, res, next) {
         }
 
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The last name you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and enter your real last name.'
         });
@@ -157,7 +157,7 @@ router.post('/', function(req, res, next) {
 
         // Show an error page if the mail address is already used
         if(result) {
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'It looks like you\'ve already registered with this mail address.\n\n' +
                 'Please continue to the login page.',
                 hideBackButton: true,
@@ -191,7 +191,7 @@ router.post('/', function(req, res, next) {
                 });
 
                 // Show registration success page
-                LayoutOptionsBuilder.build(req, res, next, 'register', 'Success', {
+                LayoutRenderer.render(req, res, next, 'register', 'Success', {
                     message: 'Welcome ' + firstName + '!\n\n' +
                     'You\'ve successfully been registered.\n\n' +
                     'Please click the button below to continue to your dashboard.',

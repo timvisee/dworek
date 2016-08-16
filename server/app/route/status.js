@@ -25,11 +25,11 @@ var router = express.Router();
 var os = require('os');
 
 var appInfo = require('../../appInfo');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Status index
 router.get('/', function(req, res, next) {
-    LayoutOptionsBuilder.build(req, res, next, 'status', 'Application Status', {
+    LayoutRenderer.render(req, res, next, 'status', 'Application Status', {
         uptime: Math.round(os.uptime())
     });
 });

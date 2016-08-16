@@ -24,11 +24,11 @@ var express = require('express');
 var router = express.Router();
 
 var appInfo = require('../../appInfo');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // About index
 router.get('/', function(req, res, next) {
-    LayoutOptionsBuilder.build(req, res, next, 'about');
+    LayoutRenderer.render(req, res, next, 'about');
 });
 
 module.exports = router;

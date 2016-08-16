@@ -30,11 +30,11 @@ var about = require('./about');
 var status = require('./status');
 
 var appInfo = require('../../appInfo');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Index page
 router.get('/', function(req, res, next) {
-    LayoutOptionsBuilder.build(req, res, next, 'index', appInfo.APP_NAME, {
+    LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME, {
         hideBackButton: true,
 
         // TODO: Move these properties to the LayoutOptionBuilder class

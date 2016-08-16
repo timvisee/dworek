@@ -28,15 +28,15 @@ var appInfo = require('../../appInfo');
 var CallbackLatch = require('../util/CallbackLatch');
 
 /**
- * LayoutOptionsBuilder class.
+ * LayoutRenderer class.
  *
  * @class
  * @constructor
  */
-var LayoutOptionsBuilder = function() {};
+var LayoutRenderer = function() {};
 
 /**
- * Build the options for the layout.
+ * Render the layout.
  *
  * @param req Express request object.
  * @param res Express response object.
@@ -47,7 +47,7 @@ var LayoutOptionsBuilder = function() {};
  *
  * @return {Object} Layout options object.
  */
-LayoutOptionsBuilder.build = function(req, res, next, jadeName, pageTitle, options) {
+LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
     // Create a base object
     var base = {
         app: {
@@ -126,4 +126,4 @@ LayoutOptionsBuilder.build = function(req, res, next, jadeName, pageTitle, optio
 };
 
 // Export the class
-module.exports = LayoutOptionsBuilder;
+module.exports = LayoutRenderer;

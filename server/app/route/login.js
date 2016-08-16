@@ -28,7 +28,7 @@ var config = require('../../config');
 var Core = require('../../Core');
 var Validator = require('../validator/Validator');
 var IpUtils = require('../util/IpUtils');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Login index
 router.get('/', function(req, res, next) {
@@ -39,7 +39,7 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the login page
-    res.render('login', LayoutOptionsBuilder.build(req, res, next, 'login'));
+    res.render('login', LayoutRenderer.render(req, res, next, 'login'));
 });
 
 // Login index
@@ -53,7 +53,7 @@ router.post('/', function(req, res, next) {
         // Show a warning if the user hadn't filled in their mail address
         if(mail.length === 0) {
             // Show an error page
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your mail address is missing.\n\n' +
                 'Please go back and fill in your mail address.'
             });
@@ -61,7 +61,7 @@ router.post('/', function(req, res, next) {
         }
 
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'The mail address you\'ve entered doesn\'t seem to be valid.\n\n' +
             'Please go back and check your mail address.'
         });
@@ -71,7 +71,7 @@ router.post('/', function(req, res, next) {
     // Make sure a password is entered
     if(password.length === 0) {
         // Show an error page
-        LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: 'Your password is missing.\n\n' +
             'Please go back and fill in your password.'
         });
@@ -88,7 +88,7 @@ router.post('/', function(req, res, next) {
 
         // Show an error page if no user was found
         if(user === null) {
-            LayoutOptionsBuilder.build(req, res, next, 'error', 'Whoops!', {
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
                 message: 'Your mail address and password combination is invalid.\n\n' +
                 'Please go back, verify your user credentials, and try to login again.'
             });
