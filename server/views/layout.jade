@@ -7,7 +7,7 @@ block layout
     head
       // Meta
       meta(http-equiv='X-UA-Compatible', content='text/html', charset='UTF-8')
-      meta(name='viewport', content='width=device-width, initial-scale=1')
+      meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
       meta(name='description', content='Create virtual drug labs in real-world locations with your cartel. Conquer labs owned by other cartels to become the drug production MVP.')
       meta(name='keywords', content='Dworek')
       meta(name='author', content='Tim Vis&eacute;e')
@@ -48,16 +48,26 @@ block layout
       //- Page title
       title= title
 
-      //- Style
-      link(rel='stylesheet', href='/style/style.css')
+      link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css')
+      link(rel='stylesheet', href='//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css')
+      link(rel='stylesheet', href='/vendor/waves/waves.min.css')
+      link(rel='stylesheet', href='/vendor/wow/animate.css')
+      link(rel='stylesheet', href='/css/nativedroid2.css')
 
-      //- jQuery
-      script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
+      //- link(rel='stylesheet', href='/css/style.css')
+      //-script(type='text/javascript', src='/js/jquery.mobile.settings.js')
 
-      //- jQuery Mobile
-      script(type='text/javascript', src='/js/jquery.mobile.settings.js')
-      link(rel='stylesheet', href='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css')
-      script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js')
+      meta(name='mobile-web-app-capable', content='yes')
+      meta(name='apple-mobile-web-app-capable', content='yes')
+      meta(name='apple-mobile-web-app-status-bar-style', content='black')
+
+      script(type='text/javascript', src='//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js')
+      script(type='text/javascript', src='//code.jquery.com/ui/1.11.4/jquery-ui.min.js')
+      script(type='text/javascript', src='//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js')
+      script(type='text/javascript', src='/vendor/waves/waves.min.js')
+      script(type='text/javascript', src='/vendor/wow/wow.min.js')
+      script(type='text/javascript', src='/js/nativedroid2.js')
+      script(type='text/javascript', src='/nd2settings.js')
 
     //- Body
     body

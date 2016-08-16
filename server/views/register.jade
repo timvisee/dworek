@@ -2,23 +2,38 @@ extends page
 
 block content
     unless success
-        p Enter your preferred mail address and password to register.
+        p Enter your mail address and password to register.
+
+        br
 
         form(method='POST', action='/register/#')
-            input(type='text', name='mail', placeholder='Mail address')
-            input(type='password', name='password', placeholder='Password', autocomplete='off')
-            input(type='password', name='password_verify', placeholder='Password verification', autocomplete='off')
-            input(type='text', name='first_name', placeholder='First name')
-            input(type='text', name='last_name', placeholder='Last name')
 
-            input(type='submit', value='Register', data-role='button', data-icon='lock')
+            label(for='mail') Mail address:
+            input(type='text', name='mail', id='mail', value='', data-clear-btn='true')
 
-            a(href='/login', data-role='button', title='Login') Login
+            label(for='password') Password:
+            input(type='password', name='password', id='password', value='', data-clear-btn='true', autocomplete='off')
+
+            label(for='password_verify') Password verification:
+            input(type='password', name='password_verify', id='password_verify', value='', data-clear-btn='true', autocomplete='off')
+
+            label(for='first_name') First name:
+            input(type='text', name='first_name', id='first_name', value='', data-clear-btn='true')
+
+            label(for='last_name') Last name:
+            input(type='text', name='last_name', id='last_name', value='', data-clear-btn='true')
+
+            br
+
+            button.ui-btn.ui-btn-raised.clr-primary(type='submit') Register
+
+            br
+
+            a.ui-btn(href='/login', title='Login') Already have an account?
 
     else
         //- Print the success message
         p: +format(message)
 
         //- Show the dashboard button
-        fieldset(data-role='controlgroup', data-type='vertical')
-            a(href='/dashboard', data-role='button', data-icon='home', title='Go to your dashboard') Dashboard
+        a.ui-btn.clr-primary(href='/dashboard', data-icon='home', title='Go to your dashboard') Dashboard

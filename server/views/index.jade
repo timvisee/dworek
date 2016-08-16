@@ -1,18 +1,27 @@
 extends page
 
+block tabs
+    if loggedIn
+        ul(data-role='nd2tabs' data-swipe=true)
+            li(data-tab='info') Info
+            li(data-tab='map') Map
+
 block content
-  p Application front page.
 
-  p
     unless loggedIn
-      fieldset(data-role='controlgroup', data-type='vertical')
-        a(href='/login', data-role='button', title='Login') Login
-        a(href='/register', data-role='button', title='Register') Register
+        p Application front page.
+        br
+        a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
+        br
+        a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register
+        a.ui-btn(href='/about', title='About this application') About
+
     else
-      p Welcome #{name}! You're logged in.
+        div(data-role='nd2tab', data-tab='info')
+            p Welcome #{name}! You're logged in.
 
-      fieldset(data-role='controlgroup', data-type='vertical')
-          a(href='/logout', data-role='button', data-icon='power', title='Logout') Logout
+            br
+            a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
 
-    fieldset(data-role='controlgroup', data-type='vertical')
-      a(href='/about', data-role='button', data-icon='info', title='About this application') About
+        div(data-role='nd2tab', data-tab='map')
+            p Map...

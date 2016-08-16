@@ -3,10 +3,20 @@ extends page
 block content
     p Enter your mail address and password to login.
 
+    br
+
     form(method='POST', action='/login/#')
-        input(type='text', name='mail', placeholder='Mail address')
-        input(type='password', name='password', placeholder='Password')
 
-        input(type='submit', data-role='button', data-icon='lock', value='Login')
+        label(for='mail') Mail address:
+        input(type='text', name='mail', id='mail', value='', data-clear-btn='true')
 
-        a(href='/register', data-role='button', title='Register') Register
+        label(for='password') Password:
+        input(type='password', name='password', id='password', value='', data-clear-btn='true')
+
+        br
+
+        button.ui-btn.ui-btn-raised.clr-primary(type='submit') Login
+
+        br
+
+        a.ui-btn(href='/register', title='Register') Don't have an account?
