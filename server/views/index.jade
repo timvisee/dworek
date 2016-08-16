@@ -7,14 +7,12 @@ block tabs
             li(data-tab='map') Map
 
 block content
-
     unless loggedIn
-        p Application front page.
+        p Welcome to Dworek.
         br
         a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
         br
         a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register
-        a.ui-btn(href='/about', title='About this application') About
 
     else
         div(data-role='nd2tab', data-tab='info')

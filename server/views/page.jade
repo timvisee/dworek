@@ -5,23 +5,33 @@ block page
     div(data-role='page')
         //- Page header
         div(data-role='header')
-            //- Back button
-            unless hideBackButton
-                a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
-                    i.zmdi.zmdi-arrow-back
+            ////- Back button
+            //unless hideBackButton
+            //    a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+            //        i.zmdi.zmdi-arrow-back
+
+            //- Sidebar button
+            a.ui-btn.ui-btn-right.wow.fadeIn(href='#leftpanel', data-wow-delay='0.4s')
+                i.zmdi.zmdi-more-vert
+
+            //- Menu button
+            a.ui-btn.ui-btn-left.wow.fadeIn(href='#leftpanel', data-wow-delay='0.4s')
+                i.zmdi.zmdi-menu
 
             //- Header title
-            //- FIXME: h1: a(href='/', data-ajax='false', title='Reload application')= title
             h1.wow.fadeIn= title
 
             //- Tabs section
             block tabs
 
+        //- Sidebar
+        include sidebar
+
         //- Page content
         div.ui-content(data-role='main')
             block content
 
-        //- //- Page footer
+        //- Page footer
         //- div(data-role='footer')
         //-     //- Footer title
         //-     //- h4: a(href='/about', title='About') Copyright © Tim Visée 2016
