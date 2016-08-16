@@ -34,9 +34,12 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Index page
 router.get('/', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME, {
-        hideBackButton: true
-    });
+    // Show the index page if the user isn't logged in, show the dashboard if logged in
+    if(!req.session.valid)
+        LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME);
+
+    else
+        LayoutRenderer.render(req, res, next, 'dashboard', appInfo.APP_NAME);
 });
 
 // Login page

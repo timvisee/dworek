@@ -1,25 +1,8 @@
 extends page
 
-block tabs
-    if session.valid
-        ul(data-role='nd2tabs' data-swipe=true)
-            li(data-tab='info') Info
-            li(data-tab='map') Map
-
 block content
-    unless session.valid
-        p Welcome to Dworek.
-        br
-        a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
-        br
-        a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register
-
-    else
-        div(data-role='nd2tab', data-tab='info')
-            p Welcome #{session.user.firstName}! You're logged in.
-
-            br
-            a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
-
-        div(data-role='nd2tab', data-tab='map')
-            p Map...
+    p Welcome to Dworek.
+    br
+    a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
+    br
+    a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register
