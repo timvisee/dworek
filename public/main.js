@@ -35,3 +35,18 @@ $(document).bind("pageinit", function() {
         }
     });
 });
+
+/**
+ * Called to show a toast to the user to tell a feature is not yet available.
+ */
+function featureNotAvailable() {
+    new $.nd2Toast({
+        message : 'Feature not available yet',
+        action : {
+            title: "Close",
+            fn: function() {},
+            color: 'lime'
+        },
+        ttl : 8000
+    });
+}
