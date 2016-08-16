@@ -20,11 +20,9 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-// $(function() {});
-
-// Configure nativedroid on page initialization
+// Initialize NativeDroid on page initialization
 $(document).bind("pageinit", function() {
-    // Initialize nativeDroid2
+    // Initialize NativeDroid
     $.nd2({
         stats: {
             // UA-Code
