@@ -705,9 +705,8 @@
             };
 
             _self.iniWow = function() {
-                if (typeof WOW !== "undefined") {
+                if (typeof WOW !== "undefined")
                     new WOW().init();
-                }
             };
 
             _self.iniWaves = function() {
@@ -750,7 +749,6 @@
             };
 
             _self.iniGoogleAnalytics = function() {
-
                 var _ga = {
                     send: function(url) {
                         if (url) {
@@ -778,16 +776,11 @@
                     _ga.send(null);
 
                     // Trigger Page Change
-
                     $("body").on("pagechange", function(evt, data) {
                         _ga.send(_self.getUrlParts(data.options.absUrl).pathname);
                     });
-
                 }
-
             };
-
-            //_self.build();
 
             // Return self
             return _self;
@@ -796,7 +789,6 @@
     })($);
 
     exports.chartThemeGenerator = function(color) {
-
         var _self = this;
 
         _self.colorIndex = ['red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber', 'orange', 'deep-orange', 'brown', 'grey', 'blue-grey'];
@@ -820,9 +812,9 @@
             brown: '#795548',
             grey: '#9E9E9E',
             blue_grey: '#607D8B'
-        },
+        };
 
-            _self.indexByColor = _self.colorIndex.indexOf(color);
+        _self.indexByColor = _self.colorIndex.indexOf(color);
 
         _self.alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
 
@@ -856,9 +848,6 @@
             }
 
             console.log("/* Chart-Color-Theme: " + color + " */\n" + css.join(" ") + "\n\n");
-
         }
-
     };
-
 }));

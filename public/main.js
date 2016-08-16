@@ -57,12 +57,12 @@ function featureNotAvailable() {
         ttl : 8000
     });
 
-    // Notification test
-    notifyMe();
-
     // Vibrate the phone
     if("vibrate" in navigator)
         window.navigator.vibrate([500, 250, 500]);
+
+    // Notification test
+    notifyMe();
 }
 
 function notifyMe() {
@@ -71,18 +71,16 @@ function notifyMe() {
         alert('This browser does not support desktop notification');
 
     // Let's check whether notification permissions have already been granted
-    else if (Notification.permission === 'granted') {
+    else if(Notification.permission === 'granted')
         // If it's okay let's create a notification
         var notification = new Notification('Feature not available yet');
-    }
 
     // Otherwise, we need to ask the user for permission
-    else if (Notification.permission !== 'denied') {
-        Notification.requestPermission(function (permission) {
+    else if(Notification.permission !== 'denied') {
+        Notification.requestPermission(function(permission) {
             // If the user accepts, let's create a notification
-            if(permission === 'granted') {
+            if(permission === 'granted')
                 var notification = new Notification('Feature not available yet');
-            }
         });
     }
 
