@@ -151,6 +151,10 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
  * @param {GameModelManager~getGameByIdCallback} callback Called with the game or when an error occurred.
  */
 GameModelManager.prototype.getGameById = function(id, callback) {
+    // Store the current instance
+    const self = this;
+
+    // Check whether the game ID is valid
     this.isValidGameId(id, function(err, result) {
         // Call back errors
         if(err !== null) {
