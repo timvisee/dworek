@@ -40,7 +40,7 @@ router.get('/', function(req, res, next) {
 
     // Show the registration page
     res.render('register', {
-        title: 'Register'
+        title: 'Registration'
     });
 });
 
@@ -170,7 +170,7 @@ router.post('/', function(req, res, next) {
             res.render('error', {
                 title: 'Whoops!',
                 message: 'It looks like you\'ve already registered with this mail address.\n\n' +
-                'Please go to the login page to login.',
+                'Please continue to the login page.',
                 hideBackButton: true,
                 showLoginButton: true
             });
