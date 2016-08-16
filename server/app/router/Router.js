@@ -32,6 +32,7 @@ var routes = require('../route/index');
 var Core = require('../../Core');
 var PathLibrary = require('../../PathLibrary');
 var SessionValidator = require('./middleware/SessionValidator');
+var LayoutRenderer = require('../layout/LayoutRenderer');
 
 /**
  * Router class.
@@ -109,8 +110,7 @@ Router.prototype.init = function(callback) {
         // Show an error page, render the stack trace if we're in development mode
         // TODO: Enable status code again
         // res.status(err.status || 500);
-        res.render('error', {
-            title: 'Whoops!',
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
             message: '<i>You broke the interwebs!</i>\n\n' +
             'We can\'t load your page because some error occurred on our end.\n\n' +
             'The web administrators are freaking out right now, running around, bashing buttons, rebooting systems...\n\n' +
