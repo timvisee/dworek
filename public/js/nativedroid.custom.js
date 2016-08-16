@@ -20,6 +20,11 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+/**
+ * Based on NativeDroid2 source.
+ *
+ * Heavily modified by Tim Visee to suit in preferred use cases.
+ */
 
 ;(function(factory) {
 
