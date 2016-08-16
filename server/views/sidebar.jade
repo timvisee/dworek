@@ -8,12 +8,12 @@ div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fix
             .row
                 .col-xs-4.center-xs
                     .box
-                        img.profile-thumbnail(src='https://2.gravatar.com/avatar/ed1f474d23ef1e028ef377c4f638d409?s=200')
+                        img.profile-thumbnail(src=session.user.avatarUrl)
 
                 .col-xs-8
                     .box.profile-text
-                        strong #{session.user.firstName}
-                        span.subline Super Power User
+                        strong Nickname
+                        span.subline= session.user.firstName + ' ' + session.user.lastName
 
     else
         h4 Dworek

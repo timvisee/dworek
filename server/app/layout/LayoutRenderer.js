@@ -22,6 +22,7 @@
 
 var _ = require('lodash');
 var merge = require('utils-merge');
+var crypto = require('crypto');
 
 var appInfo = require('../../appInfo');
 
@@ -95,6 +96,25 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
 
             // Set the last name
             config.session.user.lastName = lastName;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the mail address
+        latch.add();
+        req.session.user.getMail(function(err, mail) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Create an MD5 of the mail address
+            var mailHash = crypto.createHash('md5').update(mail).digest('hex');
+
+            // Set the mail address, and define the avatar URL
+            config.session.user.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=200&d=mm';
 
             // Resolve the latch
             latch.resolve();
