@@ -30,15 +30,17 @@ var about = require('./about');
 var status = require('./status');
 
 var appInfo = require('../../appInfo');
+var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
 
 // Index page
 router.get('/', function(req, res, next) {
-    res.render('index', {
-        title: appInfo.APP_NAME,
+    res.render('index', LayoutOptionsBuilder.build(req, appInfo.APP_NAME, {
         hideBackButton: true,
+
+        // TODO: Move these properties to the LayoutOptionBuilder class
         loggedIn: req.session.valid,
         name: req.session.valid ? req.session.user.getIdHex() : '?'
-    });
+    }));
 });
 
 // Login page

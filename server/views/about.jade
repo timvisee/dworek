@@ -2,10 +2,10 @@ extends page
 
 block content
     div(align='center')
-        h2 #{appName}
-        p: b Version: #{appVersionName} #[sup (#{appVersionCode})]
+        h2 #{app.name}
+        p: b Version: #{app.version.name} #[sup (#{app.version.code})]
 
-        p #{appName} is developed and maintained by #[a(href='http://timvisee.com/', target='_blank', title='About Tim Visée') Tim Visée].
+        p #{app.name} is developed and maintained by #[a(href='http://timvisee.com/', target='_blank', title='About Tim Visée') Tim Visée].
 
         p The source code of this application is available on #[a(href='http://github.com/timvisee/dworek', target='_blank', title='View on GitHub') GitHub].
 

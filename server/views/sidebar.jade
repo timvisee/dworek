@@ -2,24 +2,33 @@ include base
 
 div(data-role='panel', id='leftpanel', data-display='overlay', data-position-fixed=true)
 
-    .nd2-sidepanel-profile.wow.fadeInDown
-        img.profile-background(src='//lorempixel.com/400/200/abstract/2/')
-        .row
-            .col-xs-4.center-xs
-                .box
-                    img.profile-thumbnail(src='https://2.gravatar.com/avatar/ed1f474d23ef1e028ef377c4f638d409?s=200')
+    if session && session.valid
+        .nd2-sidepanel-profile.wow.fadeInDown
+            img.profile-background(src='//lorempixel.com/400/200/abstract/2/')
+            .row
+                .col-xs-4.center-xs
+                    .box
+                        img.profile-thumbnail(src='https://2.gravatar.com/avatar/ed1f474d23ef1e028ef377c4f638d409?s=200')
 
-            .col-xs-8
-                .box.profile-text
-                    strong Tim Visée
-                    span.subline Super Power User
+                .col-xs-8
+                    .box.profile-text
+                        strong Tim Visée
+                        span.subline Super Power User
+
+    else
+        h4 Dworek
 
     ul(data-role='listview')
         li(data-role='list-divider') Pages
         li: a(href='/') Frontpage
-        li: a.clr-warning(href='/logout')
-            i.zmdi.zmdi-lock &nbsp;&nbsp;
-            span Logout
+
+        unless session && session.valid
+            li: a.clr-primary(href='/login') Login
+            li: a.clr-primary(href='/register') Register
+        else
+            li: a.clr-warning(href='/logout')
+                i.zmdi.zmdi-lock &nbsp;&nbsp;
+                span Logout
 
         //div(data-role='collapsible', data-inset=false, data-collapsed-icon='carat-d', data-expanded-icon='carat-d', data-iconpos='right')
         //    h3 Basic Elements

@@ -20,15 +20,54 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var express = require('express');
-var router = express.Router();
+var _ = require('lodash');
+var merge = require('utils-merge');
 
 var appInfo = require('../../appInfo');
-var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
 
-// About index
-router.get('/', function(req, res, next) {
-    res.render('about', LayoutOptionsBuilder.build(req, 'About'));
-});
+/**
+ * LayoutOptionsBuilder class.
+ *
+ * @class
+ * @constructor
+ */
+var LayoutOptionsBuilder = function() {};
 
-module.exports = router;
+/**
+ * Build the options for the layout.
+ *
+ * @param req Express request.
+ * @param {string|undefined} pageTitle Preferred page title.
+ * @param {Object|undefined} [options] Additional options.
+ *
+ * @return {Object} Layout options object.
+ */
+LayoutOptionsBuilder.build = function(req, pageTitle, options) {
+    // Create a base object
+    var base = {
+        app: {
+            name: appInfo.APP_NAME,
+            version: {
+                name: appInfo.VERSION_NAME,
+                code: appInfo.VERSION_CODE
+            }
+        },
+        session: {
+            valid: req.session.valid
+        }
+    };
+
+    // Make sure the options parameter is an object
+    if(!_.isObject(options))
+        options = {};
+
+    // Set the page title
+    if(pageTitle !== undefined)
+        options.title = pageTitle;
+
+    // Merge the objects, and return the result
+    return merge(base, options);
+};
+
+// Export the class
+module.exports = LayoutOptionsBuilder;

@@ -25,14 +25,13 @@ var router = express.Router();
 var os = require('os');
 
 var appInfo = require('../../appInfo');
+var LayoutOptionsBuilder = require('../layout/LayoutOptionsBuilder');
 
 // Status index
 router.get('/', function(req, res, next) {
-    res.render('status', {
-        title: 'Application Status',
-
+    res.render('status', LayoutOptionsBuilder.build(req, 'Application Status', {
         uptime: Math.round(os.uptime())
-    });
+    }));
 });
 
 module.exports = router;
