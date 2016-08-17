@@ -213,14 +213,39 @@
             });
 
             // Select First if activeTab is not set
-            if (!_self.settings.activeTab) {
-                var firstEl = el.find("li[data-tab]").first();
-                if (firstEl.length > 0) {
-                    firstEl.addClass("nd2Tabs-active");
-                    _self.settings.activeTab = firstEl.data("tab");
-                } else {
-                    _self.destroyTabs();
+            if(!_self.settings.activeTab) {
+                // Create a variable to store the tab element
+                var tabElement = undefined;
+
+                // Select the proper tab element if a tab hash is given
+                if(window.location.hash.includes('tab=')) {
+                    // Get the hash as a string, remove the hash sign
+                    var hashString = window.location.hash.substring(1);
+
+                    // Loop through the hash parts
+                    hashString.split(',').forEach(function(part) {
+                        // Make sure the part start switch the tab selector
+                        if(!part.trim().startsWith('tab='))
+                            return;
+
+                        // Get the tab selector
+                        var tabSelector = part.trim().substring(4).trim();
+
+                        // Select the tab if available
+                        tabElement = el.find('li[data-tab=' + tabSelector + ']').first();
+                    });
                 }
+
+                // Select the first available tab if no tab was selected
+                if(tabElement === undefined || tabElement.length === 0)
+                    tabElement = el.find("li[data-tab]").first();
+
+                if (tabElement.length > 0) {
+                    tabElement.addClass("nd2Tabs-active");
+                    _self.settings.activeTab = tabElement.data("tab");
+
+                } else
+                    _self.destroyTabs();
             }
 
             // Bind Swipe Event
@@ -289,6 +314,9 @@
 
             _self.settings.activeIdx = parseInt(toIdx, 10);
             _self.settings.activeTab = tabKey;
+
+            // Set the window hash
+            window.location.hash = 'tab=' + tabKey;
 
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
