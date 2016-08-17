@@ -233,11 +233,15 @@
 
                         // Select the tab if available
                         tabElement = el.find('li[data-tab=' + tabSelector + ']').first();
+
+                        // Reset the selection if the element length is zero
+                        if(tabElement.length === 0)
+                            tabElement = undefined;
                     });
                 }
 
                 // Select the first available tab if no tab was selected
-                if(tabElement === undefined || tabElement.length === 0)
+                if(tabElement === undefined)
                     tabElement = el.find("li[data-tab]").first();
 
                 if (tabElement.length > 0) {
@@ -316,8 +320,12 @@
             _self.settings.activeIdx = parseInt(toIdx, 10);
             _self.settings.activeTab = tabKey;
 
-            // Set the window hash
-            window.location.hash = 'tab=' + tabKey;
+            // Set the window hash, if it isn't the first tab
+            // TODO: Only change the tab part of the hash, not everything
+            if(_self.settings.activeIdx !==  0)
+                window.location.hash = 'tab=' + tabKey;
+            else
+                window.location.hash = '';
 
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
