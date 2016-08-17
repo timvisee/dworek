@@ -243,6 +243,7 @@
                 if (tabElement.length > 0) {
                     tabElement.addClass("nd2Tabs-active");
                     _self.settings.activeTab = tabElement.data("tab");
+                    _self.settings.activeIdx = tabElement.index();
 
                 } else
                     _self.destroyTabs();
