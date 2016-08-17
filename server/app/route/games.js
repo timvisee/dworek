@@ -23,46 +23,12 @@
 var express = require('express');
 var router = express.Router();
 
-var login = require('./login');
-var logout = require('./logout');
-var register = require('./register');
-var games = require('./games')
-var game = require('./game');
-var about = require('./about');
-var status = require('./status');
-
 var appInfo = require('../../appInfo');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 
-// Index page
+// Games list index
 router.get('/', function(req, res, next) {
-    // Show the index page if the user isn't logged in, show the dashboard if logged in
-    if(!req.session.valid)
-        LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME);
-
-    else
-        LayoutRenderer.render(req, res, next, 'dashboard', appInfo.APP_NAME);
+    LayoutRenderer.render(req, res, next, 'gamelist');
 });
-
-// Login page
-router.use('/login', login);
-
-// Logout page
-router.use('/logout', logout);
-
-// Register page
-router.use('/register', register);
-
-// Games page
-router.use('/games', games);
-
-// Game page
-router.use('/game', game);
-
-// About page
-router.use('/about', about);
-
-// Status page
-router.use('/status', status);
 
 module.exports = router;
