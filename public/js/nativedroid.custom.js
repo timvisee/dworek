@@ -194,7 +194,8 @@
             activeTab: false,
             activeIdx: 0,
             activePage: null,
-            swipe: true
+            swipe: true,
+            switching: false
         },
         _create: function() {
             var _self = this;
@@ -280,7 +281,14 @@
 
             // Bind Events
             el.on("click", ".nd2Tabs-nav-item:not('.nd2Tabs-active')", function(e) {
+                // Prevent the default action
                 e.preventDefault();
+                
+                // Make sure we aren't switching pages already
+                if(_self.settings.switching)
+                    return;
+
+                // Switch tabs
                 _self.switchTab($(this), $(this).data('tab'), $(this).closest('.nd2Tabs').find(".nd2Tabs-nav-item").index($(this)[0]));
             });
 
@@ -335,6 +343,9 @@
             _self.settings.activeTab = tabKey;
             _self.settings.activePage = $.mobile.pageContainer.pagecontainer('getActivePage').first();
 
+            // Set the switching flag
+            _self.settings.switching = true;
+
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
 
@@ -350,6 +361,11 @@
             window.setTimeout(function() {
                 newContent.removeClass("from-" + direction);
             }, 150);
+
+            // Reset the switching flag
+            window.setTimeout(function() {
+                _self.settings.switching = false;
+            }, 400);
         },
         prepareTabs: function() {
             var _self = this;
