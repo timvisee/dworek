@@ -329,13 +329,6 @@
             _self.settings.activeIdx = parseInt(toIdx, 10);
             _self.settings.activeTab = tabKey;
 
-            // Set the window hash, if it isn't the first tab
-            // TODO: Only change the tab part of the hash, not everything
-            if(_self.settings.activeIdx !==  0)
-                window.location.hash = 'tab=' + tabKey;
-            else
-                window.location.hash = '';
-
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
 
