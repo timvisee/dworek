@@ -193,6 +193,7 @@
         settings: {
             activeTab: false,
             activeIdx: 0,
+            activePage: null,
             swipe: true
         },
         _create: function() {
@@ -203,9 +204,16 @@
             });
             el.addClass("nd2Tabs");
 
+            // Reset the selected tab and index if it isn't valid for the current tab container
+            if(_self.settings.activePage != $.mobile.pageContainer.pagecontainer("getActivePage").first()) {
+                _self.settings.activeTab = false;
+                _self.settings.activeIdx = 0;
+                _self.settings.activePage = null;
+            }
+
             el.find("li[data-tab]").each(function(idx) {
                 $(this).addClass("nd2Tabs-nav-item");
-                if ($(this).data("tab-active") && !_self.settings.activeTab) {
+                if($(this).data("tab-active") && !_self.settings.activeTab) {
                     $(this).addClass("nd2Tabs-active");
                     _self.settings.activeTab = $(this).data("tab");
                     _self.settings.activeIdx = idx;
@@ -213,7 +221,7 @@
             });
 
             // Select First if activeTab is not set
-            if(!_self.settings.activeTab) {
+            if(!_self.settings.activeTab || _self.settings.activePage != $.mobile.pageContainer.pagecontainer("getActivePage").first()) {
                 // Create a variable to store the tab element
                 var tabElement = undefined;
 
@@ -248,6 +256,7 @@
                     tabElement.addClass("nd2Tabs-active");
                     _self.settings.activeTab = tabElement.data("tab");
                     _self.settings.activeIdx = tabElement.index();
+                    _self.settings.activePage = $.mobile.pageContainer.pagecontainer("getActivePage").first();
 
                 } else
                     _self.destroyTabs();
