@@ -309,22 +309,25 @@
         },
         prepareTabs: function() {
             var _self = this;
+
             var tabs = $("body").find("[data-role='nd2tab']");
-            if (tabs.length > 0) {
+
+            if(tabs.length > 0) {
                 tabs.addClass("nd2Tabs-content-tab");
                 tabs.each(function(idx) {
-                    if ($(this).data('tab') == _self.settings.activeTab) {
+                    if($(this).data('tab') == _self.settings.activeTab)
                         $(this).addClass('nd2Tab-active');
-                    }
                 });
-            } else {
+
+            } else
                 _self.destroyTabs();
-            }
         }
     });
 
     $(document).bind("pagecreate", function(e) {
         $(document).trigger("includebeforecreate");
+
+        // Configure ND2 tabs
         return $("[data-role='nd2tabs']", e.target).tabs();
     });
 
