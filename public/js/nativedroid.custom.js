@@ -213,10 +213,11 @@
 
             el.find("li[data-tab]").each(function(idx) {
                 $(this).addClass("nd2Tabs-nav-item");
-                if($(this).data("tab-active") && !_self.settings.activeTab) {
+                if($(this).data("tab-active")) {
                     $(this).addClass("nd2Tabs-active");
                     _self.settings.activeTab = $(this).data("tab");
                     _self.settings.activeIdx = idx;
+                    _self.settings.activePage = $.mobile.pageContainer.pagecontainer("getActivePage").first();
                 }
             });
 
@@ -263,7 +264,7 @@
             }
 
             // Bind Swipe Event
-            if (_self.settings.swipe) {
+            if(_self.settings.swipe) {
                 $("div[role=main]").on("swipeleft", function(event) {
                     _self.changeNavTab(true);
                 }).on("swiperight", function(event) {
@@ -272,7 +273,7 @@
             }
 
             // Waves.js
-            if (typeof Waves !== "undefined") {
+            if(typeof Waves !== "undefined") {
                 Waves.attach('.nd2Tabs-nav-item', ['waves-button', 'waves-light']);
                 Waves.init();
             }
@@ -283,10 +284,8 @@
                 _self.switchTab($(this), $(this).data('tab'), $(this).closest('.nd2Tabs').find(".nd2Tabs-nav-item").index($(this)[0]));
             });
 
-            if (_self.settings.activeTab) {
+            if(_self.settings.activeTab)
                 _self.prepareTabs();
-            }
-
         },
         _update: function() {},
         refresh: function() {
@@ -302,25 +301,31 @@
             var curidx = 0;
 
             $tabs.each(function(idx) {
-                if ($(this).hasClass("nd2Tabs-active")) {
+                if($(this).hasClass("nd2Tabs-active"))
                     curidx = idx;
-                }
             });
 
             var nextidx = 0;
-            if (left) {
+            if(left)
                 nextidx = (curidx >= len - 1) ? 0 : curidx + 1;
-            } else {
+            else
                 nextidx = (curidx <= 0) ? len - 1 : curidx - 1;
-            }
             $tabs.eq(nextidx).click();
 
         },
         switchTab: function(obj, tabKey, toIdx) {
             var _self = this;
 
-            var direction = (parseInt(toIdx, 10) > _self.settings.activeIdx) ? "right" : "left";
-            var directionTo = (parseInt(toIdx, 10) < _self.settings.activeIdx) ? "right" : "left";
+            // WORKAROUND:
+            // Get the ID of the active tab
+            var activeId = _self.settings.activeIdx;
+            this.element.find("li[data-tab].nd2Tabs-active").each(function() {
+                activeId = $(this).index();
+            });
+
+            // Determine the direction of the tab pages to move
+            var direction = (parseInt(toIdx, 10) > activeId) ? "right" : "left";
+            var directionTo = (parseInt(toIdx, 10) < activeId) ? "right" : "left";
 
             obj.parent().find(".nd2Tabs-active").removeClass("nd2Tabs-active");
 
@@ -328,6 +333,7 @@
 
             _self.settings.activeIdx = parseInt(toIdx, 10);
             _self.settings.activeTab = tabKey;
+            _self.settings.activePage = $.mobile.pageContainer.pagecontainer('getActivePage').first();
 
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
@@ -344,7 +350,6 @@
             window.setTimeout(function() {
                 newContent.removeClass("from-" + direction);
             }, 150);
-
         },
         prepareTabs: function() {
             var _self = this;
