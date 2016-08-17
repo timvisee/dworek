@@ -3,7 +3,9 @@ extends page
 block tabs
     ul(data-role='nd2tabs' data-swipe=true)
         li(data-tab='dashboard') Dashboard
-        li(data-tab='games') Games
+        li(data-tab='a') A
+        li(data-tab='b') B
+        li(data-tab='c') C
 
 block content
     div(data-role='nd2tab', data-tab='dashboard')
@@ -12,9 +14,34 @@ block content
         p Show some fancy game buttons...
 
         br
+        a.ui-btn(href='/games', title='Games') Games
+
+        br
         a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
 
-    div(data-role='nd2tab', data-tab='games')
+    div(data-role='nd2tab', data-tab='a')
+        ul(data-role='listview')
+            li(data-role='list-divider') Active games
+            li: i None
+
+            li(data-role='list-divider') Joined games
+            li: i None
+
+            li(data-role='list-divider') Open games
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
+
+    div(data-role='nd2tab', data-tab='b')
+        ul(data-role='listview')
+            li(data-role='list-divider') Active games
+            li: i None
+
+            li(data-role='list-divider') Joined games
+            li: i None
+
+            li(data-role='list-divider') Open games
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
+
+    div(data-role='nd2tab', data-tab='c')
         ul(data-role='listview')
             li(data-role='list-divider') Active games
             li: i None
