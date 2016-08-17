@@ -28,7 +28,35 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Games list index
 router.get('/', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'gamelist');
+    LayoutRenderer.render(req, res, next, 'gamelist', 'Games', {
+        games: {
+            category: null
+        }
+    });
+});
+
+router.get('/active', function(req, res, next) {
+    LayoutRenderer.render(req, res, next, 'gamelist', 'Active Games', {
+        games: {
+            category: 'Active'
+        }
+    });
+});
+
+router.get('/joined', function(req, res, next) {
+    LayoutRenderer.render(req, res, next, 'gamelist', 'Joined Games', {
+        games: {
+            category: 'Joined'
+        }
+    });
+});
+
+router.get('/open', function(req, res, next) {
+    LayoutRenderer.render(req, res, next, 'gamelist', 'Open Games', {
+        games: {
+            category: 'Open'
+        }
+    });
 });
 
 module.exports = router;

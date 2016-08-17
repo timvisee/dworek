@@ -2,11 +2,17 @@ extends page
 
 block content
     ul(data-role='listview')
-        li(data-role='list-divider') Active games
-        li: i None
+        if games.category == null
+            li(data-role='list-divider') Categories
+        else
+            li(data-role='list-divider') #{games.category} games
 
-        li(data-role='list-divider') Joined games
-        li: i None
+        if games.category == null
+            li: a(href='/games/active', data-transition='slide') Active games...
+            li: a(href='/games/joined', data-transition='slide') Joined games...
+            li: a(href='/games/open', data-transition='slide') Open games...
 
-        li(data-role='list-divider') Open games
-        li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
+        else
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
+            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
