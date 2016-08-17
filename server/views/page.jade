@@ -5,13 +5,8 @@ block page
     div(data-role='page')
         //- Page header
         div(data-role='header')
-            ////- Back button
-            //unless hideBackButton
-            //    a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
-            //        i.zmdi.zmdi-arrow-back
-
             //- Sidebar button
-            a.ui-btn.ui-btn-right.wow.fadeIn(href='#', onclick='featureNotAvailable();', data-wow-delay='0.4s')
+            a.ui-btn.ui-btn-right.wow.fadeIn(href='#optionspanel', data-wow-delay='0.4s')
                 i.zmdi.zmdi-more-vert
 
             //- Menu button
@@ -30,6 +25,29 @@ block page
         //- Page content
         div.ui-content(data-role='main')
             block content
+
+        //- Option panel
+        #optionspanel.ui-bottom-sheet-list(data-role="panel", data-animate="false", data-position='bottom', data-display="overlay")
+            .row.around-xs
+                .col-xs-auto
+                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
+                        i.zmdi.zmdi-assignment.zmd-2x
+                        strong Button A
+
+                .col-xs-auto
+                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
+                        i.zmdi.zmdi-fire.zmd-2x
+                        strong Button B
+
+                .col-xs-auto
+                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
+                        i.zmdi.zmdi-cloud-outline-alt.zmd-2x
+                        strong Button C
+
+                .col-xs-auto
+                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
+                        i.zmdi.zmdi-format-color-fill.zmd-2x
+                        strong Button D
 
         //- Page footer
         //- div(data-role='footer')
