@@ -278,7 +278,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
                 var gameNameEncoded = dataParts[1];
 
                 // Decode the game name
-                var gameName = new Buffer(gameNameEncoded).toString('utf8');
+                var gameName = unescape(gameNameEncoded);
 
                 // Create a game instance, and push it into the array
                 return games.push(
@@ -300,7 +300,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
     };
 
     // Set the results limit
-    if(options.hasOwnProperty('limit'))
+    if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
         fetchFieldOptions.limit = options.limit;
 
     // Create the projection object for MongoDB
@@ -335,7 +335,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
             games.push(game);
 
             // Encode the game name
-            var nameEncoded = new Buffer(name).toString('base64');
+            var nameEncoded = escape(name);
 
             // Add the game ID to the list
             gamesData.push(id.toString() + ',' + nameEncoded);
