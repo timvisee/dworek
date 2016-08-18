@@ -168,5 +168,59 @@ GameTeamModel.prototype.setField = function(field, value, callback) {
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
+/**
+ * Get the game.
+ *
+ * @param {GameTeamModel~getGameCallback} callback Called with the game or when an error occurred.
+ */
+GameTeamModel.prototype.getGame = function(callback) {
+    this.getField('game', callback);
+};
+
+/**
+ * Called with the game or when an error occurred.
+ *
+ * @callback GameModel~getGameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameModel} Game.
+ */
+
+/**
+ * Set the game.
+ *
+ * @param {GameModel} game Game.
+ * @param {GameTeamModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameTeamModel.prototype.setGame = function(game, callback) {
+    this.setField('game', game, callback);
+};
+
+/**
+ * Get the name of the team.
+ *
+ * @param {GameTeamModel~getNameCallback} callback Called with the name or when an error occurred.
+ */
+GameTeamModel.prototype.getName = function(callback) {
+    this.getField('name', callback);
+};
+
+/**
+ * Called with the name or when an error occurred.
+ *
+ * @callback GameModel~getNameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {String} Team name.
+ */
+
+/**
+ * Set the name of the team.
+ *
+ * @param {String} name Team name..
+ * @param {GameTeamModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameTeamModel.prototype.setName = function(name, callback) {
+    this.setField('name', name, callback);
+};
+
 // Export the user class
 module.exports = GameTeamModel;
