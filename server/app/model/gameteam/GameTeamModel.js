@@ -21,7 +21,6 @@
  ******************************************************************************/
 
 var util = require('util');
-var ObjectId = require('mongodb').ObjectId;
 
 var Core = require('../../../Core');
 var GameTeamDatabase = require('./GameTeamDatabase');
