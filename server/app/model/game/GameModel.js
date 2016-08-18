@@ -21,8 +21,9 @@
  ******************************************************************************/
 
 var util = require('util');
-
 var ObjectId = require('mongodb').ObjectId;
+
+var Core = require('../../../Core');
 var GameDatabase = require('./GameDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
@@ -63,8 +64,7 @@ var GameModel = function(id) {
                      * @param {ObjectId} id
                      * @return {UserModel} User.
                      */
-                    // TODO: Get the user from the user manager instead of instantiating it directly
-                    from: (id) => new UserModel(id),
+                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an User model to an ID.
@@ -81,8 +81,7 @@ var GameModel = function(id) {
                      * @param {String} id
                      * @return {UserModel} User.
                      */
-                    // TODO: Get the user from the user manager instead of instantiating it directly
-                    from: (id) => new UserModel(new ObjectId(id)),
+                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an User model to a hexadecimal ID.
@@ -99,8 +98,7 @@ var GameModel = function(id) {
                      * @param {String} id
                      * @return {UserModel} User.
                      */
-                    // TODO: Get the user from the user manager instead of instantiating it directly
-                    from: (id) => new UserModel(new ObjectId(id)),
+                    from: (id) => Core.model.userModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an User model to a hexadecimal ID.
