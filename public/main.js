@@ -61,7 +61,7 @@ function featureNotAvailable() {
         window.navigator.vibrate([500, 250, 500]);
 
     // Notification test
-    notifyMe();
+    //notifyMe();
 }
 
 function notifyMe() {
