@@ -187,6 +187,14 @@ GameModelManager.prototype.getGameById = function(id, callback) {
 };
 
 /**
+ * Called with the game or when an error occurred.
+ *
+ * @callback GameModelManager~getGameByIdCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Game|null} Game instance, or null if no game was found for the given ID.
+ */
+
+/**
  * Get all games for the given stage.
  *
  * @param {Number} stage Game stage value.
@@ -194,6 +202,7 @@ GameModelManager.prototype.getGameById = function(id, callback) {
  * @param {Number|undefined} [options.limit=3] Number of results to limit on, undefined to disable result limitation.
  * @param {GameModelManager~getGamesWithStageCallback} callback Called with the result or when an error occurred.
  */
+// TODO: Add option to fetch game names along with this database query (for performance)
 GameModelManager.prototype.getGamesWithStage = function(stage, options, callback) {
     // Create an object with the default options
     const defaultOptions = {
