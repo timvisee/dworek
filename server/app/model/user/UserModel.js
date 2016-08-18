@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var util = require('util');
+
 var UserDatabase = require('./UserDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');

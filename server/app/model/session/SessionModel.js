@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var util = require('util');
+
 var Core = require('../../../Core');
 var SessionDatabase = require('./SessionDatabase');
 var BaseModel = require('../../db/BaseModel');
