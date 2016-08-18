@@ -247,6 +247,33 @@ GameModel.prototype.setName = function(name, callback) {
 };
 
 /**
+ * Get the stage of the game.
+ *
+ * @param {GameModel~getStageCallback} callback Called with the game stage or when an error occurred.
+ */
+GameModel.prototype.getStage = function(callback) {
+    this.getField('stage', callback);
+};
+
+/**
+ * Called with the game stage or when an error occurred.
+ *
+ * @callback GameModel~getStageCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Game stage.
+ */
+
+/**
+ * Set the stage of the game.
+ *
+ * @param {Number} stage Game stage.
+ * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameModel.prototype.setStage = function(stage, callback) {
+    this.setField('stage', stage, callback);
+};
+
+/**
  * Get the date this game was created on.
  *
  * @param {GameModel~getCreateDateCallback} callback Called with the creation date or when an error occurred.
