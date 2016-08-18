@@ -64,6 +64,13 @@ Core.model.gameModelManager = null;
 Core.model.gameTeamModelManager = null;
 
 /**
+ * Game user model manager.
+ *
+ * @type {GameUserModelManager|null} Game user model manager, or null if it isn't instantiated yet.
+ */
+Core.model.gameUserModelManager = null;
+
+/**
  * Express app instance.
  *
  * @type {*} Express app.

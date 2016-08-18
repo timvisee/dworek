@@ -33,6 +33,7 @@ var UserModelManager = require('./app/model/user/UserModelManager');
 var SessionModelManager = require('./app/model/session/SessionModelManager');
 var GameModelManager = require('./app/model/game/GameModelManager');
 var GameTeamModelManager = require('./app/model/gameteam/GameTeamModelManager');
+var GameUserModelManager = require('./app/model/gameuser/GameUserModelManager');
 
 /**
  * Constructor.
