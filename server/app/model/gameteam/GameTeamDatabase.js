@@ -54,6 +54,7 @@ GameTeamDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback
 
     // Set the callback parameter if the options parameter was left out
     if(_.isFunction(options)) {
+        //noinspection JSValidateTypes
         callback = options;
         options = {};
     }
@@ -74,6 +75,7 @@ GameTeamDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback
     }
 
     // Limit the results
+    //noinspection JSValidateTypes
     if(options.hasOwnProperty('limit') && options.limit !== undefined)
         findQuery = findQuery.limit(options.limit);
 
