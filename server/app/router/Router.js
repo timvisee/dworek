@@ -122,6 +122,9 @@ Router.prototype.init = function(callback) {
                 stack: err.stack
             }
         });
+
+        // Print the error message to the console
+        console.error(err.stack);
     });
 
     // Show a status message
