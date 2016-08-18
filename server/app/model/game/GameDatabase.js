@@ -74,7 +74,7 @@ GameDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback) {
     }
 
     // Limit the results
-    if(options.hasOwnProperty('limit'))
+    if(options.hasOwnProperty('limit') && options.limit !== undefined)
         findQuery = findQuery.limit(options.limit);
 
     // Convert the results into an array and call back
