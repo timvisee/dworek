@@ -21,6 +21,8 @@
  ******************************************************************************/
 
 var ObjectId = require('mongodb').ObjectId;
+var _ = require('lodash');
+var merge = require('utils-merge');
 
 var config = require('../../../config');
 
@@ -145,6 +147,23 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
  */
 
 /**
+ * Check whether the given game stage value is valid.
+ * The value must be a number, and must equal to one of the game stage values.
+ *
+ * @param {*} stage Game state value to test.
+ *
+ * @return {boolean} True if the game stage value is valid, false if not.
+ */
+GameModelManager.prototype.isValidStage = function(stage) {
+    // Make sure the stage is a number
+    if(!_.isNumber(stage))
+        return false;
+
+    // Make sure the number is in-bound
+    return stage >= 0 && stage <= 2;
+};
+
+/**
  * Get a game by it's game ID.
  *
  * @param {ObjectId|string} id The game ID.
@@ -168,11 +187,148 @@ GameModelManager.prototype.getGameById = function(id, callback) {
 };
 
 /**
- * Called with the game or when an error occurred.
+ * Get all games for the given stage.
  *
- * @callback GameModelManager~getGameByIdCallback
+ * @param {Number} stage Game stage value.
+ * @param {Object} [options] Options object for additional configurations.
+ * @param {Number|undefined} [options.limit=3] Number of results to limit on, undefined to disable result limitation.
+ * @param {GameModelManager~getGamesWithStageCallback} callback Called with the result or when an error occurred.
+ */
+GameModelManager.prototype.getGamesWithStage = function(stage, options, callback) {
+    // Create an object with the default options
+    const defaultOptions = {
+        limit: 3
+    };
+
+    // Make sure the game stage value is valid, call back if not
+    if(!this.isValidStage(stage)) {
+        callback(new Error('Invalid game stage value.'));
+        return;
+    }
+
+    // Set the callback parameter if the options parameter is left out
+    if(_.isFunction(options)) {
+        // Set the callback parameter and set the options to the default
+        //noinspection JSValidateTypes
+        callback = options;
+        options = {};
+    }
+
+    // Set the options to an empty object if it's undefined
+    if(options === undefined)
+        options = {};
+
+    // Merge the options
+    options = merge(options, defaultOptions);
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Store the current instance
+    const self = this;
+
+    // Determine the Redis cache key for this function
+    const redisCacheKey = 'model:game:gamesWithStage' + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+
+    // Check whether the game is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while listing games, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null, zero or an empty string
+            if(result === undefined || result === null) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Split the string by commas
+            var gameIds = result.split(',');
+
+            // Create an array of games
+            var games = [];
+
+            // Loop through the game ID's to construct game instances
+            gameIds.forEach((gameId) => games.push(self._instanceManager.create(gameId)));
+
+            // Call back the list of games
+            callback(null, games);
+        });
+    }
+
+    // Create the fetch field options object
+    var fetchFieldOptions = {
+        sortField: 'create_date',
+        sortAscending: false
+    };
+
+    // Set the results limit
+    if(options.hasOwnProperty('limit'))
+        fetchFieldOptions.limit = options.limit;
+
+    // Query the database and check whether the game is valid
+    GameDatabase.layerFetchFieldsFromDatabase({stage}, {_id: true}, options, function(err, data) {
+        // Call back errors
+        if(err !== null && err !== undefined) {
+            // Encapsulate the error and call back
+            callback(new Error(err));
+            return;
+        }
+
+        // Create an array of game instances and game IDs
+        var games = [];
+        var gameIds = [];
+
+        // Loop through the data array
+        data.forEach(function(gameData) {
+            // Get the game ID
+            var id = gameData._id;
+
+            // Create a game instance and add it to the array
+            games.push(self._instanceManager.create(id));
+
+            // Add the game ID to the list
+            gameIds.push(id.toString());
+        });
+
+        // Call back with the result
+        callback(null, games);
+
+        // Store the result in Redis if ready
+        if(RedisUtils.isReady()) {
+            // Create a comma separated string for the list of game IDs
+            var gameIdsString = gameIds.join(',');
+
+            // Store the results
+            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameIdsString, function(err) {
+                // Show a warning on error
+                if(err !== null && err !== undefined) {
+                    console.error('A Redis error occurred while storing game list data, ignoring.')
+                    console.error(new Error(err));
+                }
+            });
+        }
+    });
+};
+
+/**
+ * Called with a list of games or when an error occurred.
+ *
+ * @callback GameModelManager~getGamesWithStageCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Game|null} Game instance, or null if no game was found for the given ID.
+ * @param {Array=} Array of games. The array may be empty of no results were fetched for the given query.
  */
 
 // Return the created class
