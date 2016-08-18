@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
+
 var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
@@ -39,14 +41,44 @@ GameDatabase.DB_COLLECTION_NAME = 'game';
  *
  * @param a First find parameter.
  * @param b Second find parameter.
+ * @param {Object} [options] Additional options.
+ * @param {Number} [options.limit] Number of items to limit the result to.
+ * @param {string} [options.sortField=] Field to sort on.
+ * @param {boolean} [options.sortAscending=true] True to sort in ascending order, false to sort in descending order.
  * @param {function} callback (err, data) Callback.
  */
-GameDatabase.layerFetchFieldsFromDatabase = function(a, b, callback) {
+// TODO: Copy this updated function to other Model Database instances too
+GameDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback) {
     // Get the database instance
     var db = MongoUtil.getConnection();
 
-    // Return some user data
-    db.collection(GameDatabase.DB_COLLECTION_NAME).find(a, b).toArray(callback);
+    // Set the callback parameter if the options parameter was left out
+    if(_.isFunction(options)) {
+        callback = options;
+        options = {};
+    }
+
+    // Create the find query
+    var findQuery = db.collection(GameDatabase.DB_COLLECTION_NAME).find(a, b);
+
+    // Sort the results
+    if(options.hasOwnProperty('sortField')) {
+        // TODO: Translate the field name to MongoDB
+
+        // Set the sorting order property if not set
+        if(!options.hasOwnProperty('sortAscending'))
+            options.sortAscending = true;
+
+        // Sort
+        findQuery = findQuery.sort(options.sortField, options.sortAscending ? 1 : -1);
+    }
+
+    // Limit the results
+    if(options.hasOwnProperty('limit'))
+        findQuery = findQuery.limit(options.limit);
+
+    // Convert the results into an array and call back
+    findQuery.toArray(callback);
 };
 
 // Export the user database module
