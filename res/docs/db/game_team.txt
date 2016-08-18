@@ -1,4 +1,4 @@
-# team
+# game_team
 # This collection all teams for all games.
 
 # TODO: Not finished.
