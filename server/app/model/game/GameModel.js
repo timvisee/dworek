@@ -107,6 +107,7 @@ var GameModel = function(id) {
                     to: (user) => user.getIdHex()
                 }
             },
+            name: {},
             stage: {
                 redis: {
                     /**
