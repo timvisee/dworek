@@ -32,6 +32,7 @@ var PathLibrary = require('./PathLibrary');
 var UserModelManager = require('./app/model/user/UserModelManager');
 var SessionModelManager = require('./app/model/session/SessionModelManager');
 var GameModelManager = require('./app/model/game/GameModelManager');
+var GameTeamModelManager = require('./app/model/gameteam/GameTeamModelManager');
 
 /**
  * Constructor.
@@ -213,6 +214,7 @@ App.prototype._initModelManagers = function(callback) {
     Core.model.userModelManager = new UserModelManager();
     Core.model.sessionModelManager = new SessionModelManager();
     Core.model.gameModelManager = new GameModelManager();
+    Core.model.gameTeamModelManager = new GameTeamModelManager();
 
     // Call back
     if(callback !== undefined)
