@@ -1,0 +1,10 @@
+# team
+# This collection all teams for all games.
+
+# TODO: Not finished.
+
+_id : ID                Team ID.
+game_id : ID            Game ID this team is for.
+name : String           Team name.
+
+# TODO: Should we add a team color field?
