@@ -47,32 +47,32 @@ router.get('/', function(req, res, next) {
     latch.add();
     latch.add();
     latch.add();
-    Core.model.gameModelManager.getGamesCountWithStage(0, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(0, function(err, gameCount) {
         // Call back errors
         if(err !== null)
             next(err);
         else
-            options.games.openCount = games.length;
+            options.games.openCount = gameCount;
 
         // Resolve the latch
         latch.resolve();
     });
-    Core.model.gameModelManager.getGamesCountWithStage(1, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(1, function(err, gameCount) {
         // Call back errors
         if(err !== null)
             next(err);
         else
-            options.games.activeCount = games.length;
+            options.games.activeCount = gameCount;
 
         // Resolve the latch
         latch.resolve();
     });
-    Core.model.gameModelManager.getGamesCountWithStage(2, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(2, function(err, gameCount) {
         // Call back errors
         if(err !== null)
             next(err);
         else
-            options.games.finishedCount = games.length;
+            options.games.finishedCount = gameCount;
 
         // Resolve the latch
         latch.resolve();
