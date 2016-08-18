@@ -475,7 +475,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
                 RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gamesCount.toString(), function(err) {
                     // Show a warning on error
                     if(err !== null && err !== undefined) {
-                        console.error('A Redis error occurred while storing game list data, ignoring.')
+                        console.error('A Redis error occurred while storing game list data, ignoring.');
                         console.error(new Error(err));
                     }
                 });
