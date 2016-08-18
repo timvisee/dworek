@@ -47,7 +47,7 @@ router.get('/', function(req, res, next) {
     latch.add();
     latch.add();
     latch.add();
-    getGameList(0, undefined, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(0, function(err, games) {
         // Call back errors
         if(err !== null)
             next(err);
@@ -57,7 +57,7 @@ router.get('/', function(req, res, next) {
         // Resolve the latch
         latch.resolve();
     });
-    getGameList(1, undefined, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(1, function(err, games) {
         // Call back errors
         if(err !== null)
             next(err);
@@ -67,7 +67,7 @@ router.get('/', function(req, res, next) {
         // Resolve the latch
         latch.resolve();
     });
-    getGameList(2, undefined, function(err, games) {
+    Core.model.gameModelManager.getGamesCountWithStage(2, function(err, games) {
         // Call back errors
         if(err !== null)
             next(err);
