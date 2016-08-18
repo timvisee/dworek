@@ -24,7 +24,9 @@ var express = require('express');
 var router = express.Router();
 
 var appInfo = require('../../appInfo');
+var Core = require('../../Core');
 var LayoutRenderer = require('../layout/LayoutRenderer');
+var CallbackLatch = require('../util/CallbackLatch');
 
 // Games list index
 router.get('/', function(req, res, next) {
@@ -35,28 +37,89 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/active', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'gamelist', 'Active Games', {
-        games: {
-            category: 'Active'
-        }
-    });
-});
-
-router.get('/joined', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'gamelist', 'Joined Games', {
-        games: {
-            category: 'Joined'
-        }
-    });
-});
-
 router.get('/open', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'gamelist', 'Open Games', {
-        games: {
-            category: 'Open'
-        }
-    });
+    renderGameList(req, res, next, 0, 'Open', 'Open games');
 });
+
+router.get('/active', function(req, res, next) {
+    renderGameList(req, res, next, 1, 'Active', 'Active games');
+});
+
+router.get('/finished', function(req, res, next) {
+    renderGameList(req, res, next, 2, 'Finished', 'Finished games');
+});
+
+/**
+ * Render a list of games.
+ *
+ * @param req Express request.
+ * @param res Express response.
+ * @param next Express next callback.
+ * @param {Number} stage Game stage.
+ * @param {string} category Game category name.
+ * @param {string} pageTitle Page title.
+ */
+function renderGameList(req, res, next, stage, category, pageTitle) {
+    // Create a list of usable game objects to use for rendering
+    var gameObjects = [];
+
+    // Create a callback latch to determine whether to start rendering the layout
+    var latch = new CallbackLatch();
+
+    // Get the list of active games
+    latch.add();
+    Core.model.gameModelManager.getGamesWithStage(stage, {
+        limit: undefined
+    }, function(err, games) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Fill the list of game objects
+        games.forEach(function(game) {
+            // Add a callback latch for this entry
+            latch.add();
+
+            // Create a dummy game object
+            var gameObject = {
+                id: game.getIdHex(),
+                name: null
+            };
+
+            // Get the game name and put it in the object
+            game.getName(function(err, name) {
+                // Call back errors
+                if(err !== null) {
+                    next(err);
+                    return;
+                }
+
+                // Set the name
+                gameObject.name = name;
+
+                // Add the game object to the list
+                gameObjects.push(gameObject);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the games page
+    latch.then(function() {
+        LayoutRenderer.render(req, res, next, 'gamelist', pageTitle, {
+            games: {
+                category: category,
+                games: gameObjects
+            }
+        });
+    });
+}
 
 module.exports = router;

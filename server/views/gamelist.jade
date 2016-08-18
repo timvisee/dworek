@@ -10,15 +10,15 @@ block content
         if games.category == null
             li: a(href='/games/active', data-transition='slide') Active games...
                 span.ui-li-count() 0
-            li: a(href='/games/joined', data-transition='slide') Joined games...
-                span.ui-li-count() 0
             li: a(href='/games/open', data-transition='slide') Open games...
                 span.ui-li-count() 1
+            li: a(href='/games/finished', data-transition='slide') Finished games...
+                span.ui-li-count() 0
 
         else
-            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
-                span.ui-li-count() 1 player
-            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
-                span.ui-li-count() 2 players
-            li: a(href='/game/57b344a1620432f8bb1a07c0') TestGame
-                span.ui-li-count() 3 players
+            if games.games.length > 0
+                each game in games.games
+                    li: a(href='/game/#{game.id}')= game.name
+                        span.ui-li-count() 0 players
+            else
+                li: i No games in this category...
