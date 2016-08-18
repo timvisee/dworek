@@ -30,23 +30,70 @@ var CallbackLatch = require('../util/CallbackLatch');
 
 // Games list index
 router.get('/', function(req, res, next) {
-    LayoutRenderer.render(req, res, next, 'gamelist', 'Games', {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create an object with layout options
+    var options = {
         games: {
-            category: null
+            category: null,
+            openCount: 0,
+            activeCount: 0,
+            finishedCount: 0
         }
+    };
+
+    // Count the games
+    latch.add();
+    latch.add();
+    latch.add();
+    getGameList(0, undefined, function(err, games) {
+        // Call back errors
+        if(err !== null)
+            next(err);
+        else
+            options.games.openCount = games.length;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+    getGameList(1, undefined, function(err, games) {
+        // Call back errors
+        if(err !== null)
+            next(err);
+        else
+            options.games.activeCount = games.length;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+    getGameList(2, undefined, function(err, games) {
+        // Call back errors
+        if(err !== null)
+            next(err);
+        else
+            options.games.finishedCount = games.length;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the games page
+    latch.then(function() {
+        LayoutRenderer.render(req, res, next, 'gamelist', 'Games', options);
     });
 });
 
 router.get('/open', function(req, res, next) {
-    renderGameList(req, res, next, 0, 'Open', 'Open games');
+    renderGameList(req, res, next, 0, undefined, 'Open', 'Open games');
 });
 
 router.get('/active', function(req, res, next) {
-    renderGameList(req, res, next, 1, 'Active', 'Active games');
+    renderGameList(req, res, next, 1, undefined, 'Active', 'Active games');
 });
 
 router.get('/finished', function(req, res, next) {
-    renderGameList(req, res, next, 2, 'Finished', 'Finished games');
+    renderGameList(req, res, next, 2, undefined, 'Finished', 'Finished games');
 });
 
 /**
@@ -56,10 +103,37 @@ router.get('/finished', function(req, res, next) {
  * @param res Express response.
  * @param next Express next callback.
  * @param {Number} stage Game stage.
+ * @param {Number|undefined} limit Limit of games to fetch, undefined to fetch all.
  * @param {string} category Game category name.
  * @param {string} pageTitle Page title.
  */
-function renderGameList(req, res, next, stage, category, pageTitle) {
+function renderGameList(req, res, next, stage, limit, category, pageTitle) {
+    // Get a list of game objects
+    getGameList(stage, limit, function(err, games) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Render the games page
+        LayoutRenderer.render(req, res, next, 'gamelist', pageTitle, {
+            games: {
+                category: category,
+                games: games
+            }
+        });
+    });
+}
+
+/**
+ * Get the game list.
+ *
+ * @param {Number} stage Game stage.
+ * @param {Number|undefined} limit Limit of games to fetch, undefined to fetch all.
+ * @param {function} callback Callback(err, games)
+ */
+function getGameList(stage, limit, callback) {
     // Create a list of usable game objects to use for rendering
     var gameObjects = [];
 
@@ -69,11 +143,11 @@ function renderGameList(req, res, next, stage, category, pageTitle) {
     // Get the list of active games
     latch.add();
     Core.model.gameModelManager.getGamesWithStage(stage, {
-        limit: undefined
+        limit
     }, function(err, games) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            callback(err);
             return;
         }
 
@@ -92,7 +166,7 @@ function renderGameList(req, res, next, stage, category, pageTitle) {
             game.getName(function(err, name) {
                 // Call back errors
                 if(err !== null) {
-                    next(err);
+                    callback(err);
                     return;
                 }
 
@@ -111,14 +185,9 @@ function renderGameList(req, res, next, stage, category, pageTitle) {
         latch.resolve();
     });
 
-    // Render the games page
+    // Call back the list
     latch.then(function() {
-        LayoutRenderer.render(req, res, next, 'gamelist', pageTitle, {
-            games: {
-                category: category,
-                games: gameObjects
-            }
-        });
+        callback(null, gameObjects);
     });
 }
 
