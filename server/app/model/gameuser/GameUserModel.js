@@ -26,8 +26,6 @@ var Core = require('../../../Core');
 var GameUserDatabase = require('./GameUserDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
-var UserModel = require('../user/UserModel');
-var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
  * GameUserModel class.
@@ -156,7 +154,7 @@ var GameUserModel = function(id) {
                      * @param {ObjectId} id
                      * @return {GameTeamModel} Game Team.
                      */
-                    from: (id) => Core.model.teamModelManager._instanceManager.create(id),
+                    from: (id) => Core.model.gameTeamModelManager._instanceManager.create(id),
 
                     /**
                      * Convert an Game Team model to an ID.
@@ -279,6 +277,142 @@ GameUserModel.prototype.setField = function(field, value, callback) {
  * @callback GameModel~setFieldCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
+
+/**
+ * Get the game.
+ *
+ * @param {GameUserModel~getGameCallback} callback Called with the game or when an error occurred.
+ */
+GameUserModel.prototype.getGame = function(callback) {
+    this.getField('game', callback);
+};
+
+/**
+ * Called with the game or when an error occurred.
+ *
+ * @callback GameModel~getGameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameModel} Game.
+ */
+
+/**
+ * Set the game.
+ *
+ * @param {GameModel} game Game.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setGame = function(game, callback) {
+    this.setField('game', game, callback);
+};
+
+/**
+ * Get the user.
+ *
+ * @param {GameUserModel~getUserCallback} callback Called with the user or when an error occurred.
+ */
+GameUserModel.prototype.getUser = function(callback) {
+    this.getField('user', callback);
+};
+
+/**
+ * Called with the user or when an error occurred.
+ *
+ * @callback UserModel~getUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {UserModel} User.
+ */
+
+/**
+ * Set the user.
+ *
+ * @param {UserModel} user User.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setUser = function(user, callback) {
+    this.setField('user', user, callback);
+};
+
+/**
+ * Get the team.
+ *
+ * @param {GameTeamModel~getTeamCallback} callback Called with the team or when an error occurred.
+ */
+GameUserModel.prototype.getTeam = function(callback) {
+    this.getField('team', callback);
+};
+
+/**
+ * Called with the team or when an error occurred.
+ *
+ * @callback TeamModel~getTeamCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameTeamModel} Team.
+ */
+
+/**
+ * Set the team.
+ *
+ * @param {GameTeamModel} team Team.
+ * @param {GameTeamModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setTeam = function(team, callback) {
+    this.setField('team', team, callback);
+};
+
+/**
+ * Check whether the user is a spectator.
+ *
+ * @param {GameUserModel~isSpectatorCallback} callback Called with result or when an error occurred.
+ */
+GameUserModel.prototype.isSpectator = function(callback) {
+    this.getField('is_spectator', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~isSpectatorCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the user is a spectator, false if not.
+ */
+
+/**
+ * Set whether the user is a spectator.
+ *
+ * @param {boolean} isSpectator True if the user is a spectator, false if not.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setName = function(isSpectator, callback) {
+    this.setField('is_spectator', isSpectator, callback);
+};
+
+/**
+ * Check whether the user is a special user.
+ *
+ * @param {GameUserModel~isSpecialCallback} callback Called with result or when an error occurred.
+ */
+GameUserModel.prototype.isSpecial = function(callback) {
+    this.getField('is_special', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~isSpecialCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the user is a special user, false if not.
+ */
+
+/**
+ * Set whether the user is a special user.
+ *
+ * @param {boolean} isSpecial True if the user is a special user, false if not.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setName = function(isSpecial, callback) {
+    this.setField('is_special', isSpecial, callback);
+};
+
 
 // Export the user class
 module.exports = GameUserModel;
