@@ -28,7 +28,10 @@ var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
 var ConversionFunctions = require('../../db/ConversionFunctions');
 
 /**
- * Constructor.
+ * SessionModel class.
+ *
+ * @class
+ * @constructor
  *
  * @param {ObjectId} id Session ID object.
  *
