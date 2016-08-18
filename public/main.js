@@ -38,7 +38,6 @@ $(document).bind("pageinit", function() {
         return;
 
     // Build the page
-    console.log('Building page...');
     nativeDroid.build();
 });
 

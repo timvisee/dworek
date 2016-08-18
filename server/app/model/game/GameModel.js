@@ -107,7 +107,26 @@ var GameModel = function(id) {
                     to: (user) => user.getIdHex()
                 }
             },
-            name: {},
+            stage: {
+                redis: {
+                    /**
+                     * Convert the stage number from a string to an integer.
+                     *
+                     * @param {string} stage Stage string.
+                     * @return {Number} Stage number.
+                     */
+                    from: (stage) => parseInt(stage, 10),
+
+                    /**
+                     * Convert the stage number to a string.
+                     *
+                     * @param {Number} stage Stage number.
+                     *
+                     * @return {string} Stage number as a string.
+                     */
+                    to: (stage) => stage.toString()
+                }
+            },
             create_date: {
                 redis: {
                     from: ConversionFunctions.dateFromRedis,
