@@ -372,5 +372,125 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
  * @param {Array=} Array of games. The array may be empty of no results were fetched for the given query.
  */
 
+/**
+ * Get the number of games with the given stage.
+ *
+ * @param {Number} stage Game stage value.
+ * @param {Object} [options] Options object for additional configurations.
+ * @param {Number|undefined} [options.limit=] Number of results to limit on, undefined to disable result limitation.
+ * @param {GameModelManager~getGamesCountWithStageCallback} callback Called with the result or when an error occurred.
+ */
+GameModelManager.prototype.getGamesCountWithStage = function(stage, options, callback) {
+    // Create an object with the default options
+    const defaultOptions = {
+        limit: undefined
+    };
+
+    // Make sure the game stage value is valid, call back if not
+    if(!this.isValidStage(stage)) {
+        callback(new Error('Invalid game stage value.'));
+        return;
+    }
+
+    // Set the callback parameter if the options parameter is left out
+    if(_.isFunction(options)) {
+        // Set the callback parameter and set the options to the default
+        //noinspection JSValidateTypes
+        callback = options;
+        options = {};
+    }
+
+    // Set the options to an empty object if it's undefined
+    if(options === undefined)
+        options = {};
+
+    // Merge the options
+    options = merge(options, defaultOptions);
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Store the current instance
+    const self = this;
+
+    // Determine the Redis cache key for this function
+    const redisCacheKey = 'model:game:gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+
+    // Check whether the game is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while listing games, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null, zero or an empty string
+            if(result === undefined || result === null) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Call back the number of games
+            callback(null, parseInt(result, 10));
+        });
+    }
+
+    // Fetch the result from MongoDB when done with Redis
+    latch.then(function() {
+        // Create the fetch field options object
+        var fetchFieldOptions = {};
+
+        // Set the results limit
+        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
+            fetchFieldOptions.limit = options.limit;
+
+        // Query the database and check whether the game is valid
+        GameDatabase.layerFetchFieldsFromDatabase({stage}, {_id: true}, options, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err));
+                return;
+            }
+
+            // Get the games count
+            var gamesCount = data.length;
+
+            // Call back with the games count
+            callback(null, gamesCount);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gamesCount.toString(), function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred while storing game list data, ignoring.')
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Called with the number of games or when an error occurred.
+ *
+ * @callback GameModelManager~getGamesCountWithStageCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Number of games.
+ */
+
 // Return the created class
 module.exports = GameModelManager;
