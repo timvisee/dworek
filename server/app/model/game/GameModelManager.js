@@ -236,7 +236,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
     const self = this;
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:game:gamesWithStage' + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+    const redisCacheKey = 'model:game:gamesWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -263,7 +263,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
             }
 
             // Split the string by commas
-            var gameData = result.split(';');
+            var gameData = (result.length > 0) ? result.split(';') : [];
 
             // Create an array of games
             var games = [];
@@ -293,71 +293,74 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         });
     }
 
-    // Create the fetch field options object
-    var fetchFieldOptions = {
-        sortField: 'create_date',
-        sortAscending: false
-    };
+    // Fetch the result from MongoDB when done with Redis
+    latch.then(function() {
+        // Create the fetch field options object
+        var fetchFieldOptions = {
+            sortField: 'create_date',
+            sortAscending: false
+        };
 
-    // Set the results limit
-    if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
-        fetchFieldOptions.limit = options.limit;
+        // Set the results limit
+        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
+            fetchFieldOptions.limit = options.limit;
 
-    // Create the projection object for MongoDB
-    const projectionObject = {
-        _id: true,
-        name: true
-    };
+        // Create the projection object for MongoDB
+        const projectionObject = {
+            _id: true,
+            name: true
+        };
 
-    // Query the database and check whether the game is valid
-    GameDatabase.layerFetchFieldsFromDatabase({stage}, projectionObject, options, function(err, data) {
-        // Call back errors
-        if(err !== null && err !== undefined) {
-            // Encapsulate the error and call back
-            callback(new Error(err));
-            return;
-        }
+        // Query the database and check whether the game is valid
+        GameDatabase.layerFetchFieldsFromDatabase({stage}, projectionObject, options, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err));
+                return;
+            }
 
-        // Create an array of game instances and game data as a string
-        var games = [];
-        var gamesData = [];
+            // Create an array of game instances and game data as a string
+            var games = [];
+            var gamesData = [];
 
-        // Loop through the data array
-        data.forEach(function(gameData) {
-            // Get the game ID and name
-            var id = gameData._id;
-            var name = gameData.name;
+            // Loop through the data array
+            data.forEach(function(gameData) {
+                // Get the game ID and name
+                var id = gameData._id;
+                var name = gameData.name;
 
-            // Create a game instance
-            var game = self._instanceManager.create(id, {name});
+                // Create a game instance
+                var game = self._instanceManager.create(id, {name});
 
-            // Create a game instance and add it to the array
-            games.push(game);
+                // Create a game instance and add it to the array
+                games.push(game);
 
-            // Encode the game name
-            var nameEncoded = escape(name);
+                // Encode the game name
+                var nameEncoded = escape(name);
 
-            // Add the game ID to the list
-            gamesData.push(id.toString() + ',' + nameEncoded);
-        });
-
-        // Call back with the result
-        callback(null, games);
-
-        // Store the result in Redis if ready
-        if(RedisUtils.isReady()) {
-            // Create a comma separated string for the list of game IDs
-            var gameIdsString = gamesData.join(';');
-
-            // Store the results
-            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameIdsString, function(err) {
-                // Show a warning on error
-                if(err !== null && err !== undefined) {
-                    console.error('A Redis error occurred while storing game list data, ignoring.')
-                    console.error(new Error(err));
-                }
+                // Add the game ID to the list
+                gamesData.push(id.toString() + ',' + nameEncoded);
             });
-        }
+
+            // Call back with the result
+            callback(null, games);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Create a comma separated string for the list of game IDs
+                var gameIdsString = gamesData.join(';');
+
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameIdsString, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred while storing game list data, ignoring.')
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
     });
 };
 
