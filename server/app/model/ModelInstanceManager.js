@@ -53,9 +53,10 @@ var ModelInstanceManager = function(modelConstructor) {
  * Create a new model instance for the given model object ID.
  *
  * @param {ObjectId|String} id Object ID.
+ * @param {Object} [localCache] Object with fields and values to cache locally, which greatly benefits performance.
  * @return {Object} Model object instance.
  */
-ModelInstanceManager.prototype.create = function(id) {
+ModelInstanceManager.prototype.create = function(id, localCache) {
     // Parse the ID
     id = this._parseId(id);
 
@@ -65,6 +66,10 @@ ModelInstanceManager.prototype.create = function(id) {
 
     // Create a new model instance
     var model = new this._modelConstructor(new ObjectId(id));
+
+    // Add local cache if configured
+    if(localCache !== undefined && _.isObject(localCache))
+        model._baseModel.cacheSetFields(localCache);
 
     // Put the object in the instances map
     this._instances.set(id, model);
