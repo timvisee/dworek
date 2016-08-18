@@ -202,7 +202,6 @@ GameModelManager.prototype.getGameById = function(id, callback) {
  * @param {Number|undefined} [options.limit=3] Number of results to limit on, undefined to disable result limitation.
  * @param {GameModelManager~getGamesWithStageCallback} callback Called with the result or when an error occurred.
  */
-// TODO: Add option to fetch game names along with this database query (for performance)
 GameModelManager.prototype.getGamesWithStage = function(stage, options, callback) {
     // Create an object with the default options
     const defaultOptions = {
@@ -264,13 +263,30 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
             }
 
             // Split the string by commas
-            var gameIds = result.split(',');
+            var gameData = result.split(';');
 
             // Create an array of games
             var games = [];
 
             // Loop through the game ID's to construct game instances
-            gameIds.forEach((gameId) => games.push(self._instanceManager.create(gameId)));
+            gameData.forEach(function(data) {
+                // Split the data parts
+                var dataParts = data.split(',');
+
+                // Get the game ID and encoded name
+                var gameId = dataParts[0];
+                var gameNameEncoded = dataParts[1];
+
+                // Decode the game name
+                var gameName = new Buffer(gameNameEncoded).toString('utf8');
+
+                // Create a game instance, and push it into the array
+                return games.push(
+                    self._instanceManager.create(gameId, {
+                        name: gameName
+                    })
+                );
+            });
 
             // Call back the list of games
             callback(null, games);
@@ -287,8 +303,14 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
     if(options.hasOwnProperty('limit'))
         fetchFieldOptions.limit = options.limit;
 
+    // Create the projection object for MongoDB
+    const projectionObject = {
+        _id: true,
+        name: true
+    };
+
     // Query the database and check whether the game is valid
-    GameDatabase.layerFetchFieldsFromDatabase({stage}, {_id: true}, options, function(err, data) {
+    GameDatabase.layerFetchFieldsFromDatabase({stage}, projectionObject, options, function(err, data) {
         // Call back errors
         if(err !== null && err !== undefined) {
             // Encapsulate the error and call back
@@ -296,20 +318,27 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
             return;
         }
 
-        // Create an array of game instances and game IDs
+        // Create an array of game instances and game data as a string
         var games = [];
-        var gameIds = [];
+        var gamesData = [];
 
         // Loop through the data array
         data.forEach(function(gameData) {
-            // Get the game ID
+            // Get the game ID and name
             var id = gameData._id;
+            var name = gameData.name;
+
+            // Create a game instance
+            var game = self._instanceManager.create(id, {name});
 
             // Create a game instance and add it to the array
-            games.push(self._instanceManager.create(id));
+            games.push(game);
+
+            // Encode the game name
+            var nameEncoded = new Buffer(name).toString('base64');
 
             // Add the game ID to the list
-            gameIds.push(id.toString());
+            gamesData.push(id.toString() + ',' + nameEncoded);
         });
 
         // Call back with the result
@@ -318,7 +347,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         // Store the result in Redis if ready
         if(RedisUtils.isReady()) {
             // Create a comma separated string for the list of game IDs
-            var gameIdsString = gameIds.join(',');
+            var gameIdsString = gamesData.join(';');
 
             // Store the results
             RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameIdsString, function(err) {
