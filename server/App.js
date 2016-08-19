@@ -216,6 +216,7 @@ App.prototype._initModelManagers = function(callback) {
     Core.model.sessionModelManager = new SessionModelManager();
     Core.model.gameModelManager = new GameModelManager();
     Core.model.gameTeamModelManager = new GameTeamModelManager();
+    Core.model.gameUserModelManager = new GameUserModelManager();
 
     // Call back
     if(callback !== undefined)
