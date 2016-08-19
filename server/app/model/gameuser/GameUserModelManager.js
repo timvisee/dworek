@@ -220,10 +220,19 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
     // Create a callback latch
     var latch = new CallbackLatch();
 
+    // Override the options if queued is set to true
+    if(options.queued !== undefined && options.queued) {
+        options.players = false;
+        options.spectators = false;
+        options.specials = false;
+    }
+
     // Determine the Redis cache key for this function
     const redisCacheKey = 'model:gameuser:getGamePlayerCount:' + game.getIdHex() + ':' +
-        (options.players ? '1' : '0') + ',' + (options.spectators ? '1' : '0') + ',' +
-        (options.specials ? '1' : '0') + ',' + (options.queued ? '1' : '0') + ':count';
+        (options.players !== undefined ? (options.players ? '1' : '0') : '?') + ',' +
+        (options.spectators !== undefined ? (options.spectators ? '1' : '0') : '?') + ',' +
+        (options.specials !== undefined ? (options.specials ? '1' : '0') : '?') + ',' +
+        (options.queued !== undefined ? (options.queued ? '1' : '0') : '?')+ ':count';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -261,18 +270,13 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
             game_id: game.getId()
         };
 
-        // Apply the queued property
-        if(options.queued !== undefined) {
-            if(options.queued) {
-                options.players = false;
-                options.spectators = false;
-                options.specials = false;
-            } else
-                queryObject.$or = [
-                    {team_id: {$ne: null}},
-                    {is_spectator: true},
-                    {is_special: true}
-                ];
+        // Apply the queued property if it's set to false
+        if(options.queued !== undefined && !options.queued) {
+            queryObject.$or = [
+                {team_id: {$ne: null}},
+                {is_spectator: true},
+                {is_special: true}
+            ];
         }
 
         // Configure the fields object
@@ -282,10 +286,6 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
             queryObject.is_spectator = options.spectators;
         if(options.specials !== undefined)
             queryObject.is_special = options.specials;
-
-        // TODO: Remove this debug code
-        console.log('MongoDB query: ');
-        console.log(JSON.stringify(queryObject, undefined, 2));
 
         // Query the database and check whether the game is valid
         GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
