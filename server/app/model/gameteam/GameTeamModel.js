@@ -73,23 +73,6 @@ var GameTeamModel = function(id) {
                      */
                     to: (game) => game.getId()
                 },
-                cache: {
-                    /**
-                     * Convert a hexadecimal ID to a Game model.
-                     *
-                     * @param {String} id
-                     * @return {GameModel} Game.
-                     */
-                    from: (id) => Core.model.gameModelManager._instanceManager.create(id),
-
-                    /**
-                     * Convert an Game model to a hexadecimal ID.
-                     *
-                     * @param {GameModel} game Game.
-                     * @return {String} Hexadecimal ID.
-                     */
-                    to: (game) => game.getIdHex()
-                },
                 redis: {
                     /**
                      * Convert a hexadecimal ID to a Game model.
