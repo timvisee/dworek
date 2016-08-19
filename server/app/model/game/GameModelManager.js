@@ -410,9 +410,6 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // Determine the Redis cache key for this function
     const redisCacheKey = 'model:game:gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
 

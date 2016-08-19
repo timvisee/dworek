@@ -22,6 +22,7 @@
 
 var ObjectId = require('mongodb').ObjectId;
 var merge = require('utils-merge');
+var _ = require('lodash');
 
 var config = require('../../../config');
 
@@ -174,6 +175,154 @@ GameUserModelManager.prototype.getUserById = function(id, callback) {
  * @callback GameUserModelManager~getUserByIdCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {GameUserModel|null} Game user instance, or null if no game was found for the given ID.
+ */
+
+/**
+ * Get the number of users that joined the given games.
+ * The options parameter can be used to specify constraints for the query.
+ *
+ * @param {GameModel} game Game to get the player count for.
+ * @param {Object} [options] Options object for additional configurations and constraints.
+ * @param {boolean|undefined} [options.players=] True if the result must include players, false if the result may not
+ * include players. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.spectators=] True if the result must include spectators, false if the result may
+ * not include spectators. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.specials=] True if the result must include special players, false if the result
+ * may not include special players. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.queued=] True if the result must include queued players, false if the result may
+ * not include queued players. This property overrides other constraints when set to true.
+ * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
+ */
+GameUserModelManager.prototype.getGameUserCount = function(game, options, callback) {
+    // Create an object with the default options
+    const defaultOptions = {
+        players: undefined,
+        spectators: undefined,
+        specials: undefined,
+        queued: undefined
+    };
+
+    // Set the callback parameter if the options parameter is left out
+    if(_.isFunction(options)) {
+        // Set the callback parameter and set the options to the default
+        //noinspection JSValidateTypes
+        callback = options;
+        options = {};
+    }
+
+    // Set the options to an empty object if it's undefined
+    if(options === undefined)
+        options = {};
+
+    // Merge the options
+    options = merge(options, defaultOptions);
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the Redis cache key for this function
+    const redisCacheKey = 'model:gameuser:getGamePlayerCount:' + game.getIdHex() + ':' +
+        (options.players ? '1' : '0') + ',' + (options.spectators ? '1' : '0') + ',' +
+        (options.specials ? '1' : '0') + ',' + (options.queued ? '1' : '0') + ':count';
+
+    // Check whether the game is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while listing games, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null, zero or an empty string
+            if(result === undefined || result === null) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Call back the number of games
+            callback(null, parseInt(result, 10));
+        });
+    }
+
+    // Fetch the result from MongoDB when done with Redis
+    latch.then(function() {
+        // Create the query object
+        var queryObject = {
+            game_id: game.getId()
+        };
+
+        // Apply the queued property
+        if(options.queued !== undefined) {
+            if(options.queued) {
+                options.players = false;
+                options.spectators = false;
+                options.specials = false;
+            } else
+                queryObject.$or = [
+                    {team_id: {$ne: null}},
+                    {is_spectator: true},
+                    {is_special: true}
+                ];
+        }
+
+        // Configure the fields object
+        if(options.players !== undefined)
+            queryObject.team_id = options.players ? {$ne: null} : null;
+        if(options.spectators !== undefined)
+            queryObject.is_spectator = options.spectators;
+        if(options.specials !== undefined)
+            queryObject.is_special = options.specials;
+
+        // TODO: Remove this debug code
+        console.log('MongoDB query: ');
+        console.log(JSON.stringify(queryObject, undefined, 2));
+
+        // Query the database and check whether the game is valid
+        GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err));
+                return;
+            }
+
+            // Get the user count
+            var userCount = data.length;
+
+            // Call back with the user count
+            callback(null, userCount);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, userCount.toString(), function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred while storing game user count data ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Called with the number of users for the given game with the given constraints.
+ *
+ * @callback GameModelManager~getGameUserCountCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Number of users.
  */
 
 // Return the created class
