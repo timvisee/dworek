@@ -405,7 +405,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
         options = {};
 
     // Merge the options
-    options = merge(options, defaultOptions);
+    options = merge(defaultOptions, options);
 
     // Create a callback latch
     var latch = new CallbackLatch();

@@ -215,7 +215,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         options = {};
 
     // Merge the options
-    options = merge(options, defaultOptions);
+    options = merge(defaultOptions, options);
 
     // Create a callback latch
     var latch = new CallbackLatch();
