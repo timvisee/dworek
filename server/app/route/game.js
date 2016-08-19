@@ -24,6 +24,7 @@ var express = require('express');
 var router = express.Router();
 
 var Core = require('../../Core');
+var CallbackLatch = require('../util/CallbackLatch');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 
 // Games overview
@@ -51,18 +52,70 @@ router.get('/:gameId', function(req, res, next) {
             return;
         }
 
+        // Game properties
+        var gameName = null;
+        var gamePlayerCount = null;
+        var gamePlayerQueuedCount = null;
+
+        // Create a callback latch for the games properties
+        var latch = new CallbackLatch();
+
         // Fetch the game name
-        game.getName(function(err, gameName) {
+        latch.add();
+        game.getName(function(err, name) {
             // Call back errors
             if(err !== null) {
                 next(err);
                 return;
             }
 
+            // Set the property
+            gameName = name;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Fetch the game players
+        latch.add();
+        Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Set the property
+            gamePlayerCount = count;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Fetch the game players
+        latch.add();
+        Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Set the property
+            gamePlayerQueuedCount = count;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Render the page when we're ready
+        latch.then(function() {
             // Render the game page
             LayoutRenderer.render(req, res, next, 'game', gameName, {
                 game: {
-                    name: gameName
+                    name: gameName,
+                    playerCount: gamePlayerCount,
+                    playerQueuedCount: gamePlayerQueuedCount
                 }
             });
         });
