@@ -8,11 +8,19 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='info')
-        p Game name: #{game.name}
-        p Players: #{game.playerCount}
-        if game.playerQueuedCount > 0
-            p Queued players: #{game.playerQueuedCount}
-        p Specific game info here...
+        div.table-list(align='center')
+            h3 Game information
+            table.ui-responsive
+                tr: td Game name
+                    td= game.name
+                tr: td Players
+                    td= game.userCount
+                if game.playerQueuedCount > 0
+                    tr: td Queued players
+                        td= game.playerQueuedCount
+
+        br
+        p Other game info here...
 
     div(data-role='nd2tab', data-tab='map')
         p Show map here...
