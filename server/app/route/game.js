@@ -38,24 +38,17 @@ router.get('/:gameId', function(req, res, next) {
     // Get the game ID
     var gameId = req.params.gameId;
 
-    // Keep track whether we call back
-    var calledBack = false;
-
     // Validate the game ID
     Core.model.gameModelManager.getGameById(gameId, function(err, game) {
         // Call back errors
         if(err !== null) {
-            if(!calledBack)
-                next(err);
-            calledBack = true;
+            next(err);
             return;
         }
 
         // Call back an error if the game ID is invalid
         if(game === null) {
-            if(!calledBack)
-                next(new Error('Invalid game ID.'));
-            calledBack = true;
+            next(new Error('Invalid game ID.'));
             return;
         }
 
@@ -72,9 +65,7 @@ router.get('/:gameId', function(req, res, next) {
         game.getName(function(err, name) {
             // Call back errors
             if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
+                next(err);
                 return;
             }
 
@@ -90,9 +81,7 @@ router.get('/:gameId', function(req, res, next) {
         Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
             // Call back errors
             if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
+                next(err);
                 return;
             }
 
@@ -108,9 +97,7 @@ router.get('/:gameId', function(req, res, next) {
         Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
             // Call back errors
             if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
+                next(err);
                 return;
             }
 
@@ -123,10 +110,6 @@ router.get('/:gameId', function(req, res, next) {
 
         // Render the page when we're ready
         latch.then(function() {
-            // Make sure we didn't call back yet
-            if(calledBack)
-                return;
-
             // Render the game page
             LayoutRenderer.render(req, res, next, 'game', gameName, {
                 game: {
