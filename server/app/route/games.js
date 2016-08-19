@@ -163,7 +163,7 @@ function getGameList(stage, limit, callback) {
             var gameObject = {
                 id: game.getIdHex(),
                 name: null,
-                playerCount: 0
+                userCount: 0
             };
 
             // Create a callback latch that is used to fetch game data
@@ -189,7 +189,7 @@ function getGameList(stage, limit, callback) {
 
             // Get the player count for this game
             gameDataLatch.add();
-            Core.model.gameUserModelManager.getGameUserCount(game, {spectators: true, queued: false}, function(err, count) {
+            Core.model.gameUserModelManager.getGameUserCount(game, function(err, count) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -198,8 +198,8 @@ function getGameList(stage, limit, callback) {
                     return;
                 }
 
-                // Set the player count
-                gameObject.playerCount = count;
+                // Set the user count
+                gameObject.userCount = count;
 
                 // Resolve the latch
                 gameDataLatch.resolve();

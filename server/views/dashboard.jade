@@ -20,13 +20,13 @@ block content
                 li(data-role='list-divider') Active games
                 each game in games.games.active
                     li: a(href='/game/#{game.id}')= game.name
-                        span.ui-li-count() #{game.playerCount} player#{game.playerCount === 1 ? '' : 's'}
+                        span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
 
             li(data-role='list-divider') Newest open games
             if games.games.open.length > 0
                 each game in games.games.open
                     li: a(href='/game/#{game.id}')= game.name
-                        span.ui-li-count() #{game.playerCount} player#{game.playerCount === 1 ? '' : 's'}
+                        span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
             else
                 li: i No games in this category...
 

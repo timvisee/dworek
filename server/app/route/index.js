@@ -170,7 +170,7 @@ function getGameList(stage, limit, callback) {
 
             // Get the player count for this game
             gameDataLatch.add();
-            Core.model.gameUserModelManager.getGameUserCount(game, {spectators: true, queued: false}, function(err, count) {
+            Core.model.gameUserModelManager.getGameUserCount(game, function(err, count) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -179,8 +179,8 @@ function getGameList(stage, limit, callback) {
                     return;
                 }
 
-                // Set the player count
-                gameObject.playerCount = count;
+                // Set the user count
+                gameObject.userCount = count;
 
                 // Resolve the latch
                 gameDataLatch.resolve();
