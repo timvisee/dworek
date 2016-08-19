@@ -140,6 +140,9 @@ function getGameList(stage, limit, callback) {
     // Create a callback latch to determine whether to start rendering the layout
     var latch = new CallbackLatch();
 
+    // Define whether we called back
+    var calledBack = false;
+
     // Get the list of active games
     latch.add();
     Core.model.gameModelManager.getGamesWithStage(stage, {
@@ -159,20 +162,51 @@ function getGameList(stage, limit, callback) {
             // Create a dummy game object
             var gameObject = {
                 id: game.getIdHex(),
-                name: null
+                name: null,
+                playerCount: 0
             };
 
+            // Create a callback latch that is used to fetch game data
+            var gameDataLatch = new CallbackLatch();
+
             // Get the game name and put it in the object
+            gameDataLatch.add();
             game.getName(function(err, name) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
                 // Set the name
                 gameObject.name = name;
 
+                // Resolve the latch
+                gameDataLatch.resolve();
+            });
+
+            // Get the player count for this game
+            gameDataLatch.add();
+            Core.model.gameUserModelManager.getGameUserCount(game, {spectators: true, queued: false}, function(err, count) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the player count
+                gameObject.playerCount = count;
+
+                // Resolve the latch
+                gameDataLatch.resolve();
+            });
+
+            // Push the object in the game objects array when we're done
+            gameDataLatch.then(function() {
                 // Add the game object to the list
                 gameObjects.push(gameObject);
 
@@ -187,7 +221,8 @@ function getGameList(stage, limit, callback) {
 
     // Call back the list
     latch.then(function() {
-        callback(null, gameObjects);
+        if(!calledBack)
+            callback(null, gameObjects);
     });
 }
 

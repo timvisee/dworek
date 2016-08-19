@@ -19,6 +19,6 @@ block content
             if games.games.length > 0
                 each game in games.games
                     li: a(href='/game/#{game.id}')= game.name
-                        span.ui-li-count() 0 players
+                        span.ui-li-count() #{game.playerCount} players
             else
                 li: i No games in this category...
