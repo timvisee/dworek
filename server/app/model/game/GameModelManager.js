@@ -194,7 +194,7 @@ GameModelManager.prototype.getGameById = function(id, callback) {
  *
  * @callback GameModelManager~getGameByIdCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Game|null} Game instance, or null if no game was found for the given ID.
+ * @param {GameModel|null} Game instance, or null if no game was found for the given ID.
  */
 
 /**

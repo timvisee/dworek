@@ -300,7 +300,7 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
  * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
  */
 GameModel.prototype.hasUser = function(user, options, callback) {
-    Core.model.gameUserModelManager.hasUser(this, user, options, callback)
+    Core.model.gameUserModelManager.hasUser(this, user, options, callback);
 };
 
 /**
@@ -309,6 +309,26 @@ GameModel.prototype.hasUser = function(user, options, callback) {
  * @callback GameModelManager~hasUserCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {boolean=} True if the given user joined this game.
+ */
+
+/**
+ * Check whether the given user is a player in the game.
+ *
+ * @param {UserModel} user The user to check for.
+ * @param {GameModelManager~isPlayerCallback} callback Called with the result or when an error occurred.
+ */
+GameModel.prototype.isPlayer = function(user, callback) {
+    Core.model.gameUserModelManager.hasUser(this, user, {
+        players: true
+    }, callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModelManager~isPlayerCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the given user is a player in the game, false if not.
  */
 
 // Export the user class
