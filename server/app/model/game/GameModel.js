@@ -284,5 +284,31 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
     this.setField('create_date', createDate, callback);
 };
 
+/**
+ * Check whether the given user joined this game.
+ *
+ * @param {GameModel} game The game to check in.
+ * @param {UserModel} user The user to check for.
+ * @param {Object} [options] Options object for additional configurations and constraints.
+ * @param {boolean|undefined} [options.players=] True if the user must be in a team, false if the user may not be in a
+ * team. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.spectators=] True if the user must be a spectator, false if the user may not be
+ * a spectator. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.specials=] True if the user must be a special player, false if the user may not
+ * be a special player. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.queued=] True if the user must be queued, false if the player must not be queued.
+ * This option overrides other constraints when set to true. Undefined to ignore this constraint.
+ * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
+ */
+GameModel.prototype.hasUser = (game, user, options, callback) => Core.model.gameUserModelManager.hasUser(this, user, options, callback);
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModelManager~hasUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the given user joined this game.
+ */
+
 // Export the user class
 module.exports = GameModel;
