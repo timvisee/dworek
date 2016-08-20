@@ -1,0 +1,14 @@
+extends page
+
+block content
+    //- The the error
+    p.
+        You need to be logged in to visit this page.#[br]
+        #[br]
+        Please login or register to continue, or go to the front page.
+
+    br
+    .button-list
+        a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Go to the login page') Login
+        a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Go to the registration page') Register
+        a.ui-btn(href='/', title='Go to the front page') Front page

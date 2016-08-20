@@ -30,6 +30,12 @@ var CallbackLatch = require('../util/CallbackLatch');
 
 // Games list index
 router.get('/', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
     // Create a callback latch
     var latch = new CallbackLatch();
 
@@ -85,14 +91,35 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/open', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Render the page
     renderGameList(req, res, next, 0, undefined, 'Open', 'Open games');
 });
 
 router.get('/active', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Render the page
     renderGameList(req, res, next, 1, undefined, 'Active', 'Active games');
 });
 
 router.get('/finished', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Render the page
     renderGameList(req, res, next, 2, undefined, 'Finished', 'Finished games');
 });
 

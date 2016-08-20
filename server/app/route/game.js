@@ -35,6 +35,12 @@ router.get('/', function(req, res, next) {
 
 // Specific game
 router.get('/:gameId', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
     // Get the game ID
     var gameId = req.params.gameId;
 
