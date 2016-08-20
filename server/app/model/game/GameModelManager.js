@@ -109,32 +109,35 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
     // Create a variable to store whether a game exists with the given ID
     var hasGame = false;
 
-    // Query the database and check whether the game is valid
-    GameDatabase.layerFetchFieldsFromDatabase({_id: id}, {_id: true}, function(err, data) {
-        // Call back errors
-        if(err !== null && err !== undefined) {
-            // Encapsulate the error and call back
-            callback(new Error(err), null);
-            return;
-        }
+    // Fetch the result from MongoDB when we're done with Redis
+    latch.then(function() {
+        // Query the database and check whether the game is valid
+        GameDatabase.layerFetchFieldsFromDatabase({_id: id}, {_id: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err), null);
+                return;
+            }
 
-        // Determine whether a game exists for this ID
-        hasGame = data.length > 0;
+            // Determine whether a game exists for this ID
+            hasGame = data.length > 0;
 
-        // Call back with the result
-        callback(null, hasGame);
+            // Call back with the result
+            callback(null, hasGame);
 
-        // Store the result in Redis if ready
-        if(RedisUtils.isReady()) {
-            // Store the results
-            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
-                // Show a warning on error
-                if(err !== null && err !== undefined) {
-                    console.error('A Redis error occurred when storing Game ID validity, ignoring.')
-                    console.error(new Error(err));
-                }
-            });
-        }
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred when storing Game ID validity, ignoring.')
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
     });
 };
 
