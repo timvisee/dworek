@@ -67,6 +67,9 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Get the user's name if we've a session
     if(req.session.valid) {
         // Get the first name
@@ -74,7 +77,9 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         req.session.user.getFirstName(function(err, firstName) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -90,7 +95,9 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         req.session.user.getLastName(function(err, lastName) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -106,7 +113,9 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         req.session.user.getMail(function(err, mail) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
