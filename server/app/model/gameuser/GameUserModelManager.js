@@ -191,6 +191,7 @@ GameUserModelManager.prototype.getUserById = function(id, callback) {
  * may not include special players. Undefined if this constraint shouldn't be checked.
  * @param {boolean|undefined} [options.queued=] True if the result must include queued players, false if the result may
  * not include queued players. This property overrides other constraints when set to true.
+ * @param {UserModel|undefined} [options.user=] User model instance if only a specific user should be counted.
  * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
  */
 GameUserModelManager.prototype.getGameUserCount = function(game, options, callback) {
@@ -232,7 +233,8 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         (options.players !== undefined ? (options.players ? '1' : '0') : '?') + ',' +
         (options.spectators !== undefined ? (options.spectators ? '1' : '0') : '?') + ',' +
         (options.specials !== undefined ? (options.specials ? '1' : '0') : '?') + ',' +
-        (options.queued !== undefined ? (options.queued ? '1' : '0') : '?')+ ':count';
+        (options.queued !== undefined ? (options.queued ? '1' : '0') : '?') +
+        (options.user !== undefined ? ':user,' + options.user.getIdHex() : '') + ':count';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -287,6 +289,10 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         if(options.specials !== undefined)
             queryObject.is_special = options.specials;
 
+        // Limit the query to a specific user if set
+        if(options.user !== undefined)
+            queryObject.user_id = options.user.getId();
+
         // Query the database and check whether the game is valid
         GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
             // Call back errors
@@ -323,6 +329,49 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  * @callback GameModelManager~getGameUserCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number=} Number of users.
+ */
+
+/**
+ * Check whether the given user joined the given game.
+ *
+ * @param {GameModel} game The game to check in.
+ * @param {UserModel} user The user to check for.
+ * @param {Object} [options] Options object for additional configurations and constraints.
+ * @param {boolean|undefined} [options.players=] True if the user must be in a team, false if the user may not be in a
+ * team. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.spectators=] True if the user must be a spectator, false if the user may not be
+ * a spectator. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.specials=] True if the user must be a special player, false if the user may not
+ * be a special player. Undefined to ignore this constraint.
+ * @param {boolean|undefined} [options.queued=] True if the user must be queued, false if the player must not be queued.
+ * This option overrides other constraints when set to true. Undefined to ignore this constraint.
+ * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
+ */
+GameUserModelManager.prototype.hasUser = function(game, user, options, callback) {
+    // Merge the options
+    options = merge(options, {
+        user
+    });
+
+    // Use the game user count function, determine and call back the result
+    this.getGameUserCount(game, options, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back the result
+        callback(null, result > 0);
+    })
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModelManager~hasUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the given user is in the given game, false if not.
  */
 
 // Return the created class
