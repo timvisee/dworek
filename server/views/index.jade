@@ -2,7 +2,8 @@ extends page
 
 block content
     p Welcome to #{app.name}.
+
     br
-    a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
-    br
-    a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register
+    .button-list
+        a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Login') Login
+        a.ui-btn.ui-btn-raised.clr-primary(href='/register', title='Register') Register

@@ -41,3 +41,17 @@
   font-size: 1.1em;
   line-height: 1.2em;
 }
+
+.button-list a.ui-btn:first-child,
+.button-list button:first-child,
+.button-list input[type="button"]:first-child,
+.button-list input[type="submit"]:first-child {
+  margin-top: 0;
+}
+
+.button-list a.ui-btn,
+.button-list button,
+.button-list input[type="button"],
+.button-list input[type="submit"] {
+  margin-top: 10px;
+}

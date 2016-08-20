@@ -5,7 +5,6 @@ block content
         p Enter your mail address and password to register.
 
         br
-
         form(method='POST', action='/register/#')
 
             label(for='mail') Mail address:
@@ -24,12 +23,9 @@ block content
             input(type='text', name='last_name', id='last_name', value='', data-clear-btn='true')
 
             br
-
-            button.ui-btn.ui-btn-raised.clr-primary(type='submit') Register
-
-            br
-
-            a.ui-btn(href='/login', title='Login') Already have an account?
+            .button-list
+                button.ui-btn.ui-btn-raised.clr-primary(type='submit') Register
+                a.ui-btn(href='/login', title='Login') Already have an account?
 
     else
         //- Print the success message
