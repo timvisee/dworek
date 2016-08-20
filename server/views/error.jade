@@ -1,21 +1,32 @@
 extends page
 
 block content
-    //- Print the error message
-    p: +format(message)
+    //- Page not found error
+    if statusCode == 404
+        p.
+            The page you're trying to reach does not exist.#[br]
+            #[br]
+            Please go back to the previous page and try again.
 
-    br
-    .button-list
-        //- Show the login button if specified
-        if showLoginButton
-            a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Go to the login page') Login
+        br
+        a.ui-btn.ui-btn-raised.clr-primary(href='/', data-rel='back', data-direction='reverse', title='Go back') Go back
 
-        //- Show the back button
-        unless hideBackButton
-            //- a.ui-btn.clr-primary(href='/', data-rel='back', data-direction='reverse', title='Go back')
-            //-     i.zmdi.zmdi-arrow-back.ui-pull-left
-            //-     |  Go back
-            a.ui-btn.ui-btn-raised.clr-primary(href='/', data-rel='back', data-direction='reverse', title='Go back') Go back
+    else
+        //- Print the error message
+        p: +format(message)
+
+        br
+        .button-list
+            //- Show the login button if specified
+            if showLoginButton
+                a.ui-btn.ui-btn-raised.clr-primary(href='/login', title='Go to the login page') Login
+
+            //- Show the back button
+            unless hideBackButton
+                //- a.ui-btn.clr-primary(href='/', data-rel='back', data-direction='reverse', title='Go back')
+                //-     i.zmdi.zmdi-arrow-back.ui-pull-left
+                //-     |  Go back
+                a.ui-btn.ui-btn-raised.clr-primary(href='/', data-rel='back', data-direction='reverse', title='Go back') Go back
 
     //- Show a stack trace if given
     if showStacktrace

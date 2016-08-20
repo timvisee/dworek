@@ -116,6 +116,7 @@ Router.prototype.init = function(callback) {
             'The web administrators are freaking out right now, running around, bashing buttons, rebooting systems...\n\n' +
             'A team of wizards and magicians has been dispatched to deal with this situation.',
             showStacktrace: dev,
+            statusCode: err.status,
             stacktrace: !dev ? {} : {
                 message: err.message,
                 status: err.status,
