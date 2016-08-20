@@ -287,7 +287,6 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
 /**
  * Check whether the given user joined this game.
  *
- * @param {GameModel} game The game to check in.
  * @param {UserModel} user The user to check for.
  * @param {Object} [options] Options object for additional configurations and constraints.
  * @param {boolean|undefined} [options.players=] True if the user must be in a team, false if the user may not be in a
@@ -300,7 +299,7 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
  * This option overrides other constraints when set to true. Undefined to ignore this constraint.
  * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
  */
-GameModel.prototype.hasUser = (game, user, options, callback) => Core.model.gameUserModelManager.hasUser(this, user, options, callback);
+GameModel.prototype.hasUser = (user, options, callback) => Core.model.gameUserModelManager.hasUser(this, user, options, callback);
 
 /**
  * Called with the result or when an error occurred.
