@@ -299,7 +299,9 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
  * This option overrides other constraints when set to true. Undefined to ignore this constraint.
  * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
  */
-GameModel.prototype.hasUser = (user, options, callback) => Core.model.gameUserModelManager.hasUser(this, user, options, callback);
+GameModel.prototype.hasUser = function(user, options, callback) {
+    Core.model.gameUserModelManager.hasUser(this, user, options, callback)
+};
 
 /**
  * Called with the result or when an error occurred.
