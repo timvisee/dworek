@@ -382,12 +382,12 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
             var resultSplitted = result.split(';');
 
             // Fill the result object
-            gameUsersStateObject.total = resultSplitted[0];
-            gameUsersStateObject.totalAccepted = resultSplitted[1];
-            gameUsersStateObject.players = resultSplitted[2];
-            gameUsersStateObject.specials = resultSplitted[3];
-            gameUsersStateObject.spectators = resultSplitted[4];
-            gameUsersStateObject.requested = resultSplitted[5];
+            gameUsersStateObject.total = parseInt(resultSplitted[0], 10);
+            gameUsersStateObject.totalAccepted = parseInt(resultSplitted[1], 10);
+            gameUsersStateObject.players = parseInt(resultSplitted[2], 10);
+            gameUsersStateObject.specials = parseInt(resultSplitted[3], 10);
+            gameUsersStateObject.spectators = parseInt(resultSplitted[4], 10);
+            gameUsersStateObject.requested = parseInt(resultSplitted[5], 10);
 
             // Call back with the result
             callback(null, gameUsersStateObject);
@@ -467,10 +467,10 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
  * @typedef {Object} GameUsersState
  * @property {Number} total Total number of users that joined this game.
  * @property {Number} totalAccepted Total number of users that were accepted for this game.
- * @property {boolean} players Total number of users that joined a team.
- * @property {boolean} specials Total number of users that are a special player.
- * @property {boolean} spectators Total number of users that are a spectator.
- * @property {boolean} requested Total number of users that requested to join the game.
+ * @property {Number} players Total number of users that joined a team.
+ * @property {Number} specials Total number of users that are a special player.
+ * @property {Number} spectators Total number of users that are a spectator.
+ * @property {Number} requested Total number of users that requested to join the game.
  */
 
 /**
