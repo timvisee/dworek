@@ -108,9 +108,9 @@ router.get('/:game', function(req, res, next) {
         latch.resolve();
     });
 
-    // Fetch the game players
+    // Fetch the user state for this game
     latch.add();
-    game.hasUser(req.session.user, function(err, result) {
+    game.getUserState(req.session.user, function(err, userState) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -118,7 +118,7 @@ router.get('/:game', function(req, res, next) {
         }
 
         // Set the property
-        gameObject.joined = result;
+        gameObject.userState = userState;
 
         // Resolve the latch
         latch.resolve();
@@ -127,6 +127,7 @@ router.get('/:game', function(req, res, next) {
     // Render the page when we're ready
     latch.then(function() {
         // Render the game page
+        //noinspection JSCheckFunctionSignatures
         LayoutRenderer.render(req, res, next, 'game', gameObject.name, {
             game: gameObject
         });

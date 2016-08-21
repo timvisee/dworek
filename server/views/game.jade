@@ -9,8 +9,17 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='info')
-        //- game.joined
-        unless false
+        if game.userState.player || game.userState.spectator || game.userState.special
+        else if game.userState.requested
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Requested to join
+
+                .card-supporting-text.has-action.has-title.
+                    You've requested to join this game.
+                    Please wait for the game host to accept your request.
+
+        else
             .nd2-card.wow.fadeInUp
                 .card-title.has-supporting-text
                     h3.card-primary-title Open game
