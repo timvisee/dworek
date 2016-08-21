@@ -34,8 +34,6 @@
 
     "lodash": "4.14.1",
 
-    "validator": "5.5.0",
-
-    "utils-merge": "1.0.0"
+    "validator": "5.5.0"
   }
 }
