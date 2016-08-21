@@ -7,19 +7,22 @@ block page
         div(data-role='header')
             //- Left page button
             case page.leftButton
+                when 'menu'
+                    //- Menu button
+                    a.ui-btn.ui-btn-left.wow.fadeIn(href='#leftpanel', data-wow-delay='0.4s')
+                        i.zmdi.zmdi-menu
+
                 when 'back'
                     //- Back button
                     a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
                         i.zmdi.zmdi-arrow-back
 
-                default
-                    //- Menu button
-                    a.ui-btn.ui-btn-left.wow.fadeIn(href='#leftpanel', data-wow-delay='0.4s')
-                        i.zmdi.zmdi-menu
-
-            //- Sidebar button
-            a.ui-btn.ui-btn-right.wow.fadeIn(href='#optionspanel', data-wow-delay='0.4s')
-                i.zmdi.zmdi-more-vert
+            //- Right page button
+            case page.rightButton
+                when 'options'
+                    //- Options button
+                    a.ui-btn.ui-btn-right.wow.fadeIn(href='#optionspanel', data-wow-delay='0.4s')
+                        i.zmdi.zmdi-more-vert
 
             //- Header title
             h1.wow.fadeIn= page.title
