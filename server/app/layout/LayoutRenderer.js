@@ -61,6 +61,11 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         session: {
             valid: req.session.valid,
             user: {}
+        },
+        page: {
+            title: '<page-title>',
+            leftButton: 'menu',
+            rightButton: 'options'
         }
     };
 
@@ -135,13 +140,13 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         options = {};
 
     // Set the page title
-    if(!options.hasOwnProperty('title')) {
+    if(!_.has(options, 'page.title')) {
         // Determine the page title if it isn't set
         if(pageTitle === undefined)
             pageTitle = jadeName.charAt(0).toUpperCase() + jadeName.slice(1).toLowerCase();
 
         // Set the title
-        options.title = pageTitle;
+        _.set(options, 'page.title', pageTitle);
     }
 
     // Render the page when we're done
