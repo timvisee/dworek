@@ -189,8 +189,8 @@ GameUserModelManager.prototype.getUserById = function(id, callback) {
  * not include spectators. Undefined if this constraint shouldn't be checked.
  * @param {boolean|undefined} [options.specials=] True if the result must include special players, false if the result
  * may not include special players. Undefined if this constraint shouldn't be checked.
- * @param {boolean|undefined} [options.queued=] True if the result must include queued players, false if the result may
- * not include queued players. This property overrides other constraints when set to true.
+ * @param {boolean|undefined} [options.requested=] True if the result must include requested players, false if the result
+ * may not include requested players. This property overrides other constraints when set to true.
  * @param {UserModel|undefined} [options.user=] User model instance if only a specific user should be counted.
  * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
  */
@@ -200,7 +200,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         players: undefined,
         spectators: undefined,
         specials: undefined,
-        queued: undefined
+        requested: undefined
     };
 
     // Set the callback parameter if the options parameter is left out
@@ -221,8 +221,8 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Override the options if queued is set to true
-    if(options.queued !== undefined && options.queued) {
+    // Override the options if requested is set to true
+    if(options.requested !== undefined && options.requested) {
         options.players = false;
         options.spectators = false;
         options.specials = false;
@@ -233,7 +233,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         (options.players !== undefined ? (options.players ? '1' : '0') : '?') + ',' +
         (options.spectators !== undefined ? (options.spectators ? '1' : '0') : '?') + ',' +
         (options.specials !== undefined ? (options.specials ? '1' : '0') : '?') + ',' +
-        (options.queued !== undefined ? (options.queued ? '1' : '0') : '?') +
+        (options.requested !== undefined ? (options.requested ? '1' : '0') : '?') +
         (options.user !== undefined ? ':user,' + options.user.getIdHex() : '') + ':count';
 
     // Check whether the game is valid through Redis if ready
@@ -272,8 +272,8 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
             game_id: game.getId()
         };
 
-        // Apply the queued property if it's set to false
-        if(options.queued !== undefined && !options.queued) {
+        // Apply the requested property if it's set to false
+        if(options.requested !== undefined && !options.requested) {
             queryObject.$or = [
                 {team_id: {$ne: null}},
                 {is_spectator: true},
@@ -343,7 +343,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  * a spectator. Undefined to ignore this constraint.
  * @param {boolean|undefined} [options.specials=] True if the user must be a special player, false if the user may not
  * be a special player. Undefined to ignore this constraint.
- * @param {boolean|undefined} [options.queued=] True if the user must be queued, false if the player must not be queued.
+ * @param {boolean|undefined} [options.requested=] True if the user must be requested, false if the player must not be requested.
  * This option overrides other constraints when set to true. Undefined to ignore this constraint.
  * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
  */

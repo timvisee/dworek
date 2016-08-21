@@ -78,7 +78,7 @@ router.get('/:game', function(req, res, next) {
 
     // Fetch the game players
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
+    Core.model.gameUserModelManager.getGameUserCount(game, {requested: false}, function(err, count) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -94,7 +94,7 @@ router.get('/:game', function(req, res, next) {
 
     // Fetch the game players
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
+    Core.model.gameUserModelManager.getGameUserCount(game, {requested: true}, function(err, count) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -174,7 +174,7 @@ router.get('/:game/info', function(req, res, next) {
 
     // Fetch the game players
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
+    Core.model.gameUserModelManager.getGameUserCount(game, {requested: false}, function(err, count) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -190,7 +190,7 @@ router.get('/:game/info', function(req, res, next) {
 
     // Fetch the game players
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
+    Core.model.gameUserModelManager.getGameUserCount(game, {requested: true}, function(err, count) {
         // Call back errors
         if(err !== null) {
             next(err);

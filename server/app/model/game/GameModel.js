@@ -295,7 +295,7 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
  * a spectator. Undefined to ignore this constraint.
  * @param {boolean|undefined} [options.specials=] True if the user must be a special player, false if the user may not
  * be a special player. Undefined to ignore this constraint.
- * @param {boolean|undefined} [options.queued=] True if the user must be queued, false if the player must not be queued.
+ * @param {boolean|undefined} [options.requested=] True if the user must be requested, false if the player must not be requested.
  * This option overrides other constraints when set to true. Undefined to ignore this constraint.
  * @param {GameModelManager~hasUserCallback} callback Called with the result or when an error occurred.
  */
