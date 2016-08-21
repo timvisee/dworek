@@ -29,7 +29,7 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 var GameParam = require('../router/middleware/GameParam');
 
 // Games overview
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     // Redirect back to the front page
     res.redirect('/');
 });
@@ -37,7 +37,7 @@ router.get('/', function(req, res, next) {
 // Attach the game param middleware
 GameParam.attach(router);
 
-// Specific game
+// Game page
 router.get('/:game', function(req, res, next) {
     // Make sure the user is logged in
     if(!req.session.valid) {
@@ -54,10 +54,8 @@ router.get('/:game', function(req, res, next) {
         return;
     }
 
-    // Game properties
-    var gameName = null;
-    var gamePlayerCount = null;
-    var gamePlayerQueuedCount = null;
+    // Create a game object
+    var gameObject = {};
 
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
@@ -72,7 +70,7 @@ router.get('/:game', function(req, res, next) {
         }
 
         // Set the property
-        gameName = name;
+        gameObject.name = name;
 
         // Resolve the latch
         latch.resolve();
@@ -88,7 +86,7 @@ router.get('/:game', function(req, res, next) {
         }
 
         // Set the property
-        gamePlayerCount = count;
+        gameObject.playerCount = count;
 
         // Resolve the latch
         latch.resolve();
@@ -104,7 +102,23 @@ router.get('/:game', function(req, res, next) {
         }
 
         // Set the property
-        gamePlayerQueuedCount = count;
+        gameObject.playerQueuedCount = count;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Fetch the game players
+    latch.add();
+    game.hasUser(req.session.user, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the property
+        gameObject.joined = result;
 
         // Resolve the latch
         latch.resolve();
@@ -113,12 +127,91 @@ router.get('/:game', function(req, res, next) {
     // Render the page when we're ready
     latch.then(function() {
         // Render the game page
-        LayoutRenderer.render(req, res, next, 'game', gameName, {
-            game: {
-                name: gameName,
-                playerCount: gamePlayerCount,
-                playerQueuedCount: gamePlayerQueuedCount
-            }
+        LayoutRenderer.render(req, res, next, 'game', gameObject.name, {
+            game: gameObject
+        });
+    });
+});
+
+// Game info page
+router.get('/:game/info', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Get the game
+    const game = req.game;
+
+    // Call back if the game is invalid
+    if(game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // Create a game object
+    var gameObject = {};
+
+    // Create a callback latch for the games properties
+    var latch = new CallbackLatch();
+
+    // Fetch the game name
+    latch.add();
+    game.getName(function(err, name) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the property
+        gameObject.name = name;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Fetch the game players
+    latch.add();
+    Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the property
+        gameObject.playerCount = count;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Fetch the game players
+    latch.add();
+    Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the property
+        gameObject.playerQueuedCount = count;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the page when we're ready
+    latch.then(function() {
+        // Render the game page
+        LayoutRenderer.render(req, res, next, 'gameinfo', gameObject.name + ' info', {
+            page: {
+                leftButton: 'back'
+            },
+            game: gameObject
         });
     });
 });

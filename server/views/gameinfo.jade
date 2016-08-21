@@ -1,0 +1,16 @@
+extends page
+
+block content
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Game information
+
+        .card-supporting-text.has-action.has-title
+            table.table-list.ui-responsive
+                tr: td Game name
+                    td= game.name
+                tr: td Players
+                    td= game.playerCount
+                if game.playerQueuedCount > 0
+                    tr: td Queued players
+                        td= game.playerQueuedCount
