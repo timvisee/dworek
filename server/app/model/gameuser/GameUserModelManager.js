@@ -332,6 +332,150 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  */
 
 /**
+ * Get the number of users that joined the given games.
+ *
+ * @param {GameModel} game Game to count the users for.
+ * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
+ */
+GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
+    // Create a base object
+    var gameUsersStateObject = {
+        total: 0,
+        players: 0,
+        specials: 0,
+        spectators: 0,
+        requested: 0
+    };
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the Redis cache key for this function
+    const redisCacheKey = 'model:gameuser:getGameUsersCount:' + game.getIdHex();
+
+    // Check whether the game is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while listing games, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null, zero or an empty string
+            if(result === undefined || result === null) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Split the result into it's parts
+            var resultSplitted = result.split(';');
+
+            // Fill the result object
+            gameUsersStateObject.total = resultSplitted[0];
+            gameUsersStateObject.players = resultSplitted[1];
+            gameUsersStateObject.specials = resultSplitted[2];
+            gameUsersStateObject.spectators = resultSplitted[3];
+            gameUsersStateObject.requested = resultSplitted[4];
+
+            // Call back with the result
+            callback(null, gameUsersStateObject);
+        });
+    }
+
+    // Fetch the result from MongoDB when done with Redis
+    latch.then(function() {
+        // Create the query object
+        var queryObject = {
+            game_id: game.getId()
+        };
+
+        // Create the projection object
+        const projectionObject = {
+            team_id: true,
+            is_special: true,
+            is_spectator: true
+        };
+
+        // Query the database and check whether the game is valid
+        GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, projectionObject, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err));
+                return;
+            }
+
+            // Loop through the results
+            data.forEach(function(gameUser) {
+                // Increase the total
+                gameUsersStateObject.total++;
+
+                // Increase the player type values
+                if(gameUser.team_id !== null && gameUser.team_id !== undefined)
+                    gameUsersStateObject.players++;
+                if(gameUser.is_special)
+                    gameUsersStateObject.specials++;
+                if(gameUser.is_spectator)
+                    gameUsersStateObject.spectator++;
+
+                // Increase the requested value if the player requested to join this game
+                if((gameUser.team_id === null || gameUser.team_id === undefined) && !gameUser.is_special && !gameUser.is_spectator)
+                    gameUsersStateObject.requested++;
+            });
+
+            // Call back the result object
+            callback(null, gameUsersStateObject);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Create a data string
+                var dataString = gameUsersStateObject.total + ';' +
+                    gameUsersStateObject.players + ';' +
+                    gameUsersStateObject.specials + ';' +
+                    gameUsersStateObject.spectators + ';' +
+                    gameUsersStateObject.requested;
+
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, dataString, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred while storing the user count for a game, ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * @typedef {Object} GameUsersState
+ * @property {Number} total Total number of users that joined this game.
+ * @property {boolean} players Total number of users that joined a team.
+ * @property {boolean} specials Total number of users that are a special player.
+ * @property {boolean} spectators Total number of users that are a spectator.
+ * @property {boolean} requested Total number of users that requested to join the game.
+ */
+
+/**
+ * Called with the number of users in the game.
+ *
+ * @callback GameModelManager~getGameUserCountCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameUsersState=} Number of users in the game.
+ */
+
+/**
  * Check whether the given user joined the given game.
  *
  * @param {GameModel} game The game to check in.
@@ -411,7 +555,7 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
             }
 
             // Split the result
-            var dataSplitted = result.split(',');
+            var dataSplitted = result.split(';');
 
             // Create a UserGameState object
             const userGameState = {
@@ -478,9 +622,9 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
             // Store the result in Redis if ready
             if(RedisUtils.isReady()) {
                 // Create a data string
-                var dataString = (userGameState.player ? '1' : '0') + ',' +
-                    (userGameState.special ? '1' : '0') + ',' +
-                    (userGameState.spectator ? '1' : '0') + ',' +
+                var dataString = (userGameState.player ? '1' : '0') + ';' +
+                    (userGameState.special ? '1' : '0') + ';' +
+                    (userGameState.spectator ? '1' : '0') + ';' +
                     (userGameState.requested ? '1' : '0');
 
                 // Store the results
