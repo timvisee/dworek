@@ -63,7 +63,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
             user: {}
         },
         page: {
-            title: '<page-title>',
+            title: jadeName.charAt(0).toUpperCase() + jadeName.substring(1).toLowerCase(),
             leftButton: 'menu',
             rightButton: 'options'
         }
