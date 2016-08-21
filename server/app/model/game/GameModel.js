@@ -296,6 +296,7 @@ GameModel.prototype.getUsersCount = function(callback) {
 /**
  * @typedef {Object} GameUsersState
  * @property {Number} total Total number of users that joined this game.
+ * @property {Number} totalAccepted Total number of users that were accepted for this game.
  * @property {boolean} players Total number of users that joined a team.
  * @property {boolean} specials Total number of users that are a special player.
  * @property {boolean} spectators Total number of users that are a spectator.

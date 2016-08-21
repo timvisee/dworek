@@ -347,6 +347,7 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
     // Create a base object
     var gameUsersStateObject = {
         total: 0,
+        totalAccepted: 0,
         players: 0,
         specials: 0,
         spectators: 0,
@@ -382,10 +383,11 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
 
             // Fill the result object
             gameUsersStateObject.total = resultSplitted[0];
-            gameUsersStateObject.players = resultSplitted[1];
-            gameUsersStateObject.specials = resultSplitted[2];
-            gameUsersStateObject.spectators = resultSplitted[3];
-            gameUsersStateObject.requested = resultSplitted[4];
+            gameUsersStateObject.totalAccepted = resultSplitted[1];
+            gameUsersStateObject.players = resultSplitted[2];
+            gameUsersStateObject.specials = resultSplitted[3];
+            gameUsersStateObject.spectators = resultSplitted[4];
+            gameUsersStateObject.requested = resultSplitted[5];
 
             // Call back with the result
             callback(null, gameUsersStateObject);
@@ -431,6 +433,8 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
                 // Increase the requested value if the player requested to join this game
                 if((gameUser.team_id === null || gameUser.team_id === undefined) && !gameUser.is_special && !gameUser.is_spectator)
                     gameUsersStateObject.requested++;
+                else
+                    gameUsersStateObject.totalAccepted++;
             });
 
             // Call back the result object
@@ -440,6 +444,7 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
             if(RedisUtils.isReady()) {
                 // Create a data string
                 var dataString = gameUsersStateObject.total + ';' +
+                    gameUsersStateObject.totalAccepted + ';' +
                     gameUsersStateObject.players + ';' +
                     gameUsersStateObject.specials + ';' +
                     gameUsersStateObject.spectators + ';' +
@@ -461,6 +466,7 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
 /**
  * @typedef {Object} GameUsersState
  * @property {Number} total Total number of users that joined this game.
+ * @property {Number} totalAccepted Total number of users that were accepted for this game.
  * @property {boolean} players Total number of users that joined a team.
  * @property {boolean} specials Total number of users that are a special player.
  * @property {boolean} spectators Total number of users that are a spectator.
