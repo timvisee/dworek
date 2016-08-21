@@ -332,7 +332,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  */
 
 /**
- * Get the number of users that joined the given games.
+ * Get the number of users that joined the given game.
  *
  * @param {GameModel} game Game to count the users for.
  * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.

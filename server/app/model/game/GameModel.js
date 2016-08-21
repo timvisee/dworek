@@ -285,6 +285,32 @@ GameModel.prototype.setCreateDate = function(createDate, callback) {
 };
 
 /**
+ * Get the number of users that joined this game.
+ *
+ * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
+ */
+GameModel.prototype.getUsersCount = function(callback) {
+    Core.model.gameUserModelManager.getGameUsersCount(this, callback);
+};
+
+/**
+ * @typedef {Object} GameUsersState
+ * @property {Number} total Total number of users that joined this game.
+ * @property {boolean} players Total number of users that joined a team.
+ * @property {boolean} specials Total number of users that are a special player.
+ * @property {boolean} spectators Total number of users that are a spectator.
+ * @property {boolean} requested Total number of users that requested to join the game.
+ */
+
+/**
+ * Called with the number of users in the game.
+ *
+ * @callback GameModelManager~getGameUserCountCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameUsersState=} Number of users in the game.
+ */
+
+/**
  * Check whether the given user joined this game.
  *
  * @param {UserModel} user The user to check for.
