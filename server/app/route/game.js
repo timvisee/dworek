@@ -76,9 +76,9 @@ router.get('/:game', function(req, res, next) {
         latch.resolve();
     });
 
-    // Fetch the game players
+    // Fetch the game's users count
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {requested: false}, function(err, count) {
+    game.getUsersCount(function(err, usersCount) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -86,23 +86,7 @@ router.get('/:game', function(req, res, next) {
         }
 
         // Set the property
-        gameObject.playerCount = count;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Fetch the game players
-    latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {requested: true}, function(err, count) {
-        // Call back errors
-        if(err !== null) {
-            next(err);
-            return;
-        }
-
-        // Set the property
-        gameObject.playerQueuedCount = count;
+        gameObject.usersCount = usersCount;
 
         // Resolve the latch
         latch.resolve();
@@ -173,9 +157,9 @@ router.get('/:game/info', function(req, res, next) {
         latch.resolve();
     });
 
-    // Fetch the game players
+    // Fetch the game's users count
     latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {requested: false}, function(err, count) {
+    game.getUsersCount(function(err, usersCount) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -183,23 +167,7 @@ router.get('/:game/info', function(req, res, next) {
         }
 
         // Set the property
-        gameObject.playerCount = count;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Fetch the game players
-    latch.add();
-    Core.model.gameUserModelManager.getGameUserCount(game, {requested: true}, function(err, count) {
-        // Call back errors
-        if(err !== null) {
-            next(err);
-            return;
-        }
-
-        // Set the property
-        gameObject.playerQueuedCount = count;
+        gameObject.usersCount = usersCount;
 
         // Resolve the latch
         latch.resolve();

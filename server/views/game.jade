@@ -38,13 +38,17 @@ block content
 
             .card-supporting-text.has-action.has-title
                 table.table-list.ui-responsive
-                    tr: td Game name
+                    tr: td Name
                         td= game.name
-                    tr: td Players
-                        td= game.playerCount
-                    if game.playerQueuedCount > 0
-                        tr: td Queued players
-                            td= game.playerQueuedCount
+                    tr: td Teams
+                        td ?
+                    tr: td Participants
+                        td= game.usersCount.totalAccepted
+                            span.gray  players
+                    if game.usersCount.requested > 0
+                        tr: td Requested
+                            td= game.usersCount.requested
+                                span.gray  users
 
             .card-action
                 .row.between-xs: .col-xs-12: .box
