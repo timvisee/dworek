@@ -19,15 +19,18 @@
  * You should have received a copy of The MIT License (MIT) along with this   *
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
+table.table-list tr td,
 .table-list table tr td {
   text-align: left;
   line-height: 1.6em; }
 
+table.table-list tr td:first-child,
 .table-list table tr td:first-child {
   padding-right: 16px;
   font-weight: bold;
   text-align: right; }
 
+h3.table-list,
 .table-list h3 {
   margin: 16px 0 6px 0;
   padding: 4px 0 0 0;
