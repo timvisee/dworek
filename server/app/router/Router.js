@@ -59,7 +59,7 @@ Router.prototype.init = function(callback) {
 
     // Configure the view engine
     Core.expressApp.set('views', path.join(PathLibrary.getServerPath(), 'views'));
-    Core.expressApp.set('view engine', 'jade');
+    Core.expressApp.set('view engine', 'pug');
 
     // Get the public path
     const publicPath = PathLibrary.getPublicPath();

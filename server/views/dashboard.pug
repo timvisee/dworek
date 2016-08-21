@@ -22,13 +22,13 @@ block content
             if games.games.active.length > 0
                 li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Active games
                 each game in games.games.active
-                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/#{game.id}')= game.name
+                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/' + game.id)= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
 
             li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Newest open games
             if games.games.open.length > 0
                 each game in games.games.open
-                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/#{game.id}')= game.name
+                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/' + game.id)= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
             else
                 li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): i No games in this category...

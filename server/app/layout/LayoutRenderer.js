@@ -42,13 +42,13 @@ var LayoutRenderer = function() {};
  * @param req Express request object.
  * @param res Express response object.
  * @param {function} next Callback for the next page.
- * @param {string} jadeName Jade name of the layout to render.
+ * @param {string} pugName Pug name of the layout to render.
  * @param {string|undefined} [pageTitle] Preferred page title.
  * @param {Object|undefined} [options] Additional options.
  *
  * @return {Object} Layout options object.
  */
-LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
+LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
     // Create a layout configuration object
     var config = {
         app: {
@@ -63,7 +63,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
             user: {}
         },
         page: {
-            title: jadeName.charAt(0).toUpperCase() + jadeName.substring(1).toLowerCase(),
+            title: pugName.charAt(0).toUpperCase() + pugName.substring(1).toLowerCase(),
             leftButton: 'menu',
             rightButton: 'options',
             url: req.originalUrl
@@ -144,7 +144,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
     if(!_.has(options, 'page.title')) {
         // Determine the page title if it isn't set
         if(pageTitle === undefined)
-            pageTitle = jadeName.charAt(0).toUpperCase() + jadeName.slice(1).toLowerCase();
+            pageTitle = pugName.charAt(0).toUpperCase() + pugName.slice(1).toLowerCase();
 
         // Set the title
         _.set(options, 'page.title', pageTitle);
@@ -156,7 +156,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         config = MergeUtils.merge(config, options, true);
 
         // Render the page
-        res.render(jadeName, config);
+        res.render(pugName, config);
     });
 };
 

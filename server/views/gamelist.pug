@@ -20,7 +20,7 @@ block content
         else
             if games.games.length > 0
                 each game in games.games
-                    li: a.wow.fadeInUp(href='/game/#{game.id}', data-wow-delay=(fadeDelay += 0.1) + 's')= game.name
+                    li: a.wow.fadeInUp(href='/game/' + game.id, data-wow-delay=(fadeDelay += 0.1) + 's')= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
             else
                 li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): i No games in this category...
