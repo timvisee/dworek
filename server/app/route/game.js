@@ -26,6 +26,7 @@ var router = express.Router();
 var Core = require('../../Core');
 var CallbackLatch = require('../util/CallbackLatch');
 var LayoutRenderer = require('../layout/LayoutRenderer');
+var GameParam = require('../router/middleware/GameParam');
 
 // Games overview
 router.get('/', function(req, res, next) {
@@ -33,97 +34,91 @@ router.get('/', function(req, res, next) {
     res.redirect('/');
 });
 
+// Attach the game param middleware
+GameParam.attach(router);
+
 // Specific game
-router.get('/:gameId', function(req, res, next) {
+router.get('/:game', function(req, res, next) {
     // Make sure the user is logged in
     if(!req.session.valid) {
         LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
         return;
     }
 
-    // Get the game ID
-    var gameId = req.params.gameId;
+    // Get the game
+    const game = req.game;
 
-    // Validate the game ID
-    Core.model.gameModelManager.getGameById(gameId, function(err, game) {
+    // Call back if the game is invalid
+    if(game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // Game properties
+    var gameName = null;
+    var gamePlayerCount = null;
+    var gamePlayerQueuedCount = null;
+
+    // Create a callback latch for the games properties
+    var latch = new CallbackLatch();
+
+    // Fetch the game name
+    latch.add();
+    game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
             next(err);
             return;
         }
 
-        // Call back an error if the game ID is invalid
-        if(game === null) {
-            next(new Error('Invalid game ID.'));
+        // Set the property
+        gameName = name;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Fetch the game players
+    latch.add();
+    Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
             return;
         }
 
-        // Game properties
-        var gameName = null;
-        var gamePlayerCount = null;
-        var gamePlayerQueuedCount = null;
+        // Set the property
+        gamePlayerCount = count;
 
-        // Create a callback latch for the games properties
-        var latch = new CallbackLatch();
+        // Resolve the latch
+        latch.resolve();
+    });
 
-        // Fetch the game name
-        latch.add();
-        game.getName(function(err, name) {
-            // Call back errors
-            if(err !== null) {
-                next(err);
-                return;
+    // Fetch the game players
+    latch.add();
+    Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the property
+        gamePlayerQueuedCount = count;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the page when we're ready
+    latch.then(function() {
+        // Render the game page
+        LayoutRenderer.render(req, res, next, 'game', gameName, {
+            game: {
+                name: gameName,
+                playerCount: gamePlayerCount,
+                playerQueuedCount: gamePlayerQueuedCount
             }
-
-            // Set the property
-            gameName = name;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Fetch the game players
-        latch.add();
-        Core.model.gameUserModelManager.getGameUserCount(game, {queued: false}, function(err, count) {
-            // Call back errors
-            if(err !== null) {
-                next(err);
-                return;
-            }
-
-            // Set the property
-            gamePlayerCount = count;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Fetch the game players
-        latch.add();
-        Core.model.gameUserModelManager.getGameUserCount(game, {queued: true}, function(err, count) {
-            // Call back errors
-            if(err !== null) {
-                next(err);
-                return;
-            }
-
-            // Set the property
-            gamePlayerQueuedCount = count;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Render the page when we're ready
-        latch.then(function() {
-            // Render the game page
-            LayoutRenderer.render(req, res, next, 'game', gameName, {
-                game: {
-                    name: gameName,
-                    playerCount: gamePlayerCount,
-                    playerQueuedCount: gamePlayerQueuedCount
-                }
-            });
         });
     });
 });
