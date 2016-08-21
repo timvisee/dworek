@@ -338,6 +338,12 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  * @param {GameModelManager~getGameUserCountCallback} callback Called with the result or when an error occurred.
  */
 GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the Redis cache key for this function
+    const redisCacheKey = 'model:gameuser:getGameUsersCount:' + game.getIdHex();
+
     // Create a base object
     var gameUsersStateObject = {
         total: 0,
@@ -346,12 +352,6 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
         spectators: 0,
         requested: 0
     };
-
-    // Create a callback latch
-    var latch = new CallbackLatch();
-
-    // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:gameuser:getGameUsersCount:' + game.getIdHex();
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -530,6 +530,14 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
     // Determine the Redis cache key for this function
     const redisCacheKey = 'model:gameuser:getUserGameState:' + game.getIdHex() + ':' + user.getIdHex();
 
+    // Create a UserGameState object
+    var userGameState = {
+        player: false,
+        special: false,
+        spectator: false,
+        requested: false
+    };
+
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
         // TODO: Update this caching method!
@@ -558,12 +566,10 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
             var dataSplitted = result.split(';');
 
             // Create a UserGameState object
-            const userGameState = {
-                player: dataSplitted[0] == '1',
-                special: dataSplitted[1] == '1',
-                spectator: dataSplitted[2] == '1',
-                requested: dataSplitted[3] == '1'
-            };
+            userGameState.player = dataSplitted[0] == '1';
+            userGameState.special = dataSplitted[1] == '1';
+            userGameState.spectator = dataSplitted[2] == '1';
+            userGameState.requested = dataSplitted[3] == '1';
 
             // Call back with the result
             callback(null, userGameState);
@@ -593,14 +599,6 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
                 callback(new Error(err));
                 return;
             }
-
-            // Create a UserGameState object
-            var userGameState = {
-                player: false,
-                special: false,
-                spectator: false,
-                requested: false
-            };
 
             // Parse the data from MongoDB if there is any
             if(data.length > 0) {
