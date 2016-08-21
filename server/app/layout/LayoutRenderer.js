@@ -21,11 +21,11 @@
  ******************************************************************************/
 
 var _ = require('lodash');
-var merge = require('utils-merge');
 var crypto = require('crypto');
 
 var appInfo = require('../../appInfo');
 
+var MergeUtils = require('../util/MergeUtils');
 var CallbackLatch = require('../util/CallbackLatch');
 
 /**
@@ -65,7 +65,8 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
         page: {
             title: jadeName.charAt(0).toUpperCase() + jadeName.substring(1).toLowerCase(),
             leftButton: 'menu',
-            rightButton: 'options'
+            rightButton: 'options',
+            url: req.originalUrl
         }
     };
 
@@ -152,7 +153,7 @@ LayoutRenderer.render = function(req, res, next, jadeName, pageTitle, options) {
     // Render the page when we're done
     latch.then(function() {
         // Merge the layout configuration objects
-        config = merge(config, options);
+        config = MergeUtils.merge(config, options, true);
 
         // Render the page
         res.render(jadeName, config);
