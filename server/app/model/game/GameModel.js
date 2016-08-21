@@ -331,5 +331,31 @@ GameModel.prototype.isPlayer = function(user, callback) {
  * @param {boolean=} True if the given user is a player in the game, false if not.
  */
 
+/**
+ * Get the user state for the given user.
+ *
+ * @param {UserModel} user User.
+ * @param {GameModelManager~getUserStateCallback} callback Called with the result or when an error occurred.
+ */
+GameModel.prototype.getUserState = function(user, callback) {
+    Core.model.gameUserModelManager.getUserGameState(this, user, callback);
+};
+
+/**
+ * @typedef {Object} UserGameState
+ * @property {boolean} player True if the user is a player in a team, false if not.
+ * @property {boolean} special True if the user is a special player in the game, false if not.
+ * @property {boolean} spectator True if the user is a spectator, false if not.
+ * @property {boolean} requested True if the user requested to join this game, false if not.
+ */
+
+/**
+ * Called with the user's game state or when an error occurred.
+ *
+ * @callback GameModelManager~getUserStateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {UserGameState=} User's game state.
+ */
+
 // Export the user class
 module.exports = GameModel;

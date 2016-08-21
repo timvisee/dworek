@@ -22,6 +22,7 @@
 
 var util = require('util');
 
+var Core = require('../../../Core');
 var UserDatabase = require('./UserDatabase');
 var BaseModel = require('../../db/BaseModel');
 var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
@@ -286,6 +287,32 @@ UserModel.prototype.getCreateDate = function(callback) {
 UserModel.prototype.setCreateDate = function(createDate, callback) {
     this.setField('create_date', createDate, callback);
 };
+
+/**
+ * Get the game state for the given game.
+ *
+ * @param {GameModel} game Game.
+ * @param {GameModelManager~getGameStateCallback} callback Called with the result or when an error occurred.
+ */
+UserModel.prototype.getGameState = function(game, callback) {
+    Core.model.gameUserModelManager.getUserGameState(game, this, callback);
+};
+
+/**
+ * @typedef {Object} UserGameState
+ * @property {boolean} player True if the user is a player in a team, false if not.
+ * @property {boolean} special True if the user is a special player in the game, false if not.
+ * @property {boolean} spectator True if the user is a spectator, false if not.
+ * @property {boolean} requested True if the user requested to join this game, false if not.
+ */
+
+/**
+ * Called with the user's game state or when an error occurred.
+ *
+ * @callback GameModelManager~getGameStateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {UserGameState=} User's game state.
+ */
 
 // Export the user class
 module.exports = UserModel;
