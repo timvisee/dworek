@@ -2,25 +2,44 @@ extends page
 
 block tabs
     ul(data-role='nd2tabs' data-swipe=true)
-        li(data-tab='info') Info
-        li(data-tab='map') Map
-        li(data-tab='actions') Actions
+        - var fadeDelay = 0;
+        li.wow.fadeInUp(data-tab='info', data-wow-delay=(fadeDelay += 0.1) + 's') Info
+        li.wow.fadeInUp(data-tab='map', data-wow-delay=(fadeDelay += 0.1) + 's') Map
+        li.wow.fadeInUp(data-tab='actions', data-wow-delay=(fadeDelay += 0.1) + 's') Actions
 
 block content
     div(data-role='nd2tab', data-tab='info')
-        div.table-list(align='center')
-            h3 Game information
-            table.ui-responsive
-                tr: td Game name
-                    td= game.name
-                tr: td Players
-                    td= game.playerCount
-                if game.playerQueuedCount > 0
-                    tr: td Queued players
-                        td= game.playerQueuedCount
+        //- game.joined
+        unless false
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Open game
 
-        br
-        p Other game info here...
+                .card-supporting-text.has-action.has-title.
+                    You aren't part of this game yet, and it's still open.
+                    Click the button below to request to join the game.
+
+                .card-action
+                    .row.between-xs: .col-xs-12: .box
+                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#') Request to join
+
+        .nd2-card.wow.fadeInUp
+            .card-title.has-supporting-text
+                h3.card-primary-title Game information
+
+            .card-supporting-text.has-action.has-title
+                table.table-list.ui-responsive
+                    tr: td Game name
+                        td= game.name
+                    tr: td Players
+                        td= game.playerCount
+                    if game.playerQueuedCount > 0
+                        tr: td Queued players
+                            td= game.playerQueuedCount
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#{page.url}/info', data-transition='slide') More info
 
     div(data-role='nd2tab', data-tab='map')
         p Show map here...

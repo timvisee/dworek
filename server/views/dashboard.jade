@@ -2,8 +2,9 @@ extends page
 
 block tabs
     ul(data-role='nd2tabs' data-swipe=true)
-        li(data-tab='dashboard') Dashboard
-        li(data-tab='games') Games
+        - var fadeDelay = 0;
+        li.wow.fadeInUp(data-tab='dashboard', data-wow-delay=(fadeDelay += 0.1) + 's') Dashboard
+        li.wow.fadeInUp(data-tab='games', data-wow-delay=(fadeDelay += 0.1) + 's') Games
 
 block content
     div(data-role='nd2tab', data-tab='dashboard')
@@ -15,20 +16,22 @@ block content
         a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
 
     div(data-role='nd2tab', data-tab='games')
+        - var fadeDelay = -0.1;
+
         ul(data-role='listview')
             if games.games.active.length > 0
-                li(data-role='list-divider') Active games
+                li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Active games
                 each game in games.games.active
-                    li: a(href='/game/#{game.id}')= game.name
+                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/#{game.id}')= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
 
-            li(data-role='list-divider') Newest open games
+            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Newest open games
             if games.games.open.length > 0
                 each game in games.games.open
-                    li: a(href='/game/#{game.id}')= game.name
+                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): a(href='/game/#{game.id}')= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
             else
-                li: i No games in this category...
+                li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): i No games in this category...
 
-        hr
-        a.ui-btn(href='/games', title='View all games...') View all games...
+        br
+        a.ui-btn.wow.fadeInUp(href='/games', data-wow-delay=(fadeDelay += 0.1) + 's', title='View all games...') View all games...

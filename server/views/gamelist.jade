@@ -2,23 +2,25 @@ extends page
 
 block content
     ul(data-role='listview')
-        if games.category == null
-            li(data-role='list-divider') Categories
-        else
-            li(data-role='list-divider') #{games.category} games
+        - var fadeDelay = -0.1;
 
         if games.category == null
-            li: a(href='/games/open', data-transition='slide') Open games...
+            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Categories
+        else
+            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') #{games.category} games
+
+        if games.category == null
+            li: a.wow.fadeInUp(href='/games/open', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Open games...
                 span.ui-li-count()= games.openCount
-            li: a(href='/games/active', data-transition='slide') Active games...
+            li: a.wow.fadeInUp(href='/games/active', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Active games...
                 span.ui-li-count()= games.activeCount
-            li: a(href='/games/finished', data-transition='slide') Finished games...
+            li: a.wow.fadeInUp(href='/games/finished', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Finished games...
                 span.ui-li-count()= games.finishedCount
 
         else
             if games.games.length > 0
                 each game in games.games
-                    li: a(href='/game/#{game.id}')= game.name
+                    li: a.wow.fadeInUp(href='/game/#{game.id}', data-wow-delay=(fadeDelay += 0.1) + 's')= game.name
                         span.ui-li-count() #{game.userCount} user#{game.userCount === 1 ? '' : 's'}
             else
-                li: i No games in this category...
+                li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): i No games in this category...
