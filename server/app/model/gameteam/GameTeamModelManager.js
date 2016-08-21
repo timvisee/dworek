@@ -21,7 +21,6 @@
  ******************************************************************************/
 
 var ObjectId = require('mongodb').ObjectId;
-var merge = require('utils-merge');
 
 var config = require('../../../config');
 

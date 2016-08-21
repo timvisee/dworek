@@ -22,7 +22,6 @@
 
 var ObjectId = require('mongodb').ObjectId;
 var _ = require('lodash');
-var merge = require('utils-merge');
 
 var config = require('../../../config');
 
@@ -31,6 +30,7 @@ var GameModel = require('./GameModel');
 var RedisUtils = require('../../redis/RedisUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var CallbackLatch = require('../../util/CallbackLatch');
+var MergeUtils = require('../../util/MergeUtils');
 
 /**
  * GameModelManager class.
@@ -230,7 +230,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         options = {};
 
     // Merge the options
-    options = merge(options, defaultOptions);
+    options = MergeUtils.merge(options, defaultOptions);
 
     // Create a callback latch
     var latch = new CallbackLatch();
@@ -408,7 +408,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
         options = {};
 
     // Merge the options
-    options = merge(defaultOptions, options);
+    options = MergeUtils.merge(defaultOptions, options);
 
     // Create a callback latch
     var latch = new CallbackLatch();

@@ -21,7 +21,6 @@
  ******************************************************************************/
 
 var ObjectId = require('mongodb').ObjectId;
-var merge = require('utils-merge');
 var _ = require('lodash');
 
 var config = require('../../../config');
@@ -31,6 +30,7 @@ var GameUserModel = require('./GameUserModel');
 var RedisUtils = require('../../redis/RedisUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var CallbackLatch = require('../../util/CallbackLatch');
+var MergeUtils = require('../../util/MergeUtils');
 
 /**
  * GameUserModelManager class.
@@ -216,7 +216,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
         options = {};
 
     // Merge the options
-    options = merge(defaultOptions, options);
+    options = MergeUtils.merge(defaultOptions, options);
 
     // Create a callback latch
     var latch = new CallbackLatch();
@@ -349,9 +349,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
  */
 GameUserModelManager.prototype.hasUser = function(game, user, options, callback) {
     // Merge the options
-    options = merge(options, {
-        user
-    });
+    options = MergeUtils.merge(options, {user});
 
     // Use the game user count function, determine and call back the result
     this.getGameUserCount(game, options, function(err, result) {
