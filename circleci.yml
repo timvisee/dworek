@@ -6,3 +6,6 @@ machine:
 dependencies:
   override:
     - npm install --dev
+test:
+  override:
+    - echo "test"
