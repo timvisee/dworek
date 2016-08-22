@@ -252,6 +252,32 @@ UserModel.prototype.getNickname = function(callback) {
  */
 
 /**
+ * Check whether the user has a custom nickname.
+ *
+ * @param {UserModel~hasNicknameCallback} callback Called with the result or when an error occurred.
+ */
+UserModel.prototype.hasNickname = function(callback) {
+    this.getNickname(function(err, nickname) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Determine the result, and call back
+        callback(null, nickname.trim().length > 0)
+    });
+};
+
+/**
+ * Called with the nickname of the user or when an error occurred.
+ *
+ * @callback UserModel~hasNicknameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the user has a nickname, false if not.
+ */
+
+/**
  * Set the nickname of the user.
  *
  * @param {String} nickname Nickname.
@@ -259,6 +285,16 @@ UserModel.prototype.getNickname = function(callback) {
  */
 UserModel.prototype.setNickname = function(nickname, callback) {
     this.setField('nickname', nickname, callback);
+};
+
+/**
+ * Reset the nickname of the user.
+ * This will remove the nickname of the user if any is set.
+ *
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setNickname = function(callback) {
+    this.setNickname('', callback);
 };
 
 /**
