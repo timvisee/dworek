@@ -37,8 +37,6 @@
 
     "validator": "5.5.0",
 
-    "mocha": "2.4.5",
-    "chai": "3.5.0",
-    "supertest": "1.2.0"
+    "mocha": "2.4.5"
   }
 }
