@@ -32,6 +32,7 @@ var routes = require('../route/index');
 var Core = require('../../Core');
 var PathLibrary = require('../../PathLibrary');
 var SessionValidator = require('./middleware/SessionValidator');
+var UrlFixer = require('./middleware/UrlFixer');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 
 /**
@@ -84,6 +85,10 @@ Router.prototype.init = function(callback) {
         // Route to the next handler
         next();
     });
+
+    // Fix malformed URLs with double slashes
+    console.log('Attaching URL fixer middleware...');
+    Core.expressApp.use(UrlFixer.route);
 
     // Attach the session validator middleware
     console.log('Attaching session validation middleware...');
