@@ -132,6 +132,12 @@ config.redis.cacheExpire = 60 * 5;
  */
 config.web.port = process.env.WEB_PORT || 3000;
 
+/**
+ * Define whether to automatically fix malformed URLs.
+ * @type {boolean}
+ */
+config.web.fixUrl = true;
+
 
 /******************************************************************************
  * Security configuration.                                                    *
