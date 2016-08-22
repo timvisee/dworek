@@ -1,3 +1,4 @@
+007
 Action Jackson
 Ammo
 Angel Eyes
@@ -44,6 +45,7 @@ Goliath
 Good Looking
 Greed
 Grinning
+H4X0R
 Horseface
 Hot Shot
 Iceman
