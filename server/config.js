@@ -219,6 +219,18 @@ config.validation.nameMinLength = 2;
  */
 config.validation.nameMaxLength = 128;
 
+/**
+ * Minimum number of nickname characters.
+ * @type {int}
+ */
+config.validation.nicknameMinLength = 1;
+
+/**
+ * Maximum number of nickname characters.
+ * @type {int}
+ */
+config.validation.nicknameMaxLength = 32;
+
 
 // Export the configuration
 module.exports = config;

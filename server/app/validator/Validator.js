@@ -138,5 +138,36 @@ Validator.isValidLastName = function(lastName) {
     return charCount >= config.validation.nameMinLength && charCount <= config.validation.nameMaxLength;
 };
 
+/**
+ * Format the the given nickname.
+ *
+ * @param {string} nickname Nickname of the user.
+ *
+ * @return {string} The formatted nickname.
+ */
+Validator.formatNickname = function(nickname) {
+    // Trim the nickname, and return
+    return nickname.trim();
+};
+
+/**
+ * Check whether the given nickname is valid.
+ *
+ * @param {string} nickname Nickname.
+ *
+ * @return {boolean} True if the nickname is valid, false if not.
+ */
+Validator.isValidNickname = function(nickname) {
+    // Trim the nickname
+    nickname = nickname.trim();
+
+    // Count the number of characters
+    var charCount = nickname.length;
+
+    // Make sure the length is within bounds
+    return charCount === 0 ||
+        (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
+};
+
 // Export the class
 module.exports = Validator;
