@@ -22,6 +22,7 @@
 
 var _ = require('lodash');
 
+var Core = require('../../../Core');
 var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
@@ -35,6 +36,57 @@ var GameUserDatabase = function() {};
  * Database collection name.
  */
 GameUserDatabase.DB_COLLECTION_NAME = 'game_user';
+
+/**
+ * Add a game user to the database.
+ * The team, special and spectator parameters may be set to null, false and false in order to create a game join request
+ * for the given user.
+ *
+ * @param {GameModel} game Game.
+ * @param {UserModel} user User.
+ * @param {GameTeamModel|null} team Team if the game user has any, or null if the user doesn't have a team.
+ * @param {boolean} isSpecial True if this game user is special, false if not.
+ * @param {boolean} isSpectator True if this game user is a spectator, false if not.
+ * @param {function} callback (err, {GameUserModel} gameUserId) Callback.
+ */
+GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator, callback) {
+    // Get the database instance
+    var db = MongoUtil.getConnection();
+
+    // Create the object to insert
+    var insertObject = {
+        game: game.getId(),
+        user: user.getId(),
+        team: team == null ? null : team.getId(),
+        isSpecial,
+        isSpectator
+    };
+
+    // Insert the game user into the database
+    db.collection(GameUserDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err, result) {
+        // Handle errors and make sure the status is ok
+        if(err !== null) {
+            // Show a warning and call back with the error
+            console.warn('Unable to create new user, failed to insert user into database.');
+            callback(err, null);
+            return;
+        }
+
+        // Call back with the inserted ID
+        callback(null, Core.model.gameUserModelManager._instanceManager.create(insertObject._id));
+    });
+};
+
+/**
+ * Add a game user request to the database.
+ *
+ * @param {GameModel} game Game.
+ * @param {UserModel} user User.
+ * @param {function} callback (err, {ObjectId} gameUserId) Callback.
+ */
+GameUserDatabase.addGameUserRequest = function(game, user, callback) {
+    this.addGameUser(game, user, null, false, false, callback);
+};
 
 /**
  * Do a find query on the API token database. Parse the result as an array through a callback.

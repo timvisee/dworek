@@ -45,7 +45,7 @@ UserDatabase.DB_COLLECTION_NAME = 'user';
  * @param {String} password Password.
  * @param {String} firstName First name.
  * @param {String} lastName Last name.
- * @param {function} callback (err, {ObjectId} userId) Callback.
+ * @param {function} callback (err, {UserModel} userId) Callback.
  */
 UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
     // Get the database instance
