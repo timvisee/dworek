@@ -47,11 +47,11 @@ router.get('/', function(req, res, next) {
 // Register index
 router.post('/', function(req, res, next) {
     // Get the registration field values
-    var mail = req.body.mail;
-    var password = req.body.password;
-    var passwordVerify = req.body.password_verify;
-    var firstName = req.body.first_name;
-    var lastName = req.body.last_name;
+    var mail = req.body['field-mail'];
+    var password = req.body['field-password'];
+    var passwordVerify = req.body['field-password-verify'];
+    var firstName = req.body['field-first-name'];
+    var lastName = req.body['field-last-name'];
 
     // Validate mail address
     if(!Validator.isValidMail(mail)) {

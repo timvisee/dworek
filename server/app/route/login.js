@@ -46,8 +46,8 @@ router.get('/', function(req, res, next) {
 // Login index
 router.post('/', function(req, res, next) {
     // Get the login field values
-    var mail = req.body.mail;
-    var password = req.body.password;
+    var mail = req.body['field-mail'];
+    var password = req.body['field-password'];
 
     // Validate mail address
     if(!Validator.isValidMail(mail)) {
