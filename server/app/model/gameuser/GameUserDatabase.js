@@ -54,10 +54,11 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
     var db = MongoUtil.getConnection();
 
     // Create the object to insert
+    // TODO: Dynamically get the proper field names from the model configuration
     var insertObject = {
-        game: game.getId(),
-        user: user.getId(),
-        team: team == null ? null : team.getId(),
+        game_id: game.getId(),
+        user_id: user.getId(),
+        team_id: team == null ? null : team.getId(),
         isSpecial,
         isSpectator
     };

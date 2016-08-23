@@ -30,6 +30,7 @@ var CallbackLatch = require('../util/CallbackLatch');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 var GameParam = require('../router/middleware/GameParam');
 var Validator = require('../validator/Validator');
+var GameUserDatabase = require('../model/gameuser/GameUserDatabase');
 
 // Games overview
 router.get('/', function(req, res) {
@@ -48,8 +49,9 @@ router.get('/:game', function(req, res, next) {
         return;
     }
 
-    // Get the game
+    // Get the game and user
     const game = req.game;
+    const user = req.session.user;
 
     // Call back if the game is invalid
     if(game === undefined) {
@@ -97,7 +99,7 @@ router.get('/:game', function(req, res, next) {
 
     // Fetch the user state for this game
     latch.add();
-    game.getUserState(req.session.user, function(err, userState) {
+    game.getUserState(user, function(err, userState) {
         // Call back errors
         if(err !== null) {
             next(err);
@@ -151,7 +153,8 @@ router.get('/:game/join', function(req, res, next) {
         if(userState.requested) {
             // Show an error page
             LayoutRenderer.render(req, res, next, 'error', 'Already requested', {
-                message: 'It looks like you\'ve already requested to join this game.'
+                message: 'It looks like you\'ve already requested to join this game.\n\n' +
+                'Please wait for the host of the game to accept your request.'
             });
             return;
         }
@@ -173,7 +176,7 @@ router.get('/:game/join', function(req, res, next) {
 
         // Determine whether the user has a nickname
         latch.add();
-        Core.model.gameUserModelManager.addGameUserRequest(game, user, function(err, gameUser) {
+        GameUserDatabase.addGameUserRequest(game, user, function(err, gameUser) {
             // Call back errors
             if(err !== null) {
                 next(err);
