@@ -293,7 +293,7 @@ UserModel.prototype.setNickname = function(nickname, callback) {
  *
  * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
-UserModel.prototype.setNickname = function(callback) {
+UserModel.prototype.resetNickname = function(callback) {
     this.setNickname('', callback);
 };
 
