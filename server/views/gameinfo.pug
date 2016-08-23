@@ -11,13 +11,13 @@ block content
                     td= game.name
                 tr: td In team
                     td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} players
+                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Spectators
                     td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} players
+                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Special
                     td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} players
+                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Requested
                     td= game.usersCount.requested
-                        span.gray  users
+                        span.gray  user#{game.usersCount.requested == 1 ? '' : 's'}

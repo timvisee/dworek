@@ -44,11 +44,11 @@ block content
                         td ?
                     tr: td Participants
                         td= game.usersCount.totalAccepted
-                            span.gray  players
+                            span.gray  player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
                     if game.usersCount.requested > 0
                         tr: td Requested
                             td= game.usersCount.requested
-                                span.gray  users
+                                span.gray  user#{game.usersCount.requested == 1 ? '' : 's'}
 
             .card-action
                 .row.between-xs: .col-xs-12: .box
