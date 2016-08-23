@@ -12,8 +12,12 @@ include base
 
                 .col-xs-8
                     .box.profile-text
-                        strong Nickname
-                        span.subline= session.user.firstName + ' ' + session.user.lastName
+                        if session.user.hasNickname
+                            strong= session.user.nickname
+                            span.subline= session.user.firstName + ' ' + session.user.lastName
+                        else
+                            strong= session.user.firstName
+                            span.subline= session.user.lastName
 
     else
         h4 Dworek

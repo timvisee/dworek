@@ -78,6 +78,8 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
 
     // Get the user's name if we've a session
     if(req.session.valid) {
+        // TODO: Combine all these name queries in a single query
+
         // Get the first name
         latch.add();
         req.session.user.getFirstName(function(err, firstName) {
@@ -109,6 +111,25 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
 
             // Set the last name
             config.session.user.lastName = lastName;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the nickname
+        latch.add();
+        req.session.user.getNickname(function(err, nickname) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the nickname
+            config.session.user.nickname = nickname;
+            config.session.user.hasNickname = nickname.trim().length > 0;
 
             // Resolve the latch
             latch.resolve();
