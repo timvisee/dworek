@@ -86,3 +86,41 @@ function notifyMe() {
     // At last, if the user has denied notifications, and you
     // want to be respectful there is no need to bother them any more.
 }
+
+// Nickname randomization
+$(document).bind("pagecreate", function() {
+    // Get the elements
+    const nicknameField = $('#field-nickname');
+    const nicknameRandomizeButton = $('.nickname-random-btn');
+
+    /**
+     * Set the nickname field to a random nickname.
+     */
+    function setRandomNickname() {
+        const animationClass = 'animated';
+        const animationTypeClass = 'bounceInLeft';
+
+        // Remove animation classes from previous times
+        if(nicknameField.hasClass(animationTypeClass))
+            nicknameField.removeClass(animationTypeClass);
+
+        // Animate the text field and set a random nickname next tick
+        setTimeout(function() {
+            nicknameField.addClass(animationClass + ' ' + animationTypeClass);
+            nicknameField.val(getRandomNickname());
+        }, 1);
+    }
+
+    // Check whether we should randomize on page creation
+    if(nicknameField.data('randomize'))
+        setRandomNickname();
+
+    // Randomize the nickname on random button click
+    nicknameRandomizeButton.click(function(e) {
+        // Prevent the default action
+        e.preventDefault();
+
+        // Put a random nickname in the field
+        setRandomNickname();
+    });
+});
