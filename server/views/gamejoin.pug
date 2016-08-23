@@ -1,0 +1,32 @@
+extends page
+
+block content
+    p.
+        You've successfully requested to join this game.
+        The host of the game must accept your request before you're able to play.
+
+    if user.hasNickname
+        p Click the button below to go back to the game overview page.
+        br
+        a.ui-btn.ui-btn-raised.clr-primary(href=page.url + '/..', title='Back to the game overview', data-ajax='false') Game overview
+
+    else
+        p Before you play, you haven't picked a nickname yet. Why not pick one now?
+
+        br
+        form(method='POST', action=page.url + '/#', data-ajax='false')
+            .row
+                .col-xs
+                    .box
+                        label(for='field-nickname') Nickname:
+                        input(type='text', name='field-nickname', id='field-nickname', value='', data-clear-btn='true', data-randomize='true')
+                .bottom-xs.end-xs
+                    .box
+                        a.ui-btn.ui-btn-inline.ui-mini.nickname-btn(href='#', style='margin-top: 10px;')
+                            i.zmdi.zmdi-refresh
+                            | &nbsp;&nbsp;Random
+
+            br
+            .button-list
+                button.ui-btn.ui-btn-raised.clr-primary(type='submit') Use nickname
+                a.ui-btn(href=page.url + '/..', title='Skip', data-ajax='false') Skip

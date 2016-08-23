@@ -23,10 +23,13 @@
 var express = require('express');
 var router = express.Router();
 
+var config = require('../../config');
+
 var Core = require('../../Core');
 var CallbackLatch = require('../util/CallbackLatch');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 var GameParam = require('../router/middleware/GameParam');
+var Validator = require('../validator/Validator');
 
 // Games overview
 router.get('/', function(req, res) {
@@ -115,6 +118,109 @@ router.get('/:game', function(req, res, next) {
         LayoutRenderer.render(req, res, next, 'game', gameObject.name, {
             game: gameObject
         });
+    });
+});
+
+// Game join page
+router.get('/:game/join', function(req, res, next) {
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Get the game
+    const game = req.game;
+
+    // Call back if the game is invalid
+    if(game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // TODO: Game joining logic here!
+
+    // Check whether the user has a nickname configured
+    req.session.user.hasNickname(function(err, hasNickname) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Render the game page
+        LayoutRenderer.render(req, res, next, 'gamejoin', 'Requested', {
+            page: {
+                leftButton: 'none',
+                rightButton: 'none'
+            },
+            user: {
+                hasNickname
+            }
+        });
+    });
+});
+
+// Game join post page
+router.post('/:game/join', function(req, res, next) {
+    // Get the nickname field
+    var nickname = req.body['field-nickname'];
+
+    // Make sure the user is logged in
+    if(!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Get the game
+    const game = req.game;
+
+    // Call back if the game is invalid
+    if(game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // Validate mail address
+    if(nickname === undefined) {
+        // Show an error page
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
+            message: 'An error occurred while setting your nick name.\n\n' +
+            'Please go back and try it again.'
+        });
+        return;
+    }
+
+    // Validate nickname
+    if(!Validator.isValidNickname(nickname)) {
+        // Show an error page
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
+            message: 'The nickname you\'ve entered isn\'t valid.\n\n' +
+            'Nicknames must be between ' + config.validation.nicknameMinLength +
+            ' and ' + config.validation.nicknameMaxLength + ' characters long. The field may be left blank if you ' +
+            'don\'t prefer a nickname.\n\n' +
+            'Please go back and enter a new nickname.',
+            page: {
+                leftButton: 'back'
+            }
+        });
+        return;
+    }
+
+    // Format the nickname
+    nickname = Validator.formatNickname(nickname);
+
+    // Set the users nickname
+    req.session.user.setNickname(nickname, function(err) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Redirect to the game's page
+        // TODO: Properly format the URL
+        res.redirect(req.originalUrl.replace('join', ''));
     });
 });
 
