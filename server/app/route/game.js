@@ -338,7 +338,7 @@ router.get('/:game/info', function(req, res, next) {
     // Render the page when we're ready
     latch.then(function() {
         // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameinfo', gameObject.name + ' info', {
+        LayoutRenderer.render(req, res, next, 'gameinfo', gameObject.name, {
             page: {
                 leftButton: 'back'
             },
