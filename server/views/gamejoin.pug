@@ -11,7 +11,7 @@ block content
         a.ui-btn.ui-btn-raised.clr-primary(href=page.url + '/..', title='Back to the game overview', data-ajax='false') Game overview
 
     else
-        p Before you play, you haven't picked a nickname yet. Why not pick one now?
+        p Before you play: you haven't picked a nickname yet. Why not pick one now?
 
         br
         form(method='POST', action=page.url + '/#', data-ajax='false')
@@ -22,7 +22,7 @@ block content
                         input(type='text', name='field-nickname', id='field-nickname', value='', data-clear-btn='true', data-randomize='true')
                 .bottom-xs.end-xs
                     .box
-                        a.ui-btn.ui-btn-inline.ui-mini.nickname-btn(href='#', style='margin-top: 10px;')
+                        a.ui-btn.ui-btn-inline.ui-mini.nickname-random-btn(href='#', style='margin-top: 10px;')
                             i.zmdi.zmdi-refresh
                             | &nbsp;&nbsp;Random
 
