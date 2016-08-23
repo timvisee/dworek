@@ -9,6 +9,8 @@ block content
             table.table-list.ui-responsive
                 tr: td Name
                     td= game.name
+                tr: td Teams
+                    td ?
                 tr: td In team
                     td= game.usersCount.players
                         span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
