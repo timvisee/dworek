@@ -40,7 +40,7 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the login page
-    res.render('login', LayoutRenderer.render(req, res, next, 'login'));
+    LayoutRenderer.render(req, res, next, 'login');
 });
 
 // Login index
