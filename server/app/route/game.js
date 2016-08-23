@@ -129,8 +129,9 @@ router.get('/:game/join', function(req, res, next) {
         return;
     }
 
-    // Get the game
+    // Get the game and user
     const game = req.game;
+    const user = req.session.user;
 
     // Call back if the game is invalid
     if(game === undefined) {
@@ -138,25 +139,77 @@ router.get('/:game/join', function(req, res, next) {
         return;
     }
 
-    // TODO: Game joining logic here!
-
-    // Check whether the user has a nickname configured
-    req.session.user.hasNickname(function(err, hasNickname) {
+    // Get the user's state for this game
+    game.getUserState(user, function(err, userState) {
         // Call back errors
         if(err !== null) {
             next(err);
             return;
         }
 
-        // Render the game page
-        LayoutRenderer.render(req, res, next, 'gamejoin', 'Requested', {
-            page: {
-                leftButton: 'none',
-                rightButton: 'none'
-            },
-            user: {
-                hasNickname
+        // Make sure the user hasn't requested already
+        if(userState.requested) {
+            // Show an error page
+            LayoutRenderer.render(req, res, next, 'error', 'Already requested', {
+                message: 'It looks like you\'ve already requested to join this game.'
+            });
+            return;
+        }
+
+        // Make sure the user hasn't joined already
+        if(userState.player || userState.special || userState.special) {
+            // Show an error page
+            LayoutRenderer.render(req, res, next, 'error', 'Already joined', {
+                message: 'It looks like you\'ve already joined this game.'
+            });
+            return;
+        }
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Create a flag that defines whether the user has a nickname
+        var hasNickname = false;
+
+        // Determine whether the user has a nickname
+        latch.add();
+        Core.model.gameUserModelManager.addGameUserRequest(game, user, function(err, gameUser) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
             }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Check whether the user has a nickname configured
+        latch.add();
+        user.hasNickname(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Store the result and resolve the latch
+            hasNickname = result;
+            latch.resolve();
+        });
+
+        // Render the page when we're done
+        latch.then(function() {
+            // Render the game page
+            LayoutRenderer.render(req, res, next, 'gamejoin', 'Requested', {
+                page: {
+                    leftButton: 'none',
+                    rightButton: 'none'
+                },
+                user: {
+                    hasNickname
+                }
+            });
         });
     });
 });
