@@ -660,5 +660,110 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
  * @param {UserGameState=} User's game state.
  */
 
+/**
+ * Get a list of users that joined the given game.
+ * The options parameter can be used to specify constraints for the query.
+ *
+ * @param {GameModel} game Game to get the players for.
+ * @param {Object} [options] Options object for additional configurations and constraints.
+ * @param {boolean|undefined} [options.players=] True if the result must include players, false if the result may not
+ * include players. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.spectators=] True if the result must include spectators, false if the result may
+ * not include spectators. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.specials=] True if the result must include special players, false if the result
+ * may not include special players. Undefined if this constraint shouldn't be checked.
+ * @param {boolean|undefined} [options.requested=] True if the result must include requested players, false if the result
+ * may not include requested players. This property overrides other constraints when set to true.
+ * @param {UserModel|undefined} [options.user=] User model instance if only a specific user should be counted.
+ * @param {GameModelManager~getGameUsersCallback} callback Called with the result or when an error occurred.
+ */
+// TODO: Add Redis caching to this function?
+GameUserModelManager.prototype.getGameUsers = function(game, options, callback) {
+    // Create an object with the default options
+    const defaultOptions = {
+        players: undefined,
+        spectators: undefined,
+        specials: undefined,
+        requested: undefined
+    };
+
+    // Set the callback parameter if the options parameter is left out
+    if(_.isFunction(options)) {
+        // Set the callback parameter and set the options to the default
+        //noinspection JSValidateTypes
+        callback = options;
+        options = {};
+    }
+
+    // Set the options to an empty object if it's undefined
+    if(options === undefined)
+        options = {};
+
+    // Merge the options
+    options = MergeUtils.merge(defaultOptions, options);
+
+    // Override the options if requested is set to true
+    if(options.requested !== undefined && options.requested) {
+        options.players = false;
+        options.spectators = false;
+        options.specials = false;
+    }
+
+    // Create the query object
+    var queryObject = {
+        game_id: game.getId()
+    };
+
+    // Apply the requested property if it's set to false
+    if(options.requested !== undefined && !options.requested) {
+        queryObject.$or = [
+            {team_id: {$ne: null}},
+            {is_spectator: true},
+            {is_special: true}
+        ];
+    }
+
+    // Configure the fields object
+    if(options.players !== undefined)
+        queryObject.team_id = options.players ? {$ne: null} : null;
+    if(options.spectators !== undefined)
+        queryObject.is_spectator = options.spectators;
+    if(options.specials !== undefined)
+        queryObject.is_special = options.specials;
+
+    // Limit the query to a specific user if set
+    if(options.user !== undefined)
+        queryObject.user_id = options.user.getId();
+
+    // Fetch the result from MongoDB
+    GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+        // Call back errors
+        if(err !== null && err !== undefined) {
+            // Encapsulate the error and call back
+            callback(new Error(err));
+            return;
+        }
+
+        // Create an array of users
+        var users = [];
+
+        // Loop through the results, create an user object for each user and add it to the array
+        data.forEach(function(userData) {
+            users.push(this._instanceManager.create(userData._id));
+        });
+
+        // Call back with the users array
+        callback(null, users);
+    });
+};
+
+/**
+ * Called with the array of users for the given game with the given constraints.
+ *
+ * @callback GameModelManager~getGameUsersCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Array=} Array of UserModel users.
+ */
+
 // Return the created class
 module.exports = GameUserModelManager;
