@@ -59,8 +59,8 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
         game_id: game.getId(),
         user_id: user.getId(),
         team_id: team == null ? null : team.getId(),
-        isSpecial,
-        isSpectator
+        is_special: isSpecial,
+        is_spectator: isSpectator
     };
 
     // Insert the game user into the database
