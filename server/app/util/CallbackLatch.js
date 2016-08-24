@@ -53,10 +53,16 @@ SmartCallback.prototype.identity = function() {
 
 /**
  * Add a new callback.
+ *
+ * @param {Number} [amount=1] Amount to increase by.
  */
-SmartCallback.prototype.add = function() {
+SmartCallback.prototype.add = function(amount) {
+    // Parse the amount value
+    if(amount === undefined)
+        amount = 1;
+
     // Increase the count
-    this._count++;
+    this._count += amount;
 };
 
 /**
