@@ -25,6 +25,7 @@ var _ = require('lodash');
 
 var config = require('../../../config');
 
+var Core = require('../../../Core');
 var GameUserDatabase = require('./GameUserDatabase');
 var GameUserModel = require('./GameUserModel');
 var RedisUtils = require('../../redis/RedisUtils');
@@ -736,7 +737,7 @@ GameUserModelManager.prototype.getGameUsers = function(game, options, callback) 
         queryObject.user_id = options.user.getId();
 
     // Fetch the result from MongoDB
-    GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+    GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {user_id: true}, function(err, data) {
         // Call back errors
         if(err !== null && err !== undefined) {
             // Encapsulate the error and call back
@@ -749,7 +750,7 @@ GameUserModelManager.prototype.getGameUsers = function(game, options, callback) 
 
         // Loop through the results, create an user object for each user and add it to the array
         data.forEach(function(userData) {
-            users.push(this._instanceManager.create(userData._id));
+            users.push(Core.model.userModelManager._instanceManager.create(userData.user_id));
         });
 
         // Call back with the users array
