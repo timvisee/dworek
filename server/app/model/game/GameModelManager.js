@@ -132,7 +132,7 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
                 RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
                     // Show a warning on error
                     if(err !== null && err !== undefined) {
-                        console.error('A Redis error occurred when storing Game ID validity, ignoring.')
+                        console.error('A Redis error occurred when storing Game ID validity, ignoring.');
                         console.error(new Error(err));
                     }
                 });
@@ -146,7 +146,7 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
  *
  * @callback GameModelManager~isValidGameIdCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {boolean} True if a game with this ID exists, false if not.
+ * @param {boolean=} True if a game with this ID exists, false if not.
  */
 
 /**
