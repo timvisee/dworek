@@ -20,13 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-// Inspired by:
-// http://developmentnow.com/2015/02/05/make-your-node-js-api-bulletproof-how-to-test-with-mocha-chai-and-supertest/
-
 var mocha = require('mocha');
 var it = mocha.it;
 
-// Dummy test
-it('Dummy test.', function(done) {
-    done();
-});
+// Dummy test, to successfully pass CI builds
+it('Dummy test.', (done) => done());
