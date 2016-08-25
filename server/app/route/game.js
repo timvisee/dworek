@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var crypto = require('crypto');
 var express = require('express');
 var router = express.Router();
 
@@ -573,6 +574,25 @@ function getGameUserListObject(game, category, callback) {
 
                 // Resolve the user latch
                 userLatch.resolve();
+            });
+
+            // Get the avatar URL of the user
+            latch.add();
+            user.getMail(function(err, mail) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Create an MD5 of the mail address
+                var mailHash = crypto.createHash('md5').update(mail).digest('hex');
+
+                // Set the mail address, and define the avatar URL
+                userObject.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=200&d=mm';
+
+                // Resolve the latch
+                latch.resolve();
             });
 
             // Put the data in the object when we're done fetching the names
