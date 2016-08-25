@@ -166,3 +166,49 @@ $(document).bind("pagecreate", function() {
         setRandomNickname();
     });
 });
+
+/**
+ * Check whether the given value is a JavaScript object.
+ *
+ * @param {*} value The value to check.
+ * @return {boolean} True if the value is an object, false if not.
+ */
+// TODO: Move this function to some utilities file
+function isObject(value) {
+    // Get the value type
+    const type = typeof value;
+
+    // Compare the types and return the result
+    return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Merge an object recursively.
+ * Object b overwrites a.
+ *
+ * @param {Object} a Object A.
+ * @param {Object} b Object B.
+ * @param {boolean} [recursive=true] True to merge recursively, false to merge flat objects.
+ * @return {*} Merged object.
+ */
+// TODO: Move this function to some utilities file
+function merge(a, b, recursive) {
+    // Set the default value for the recursive param
+    if(recursive === undefined)
+        recursive = true;
+
+    // Make sure both objects are given
+    if(isObject(a) && isObject(b)) {
+        // Loop through all the keys
+        for(var key in b) {
+            // Check whether we should merge two objects recursively, or whether we should merge flag
+            if(recursive && isObject(a[key]) && isObject(b[key]))
+                a[key] = merge(a[key], b[key], true);
+            else
+                a[key] = b[key];
+        }
+    }
+
+    // Return the object
+    return a;
+}
