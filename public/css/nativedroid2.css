@@ -408,7 +408,6 @@ code {
 	left: 1em;
 }
 
-.ui-listview img.ui-thumbnail.ui-thumbnail-circular,
 .ui-listview img.ui-thumbnail.ui-thumbnail-circular {
 	border-radius: 50% !important;
 	overflow: hidden;
@@ -418,7 +417,17 @@ code {
 	-ms-transform: scale(0.7);
 	-o-transform: scale(0.7);
 	transform: scale(0.7);
+}
 
+.ui-listview img.ui-thumbnail.ui-thumbnail-square {
+	border-radius: 5% !important;
+	overflow: hidden;
+
+	-webkit-transform: scale(0.7);
+	-moz-transform: scale(0.7);
+	-ms-transform: scale(0.7);
+	-o-transform: scale(0.7);
+	transform: scale(0.7);
 }
 
 .ui-listview > li h1, .ui-listview > li h2, .ui-listview > li h3, .ui-listview > li h4, .ui-listview > li h5, .ui-listview > li h6, .ui-listview > li p {

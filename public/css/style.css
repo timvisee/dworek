@@ -55,4 +55,23 @@ h3.table-list,
 .gray {
   color: gray; }
 
+.header {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.4em; }
+
+.ui-checkbox label img.ui-thumbnail {
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin: 0 10px 0 2px; }
+
+.ui-checkbox label img.ui-thumbnail.ui-thumbnail-circular {
+  border-radius: 50% !important; }
+
+.ui-checkbox label img.ui-thumbnail.ui-thumbnail-square {
+  border-radius: 10% !important; }
+
 /*# sourceMappingURL=style.css.map */
