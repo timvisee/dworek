@@ -42,29 +42,71 @@ $(document).bind("pageinit", function() {
 });
 
 /**
+ * Show a notification as configured.
+ * This function can be used to show in-page toast, or native notifications.
+ *
+ * @param {string} message Message to show in the notification.
+ * @param {Object} [options] Notification options object.
+ * @param {boolean} [options.toast=true] True to show an in-page toast notification, false if not.
+ * @param {boolean} [options.native=false] True to show a native notification if supported, false if not.
+ * @param {boolean} [options.vibrate=false] True to vibrate the user's device if supported, false if not.
+ * @param {Number} [options.ttl=4000] Notification time to live in milliseconds, if supported.
+ */
+// TODO: Make vibrations configurable
+// TODO: Implement native notifications
+// TODO: Make action buttons configurable
+function showNotification(message, options) {
+    // Default options
+    var defaultOptions = {
+        toast: true,
+        native: false,
+        vibrate: false,
+        ttl: 4000
+    };
+
+    // Set the default options parameter
+    if(options === undefined)
+        options = {};
+
+    // Merge the options with the default options
+    options = merge(defaultOptions, options);
+
+    // Show a toast notification
+    if(options.toast) {
+        // Show the toast notification
+        new $.nd2Toast({
+            message,
+            action: {
+                title: "Close",
+                fn: function() {},
+                color: 'lime'
+            },
+            ttl: options.ttl
+        });
+    }
+
+    // Vibrate the phone
+    if(options.vibrate)
+        if("vibrate" in navigator)
+            window.navigator.vibrate([500, 250, 500]);
+
+    // Notification test
+    //showNativeNotification();
+}
+
+/**
  * Called to show a toast to the user to tell a feature is not yet available.
  */
 function featureNotAvailable() {
-    // Show a toast notification
-    new $.nd2Toast({
-        message : 'Feature not available yet',
-        action : {
-            title: "Close",
-            fn: function() {},
-            color: 'lime'
-        },
-        ttl : 8000
+    showNotification('Feature not available yet', {
+        toast: true,
+        native: false,
+        vibrate: true
     });
-
-    // Vibrate the phone
-    if("vibrate" in navigator)
-        window.navigator.vibrate([500, 250, 500]);
-
-    // Notification test
-    //notifyMe();
 }
 
-function notifyMe() {
+// TODO: Complete this feature
+function showNativeNotification() {
     // Let's check if the browser supports notifications
     if(!('Notification' in window))
         alert('This browser does not support desktop notification');
