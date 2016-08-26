@@ -32,6 +32,8 @@ var RedisUtils = require('../../redis/RedisUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var CallbackLatch = require('../../util/CallbackLatch');
 var MergeUtils = require('../../util/MergeUtils');
+var GameModel = require('../game/GameModel');
+var UserModel = require('../user/UserModel');
 
 /**
  * GameUserModelManager class.
@@ -764,6 +766,136 @@ GameUserModelManager.prototype.getGameUsers = function(game, options, callback) 
  * @callback GameModelManager~getGameUsersCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Array=} Array of UserModel users.
+ */
+
+/**
+ * Get a game user by a game and user instance.
+ *
+ * @param {GameModel|ObjectId|string} game The game model instance, or a game ID.
+ * @param {UserModel|ObjectId|string} user The user model instance, or an user ID.
+ * @param {GameUserModelManager~getGameUserCallback} callback Called with the result or when an error occurred.
+ */
+GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
+    // Parse the game parameter
+    if(game instanceof GameModel)
+        game = game.getId();
+    if(game === null || game === undefined || !ObjectId.isValid(game)) {
+        // Call back
+        callback(null, null);
+        return;
+    }
+    if(!(game instanceof ObjectId))
+        game = new ObjectId(game);
+    
+    // Parse the user parameter
+    if(user instanceof UserModel)
+        user = user.getId();
+    if(user === null || user === undefined || !ObjectId.isValid(user)) {
+        // Call back
+        callback(null, null);
+        return;
+    }
+    if(!(user instanceof ObjectId))
+        user = new ObjectId(user);
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Store the current instance
+    const self = this;
+
+    // TODO: Check an instance for this ID is already available?
+
+    // Determine the Redis cache key
+    var redisCacheKey = 'model:gameuser:getGameUser' + game.toString() + ':' + user.toString();
+
+    // Get the game user ID for this game and user through Redis
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while checking game validity, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null or zero
+            if(result === undefined || result === null || result == 0) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // A game user ID is found, create an instance and return it
+            //noinspection JSCheckFunctionSignatures
+            callback(null, self._instanceManager.create(id));
+        });
+    }
+
+    // Fetch the result from MongoDB when we're done with Redis
+    latch.then(function() {
+        // Create a query object
+        const queryObject = {
+            game_id: game,
+            user_id: user
+        };
+
+        // Query the database and check whether the game is valid
+        GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err), null);
+                return;
+            }
+
+            // Determine whether we have a game user
+            const hasGameUser = data.length > 0;
+
+            // Call back null if no game user was found
+            if(!hasGameUser)
+                callback(null, null);
+
+            // Get the game user ID
+            var gameUserId = hasGameUser ? data[0]._id : 0;
+
+            // Get the game user instance to call back
+            if(hasGameUser) {
+                // Create a game user instance
+                const gameUser = self._instanceManager.create(gameUserId);
+
+                // Call back with the game user
+                callback(null, gameUser);
+            }
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameUserId, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred when storing game user ID, ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameUserModelManager~getGameUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameUserModel=} GameUserModel instance or null if none was found.
  */
 
 // Return the created class
