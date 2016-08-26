@@ -431,7 +431,7 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
                 if(gameUser.is_special)
                     gameUsersStateObject.specials++;
                 if(gameUser.is_spectator)
-                    gameUsersStateObject.spectator++;
+                    gameUsersStateObject.spectators++;
 
                 // Increase the requested value if the player requested to join this game
                 if((gameUser.team_id === null || gameUser.team_id === undefined) && !gameUser.is_special && !gameUser.is_spectator)
