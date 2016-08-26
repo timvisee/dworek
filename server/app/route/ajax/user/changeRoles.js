@@ -141,6 +141,7 @@ router.post('/', function(req, res, next) {
                     newTeam = null;
 
                 // Set the users special state
+                latch.add();
                 gameUser.setFields({
                     team: newTeam,
                     is_special: isSpecial,
@@ -162,9 +163,11 @@ router.post('/', function(req, res, next) {
 
         // Send the result when we're done
         latch.then(function() {
-            res.json({
-                status: 'ok'
-            });
+            // Send an OK response if not cancelled
+            if(!cancelled)
+                res.json({
+                    status: 'ok'
+                });
         });
     });
 });
