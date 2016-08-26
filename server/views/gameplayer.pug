@@ -1,10 +1,10 @@
 extends page
 
 block content
-    ul(data-role='listview')
-        - var fadeDelay = -0.1;
+    - var fadeDelay = -0.1;
 
-        if game.users.category == null
+    if game.users.category == null
+        ul(data-role='listview')
             if game.users.count.requested > 0
                 li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Join requests
                 li: a.wow.fadeInUp(href=page.url + '/requested', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Requests...
@@ -22,11 +22,67 @@ block content
                 li: a.wow.fadeInUp(href=page.url + '/requested', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Requests...
                     span.ui-li-count()= game.users.count.requested
 
+    else
+        a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop') Change roles
+
+        #popupChangeUserRole(data-role='popup')
+            div(data-role='header')
+                a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+                    i.zmdi.zmdi-close
+                h1.nd-title Change roles
+
+            div(data-role='content')
+                p Please configure the roles for the selected users below.
+
+                br
+                label.select(for='field-team') Team
+                select(name='field-team', id='field-team', data-native-menu='false')
+                    option(value='none') None
+                    option(value='random', selected='selected') Random
+                    option(disabled='disabled') ──────────
+                    option(value='none') Some team name...
+
+                //- Flip switches for special players and spectators
+                br
+                .row
+                    .col-xs: .box
+                        //- Flip switch for special players
+                        label(for='field-special') Special player
+                        select(name='field-special', id='field-special', data-role='flipswitch', selected='selected')
+                            option(value='false') NO
+                            option(value='true') YES
+
+                    .col-xs: .box
+                        //- Flip switch for spectators
+                        label(for='field-spectator') Spectator
+                        select(name='field-spectator', id='field-spectator', data-role='flipswitch', selected='selected')
+                            option(value='false') NO
+                            option(value='true') YES
+
+                //- Game ID
+                input(type='hidden', name='field-game', value=game.id)
+
+                //- Action buttons
+                br
+                .button-list
+                    a.ui-btn.clr-primary.action-apply(href='#', data-inline='true')
+                        i.zmdi.zmdi-check
+                        | &nbsp;&nbsp;Apply
+                    a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
+                        i.zmdi.zmdi-cancel
+                        | &nbsp;Cancel
+
+
+
+        h1.header.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's') Users
+
+        if game.users.users.length > 0
+            each user in game.users.users
+                .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
+                    input(type='checkbox', name='checkbox-user-' + user.id, id='checkbox-user-' + user.id)
+                    label(for='checkbox-user-' + user.id)
+                        img.ui-thumbnail.ui-thumbnail-square(src=user.avatarUrl)
+                        | #{user.firstName} #{user.lastName}
         else
-            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Users
-            if game.users.users.length > 0
-                each user in game.users.users
-                    li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')= user.firstName + ' ' + user.lastName
-                    //- user.firstName + ' ' + user.lastName
-            else
-                li.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's'): i No users in this category...
+            p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
+                i No users in this category...
