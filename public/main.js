@@ -171,6 +171,134 @@ $(document).bind("pagecreate", function() {
     });
 });
 
+// User role modification
+$(document).bind("pagecreate", function() {
+    // Get the elements
+    const buttonChangeRoles = $('.action-change-user-roles');
+    const popup = $('#popupChangeUserRole');
+    const checkboxNamePrefix = 'checkbox-user-';
+    const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
+    const popupGameSelector = 'input[name=field-game]';
+    const popupTeamSelector = 'select[name=field-team]';
+    const popupSpecialSelector = 'select[name=field-special]';
+    const popupSpectatorSelector = 'select[name=field-spectator]';
+
+    // Handle button click events
+    buttonChangeRoles.click(function(e) {
+        // Prevent the default click operation
+        e.preventDefault();
+
+        // Find the user checkboxes on the page that is currently active
+        const checkboxes = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelector);
+
+        // Show a warning if no user is selected
+        if(checkboxes.length == 0) {
+            showNotification('Please select the users to change', {
+                toast: true,
+                native: false,
+                vibrate: true,
+                vibrationPattern: 50
+            });
+            return;
+        }
+
+        // Create a list of user IDs
+        var userIds = [];
+
+        // Loop through all checkboxes and put the user ID in the list
+        checkboxes.each(function() {
+            userIds.push($(this).attr('name').replace(checkboxNamePrefix, '').trim());
+        });
+
+        // Open the user dialog
+        popup.popup('open', {
+            transition: 'pop'
+        });
+
+        // Find the apply button of the popup
+        const applyButton = popup.find('.action-apply');
+
+        // Unbind the previous click event, and bind a new one
+        applyButton.unbind('click');
+        applyButton.click(function(e) {
+            // Prevent the default action
+            e.preventDefault();
+
+            // Get the team, special and spectator fields
+            const gameField = popup.find(popupGameSelector);
+            const teamField = popup.find(popupTeamSelector);
+            const specialField = popup.find(popupSpecialSelector);
+            const spectatorField = popup.find(popupSpectatorSelector);
+
+            // Get the game ID
+            const gameId = gameField.val();
+
+            // Get the team selector value
+            const teamValue = teamField.val();
+
+            // Determine whether the users will be special players and/or spectators
+            const special = specialField.val() == 'true';
+            const spectator = spectatorField.val() == 'true';
+
+            // Create an role change object to send to the server
+            const updateObject = {
+                game: gameId,
+                users: userIds,
+                role: {
+                    team: teamValue,
+                    special,
+                    spectator
+                }
+            };
+
+            // TODO: Send the object through ajax, and report the result!
+            // TODO: Delete successfully deleted users!
+
+            // Callback on error
+            var onError = function() {
+                // Show an error notification
+                showNotification('Failed to change user roles!', {
+                    toast: true,
+                    native: false,
+                    vibrate: true
+                });
+
+                //TODO: Revert the deleted checkboxes from the page!
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '/ajax/user/changeRoles',
+                data: {
+                    data: JSON.stringify(updateObject)
+                },
+                dataType: 'json',
+                success: function(data) {
+                    // Show an error message if any kind of error occurred
+                    if(data.status != 'ok' || data.hasOwnProperty('error')) {
+                        onError();
+                        return;
+                    }
+
+                    // Show an error notification
+                    showNotification('Changes roles for ' + userIds.length + ' user' + (userIds.length != 1 ? 's' : ''), {
+                        toast: true,
+                        native: false,
+                        vibrate: true,
+                        vibrationPattern: 50
+                    });
+
+                    // TODO: Delete checkboxes for users that don't belong in the current category anymore
+                },
+                error: onError
+            });
+
+            // Close the popup
+            popup.popup('close');
+        });
+    });
+});
+
 /**
  * Check whether the given value is a JavaScript object.
  *
