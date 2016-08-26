@@ -477,6 +477,7 @@ function renderGameUserListPage(req, res, next, category) {
 function getGameUserListObject(game, category, callback) {
     // Create a game object
     var gameObject = {
+        id: game.getIdHex(),
         users: {
             category: category
         }
