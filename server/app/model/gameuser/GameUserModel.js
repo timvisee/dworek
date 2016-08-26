@@ -137,7 +137,7 @@ var GameUserModel = function(id) {
                      * @param {ObjectId} id
                      * @return {GameTeamModel} Game Team.
                      */
-                    from: (id) => Core.model.gameTeamModelManager._instanceManager.create(id),
+                    from: (id) => id !== null ? Core.model.gameTeamModelManager._instanceManager.create(id) : null,
 
                     /**
                      * Convert an Game Team model to an ID.
@@ -145,7 +145,7 @@ var GameUserModel = function(id) {
                      * @param {GameTeamModel} team Game Team.
                      * @return {ObjectId} ID.
                      */
-                    to: (team) => team.getId()
+                    to: (team) => team !== null ? team.getId() : null
                 },
                 redis: {
                     /**
@@ -154,7 +154,7 @@ var GameUserModel = function(id) {
                      * @param {String} id
                      * @return {GameTeamModel} Team.
                      */
-                    from: (id) => Core.model.gameTeamModelManager._instanceManager.create(id),
+                    from: (id) => id !== '' ? Core.model.gameTeamModelManager._instanceManager.create(id) : null,
 
                     /**
                      * Convert an Game Team model to a hexadecimal ID.
@@ -162,7 +162,7 @@ var GameUserModel = function(id) {
                      * @param {GameTeamModel} team Game Team.
                      * @return {String} Hexadecimal ID.
                      */
-                    to: (team) => team.getIdHex()
+                    to: (team) => team !== null ? team.getIdHex() : ''
                 }
             },
             is_special: {
