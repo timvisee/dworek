@@ -23,8 +23,13 @@
 var express = require('express');
 var router = express.Router();
 
+var changeRoles = require('./changeRoles');
+
 // Index page
 router.get('/', (req, res, next) => next(new Error('No AJAX endpoint specified')));
+
+// Change roles request
+router.use('/changeRoles', changeRoles);
 
 // Export the router
 module.exports = router;
