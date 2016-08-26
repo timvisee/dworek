@@ -50,17 +50,20 @@ $(document).bind("pageinit", function() {
  * @param {boolean} [options.toast=true] True to show an in-page toast notification, false if not.
  * @param {boolean} [options.native=false] True to show a native notification if supported, false if not.
  * @param {boolean} [options.vibrate=false] True to vibrate the user's device if supported, false if not.
+ * @param {Array} [options.vibrationPattern=[500, 250, 500]] Array with vibration pattern timings in milliseconds.
  * @param {Number} [options.ttl=4000] Notification time to live in milliseconds, if supported.
  */
 // TODO: Make vibrations configurable
 // TODO: Implement native notifications
 // TODO: Make action buttons configurable
+// TODO: Add option to show an error notification (which has a red background or something)
 function showNotification(message, options) {
     // Default options
     var defaultOptions = {
         toast: true,
         native: false,
         vibrate: false,
+        vibrationPattern: [500, 250, 500],
         ttl: 4000
     };
 
@@ -70,6 +73,10 @@ function showNotification(message, options) {
 
     // Merge the options with the default options
     options = merge(defaultOptions, options);
+
+    // Parse the vibration pattern option if set
+    if(!Array.isArray(options.vibrationPattern))
+        options.vibrationPattern = [options.vibrationPattern];
 
     // Show a toast notification
     if(options.toast) {
@@ -88,10 +95,7 @@ function showNotification(message, options) {
     // Vibrate the phone
     if(options.vibrate)
         if("vibrate" in navigator)
-            window.navigator.vibrate([500, 250, 500]);
-
-    // Notification test
-    //showNativeNotification();
+            window.navigator.vibrate(options.vibrationPattern);
 }
 
 /**
