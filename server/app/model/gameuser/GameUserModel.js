@@ -365,7 +365,7 @@ GameUserModel.prototype.isSpectator = function(callback) {
  * @param {boolean} isSpectator True if the user is a spectator, false if not.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setName = function(isSpectator, callback) {
+GameUserModel.prototype.setSpectator = function(isSpectator, callback) {
     this.setField('is_spectator', isSpectator, callback);
 };
 
@@ -392,7 +392,7 @@ GameUserModel.prototype.isSpecial = function(callback) {
  * @param {boolean} isSpecial True if the user is a special user, false if not.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setName = function(isSpecial, callback) {
+GameUserModel.prototype.setSpecial = function(isSpecial, callback) {
     this.setField('is_special', isSpecial, callback);
 };
 
