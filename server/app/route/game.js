@@ -590,7 +590,7 @@ function getGameUserListObject(game, category, callback) {
                 var mailHash = crypto.createHash('md5').update(mail).digest('hex');
 
                 // Set the mail address, and define the avatar URL
-                userObject.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=200&d=mm';
+                userObject.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=64&d=mm';
 
                 // Resolve the latch
                 latch.resolve();
