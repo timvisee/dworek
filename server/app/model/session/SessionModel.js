@@ -169,6 +169,23 @@ SessionModel.prototype.setField = function(field, value, callback) {
  */
 
 /**
+ * Set the given fields to the given values.
+ *
+ * @param {Object} fields Object with key value pairs.
+ * @param {SessionModel~setFieldsCallback} callback Called on success, or when an error occurred.
+ */
+SessionModel.prototype.setFields = function(fields, callback) {
+    this._baseModel.setFields(fields, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback SessionModel~setFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the user that owns this session.
  *
  * @param {SessionModel~getUserCallback} callback Called with the user, or when an error occurred.

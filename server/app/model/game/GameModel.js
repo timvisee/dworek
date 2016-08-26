@@ -177,6 +177,23 @@ GameModel.prototype.setField = function(field, value, callback) {
  */
 
 /**
+ * Set the given fields to the given values.
+ *
+ * @param {Object} fields Object with key value pairs.
+ * @param {GameModel~setFieldsCallback} callback Called on success, or when an error occurred.
+ */
+GameModel.prototype.setFields = function(fields, callback) {
+    this._baseModel.setFields(fields, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback GameModel~setFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the user that created this game.
  *
  * @param {GameTeamModel~getUserCallback} callback Called with the user or when an error occurred.

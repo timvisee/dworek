@@ -127,6 +127,23 @@ UserModel.prototype.setField = function(field, value, callback) {
  */
 
 /**
+ * Set the given fields to the given values.
+ *
+ * @param {Object} fields Object with key value pairs.
+ * @param {UserModel~setFieldsCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setFields = function(fields, callback) {
+    this._baseModel.setFields(fields, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback UserModel~setFieldsCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the mail address for a user.
  *
  * @param {UserModel~getMailCallback} callback Called with mail address or when an error occurred.
