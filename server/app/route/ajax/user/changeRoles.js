@@ -93,6 +93,9 @@ router.post('/', function(req, res, next) {
         // Determine whether this request is cancelled, due to an error of some sort
         var cancelled = false;
 
+        // Create an array of players that were successfully updated
+        var updatedUsers = [];
+
         // Loop through the user ids
         users.forEach(function(userId) {
             // Format the user ID
@@ -158,6 +161,9 @@ router.post('/', function(req, res, next) {
                         return;
                     }
 
+                    // Add the user to the updated users list
+                    updatedUsers.push(userId);
+
                     // Resolve the latch
                     latch.resolve();
                 });
@@ -172,7 +178,8 @@ router.post('/', function(req, res, next) {
             // Send an OK response if not cancelled
             if(!cancelled)
                 res.json({
-                    status: 'ok'
+                    status: 'ok',
+                    updatedUsers
                 });
         });
     });
