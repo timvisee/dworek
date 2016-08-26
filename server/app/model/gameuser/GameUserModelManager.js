@@ -827,7 +827,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null || result === '' || result == 0) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -864,7 +864,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
                 callback(null, null);
 
             // Get the game user ID
-            var gameUserId = hasGameUser ? data[0]._id : 0;
+            var gameUserId = hasGameUser ? data[0]._id : '';
 
             // Get the game user instance to call back
             if(hasGameUser) {
@@ -878,7 +878,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
             // Store the result in Redis if ready
             if(RedisUtils.isReady()) {
                 // Store the results
-                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameUserId, function(err) {
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, gameUserId.toString(), function(err) {
                     // Show a warning on error
                     if(err !== null && err !== undefined) {
                         console.error('A Redis error occurred when storing game user ID, ignoring.');
