@@ -260,6 +260,9 @@ $(document).bind("pagecreate", function() {
                 $(this).parent().addClass('ui-disabled');
             });
 
+            // Disable the change roles button
+            buttonChangeRoles.addClass('ui-disabled');
+
             // Callback on error
             var onError = function() {
                 // Show an error notification
@@ -277,6 +280,9 @@ $(document).bind("pagecreate", function() {
                     // Enable the checkbox
                     checkbox.parent().removeClass('ui-disabled');
                 });
+
+                // Enable the change roles button
+                buttonChangeRoles.removeClass('ui-disabled');
             };
 
             $.ajax({
@@ -326,6 +332,9 @@ $(document).bind("pagecreate", function() {
                         // Enable the checkbox
                         checkbox.parent().removeClass('ui-disabled');
                     });
+
+                    // Enable the change roles button
+                    buttonChangeRoles.removeClass('ui-disabled');
 
                     // TODO: Invalidate other player list pages!
                 },
