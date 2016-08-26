@@ -178,6 +178,7 @@ $(document).bind("pagecreate", function() {
     const popup = $('#popupChangeUserRole');
     const checkboxNamePrefix = 'checkbox-user-';
     const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
+    const checkboxSelectorUser = (userId) => 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
     const popupGameSelector = 'input[name=field-game]';
     const popupTeamSelector = 'select[name=field-team]';
     const popupSpecialSelector = 'select[name=field-special]';
@@ -254,6 +255,11 @@ $(document).bind("pagecreate", function() {
             // TODO: Send the object through ajax, and report the result!
             // TODO: Delete successfully deleted users!
 
+            // Disable all checkboxes for the selected users
+            checkboxes.each(function() {
+                $(this).parent().addClass('ui-disabled');
+            });
+
             // Callback on error
             var onError = function() {
                 // Show an error notification
@@ -263,7 +269,14 @@ $(document).bind("pagecreate", function() {
                     vibrate: true
                 });
 
-                //TODO: Revert the deleted checkboxes from the page!
+                // Revert the checkbox states
+                userIds.forEach(function(userId) {
+                    // Find it's checkbox
+                    const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+
+                    // Enable the checkbox
+                    checkbox.parent().removeClass('ui-disabled');
+                });
             };
 
             $.ajax({
@@ -280,15 +293,41 @@ $(document).bind("pagecreate", function() {
                         return;
                     }
 
+                    // Get the list of updated users
+                    const updatedUsers = data.updatedUsers;
+                    const updatedUsersCount = updatedUsers.length;
+
                     // Show an error notification
-                    showNotification('Changes roles for ' + userIds.length + ' user' + (userIds.length != 1 ? 's' : ''), {
+                    showNotification('Changes roles for ' + updatedUsersCount + ' user' + (updatedUsersCount != 1 ? 's' : ''), {
                         toast: true,
                         native: false,
                         vibrate: true,
                         vibrationPattern: 50
                     });
 
-                    // TODO: Delete checkboxes for users that don't belong in the current category anymore
+                    // Loop through the list of updated users and remove their checkboxes
+                    updatedUsers.forEach(function(userId) {
+                        // Find it's checkbox
+                        const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+
+                        // Remove the parent checkbox from the page
+                        checkbox.parent().remove();
+                    });
+
+                    // Loop through the original list of user IDs
+                    userIds.forEach(function(userId) {
+                        // Check whether this user ID hasn't been covered
+                        if(updatedUsers.indexOf(userId) !== -1)
+                            return;
+
+                        // Find it's checkbox
+                        const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+
+                        // Enable the checkbox
+                        checkbox.parent().removeClass('ui-disabled');
+                    });
+
+                    // TODO: Invalidate other player list pages!
                 },
                 error: onError
             });
