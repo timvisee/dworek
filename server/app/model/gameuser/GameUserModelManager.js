@@ -835,7 +835,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
 
             // A game user ID is found, create an instance and return it
             //noinspection JSCheckFunctionSignatures
-            callback(null, self._instanceManager.create(id));
+            callback(null, self._instanceManager.create(result));
         });
     }
 
