@@ -23,6 +23,7 @@
 var express = require('express');
 var router = express.Router();
 
+var ajax = require('./ajax/index');
 var login = require('./login');
 var logout = require('./logout');
 var register = require('./register');
@@ -86,6 +87,9 @@ router.get('/', function(req, res, next) {
         LayoutRenderer.render(req, res, next, 'dashboard', appInfo.APP_NAME, options);
     });
 });
+
+// Ajax requests
+router.use('/ajax', ajax);
 
 // Login page
 router.use('/login', login);
@@ -207,4 +211,5 @@ function getGameList(stage, limit, callback) {
     });
 }
 
+// Export the router
 module.exports = router;
