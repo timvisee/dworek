@@ -22,8 +22,6 @@
 
 var express = require('express');
 var router = express.Router();
-var mongo = require('mongodb');
-var ObjectId = mongo.ObjectId;
 
 var Core = require('../../../../Core');
 var CallbackLatch = require('../../../util/CallbackLatch');
@@ -89,7 +87,7 @@ router.post('/', function(req, res, next) {
 
     // Continue when we're done fetching the game
     latch.then(function() {
-        // Reset the latch back to it's identity
+        // Reset the latch back to it's identity to recycle it
         latch.identity();
 
         // Determine whether this request is cancelled, due to an error of some sort
@@ -105,6 +103,7 @@ router.post('/', function(req, res, next) {
                 return;
 
             // Get the game user for this game and user
+            latch.add();
             Core.model.gameUserModelManager.getGameUser(game, userId, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
@@ -117,12 +116,13 @@ router.post('/', function(req, res, next) {
                 // Make sure the game user is valid
                 if(gameUser === null || gameUser === undefined) {
                     // Respond with an error
-                    res.json({
-                        status: 'error',
-                        error: {
-                            message: 'Invalid game and user ID combination for user \'' + userId + '\''
-                        }
-                    });
+                    if(!cancelled)
+                        res.json({
+                            status: 'error',
+                            error: {
+                                message: 'Invalid game and user ID combination for user \'' + userId + '\''
+                            }
+                        });
 
                     // Set the cancelled flag and return
                     cancelled = true;
@@ -140,13 +140,16 @@ router.post('/', function(req, res, next) {
                     // TODO: Determine the new team value (random, and team IDs)
                     newTeam = null;
 
-                // Set the users special state
-                latch.add();
-                gameUser.setFields({
+                // Create a fields object with the new field values
+                const fields = {
                     team: newTeam,
                     is_special: isSpecial,
                     is_spectator: isSpectator
-                }, function(err) {
+                };
+
+                // Set the users special state
+                latch.add();
+                gameUser.setFields(fields, function(err) {
                     // Call back errors
                     if(err !== null) {
                         if(!cancelled)
@@ -158,6 +161,9 @@ router.post('/', function(req, res, next) {
                     // Resolve the latch
                     latch.resolve();
                 });
+
+                // Resolve the latch
+                latch.resolve();
             });
         });
 
