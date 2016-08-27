@@ -9,6 +9,19 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='info')
+        if game.usersCount.requested > 0
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Users waiting approval
+
+                .card-supporting-text.has-action.has-title.
+                    #{game.usersCount.requested} user#{game.usersCount.requested == 1 ? '' : 's'} requested to join this game and are awaiting your approval.
+                    Visit the players page to accept or reject these users.
+
+                .card-action
+                    .row.between-xs: .col-xs-12: .box
+                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
+
         if game.userState.player || game.userState.spectator || game.userState.special
         else if game.userState.requested
             .nd2-card.wow.fadeInUp
