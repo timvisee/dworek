@@ -92,12 +92,12 @@ router.post('/', function(req, res, next) {
         latch.identity();
 
         // Create flags to define whether the user is admin or host of the game
-        var admin = false;
-        var host = false;
+        var isAdmin = false;
+        var isHost = false;
 
         // Check whether the user is administrator
         latch.add();
-        user.isAdmin(function(err, isAdmin) {
+        user.isAdmin(function(err, result) {
             // Call back errors
             if(err !== null) {
                 next(err);
@@ -105,7 +105,7 @@ router.post('/', function(req, res, next) {
             }
 
             // Set the admin flag
-            admin = isAdmin;
+            isAdmin = result;
 
             // Resolve the latch
             latch.resolve();
@@ -113,7 +113,7 @@ router.post('/', function(req, res, next) {
 
         // Check whether the user is host of the game
         latch.add();
-        game.getUser(function(err, gameHost) {
+        game.getUser(function(err, result) {
             // Call back errors
             if(err != null) {
                 next(err);
@@ -121,13 +121,13 @@ router.post('/', function(req, res, next) {
             }
 
             // Make sure the host user isn't null
-            if(gameHost === null) {
-                host = false;
+            if(result === null) {
+                isHost = false;
                 return;
             }
 
             // Determine whether the user is host, and set the flag
-            host = gameHost.getId().equals(user.getId());
+            isHost = result.getId().equals(user.getId());
         });
 
         // Continue when we're done
@@ -136,7 +136,7 @@ router.post('/', function(req, res, next) {
             latch.identity();
 
             // Make sure the user is host or administrator
-            if(!host && !admin) {
+            if(!isHost && !isAdmin) {
                 next(new Error('You don\'t have permission to change user roles'));
                 return;
             }
