@@ -12,7 +12,7 @@ block content
         if (user.isHost || user.isAdmin) && game.usersCount.requested > 0
             .nd2-card.wow.fadeInUp
                 .card-title.has-supporting-text
-                    h3.card-primary-title Users waiting approval
+                    h3.card-primary-title Users awaiting approval
 
                 .card-supporting-text.has-action.has-title.
                     #{game.usersCount.requested} user#{game.usersCount.requested == 1 ? '' : 's'} requested to join this game and are awaiting your approval.
