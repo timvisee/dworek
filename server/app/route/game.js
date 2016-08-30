@@ -60,8 +60,9 @@ router.get('/:game', function(req, res, next) {
         return;
     }
 
-    // Create a game object
+    // Create a game and user object
     var gameObject = {};
+    var userObject = {};
 
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
@@ -114,12 +115,51 @@ router.get('/:game', function(req, res, next) {
         latch.resolve();
     });
 
+    // Determine whether the user is game host
+    latch.add();
+    game.getUser(function(err, host) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Make sure the user isn't null
+        if(host === null) {
+            userObject.isHost = false;
+            return;
+        }
+
+        // Set whether the user is
+        userObject.isHost = host.getId().equals(user.getId());
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Determine whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set whether the user is administrator
+        userObject.isAdmin = isAdmin;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Render the page when we're ready
     latch.then(function() {
         // Render the game page
         //noinspection JSCheckFunctionSignatures
         LayoutRenderer.render(req, res, next, 'game', gameObject.name, {
-            game: gameObject
+            game: gameObject,
+            user: userObject
         });
     });
 });

@@ -9,7 +9,7 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='info')
-        if game.usersCount.requested > 0
+        if (user.isHost || user.isAdmin) && game.usersCount.requested > 0
             .nd2-card.wow.fadeInUp
                 .card-title.has-supporting-text
                     h3.card-primary-title Users waiting approval
