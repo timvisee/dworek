@@ -335,8 +335,6 @@ $(document).bind("pagecreate", function() {
 
                     // Enable the change roles button
                     buttonChangeRoles.removeClass('ui-disabled');
-
-                    // TODO: Invalidate other player list pages!
                 },
                 error: onError
             });
