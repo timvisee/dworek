@@ -285,6 +285,7 @@ $(document).bind("pagecreate", function() {
                 buttonChangeRoles.removeClass('ui-disabled');
             };
 
+            // Do an request to change the user roles
             $.ajax({
                 type: "POST",
                 url: '/ajax/user/changeRoles',

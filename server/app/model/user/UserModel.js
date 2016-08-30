@@ -67,6 +67,18 @@ var UserModel = function(id) {
                     from: ConversionFunctions.dateFromRedis,
                     to: ConversionFunctions.dateToRedis
                 }
+            },
+            is_admin: {
+                redis: {
+                    from: (isAdmin) => isAdmin != '0',
+                    to: (isAdmin) => isAdmin ? '1' : '0'
+                }
+            },
+            is_pro: {
+                redis: {
+                    from: (isPro) => isPro != '0',
+                    to: (isPro) => isPro ? '1' : '0'
+                }
             }
         }
     });
@@ -339,6 +351,60 @@ UserModel.prototype.getCreateDate = function(callback) {
  */
 UserModel.prototype.setCreateDate = function(createDate, callback) {
     this.setField('create_date', createDate, callback);
+};
+
+/**
+ * Check whether this user is administrator.
+ *
+ * @param {UserModel~isAdminCallback} callback Called with the result or when an error occurred.
+ */
+UserModel.prototype.isAdmin = function(callback) {
+    this.getField('is_admin', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback UserModel~isAdminCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the user is administrator, false if not.
+ */
+
+/**
+ * Set whether the user is administrator.
+ *
+ * @param {boolean} isAdmin True if the user is administrator, false if not.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setCreateDate = function(isAdmin, callback) {
+    this.setField('is?admin', isAdmin, callback);
+};
+
+/**
+ * Check whether this user is pro.
+ *
+ * @param {UserModel~isProCallback} callback Called with the result or when an error occurred.
+ */
+UserModel.prototype.isPro = function(callback) {
+    this.getField('is_pro', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback UserModel~isProCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if the user is pro, false if not.
+ */
+
+/**
+ * Set whether the user is pro.
+ *
+ * @param {boolean} isPro True if the user is pro, false if not.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setCreateDate = function(isPro, callback) {
+    this.setField('is?pro', isPro, callback);
 };
 
 /**

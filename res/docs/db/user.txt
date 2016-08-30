@@ -8,3 +8,5 @@ first_name : String             User's first name.
 last_name : String              User's last name.
 nickname : String               User display name.
 create_date : Date              User creation date and time.
+is_admin : bool                 True if the user is an administrator, false if not.
+is_pro : bool                   True if the user is a pro user, false if not. This usually defines whether the user can host games.
