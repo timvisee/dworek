@@ -600,23 +600,15 @@ function getGameUserListObject(game, category, callback) {
     });
 
     // Create the query options object based on the category
-    var options;
+    var options = {};
     if(category === 'requested')
-        options = {
-            requested: true
-        };
+        options.requested = true;
     else if(category === 'players')
-        options = {
-            players: true
-        };
+        options.players = true;
     else if(category === 'specials')
-        options = {
-            specials: true
-        };
+        options.specials = true;
     else if(category === 'spectators')
-        options = {
-            spectators: true
-        };
+        options.spectators = true;
 
     // Get the users in this category
     latch.add();
