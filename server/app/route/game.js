@@ -779,12 +779,12 @@ router.get('/:game/teams', function(req, res, next) {
 
         // Make sure the user isn't null
         if(result === null) {
-            jemoeder.isHost = false;
+            userObject.isHost = false;
             return;
         }
 
         // Determine whether the user is host of the game
-        jemoeder.isHost = result.getId().equals(user.getId());
+        userObject.isHost = result.getId().equals(user.getId());
 
         // Resolve the latch
         latch.resolve();
