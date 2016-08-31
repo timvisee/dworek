@@ -6,11 +6,11 @@ block content
     if game.users.category == null
         ul(data-role='listview')
             if game.users.count.requested > 0
-                li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Join requests
-                li: a.wow.fadeInUp(href=page.url + '/requested', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Requests...
+                li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Unapproved users
+                li: a.wow.fadeInUp(href=page.url + '/requested', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Users waiting approval...
                     span.ui-li-count()= game.users.count.requested
 
-            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Players
+            li.wow.fadeInUp(data-role='list-divider', data-wow-delay=(fadeDelay += 0.1) + 's') Approved users
             li: a.wow.fadeInUp(href=page.url + '/players', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Team players...
                 span.ui-li-count()= game.users.count.players
             li: a.wow.fadeInUp(href=page.url + '/specials', data-transition='slide', data-wow-delay=(fadeDelay += 0.1) + 's') Special players...
@@ -40,7 +40,8 @@ block content
                     option(value='none') None
                     option(value='random', selected='selected') Random
                     option(disabled='disabled') ──────────
-                    option(value='none') Some team name...
+                    //- TODO: Show team names here!
+                    option(value='none') Team names should show up here!
 
                 //- Flip switches for special players and spectators
                 br
@@ -85,4 +86,4 @@ block content
                         | #{user.firstName} #{user.lastName}
         else
             p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
-                i No users in this category...
+                i No users here...
