@@ -178,8 +178,6 @@ GameTeamModelManager.prototype.getTeamById = function(id, callback) {
  * @param {GameTeamModel|null} Game team instance, or null if no game was found for the given ID.
  */
 
-// TODO: Finish the code below!
-
 /**
  * Get all the teams for the given game.
  *
@@ -308,9 +306,9 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
 /**
  * Called with the result or when an error occurred.
  *
- * @callback GameTeamModelManager~isValidGameIdCallback
+ * @callback GameTeamModelManager~getGameTeamsCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {boolean} True if a game with this ID exists, false if not.
+ * @param {Array} Array of teams for this game. An empty array is returned if the game doesn't have any team.
  */
 
 // Return the created class
