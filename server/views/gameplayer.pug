@@ -23,7 +23,9 @@ block content
                     span.ui-li-count()= game.users.count.requested
 
     else
-        a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop') Change roles
+        //- Show the change roles button if the user has proper rights
+        if user.isHost || user.isAdmin
+            a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop') Change roles
 
         #popupChangeUserRole(data-role='popup')
             div(data-role='header')
@@ -78,12 +80,18 @@ block content
         h1.header.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's') Users
 
         if game.users.users.length > 0
-            each user in game.users.users
+            each entry in game.users.users
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
-                    input(type='checkbox', name='checkbox-user-' + user.id, id='checkbox-user-' + user.id)
-                    label(for='checkbox-user-' + user.id)
-                        img.ui-thumbnail.ui-thumbnail-square(src=user.avatarUrl)
-                        | #{user.firstName} #{user.lastName}
+                    //- Checkbox, enabled or disabled based on the users' rights
+                    if user.isHost || user.isAdmin
+                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id)
+                    else
+                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id, disabled='disabled')
+
+                    //- Label with the avatar
+                    label(for='checkbox-user-' + entry.id)
+                        img.ui-thumbnail.ui-thumbnail-square(src=entry.avatarUrl)
+                        | #{entry.firstName} #{entry.lastName}
         else
             p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                 i No users here...
