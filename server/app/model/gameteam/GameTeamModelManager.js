@@ -231,6 +231,12 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
                 return;
             }
 
+            // Call back an empty array if the string was empty
+            if(result.trim().length === 0) {
+                callback(null, []);
+                return;
+            }
+
             // Split the result
             var teamIds = result.split(",");
 
@@ -257,21 +263,25 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
                 return;
             }
 
-            // Create a list of games
+            // Create a list of team IDs and teams
+            var teamIds = [];
             var teams = [];
 
             // Loop through the result data
             data.forEach(function(teamObject) {
                 // Get the team ID and team name
-                var teamId = teamObject._id;
-                var teamName = teamObject.name;
+                const teamId = teamObject._id;
+                const teamName = teamObject.name;
 
-                // Create a new game object
-                var game = self._instanceManager.create(teamId);
-                game._baseModel.cacheSetField('name', teamName);
+                // Add the team ID to the list
+                teamIds.push(teamId);
+
+                // Create a new team object, and internally cache the team name to improve performance
+                const team = self._instanceManager.create(teamId);
+                team._baseModel.cacheSetField('name', teamName);
 
                 // Put the game into the list of games
-                games.push(game);
+                teams.push(team);
             });
 
             // Call back with the list of teams
@@ -279,11 +289,14 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
 
             // Store the result in Redis if ready
             if(RedisUtils.isReady()) {
+                // Combine all team IDs in one string to cache
+                var teamsString = teamIds.join(',');
+
                 // Store the results
-                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, teamsString, function(err) {
                     // Show a warning on error
                     if(err !== null && err !== undefined) {
-                        console.error('A Redis error occurred when storing Game Team ID validity, ignoring.');
+                        console.error('A Redis error occurred when storing game teams, ignoring.');
                         console.error(new Error(err));
                     }
                 });
