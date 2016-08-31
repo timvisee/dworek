@@ -480,8 +480,9 @@ function renderGameUserListPage(req, res, next, category) {
         return;
     }
 
-    // Get the game
+    // Get the game and user
     const game = req.game;
+    const user = req.session.user;
 
     // Call back if the game is invalid
     if(game === undefined) {
@@ -489,20 +490,76 @@ function renderGameUserListPage(req, res, next, category) {
         return;
     }
 
-    // Get the game object
-    getGameUserListObject(game, category, function(err, gameObject) {
+    // Create a callback latch to fetch the user rights
+    var latch = new CallbackLatch();
+
+    // Create a game and user object
+    var gameObject = {};
+    var userObject = {};
+
+    // Determine whether the user is game host
+    latch.add();
+    game.getUser(function(err, host) {
         // Call back errors
         if(err !== null) {
             next(err);
             return;
         }
 
+        // Make sure the user isn't null
+        if(host === null) {
+            userObject.isHost = false;
+            return;
+        }
+
+        // Set whether the user is
+        userObject.isHost = host.getId().equals(user.getId());
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Determine whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set whether the user is administrator
+        userObject.isAdmin = isAdmin;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the game object
+    latch.add();
+    getGameUserListObject(game, category, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the game object
+        gameObject = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the page when everything is fetched successfully
+    latch.then(function() {
         // Render the game page
         LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
             page: {
                 leftButton: 'back'
             },
-            game: gameObject
+            game: gameObject,
+            user: userObject
         });
     });
 }
