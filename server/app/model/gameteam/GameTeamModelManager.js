@@ -24,6 +24,7 @@ var ObjectId = require('mongodb').ObjectId;
 
 var config = require('../../../config');
 
+var GameModel = require('./../game/GameModel');
 var GameTeamDatabase = require('./GameTeamDatabase');
 var GameTeamModel = require('./GameTeamModel');
 var RedisUtils = require('../../redis/RedisUtils');
