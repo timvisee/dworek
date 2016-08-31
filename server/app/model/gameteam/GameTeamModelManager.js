@@ -178,5 +178,127 @@ GameTeamModelManager.prototype.getTeamById = function(id, callback) {
  * @param {GameTeamModel|null} Game team instance, or null if no game was found for the given ID.
  */
 
+// TODO: Finish the code below!
+
+/**
+ * Get all the teams for the given game.
+ *
+ * @param {Game|ObjectId|string} game The game or the ID of the game to get the teams for.
+ * @param {GameTeamModelManager~getGameTeamsCallback} callback Called with the result or when an error occurred.
+ */
+GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
+    // Validate the object ID, or get the object ID if a game is given
+    if(game instanceof GameModel)
+        game = game.getId();
+    else if(game === null || game === undefined || !ObjectId.isValid(game)) {
+        // Call back
+        callback(null, false);
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Store the current instance
+    const self = this;
+
+    // TODO: Check an instance for this ID is already available?
+
+    // Determine the Redis cache key
+    var redisCacheKey = 'model:gameteam:getGameTeams:' + game.toString();
+
+    // Check whether the game is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while checking game validity, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null or zero
+            if(result === undefined || result === null || result == 0) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Split the result
+            var teamIds = result.split(",");
+
+            // Create an array of teams
+            var teams = [];
+
+            // Loop through the team IDs
+            teamIds.forEach((teamId) => teams.push(self._instanceManager.create(teamId)));
+
+            // Call back the list of teams
+            //noinspection JSCheckFunctionSignatures
+            callback(null, teams);
+        });
+    }
+
+    // Fetch the result from MongoDB when we're done with Redis
+    latch.then(function() {
+        // Query the database and check whether the game is valid
+        GameTeamDatabase.layerFetchFieldsFromDatabase({game_id: game}, {_id: true, name: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err), null);
+                return;
+            }
+
+            // Create a list of games
+            var teams = [];
+
+            // Loop through the result data
+            data.forEach(function(teamObject) {
+                // Get the team ID and team name
+                var teamId = teamObject._id;
+                var teamName = teamObject.name;
+
+                // Create a new game object
+                var game = self._instanceManager.create(teamId);
+                game._baseModel.cacheSetField('name', teamName);
+
+                // Put the game into the list of games
+                games.push(game);
+            });
+
+            // Call back with the list of teams
+            callback(null, teams);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred when storing Game Team ID validity, ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameTeamModelManager~isValidGameIdCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if a game with this ID exists, false if not.
+ */
+
 // Return the created class
 module.exports = GameTeamModelManager;
