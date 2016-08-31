@@ -1,0 +1,29 @@
+extends page
+
+block content
+    - var fadeDelay = -0.1;
+
+    h1.header.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's') Teams
+
+    //- Create a form and show a list of teams
+    form
+        if teams.length > 0
+            each entry in teams
+                .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
+                    //- Checkbox, enabled or disabled based on the users' rights
+                    if user.isHost || user.isAdmin
+                        input(type='checkbox', name='checkbox-user-' + entry.name, id='checkbox-user-' + entry.name)
+                    else
+                        input(type='checkbox', name='checkbox-user-' + entry.name, id='checkbox-user-' + entry.name, disabled='disabled')
+
+                    //- Label with the avatar
+                    label(for='checkbox-user-' + entry.name)= entry.name
+        else
+            p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
+                i No teams here...
+
+        br
+        if user.isAdmin || user.isHost
+            .button-list
+                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='a', data-wow-delay=(fadeDelay += 0.1) + 's') Test Button
+                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='a', data-wow-delay=(fadeDelay += 0.1) + 's') Test Button
