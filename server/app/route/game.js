@@ -746,6 +746,23 @@ router.get('/:game/teams', function(req, res, next) {
     // Create an user object
     var userObject = {};
 
+    // Get the game name
+    var gameName = '';
+    latch.add();
+    game.getName(function(err, name) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the game name
+        gameName = name;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Check whether the user is administrator
     latch.add();
     user.isAdmin(function(err, result) {
@@ -790,28 +807,71 @@ router.get('/:game/teams', function(req, res, next) {
         latch.resolve();
     });
 
+    // Create a teams object
+    var teams = [];
+
+    // Create a flag to define whether we called back
+    var calledBack = false;
+
+    // Get the teams for this game
+    Core.model.gameTeamModelManager.getGameTeams(game, function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Loop through the list of teams
+        result.forEach(function(team) {
+            // Add a latch
+            latch.add();
+
+            // Create a team object to add to the array
+            var teamObject = {
+                id: team.getIdHex(),
+                name: ''
+            };
+
+            // Create a callback latch
+            var teamLatch = new CallbackLatch();
+
+            // Get the team name
+            team.getName(function(err, name) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the team name
+                teamObject.name = name;
+
+                // Resolve the latch
+                teamLatch.resolve();
+            });
+
+            // Add the team ot the list of teams when we're done fetching it's fields
+            teamLatch.then(function() {
+                // Add the team
+                teams.push(teamObject);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+    });
+
     // Continue when we're done fetching the users permissions
     latch.then(function() {
         // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameteam', 'Teams', {
+        LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
             page: {
                 leftButton: 'back'
             },
             user: userObject,
-            teams: [
-                {
-                    name: 'TeamA'
-                },
-                {
-                    name: 'TeamB'
-                },
-                {
-                    name: 'TeamC'
-                },
-                {
-                    name: 'TeamD'
-                }
-            ]
+            teams
         });
     });
 });
