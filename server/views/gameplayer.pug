@@ -23,10 +23,7 @@ block content
                     span.ui-li-count()= game.users.count.requested
 
     else
-        //- Show the change roles button if the user has proper rights
-        if user.isHost || user.isAdmin
-            a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop') Change roles
-
+        //- Change user role popup
         #popupChangeUserRole(data-role='popup')
             div(data-role='header')
                 a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
@@ -92,6 +89,12 @@ block content
                     label(for='checkbox-user-' + entry.id)
                         img.ui-thumbnail.ui-thumbnail-square(src=entry.avatarUrl)
                         | #{entry.firstName} #{entry.lastName}
+
+            br
+            //- Show the change roles button if the user has proper rights
+            if user.isHost || user.isAdmin
+                a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles.wow.fadeInUp(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Change roles
+
         else
             p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                 i No users here...
