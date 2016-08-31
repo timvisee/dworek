@@ -713,4 +713,107 @@ function getGameUserListObject(game, category, callback) {
  * @param {Object=} Game object instance.
  */
 
+// TODO: Finish this code below!
+
+// Game teams page
+router.get('/:game/teams', function(req, res, next) {
+    // Make sure the user is logged in
+    if (!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Get the game
+    const game = req.game;
+    const user = req.session.user;
+
+    // Call back if the game is invalid
+    if (game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // Create a game object
+    var gameObject = {
+        users: {
+            category: null
+        }
+    };
+
+    // Create a callback latch for the games properties
+    var latch = new CallbackLatch();
+
+    // Create an user object
+    var userObject = {};
+
+    // Check whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, result) {
+        // Call back results
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Make sure the user isn't null
+        if(result === null) {
+            userObject.isAdmin = false;
+            return;
+        }
+
+        // Set whether the user is admin
+        userObject.isAdmin = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Check whether the user is host of the game
+    latch.add();
+    game.getUser(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Make sure the user isn't null
+        if(result === null) {
+            jemoeder.isHost = false;
+            return;
+        }
+
+        // Determine whether the user is host of the game
+        jemoeder.isHost = result.getId().equals(user.getId());
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Continue when we're done fetching the users permissions
+    latch.then(function() {
+        // Render the game page
+        LayoutRenderer.render(req, res, next, 'gameteam', 'Teams', {
+            page: {
+                leftButton: 'back'
+            },
+            user: userObject,
+            teams: [
+                {
+                    name: 'TeamA'
+                },
+                {
+                    name: 'TeamB'
+                },
+                {
+                    name: 'TeamC'
+                },
+                {
+                    name: 'TeamD'
+                }
+            ]
+        });
+    });
+});
+
 module.exports = router;
