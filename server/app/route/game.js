@@ -115,6 +115,22 @@ router.get('/:game', function(req, res, next) {
         latch.resolve();
     });
 
+    // Count the number of teams for this game
+    latch.add();
+    game.getTeamCount(function(err, teamCount) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the number of teams
+        gameObject.teamCount = teamCount;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Determine whether the user is game host
     latch.add();
     game.getUser(function(err, host) {
@@ -371,6 +387,22 @@ router.get('/:game/info', function(req, res, next) {
 
         // Set the property
         gameObject.usersCount = usersCount;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Count the number of teams for this game
+    latch.add();
+    game.getTeamCount(function(err, teamCount) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Set the number of teams
+        gameObject.teamCount = teamCount;
 
         // Resolve the latch
         latch.resolve();

@@ -55,10 +55,10 @@ block content
                     tr: td Name
                         td= game.name
                     tr: td Teams
-                        td ?
+                        td= game.teamCount
                     tr: td Participants
                         td= game.usersCount.totalAccepted
-                            span.gray  player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
+                            span.gray  user#{game.usersCount.totalAccepted == 1 ? '' : 's'}
                     if game.usersCount.requested > 0
                         tr: td Requested
                             td= game.usersCount.requested

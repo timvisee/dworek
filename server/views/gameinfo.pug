@@ -10,7 +10,7 @@ block content
                 tr: td Name
                     td= game.name
                 tr: td Teams
-                    td ?
+                    td= game.teamCount
                 tr: td In team
                     td= game.usersCount.players
                         span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
