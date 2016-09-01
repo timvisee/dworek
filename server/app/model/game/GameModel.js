@@ -401,5 +401,40 @@ GameModel.prototype.getUserState = function(user, callback) {
  * @param {UserGameState=} User's game state.
  */
 
+
+/**
+ * Get the teams for this game.
+ *
+ * @param {GameModel~getTeamsCallback} callback Called back with the list of teams or when an error occurred.
+ */
+GameModel.prototype.getTeams = function(callback) {
+    Core.model.gameTeamModelManager.getGameTeams(this, callback);
+};
+
+/**
+ * Called back with the list of teams or when an error occurred.
+ *
+ * @callback GameModel~getTeamsCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Array} Array of team model instances.
+ */
+
+/**
+ * Get the number of teams for this game.
+ *
+ * @param {GameModel~getTeamCountCallback} callback Called back with the number of teams or when an error occurred.
+ */
+GameModel.prototype.getTeamCount = function(callback) {
+    Core.model.gameTeamModelManager.getGameTeamCount(this, callback);
+};
+
+/**
+ * Called back with the number of teams or when an error occurred.
+ *
+ * @callback GameModel~getTeamCountCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Number} Number of teams in this game.
+ */
+
 // Export the user class
 module.exports = GameModel;
