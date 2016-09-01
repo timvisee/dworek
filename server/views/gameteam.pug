@@ -5,6 +5,34 @@ block content
 
     h1.header.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's') Teams
 
+    //- Create team popup
+    #popupCreateTeam(data-role='popup')
+        div(data-role='header')
+            a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+                i.zmdi.zmdi-close
+            h1.nd-title Create team
+
+        div(data-role='content')
+            p Please specify the name of the team you'd like to create.
+
+            br
+            label(for='field-team-name') Team name:
+            input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
+
+            //- Game ID
+            //- TODO: Make sure the game ID is given!
+            //input(type='hidden', name='field-game', value=game.id)
+
+            //- Action buttons
+            br
+            .button-list
+                a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
+                    i.zmdi.zmdi-check
+                    | &nbsp;&nbsp;Create
+                a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
+                    i.zmdi.zmdi-cancel
+                    | &nbsp;Cancel
+
     //- Create a form and show a list of teams
     form
         if teams.length > 0
@@ -25,5 +53,5 @@ block content
         br
         if user.isAdmin || user.isHost
             .button-list
-                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='a', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
-                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='a', data-wow-delay=(fadeDelay += 0.1) + 's') Delete team
+                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
+                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete team
