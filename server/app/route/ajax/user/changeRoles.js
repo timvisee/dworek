@@ -128,6 +128,9 @@ router.post('/', function(req, res, next) {
 
             // Determine whether the user is host, and set the flag
             isHost = result.getId().equals(user.getId());
+
+            // Resolve the host
+            latch.resolve();
         });
 
         // Continue when we're done
