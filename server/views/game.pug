@@ -46,29 +46,29 @@ block content
                         .row.between-xs: .col-xs-12: .box
                             a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/join', data-transition='slide') Request to join
 
-            .nd2-card.wow.fadeInUp
-                .card-title.has-supporting-text
-                    h3.card-primary-title Game information
+        .nd2-card.wow.fadeInUp
+            .card-title.has-supporting-text
+                h3.card-primary-title Game information
 
-                .card-supporting-text.has-action.has-title
-                    table.table-list.ui-responsive
-                        tr: td Name
-                            td= game.name
-                        tr: td Teams
-                            td ?
-                        tr: td Participants
-                            td= game.usersCount.totalAccepted
-                                span.gray  player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
-                        if game.usersCount.requested > 0
-                            tr: td Requested
-                                td= game.usersCount.requested
-                                    span.gray  user#{game.usersCount.requested == 1 ? '' : 's'}
+            .card-supporting-text.has-action.has-title
+                table.table-list.ui-responsive
+                    tr: td Name
+                        td= game.name
+                    tr: td Teams
+                        td 3
+                    tr: td Participants
+                        td= game.usersCount.totalAccepted
+                            span.gray  player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
+                    if game.usersCount.requested > 0
+                        tr: td Requested
+                            td= game.usersCount.requested
+                                span.gray  user#{game.usersCount.requested == 1 ? '' : 's'}
 
-                .card-action
-                    .row.between-xs: .col-xs-12: .box
-                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/info', data-transition='slide') More info
-                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
-                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/teams', data-transition='slide') Teams
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/info', data-transition='slide') More info
+                    a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
+                    a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/teams', data-transition='slide') Teams
 
     div(data-role='nd2tab', data-tab='map')
         p Show map here...
