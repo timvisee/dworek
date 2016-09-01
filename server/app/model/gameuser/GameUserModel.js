@@ -24,8 +24,7 @@ var util = require('util');
 
 var Core = require('../../../Core');
 var GameUserDatabase = require('./GameUserDatabase');
-var BaseModel = require('../../db/BaseModel');
-var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
+var BaseModel = require('../../database/BaseModel');
 
 /**
  * GameUserModel class.

@@ -24,9 +24,8 @@ var util = require('util');
 
 var Core = require('../../../Core');
 var SessionDatabase = require('./SessionDatabase');
-var BaseModel = require('../../db/BaseModel');
-var DatabaseObjectLayer = require('../../database/DatabaseObjectLayer');
-var ConversionFunctions = require('../../db/ConversionFunctions');
+var BaseModel = require('../../database/BaseModel');
+var ConversionFunctions = require('../../database/ConversionFunctions');
 
 /**
  * SessionModel class.
