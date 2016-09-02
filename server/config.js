@@ -232,16 +232,16 @@ config.validation.nicknameMinLength = 1;
 config.validation.nicknameMaxLength = 32;
 
 /**
- * Minimum number of group name characters.
+ * Minimum number of team name characters.
  * @type {int}
  */
-config.validation.groupNameMinLength = 1;
+config.validation.teamNameMinLength = 1;
 
 /**
- * Maximum number of group name characters.
+ * Maximum number of team name characters.
  * @type {int}
  */
-config.validation.groupNameMaxLength = 64;
+config.validation.teamNameMaxLength = 64;
 
 
 // Export the configuration

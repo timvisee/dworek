@@ -170,30 +170,30 @@ Validator.isValidNickname = function(nickname) {
 };
 
 /**
- * Format the the given group name.
+ * Format the the given team name.
  *
- * @param {string} groupName Group name.
+ * @param {string} teamName Team name.
  *
- * @return {string} The formatted group name.
+ * @return {string} The formatted team name.
  */
-Validator.formatGroupName = function(groupName) {
-    // Trim the group name, and return
-    return groupName.trim();
+Validator.formatTeamName = function(teamName) {
+    // Trim the team name, and return
+    return teamName.trim();
 };
 
 /**
- * Check whether the given group name is valid.
+ * Check whether the given team name is valid.
  *
- * @param {string} groupName Group name.
+ * @param {string} teamName Team name.
  *
- * @return {boolean} True if the group name is valid, false if not.
+ * @return {boolean} True if the team name is valid, false if not.
  */
-Validator.isValidGroupName = function(groupName) {
-    // Trim the group name
-    groupName = groupName.trim();
+Validator.isValidTeamName = function(teamName) {
+    // Trim the team name
+    teamName = teamName.trim();
 
     // Count the number of characters
-    var charCount = groupName.length;
+    var charCount = teamName.length;
 
     // Make sure the length is within bounds
     return charCount === 0 ||
