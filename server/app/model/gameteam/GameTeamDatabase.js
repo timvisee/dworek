@@ -46,17 +46,17 @@ GameTeamDatabase.DB_COLLECTION_NAME = 'game_team';
  */
 GameTeamDatabase.addGameTeam = function(game, teamName, callback) {
     // Get the database instance
-    var db = MongoUtil.getConnection();
+    const db = MongoUtil.getConnection();
 
     // Create the object to insert
     // TODO: Dynamically get the proper field names from the model configuration
-    var insertObject = {
+    const insertObject = {
         game_id: game.getId(),
         name: teamName
     };
 
-    // Insert the game user into the database
-    db.collection(GameTeamDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err, result) {
+    // Insert the game team into the database
+    db.collection(GameTeamDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err) {
         // Handle errors and make sure the status is ok
         if(err !== null) {
             // Show a warning and call back with the error
