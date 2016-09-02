@@ -196,8 +196,7 @@ Validator.isValidTeamName = function(teamName) {
     const charCount = teamName.length;
 
     // Make sure the length is within bounds
-    return charCount === 0 ||
-        (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
+    return (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
 };
 
 // Export the class
