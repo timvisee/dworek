@@ -34,7 +34,7 @@ block content
                     | &nbsp;Cancel
 
     //- Create a form and show a list of teams
-    form
+    .team-list
         if teams.length > 0
             each entry in teams
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
@@ -54,4 +54,4 @@ block content
         if user.isAdmin || user.isHost
             .button-list
                 a.ui-btn.ui-btn-raised.clr-primary.action-create-team.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
-                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected
+                a.ui-btn.ui-btn-raised.clr-primary.action-delete-selected.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected
