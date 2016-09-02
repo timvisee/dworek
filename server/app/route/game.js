@@ -772,7 +772,12 @@ router.post('/:game/teams', function(req, res, next) {
 
     // Validate the team name
     if(!Validator.isValidTeamName(teamName)) {
-        next(new Error('Team name not allowed.'));
+        // Show an error page
+        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
+            message: 'The specified team name is invalid.\n\n' +
+            'The team name must be between ' + config.validation.teamNameMinLength + ' and ' + config.validation.teamNameMaxLength + ' characters long.\n\n' +
+            'Please go back and choose a different team name.'
+        });
         return;
     }
 
