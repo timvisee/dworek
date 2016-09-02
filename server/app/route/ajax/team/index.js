@@ -23,56 +23,13 @@
 var express = require('express');
 var router = express.Router();
 
-var Core = require('../../../Core');
-var user = require('./user/index');
-var team = require('./team/index');
+var createTeam = require('./createTeam');
 
 // Index page
 router.get('/', (req, res, next) => next(new Error('No AJAX endpoint specified')));
 
-// User directory
-router.use('/user', user);
-
-// Team directory
-router.use('/team', team);
-
-// Catch 404 errors, and forward them to the error handler
-router.use(function(req, res, next) {
-    // Create an error, and set the status code
-    var error = new Error('Not Found');
-    error.status = 404;
-
-    // Forward the error
-    next(error);
-});
-
-// Error handler
-router.use(function(err, req, res) {
-    // Determine whether we're in development mode
-    var dev = Core.expressApp.get('env') === 'development';
-
-    // Show an error page, render the stack trace if we're in development mode
-    res.status(err.status || 500);
-
-    // Create a response object
-    var responseObject = {
-        status: 'error',
-        error: {
-            message: err.message,
-            status: err.status
-        }
-    };
-
-    // Append the stack trace if we're in development mode
-    if(dev)
-        responseObject.error.stacktrace = err.stack;
-
-    // Respond with the response object
-    res.json(responseObject);
-
-    // Print the error message to the console
-    console.error(err.stack);
-});
+// Create team request
+router.use('/createTeam', createTeam);
 
 // Export the router
 module.exports = router;
