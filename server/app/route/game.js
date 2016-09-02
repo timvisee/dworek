@@ -747,7 +747,7 @@ function getGameUserListObject(game, category, callback) {
  */
 
 // Game teams page
-router.get('/:game/teams', (req, res, next) => renderTeamPage());
+router.get('/:game/teams', (req, res, next) => renderTeamPage(req, res, next));
 
 // Game team creation page
 router.post('/:game/teams', function(req, res, next) {
@@ -876,9 +876,7 @@ function renderTeamPage(req, res, next) {
 
     // Create a game object
     var gameObject = {
-        users: {
-            category: null
-        }
+        id: game.getIdHex()
     };
 
     // Create a callback latch for the games properties
@@ -1012,6 +1010,7 @@ function renderTeamPage(req, res, next) {
                 leftButton: 'back'
             },
             user: userObject,
+            game: gameObject,
             teams
         });
     });
