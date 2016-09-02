@@ -16,23 +16,22 @@ block content
             p Please specify the name of the team you'd like to create.
 
             br
-            form(method='POST', action=page.url + '/#', data-ajax='false')
-                label(for='field-team-name') Team name:
-                input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
+            label(for='field-team-name') Team name:
+            input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
 
-                //- Game ID
-                //- TODO: Make sure the game ID is given!
-                input(type='hidden', name='field-game', value=game.id)
+            //- Game ID
+            //- TODO: Make sure the game ID is given!
+            input(type='hidden', name='field-game', value=game.id)
 
-                //- Action buttons
-                br
-                .button-list
-                    a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
-                        i.zmdi.zmdi-check
-                        | &nbsp;&nbsp;Create
-                    a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
-                        i.zmdi.zmdi-cancel
-                        | &nbsp;Cancel
+            //- Action buttons
+            br
+            .button-list
+                a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
+                    i.zmdi.zmdi-check
+                    | &nbsp;&nbsp;Create
+                a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
+                    i.zmdi.zmdi-cancel
+                    | &nbsp;Cancel
 
     //- Create a form and show a list of teams
     form
