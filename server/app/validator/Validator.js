@@ -94,7 +94,7 @@ Validator.isValidFirstName = function(firstName) {
     firstName = firstName.trim();
 
     // Count the number of characters
-    var charCount = firstName.length;
+    const charCount = firstName.length;
 
     // Make sure the length is within bounds
     return charCount >= config.validation.nameMinLength && charCount <= config.validation.nameMaxLength;
@@ -112,7 +112,7 @@ Validator.formatLastName = function(lastName) {
     lastName = lastName.trim();
 
     // Determine the character position of the last word
-    var charPos = lastName.lastIndexOf(' ') + 1;
+    const charPos = lastName.lastIndexOf(' ') + 1;
 
     // Format and return the last name
     return lastName.substring(0, charPos).toLowerCase() +
@@ -132,7 +132,7 @@ Validator.isValidLastName = function(lastName) {
     lastName = lastName.trim();
 
     // Count the number of characters
-    var charCount = lastName.length;
+    const charCount = lastName.length;
 
     // Make sure the length is within bounds
     return charCount >= config.validation.nameMinLength && charCount <= config.validation.nameMaxLength;
@@ -162,7 +162,7 @@ Validator.isValidNickname = function(nickname) {
     nickname = nickname.trim();
 
     // Count the number of characters
-    var charCount = nickname.length;
+    const charCount = nickname.length;
 
     // Make sure the length is within bounds
     return charCount === 0 ||
@@ -193,7 +193,7 @@ Validator.isValidTeamName = function(teamName) {
     teamName = teamName.trim();
 
     // Count the number of characters
-    var charCount = teamName.length;
+    const charCount = teamName.length;
 
     // Make sure the length is within bounds
     return charCount === 0 ||
