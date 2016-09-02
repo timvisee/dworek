@@ -32,6 +32,7 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 var GameParam = require('../router/middleware/GameParam');
 var Validator = require('../validator/Validator');
 var GameUserDatabase = require('../model/gameuser/GameUserDatabase');
+var GameTeamDatabase = require('../model/gameteam/GameTeamDatabase');
 
 // Games overview
 router.get('/', function(req, res) {
@@ -745,10 +746,113 @@ function getGameUserListObject(game, category, callback) {
  * @param {Object=} Game object instance.
  */
 
-// TODO: Finish this code below!
-
 // Game teams page
-router.get('/:game/teams', function(req, res, next) {
+router.get('/:game/teams', (req, res, next) => renderTeamPage());
+
+// Game team creation page
+router.post('/:game/teams', function(req, res, next) {
+    // Make sure the user is logged in
+    if (!req.session.valid) {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        return;
+    }
+
+    // Get the game
+    const game = req.game;
+    const user = req.session.user;
+
+    // Call back if the game is invalid
+    if (game === undefined) {
+        next(new Error('Invalid game.'));
+        return;
+    }
+
+    // Get the preferred team name
+    var teamName = req.body['field-team-name'];
+
+    // Validate the team name
+    if(!Validator.isValidTeamName(teamName)) {
+        next(new Error('Team name not allowed.'));
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create flags to determine whether the user has permission
+    var hasPermission = false;
+
+    // Check whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, result) {
+        // Call back results
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Change the flag if the user has permission
+        if(result === true)
+            hasPermission = true;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Check whether the user is host of the game
+    latch.add();
+    game.getUser(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Make sure the result isn't null
+        if(result === null)
+            return;
+
+        // Change the flag if the user is host of the game
+        if(user.getId().equals(result.getId()))
+            hasPermission = true;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Render the page when we're done
+    latch.then(function() {
+        // Throw an error if the user doesn't have permission
+        if(!hasPermission) {
+            next(new Error('No permission'));
+            return;
+        }
+
+        // Format the team name
+        teamName = Validator.formatTeamName(teamName);
+
+        // Create the team
+        GameTeamDatabase.addGameTeam(game, teamName, function(err, gameTeam) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Render the team page
+            renderTeamPage(req, res, next);
+        });
+    });
+});
+
+/**
+ * Render the team page.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ * @param next Express next callback.
+ */
+function renderTeamPage(req, res, next) {
     // Make sure the user is logged in
     if (!req.session.valid) {
         LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
@@ -906,6 +1010,6 @@ router.get('/:game/teams', function(req, res, next) {
             teams
         });
     });
-});
+}
 
 module.exports = router;
