@@ -16,22 +16,23 @@ block content
             p Please specify the name of the team you'd like to create.
 
             br
-            label(for='field-team-name') Team name:
-            input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
+            form(method='POST', action=page.url + '/#')
+                label(for='field-team-name') Team name:
+                input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
 
-            //- Game ID
-            //- TODO: Make sure the game ID is given!
-            //input(type='hidden', name='field-game', value=game.id)
+                //- Game ID
+                //- TODO: Make sure the game ID is given!
+                input(type='hidden', name='field-game', value=game.id)
 
-            //- Action buttons
-            br
-            .button-list
-                a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
-                    i.zmdi.zmdi-check
-                    | &nbsp;&nbsp;Create
-                a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
-                    i.zmdi.zmdi-cancel
-                    | &nbsp;Cancel
+                //- Action buttons
+                br
+                .button-list
+                    button.ui-btn.ui-btn-raised.clr-primary(type='submit', data-inline='true')
+                        i.zmdi.zmdi-check
+                        | &nbsp;&nbsp;Create
+                    a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
+                        i.zmdi.zmdi-cancel
+                        | &nbsp;Cancel
 
     //- Create a form and show a list of teams
     form
@@ -40,12 +41,12 @@ block content
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                     //- Checkbox, enabled or disabled based on the users' rights
                     if user.isHost || user.isAdmin
-                        input(type='checkbox', name='checkbox-user-' + entry.name, id='checkbox-user-' + entry.name)
+                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id)
                     else
-                        input(type='checkbox', name='checkbox-user-' + entry.name, id='checkbox-user-' + entry.name, disabled='disabled')
+                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id, disabled='disabled')
 
                     //- Label with the avatar
-                    label(for='checkbox-user-' + entry.name)= entry.name
+                    label(for='checkbox-user-' + entry.id)= entry.name
         else
             p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                 i No teams here...
