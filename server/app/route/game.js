@@ -787,12 +787,17 @@ router.post('/:game/teams', function(req, res, next) {
     // Create flags to determine whether the user has permission
     var hasPermission = false;
 
+    // Keep track whether we called back
+    var calledBack = false;
+
     // Check whether the user is administrator
     latch.add();
     user.isAdmin(function(err, result) {
-        // Call back results
+        // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -809,13 +814,18 @@ router.post('/:game/teams', function(req, res, next) {
     game.getUser(function(err, result) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
         // Make sure the result isn't null
-        if(result === null)
+        if(result === null) {
+            // Resolve the latch and return
+            latch.resolve();
             return;
+        }
 
         // Change the flag if the user is host of the game
         if(user.getId().equals(result.getId()))
@@ -829,7 +839,9 @@ router.post('/:game/teams', function(req, res, next) {
     latch.then(function() {
         // Throw an error if the user doesn't have permission
         if(!hasPermission) {
-            next(new Error('No permission'));
+            if(!calledBack)
+                next(new Error('No permission'));
+            calledBack = true;
             return;
         }
 
@@ -840,12 +852,15 @@ router.post('/:game/teams', function(req, res, next) {
         GameTeamDatabase.addGameTeam(game, teamName, function(err, gameTeam) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
             // Render the team page
-            renderTeamPage(req, res, next);
+            if(!calledBack)
+                renderTeamPage(req, res, next);
         });
     });
 });
@@ -859,7 +874,7 @@ router.post('/:game/teams', function(req, res, next) {
  */
 function renderTeamPage(req, res, next) {
     // Make sure the user is logged in
-    if (!req.session.valid) {
+    if(!req.session.valid) {
         LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
         return;
     }
@@ -869,7 +884,7 @@ function renderTeamPage(req, res, next) {
     const user = req.session.user;
 
     // Call back if the game is invalid
-    if (game === undefined) {
+    if(game === undefined) {
         next(new Error('Invalid game.'));
         return;
     }
@@ -885,13 +900,18 @@ function renderTeamPage(req, res, next) {
     // Create an user object
     var userObject = {};
 
+    // Keep track whether we called back
+    var calledBack = false;
+
     // Get the game name
     var gameName = '';
     latch.add();
     game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -905,9 +925,11 @@ function renderTeamPage(req, res, next) {
     // Check whether the user is administrator
     latch.add();
     user.isAdmin(function(err, result) {
-        // Call back results
+        // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -929,7 +951,9 @@ function renderTeamPage(req, res, next) {
     game.getUser(function(err, result) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -949,30 +973,25 @@ function renderTeamPage(req, res, next) {
     // Create a teams object
     var teams = [];
 
-    // Create a flag to define whether we called back
-    var calledBack = false;
-
     // Get the teams for this game
+    latch.add();
     Core.model.gameTeamModelManager.getGameTeams(game, function(err, result) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
         // Loop through the list of teams
+        latch.add(result.length);
         result.forEach(function(team) {
-            // Add a latch
-            latch.add();
-
             // Create a team object to add to the array
             var teamObject = {
                 id: team.getIdHex(),
                 name: ''
             };
-
-            // Create a callback latch
-            var teamLatch = new CallbackLatch();
 
             // Get the team name
             team.getName(function(err, name) {
@@ -987,12 +1006,6 @@ function renderTeamPage(req, res, next) {
                 // Set the team name
                 teamObject.name = name;
 
-                // Resolve the latch
-                teamLatch.resolve();
-            });
-
-            // Add the team ot the list of teams when we're done fetching it's fields
-            teamLatch.then(function() {
                 // Add the team
                 teams.push(teamObject);
 
@@ -1000,19 +1013,23 @@ function renderTeamPage(req, res, next) {
                 latch.resolve();
             });
         });
+
+        // Resolve the latch
+        latch.resolve();
     });
 
     // Continue when we're done fetching the users permissions
     latch.then(function() {
-        // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
-            page: {
-                leftButton: 'back'
-            },
-            user: userObject,
-            game: gameObject,
-            teams
-        });
+        // Render the game page if we didn't call back yet
+        if(!calledBack)
+            LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
+                page: {
+                    leftButton: 'back'
+                },
+                user: userObject,
+                game: gameObject,
+                teams
+            });
     });
 }
 
