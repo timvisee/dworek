@@ -348,7 +348,6 @@ $(document).bind("pagecreate", function() {
     // Get the elements
     const buttonCreateTeam = $('.action-create-team');
     const popup = $('#popupCreateTeam');
-    const checkboxNamePrefix = 'checkbox-team-';
     const popupGameField = 'input[name=field-game]';
     const popupTeamNameField = 'input[name=field-team-name]';
 

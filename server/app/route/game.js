@@ -747,132 +747,7 @@ function getGameUserListObject(game, category, callback) {
  */
 
 // Game teams page
-router.get('/:game/teams', (req, res, next) => renderTeamPage(req, res, next));
-
-// Game team creation page
-router.post('/:game/teams', function(req, res, next) {
-    // Make sure the user is logged in
-    if (!req.session.valid) {
-        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
-        return;
-    }
-
-    // Get the game
-    const game = req.game;
-    const user = req.session.user;
-
-    // Call back if the game is invalid
-    if (game === undefined) {
-        next(new Error('Invalid game.'));
-        return;
-    }
-
-    // Get the preferred team name
-    var teamName = req.body['field-team-name'];
-
-    // Validate the team name
-    if(!Validator.isValidTeamName(teamName)) {
-        // Show an error page
-        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
-            message: 'The specified team name is invalid.\n\n' +
-            'The team name must be between ' + config.validation.teamNameMinLength + ' and ' + config.validation.teamNameMaxLength + ' characters long.\n\n' +
-            'Please go back and choose a different team name.'
-        });
-        return;
-    }
-
-    // Create a callback latch
-    var latch = new CallbackLatch();
-
-    // Create flags to determine whether the user has permission
-    var hasPermission = false;
-
-    // Keep track whether we called back
-    var calledBack = false;
-
-    // Check whether the user is administrator
-    latch.add();
-    user.isAdmin(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                next(err);
-            calledBack = true;
-            return;
-        }
-
-        // Change the flag if the user has permission
-        if(result === true)
-            hasPermission = true;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Check whether the user is host of the game
-    latch.add();
-    game.getUser(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                next(err);
-            calledBack = true;
-            return;
-        }
-
-        // Make sure the result isn't null
-        if(result === null) {
-            // Resolve the latch and return
-            latch.resolve();
-            return;
-        }
-
-        // Change the flag if the user is host of the game
-        if(user.getId().equals(result.getId()))
-            hasPermission = true;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Render the page when we're done
-    latch.then(function() {
-        // Throw an error if the user doesn't have permission
-        if(!hasPermission) {
-            if(!calledBack)
-                next(new Error('No permission'));
-            calledBack = true;
-            return;
-        }
-
-        // Format the team name
-        teamName = Validator.formatTeamName(teamName);
-
-        // Create the team
-        GameTeamDatabase.addGameTeam(game, teamName, function(err, gameTeam) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
-                return;
-            }
-
-            // Render the team page
-            if(!calledBack)
-                renderTeamPage(req, res, next);
-        });
-    });
-});
-
-/**
- * Render the team page.
- *
- * @param req Express request object.
- * @param res Express response object.
- * @param next Express next callback.
- */
-function renderTeamPage(req, res, next) {
+router.get('/:game/teams', function(req, res, next) {
     // Make sure the user is logged in
     if(!req.session.valid) {
         LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
@@ -1031,6 +906,6 @@ function renderTeamPage(req, res, next) {
                 teams
             });
     });
-}
+});
 
 module.exports = router;
