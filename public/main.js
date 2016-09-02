@@ -252,9 +252,6 @@ $(document).bind("pagecreate", function() {
                 }
             };
 
-            // TODO: Send the object through ajax, and report the result!
-            // TODO: Delete successfully deleted users!
-
             // Disable all checkboxes for the selected users
             checkboxes.each(function() {
                 $(this).parent().addClass('ui-disabled');
