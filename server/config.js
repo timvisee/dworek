@@ -231,6 +231,18 @@ config.validation.nicknameMinLength = 1;
  */
 config.validation.nicknameMaxLength = 32;
 
+/**
+ * Minimum number of group name characters.
+ * @type {int}
+ */
+config.validation.groupNameMinLength = 1;
+
+/**
+ * Maximum number of group name characters.
+ * @type {int}
+ */
+config.validation.groupNameMaxLength = 64;
+
 
 // Export the configuration
 module.exports = config;

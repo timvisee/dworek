@@ -169,5 +169,36 @@ Validator.isValidNickname = function(nickname) {
         (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
 };
 
+/**
+ * Format the the given group name.
+ *
+ * @param {string} groupName Group name.
+ *
+ * @return {string} The formatted group name.
+ */
+Validator.formatGroupName = function(groupName) {
+    // Trim the group name, and return
+    return groupName.trim();
+};
+
+/**
+ * Check whether the given group name is valid.
+ *
+ * @param {string} groupName Group name.
+ *
+ * @return {boolean} True if the group name is valid, false if not.
+ */
+Validator.isValidGroupName = function(groupName) {
+    // Trim the group name
+    groupName = groupName.trim();
+
+    // Count the number of characters
+    var charCount = groupName.length;
+
+    // Make sure the length is within bounds
+    return charCount === 0 ||
+        (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
+};
+
 // Export the class
 module.exports = Validator;
