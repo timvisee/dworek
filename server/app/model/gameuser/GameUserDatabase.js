@@ -68,7 +68,7 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
         // Handle errors and make sure the status is ok
         if(err !== null) {
             // Show a warning and call back with the error
-            console.warn('Unable to create new user, failed to insert user into database.');
+            console.warn('Unable to create new game user, failed to insert game user into database.');
             callback(err, null);
             return;
         }

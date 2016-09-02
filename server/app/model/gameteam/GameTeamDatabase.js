@@ -22,6 +22,7 @@
 
 var _ = require('lodash');
 
+var Core = require('../../../Core');
 var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
@@ -35,6 +36,39 @@ var GameTeamDatabase = function() {};
  * Database collection name.
  */
 GameTeamDatabase.DB_COLLECTION_NAME = 'game_team';
+
+/**
+ * Add a new team to a game.
+ *
+ * @param {GameModel} game Game.
+ * @param {String} teamName Team name.
+ * @param {function} callback (err, {GameTeamModel} gameTeam) Callback.
+ */
+GameTeamDatabase.addGameTeam = function(game, teamName, callback) {
+    // Get the database instance
+    var db = MongoUtil.getConnection();
+
+    // Create the object to insert
+    // TODO: Dynamically get the proper field names from the model configuration
+    var insertObject = {
+        game_id: game.getId(),
+        name: teamName
+    };
+
+    // Insert the game user into the database
+    db.collection(GameTeamDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err, result) {
+        // Handle errors and make sure the status is ok
+        if(err !== null) {
+            // Show a warning and call back with the error
+            console.warn('Unable to create new game team, failed to insert game team into database.');
+            callback(err, null);
+            return;
+        }
+
+        // Call back with the inserted ID
+        callback(null, Core.model.gameTeamModelManager._instanceManager.create(insertObject._id));
+    });
+};
 
 /**
  * Do a find query on the API token database. Parse the result as an array through a callback.
