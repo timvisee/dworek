@@ -27,7 +27,7 @@ block content
                 //- Action buttons
                 br
                 .button-list
-                    button.ui-btn.ui-btn-raised.clr-primary(type='submit', data-inline='true', data-ajax='false')
+                    a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
                         i.zmdi.zmdi-check
                         | &nbsp;&nbsp;Create
                     a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
@@ -54,5 +54,5 @@ block content
         br
         if user.isAdmin || user.isHost
             .button-list
-                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
+                a.ui-btn.ui-btn-raised.clr-primary.action-create-team.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
                 a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected

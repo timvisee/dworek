@@ -343,6 +343,108 @@ $(document).bind("pagecreate", function() {
     });
 });
 
+// Team creation
+$(document).bind("pagecreate", function() {
+    // Get the elements
+    const buttonCreateTeam = $('.action-create-team');
+    const popup = $('#popupCreateTeam');
+    const checkboxNamePrefix = 'checkbox-team-';
+    const popupGameField = 'input[name=field-game]';
+    const popupTeamNameField = 'input[name=field-team-name]';
+
+    // Handle button click events
+    buttonCreateTeam.click(function(e) {
+        // Prevent the default click operation
+        e.preventDefault();
+
+        // Open the team creation dialog
+        popup.popup('open', {
+            transition: 'pop'
+        });
+
+        // Find the create button of the popup
+        const createButton = popup.find('.action-create');
+
+        // Unbind the previous click event, and bind a new one
+        createButton.unbind('click');
+        createButton.click(function(e) {
+            // Prevent the default action
+            e.preventDefault();
+
+            // Get the team name
+            const teamField = popup.find(popupTeamNameField);
+            const gameField = popup.find(popupGameField);
+
+            // Get the game ID
+            const gameId = gameField.val();
+
+            // Get the team selector value
+            const teamName = teamField.val();
+
+            // Create an object to send to the server
+            const createObject = {
+                game: gameId,
+                teamName: teamName
+            };
+
+            // Disable the create team button
+            buttonCreateTeam.addClass('ui-disabled');
+
+            // Callback on error
+            var onError = function(message) {
+                // Define the error message
+                var error = 'Failed to create team!';
+                if(message !== undefined)
+                    error = 'Error: ' + message;
+
+                // Show an error notification
+                showNotification(error, {
+                    toast: true,
+                    native: false,
+                    vibrate: true
+                });
+
+                // Enable the create team button
+                buttonCreateTeam.removeClass('ui-disabled');
+            };
+
+            // Do an request to create the team
+            $.ajax({
+                type: "POST",
+                url: '/ajax/team/createTeam',
+                data: {
+                    data: JSON.stringify(createObject)
+                },
+                dataType: 'json',
+                success: function(data) {
+                    // Show an error message if any kind of error occurred
+                    if(data.status != 'ok' || data.hasOwnProperty('error')) {
+                        onError(data.error.message);
+                        return;
+                    }
+
+                    // Show an error notification
+                    showNotification('Team created successfully!', {
+                        toast: true,
+                        native: false,
+                        vibrate: true,
+                        vibrationPattern: 50
+                    });
+
+                    // TODO: Add the team to the checkbox list!
+
+                    // Enable the create team button
+                    buttonCreateTeam.removeClass('ui-disabled');
+                },
+                error: onError
+            });
+
+            // Close the popup
+            popup.popup('close');
+        });
+    });
+});
+
 /**
  * Check whether the given value is a JavaScript object.
  *
