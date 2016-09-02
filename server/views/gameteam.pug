@@ -16,7 +16,7 @@ block content
             p Please specify the name of the team you'd like to create.
 
             br
-            form(method='POST', action=page.url + '/#')
+            form(method='POST', action=page.url + '/#', data-ajax='false')
                 label(for='field-team-name') Team name:
                 input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
 
@@ -27,7 +27,7 @@ block content
                 //- Action buttons
                 br
                 .button-list
-                    button.ui-btn.ui-btn-raised.clr-primary(type='submit', data-inline='true')
+                    button.ui-btn.ui-btn-raised.clr-primary(type='submit', data-inline='true', data-ajax='false')
                         i.zmdi.zmdi-check
                         | &nbsp;&nbsp;Create
                     a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
@@ -39,14 +39,14 @@ block content
         if teams.length > 0
             each entry in teams
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
-                    //- Checkbox, enabled or disabled based on the users' rights
+                    //- Checkbox, enabled or disabled based on the team name
                     if user.isHost || user.isAdmin
-                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id)
+                        input(type='checkbox', name='checkbox-team-' + entry.id, id='checkbox-team-' + entry.id)
                     else
-                        input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id, disabled='disabled')
+                        input(type='checkbox', name='checkbox-team-' + entry.id, id='checkbox-team-' + entry.id, disabled='disabled')
 
-                    //- Label with the avatar
-                    label(for='checkbox-user-' + entry.id)= entry.name
+                    //- Label with the team name
+                    label(for='checkbox-team-' + entry.id)= entry.name
         else
             p.wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                 i No teams here...
@@ -55,4 +55,4 @@ block content
         if user.isAdmin || user.isHost
             .button-list
                 a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
-                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete team
+                a.ui-btn.ui-btn-raised.clr-primary.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected
