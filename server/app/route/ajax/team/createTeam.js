@@ -170,9 +170,16 @@ router.post('/', function(req, res, next) {
                     return;
                 }
 
+                // Make sure the team isn't null
+                if(gameTeam === null) {
+                    next(new Error('Failed to create game team'));
+                    return;
+                }
+
                 // Send an OK response
                 res.json({
-                    status: 'ok'
+                    status: 'ok',
+                    team: gameTeam.getIdHex()
                 });
             });
         });
