@@ -350,6 +350,7 @@ $(document).bind("pagecreate", function() {
     const popup = $('#popupCreateTeam');
     const popupGameField = 'input[name=field-game]';
     const popupTeamNameField = 'input[name=field-team-name]';
+    const teamList = $.mobile.pageContainer.pagecontainer('getActivePage').find('.team-list');
 
     // Handle button click events
     buttonCreateTeam.click(function(e) {
@@ -430,7 +431,14 @@ $(document).bind("pagecreate", function() {
                         vibrationPattern: 50
                     });
 
-                    // TODO: Add the team to the checkbox list!
+                    // Append the team to the team list
+                    teamList.append('<div class="wow fadeInUp">' +
+                        '<input type="checkbox" name="checkbox-team-ID-HERE" id="checkbox-team-ID-HERE">' +
+                        '<label for="checkbox-team-ID-HERE">' + teamName + '</label>' +
+                        '</div>');
+
+                    // Trigger page creation, to properly style the new checkbox
+                    $.mobile.pageContainer.pagecontainer('getActivePage').trigger('create');
 
                     // Enable the create team button
                     buttonCreateTeam.removeClass('ui-disabled');
