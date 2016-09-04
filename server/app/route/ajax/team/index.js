@@ -24,12 +24,16 @@ var express = require('express');
 var router = express.Router();
 
 var createTeam = require('./createTeam');
+var deleteTeam = require('./deleteTeam');
 
 // Index page
 router.get('/', (req, res, next) => next(new Error('No AJAX endpoint specified')));
 
 // Create team request
 router.use('/createTeam', createTeam);
+
+// Delete team request
+router.use('/deleteTeam', createTeam);
 
 // Export the router
 module.exports = router;
