@@ -59,7 +59,7 @@ router.post('/', function(req, res, next) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Get the
+    // Get the game instance and make sure the game exists
     latch.add();
     Core.model.gameModelManager.getGameById(gameId, function(err, result) {
         // Call back errors
@@ -91,6 +91,9 @@ router.post('/', function(req, res, next) {
         // Reset the latch back to it's identity to recycle it
         latch.identity();
 
+        // Make sure we only call back once
+        var calledBack = false;
+
         // Create flags to define whether the user is admin or host of the game
         var isAdmin = false;
         var isHost = false;
@@ -100,7 +103,9 @@ router.post('/', function(req, res, next) {
         user.isAdmin(function(err, result) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -116,7 +121,9 @@ router.post('/', function(req, res, next) {
         game.getUser(function(err, result) {
             // Call back errors
             if(err != null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -162,6 +169,10 @@ router.post('/', function(req, res, next) {
                 // Get the game user for this game and user
                 latch.add();
                 Core.model.gameUserModelManager.getGameUser(game, userId, function(err, gameUser) {
+                    // Continue if the operation was cancelled
+                    if(cancelled)
+                        return;
+
                     // Call back errors
                     if(err !== null) {
                         if(!cancelled)
@@ -230,7 +241,7 @@ router.post('/', function(req, res, next) {
             // Send the result when we're done
             latch.then(function() {
                 // Send an OK response if not cancelled
-                if(!cancelled)
+                if(!calledBack && !cancelled)
                     res.json({
                         status: 'ok',
                         updatedUsers
