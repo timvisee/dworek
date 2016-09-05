@@ -65,8 +65,17 @@ GameTeamDatabase.addGameTeam = function(game, teamName, callback) {
             return;
         }
 
-        // Call back with the inserted ID
-        callback(null, Core.model.gameTeamModelManager._instanceManager.create(insertObject._id));
+        // Flush the cache for the model manager
+        Core.model.gameTeamModelManager.flushCache(function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back with the inserted ID
+            callback(null, Core.model.gameTeamModelManager._instanceManager.create(insertObject._id));
+        });
     });
 };
 

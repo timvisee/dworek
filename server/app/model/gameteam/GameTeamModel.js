@@ -223,10 +223,23 @@ GameTeamModel.prototype.setName = function(name, callback) {
 /**
  * Delete the game team.
  *
- * @param {GameTeamModel~deleteCallback} callback Called on success, or when an error occurred.
+ * @param {GameTeamModel~deleteCallback} [callback] Called on success, or when an error occurred.
  */
 GameTeamModel.prototype.delete = function(callback) {
-    this._baseModel.flush(undefined, callback);
+    this._baseModel.flush(undefined, function(err) {
+        // Call back errors
+        if(err !== null) {
+            if(callback !== undefined)
+                callback(err);
+            return;
+        }
+
+        // Flush the model manager
+        Core.model.gameTeamModelManager.flushCache(function(err) {
+            if(callback !== undefined)
+                callback(err);
+        });
+    });
 };
 
 /**

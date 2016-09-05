@@ -47,6 +47,12 @@ var GameTeamModelManager = function() {
 };
 
 /**
+ * Redis key root for cache.
+ * @type {string}
+ */
+GameTeamModelManager.REDIS_KEY_ROOT = 'model:gameteam';
+
+/**
  * Check whether the given game team ID is valid and exists.
  *
  * @param {ObjectId|string} id The game team ID.
@@ -73,7 +79,7 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:gameteam:' + id.toString() + ':exists';
+    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -204,7 +210,7 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:gameteam:getGameTeams:' + game.toString();
+    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':getGameTeams:' + game.toString();
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -337,7 +343,7 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:gameteam:getGameTeamCount:' + game.toString();
+    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':getGameTeamCount:' + game.toString();
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -413,6 +419,36 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
  * @callback GameTeamModelManager~getGameTeamCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number} Number of teams for this game.
+ */
+
+/**
+ * Flush the cache for this model manager.
+ *
+ * @param {GameTeamModelManager~flushCacheCallback} callback Called on success or when an error occurred.
+ */
+GameTeamModelManager.prototype.flushCache = function(callback) {
+    // Determine the cache key for this manager and wildcard it
+    const cacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':*';
+
+    // Flush the cache
+    RedisUtils.flushKeys(cacheKey, function(err, keyCount) {
+        // Call back errors
+        if(err !== null) {
+            callback(err, 0);
+            return;
+        }
+
+        // Call back with the number of deleted cache keys
+        callback(null, keyCount);
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback GameTeamModelManager~flushCacheCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Number} Number of deleted/flushed keys.
  */
 
 // Return the created class
