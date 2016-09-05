@@ -33,7 +33,7 @@ router.get('/', (req, res, next) => next(new Error('No AJAX endpoint specified')
 router.use('/createTeam', createTeam);
 
 // Delete team request
-router.use('/deleteTeam', createTeam);
+router.use('/deleteTeam', deleteTeam);
 
 // Export the router
 module.exports = router;
