@@ -167,8 +167,11 @@ RedisUtils.flushKeys = function(keys, callback) {
     }
 
     // Make sure Redis is ready
-    if(!RedisUtils.isReady())
-        return 0;
+    if(!RedisUtils.isReady()) {
+        // Call back with zero
+        callback(null, 0);
+        return;
+    }
 
     // Keep track whether we called back or not
     var calledBack = false;
