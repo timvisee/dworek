@@ -182,6 +182,9 @@ RedisUtils.flushKeys = function(keys, callback) {
     // Create a list with keys to delete
     var deleteKeys = [];
 
+    // Get the Redis instance
+    const redis = RedisUtils.getConnection();
+
     // Loop through the list of keys
     keys.forEach(function(key) {
         // Make sure the key is a string
@@ -233,9 +236,6 @@ RedisUtils.flushKeys = function(keys, callback) {
             callback(null, 0);
             return;
         }
-
-        // Get the Redis instance
-        const redis = RedisUtils.getConnection();
 
         // Delete the list of keys
         redis.del(deleteKeys, function(err, reply) {
