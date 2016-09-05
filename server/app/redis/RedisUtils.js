@@ -192,7 +192,7 @@ RedisUtils.flushKeys = function(keys, callback) {
         key = key.trim();
 
         // Add the key to the list of keys to delete if it doesn't contain a wildcard character
-        if(key.includes('*')) {
+        if(!key.includes('*')) {
             deleteKeys.push(key);
             return;
         }
