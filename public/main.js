@@ -187,7 +187,9 @@ $(document).bind("pageinit", function() {
     const popup = $('#popupChangeUserRole');
     const checkboxNamePrefix = 'checkbox-user-';
     const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
-    const checkboxSelectorUser = (userId) => 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
+    const checkboxSelectorUser = function(userId) {
+        return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
+    };
     const popupGameSelector = 'input[name=field-game]';
     const popupTeamSelector = 'select[name=field-team]';
     const popupSpecialSelector = 'select[name=field-special]';
@@ -481,7 +483,9 @@ $(document).bind("pageinit", function() {
     const popup = $('#popupDeleteTeam');
     const checkboxNamePrefix = 'checkbox-team-';
     const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
-    const checkboxSelectorUser = (userId) => 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
+    const checkboxSelectorUser = function(userId) {
+        return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
+    };
     const popupGameSelector = 'input[name=field-game]';
 
     // Handle button click events
