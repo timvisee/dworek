@@ -73,8 +73,17 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
             return;
         }
 
-        // Call back with the inserted ID
-        callback(null, Core.model.gameUserModelManager._instanceManager.create(insertObject._id));
+        // Flush the model manager cache
+        Core.model.gameUserModelManager.flushCache(function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back with the inserted ID
+            callback(null, Core.model.gameUserModelManager._instanceManager.create(insertObject._id));
+        });
     });
 };
 

@@ -21,6 +21,8 @@
  ******************************************************************************/
 
 var config = require('../../../config');
+
+var Core = require('../../../Core');
 var MongoUtil = require('../../mongo/MongoUtils');
 
 /**
@@ -75,8 +77,17 @@ SessionDatabase.addSession = function(user, token, ip, callback) {
             return;
         }
 
-        // Call back with the inserted ID
-        callback(null, insertObject._id);
+        // Flush the model manager
+        Core.model.sessionModelManager.flush(function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back with the inserted ID
+            callback(null, insertObject._id);
+        });
     });
 };
 

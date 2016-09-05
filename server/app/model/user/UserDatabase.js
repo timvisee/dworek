@@ -123,8 +123,17 @@ UserDatabase.addUser = function(mail, password, firstName, lastName, callback) {
                 return;
             }
 
-            // Call back with the inserted ID
-            callback(null, Core.model.userModelManager._instanceManager.create(insertObject._id));
+            // Flush the model manager
+            Core.model.userModelManager.flushCache(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Call back with the inserted ID
+                callback(null, Core.model.userModelManager._instanceManager.create(insertObject._id));
+            });
         });
     });
 };
