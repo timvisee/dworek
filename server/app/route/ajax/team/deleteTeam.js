@@ -148,9 +148,6 @@ router.post('/', function(req, res, next) {
                 return;
             }
 
-            // Determine whether this request is cancelled, due to an error of some sort
-            var cancelled = false;
-
             // Create an array of teams that were successfully deleted
             var deletedTeams = [];
 
@@ -160,17 +157,17 @@ router.post('/', function(req, res, next) {
                 // Format the team ID
                 teamId = teamId.trim();
 
-                // Cancel
-                if(cancelled)
+                // Cancel the current loop if we called back already
+                if(calledBack)
                     return;
 
                 // Get the team instance
                 Core.model.gameTeamModelManager.getTeamById(teamId, function(err, team) {
                     // Call back errors
                     if(err !== null) {
-                        if(!cancelled)
+                        if(!calledBack)
                             next(err);
-                        cancelled = true;
+                        calledBack = true;
                         return;
                     }
 
@@ -178,9 +175,9 @@ router.post('/', function(req, res, next) {
                     team.delete(function(err) {
                         // Call back errors
                         if(err !== null) {
-                            if(!cancelled)
+                            if(!calledBack)
                                 next(err);
-                            cancelled = true;
+                            calledBack = true;
                             return;
                         }
 
@@ -193,7 +190,7 @@ router.post('/', function(req, res, next) {
             // Send the result when we're done
             latch.then(function() {
                 // Send an OK response if not cancelled
-                if(!cancelled)
+                if(!calledBack)
                     res.json({
                         status: 'ok',
                         deletedTeams

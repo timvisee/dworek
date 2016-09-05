@@ -151,9 +151,6 @@ router.post('/', function(req, res, next) {
                 return;
             }
 
-            // Determine whether this request is cancelled, due to an error of some sort
-            var cancelled = false;
-
             // Create an array of players that were successfully updated
             var updatedUsers = [];
 
@@ -162,29 +159,29 @@ router.post('/', function(req, res, next) {
                 // Format the user ID
                 userId = userId.trim();
 
-                // Cancel
-                if(cancelled)
+                // Cancel the current loop if we called back already
+                if(calledBack)
                     return;
 
                 // Get the game user for this game and user
                 latch.add();
                 Core.model.gameUserModelManager.getGameUser(game, userId, function(err, gameUser) {
                     // Continue if the operation was cancelled
-                    if(cancelled)
+                    if(calledBack)
                         return;
 
                     // Call back errors
                     if(err !== null) {
-                        if(!cancelled)
+                        if(!calledBack)
                             next(err);
-                        cancelled = true;
+                        calledBack = true;
                         return;
                     }
 
                     // Make sure the game user is valid
                     if(gameUser === null || gameUser === undefined) {
                         // Respond with an error
-                        if(!cancelled)
+                        if(!calledBack)
                             res.json({
                                 status: 'error',
                                 error: {
@@ -193,7 +190,7 @@ router.post('/', function(req, res, next) {
                             });
 
                         // Set the cancelled flag and return
-                        cancelled = true;
+                        calledBack = true;
                         return;
                     }
 
@@ -220,9 +217,9 @@ router.post('/', function(req, res, next) {
                     gameUser.setFields(fields, function(err) {
                         // Call back errors
                         if(err !== null) {
-                            if(!cancelled)
+                            if(!calledBack)
                                 next(err);
-                            cancelled = true;
+                            calledBack = true;
                             return;
                         }
 
@@ -241,7 +238,7 @@ router.post('/', function(req, res, next) {
             // Send the result when we're done
             latch.then(function() {
                 // Send an OK response if not cancelled
-                if(!calledBack && !cancelled)
+                if(!calledBack && !calledBack)
                     res.json({
                         status: 'ok',
                         updatedUsers
