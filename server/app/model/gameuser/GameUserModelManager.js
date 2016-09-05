@@ -36,6 +36,12 @@ var GameModel = require('../game/GameModel');
 var UserModel = require('../user/UserModel');
 
 /**
+ * Redis key root for cache.
+ * @type {string}
+ */
+const REDIS_KEY_ROOT = 'model:gameuser';
+
+/**
  * GameUserModelManager class.
  *
  * @class
@@ -77,7 +83,7 @@ GameUserModelManager.prototype.isValidId = function(id, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:gameuser:' + id.toString() + ':exists';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -232,7 +238,7 @@ GameUserModelManager.prototype.getGameUserCount = function(game, options, callba
     }
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:gameuser:getGamePlayerCount:' + game.getIdHex() + ':' +
+    const redisCacheKey = REDIS_KEY_ROOT + ':getGamePlayerCount:' + game.getIdHex() + ':' +
         (options.players !== undefined ? (options.players ? '1' : '0') : '?') + ',' +
         (options.spectators !== undefined ? (options.spectators ? '1' : '0') : '?') + ',' +
         (options.specials !== undefined ? (options.specials ? '1' : '0') : '?') + ',' +
@@ -345,7 +351,7 @@ GameUserModelManager.prototype.getGameUsersCount = function(game, callback) {
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:gameuser:getGameUsersCount:' + game.getIdHex();
+    const redisCacheKey = REDIS_KEY_ROOT + ':getGameUsersCount:' + game.getIdHex();
 
     // Create a base object
     var gameUsersStateObject = {
@@ -537,7 +543,7 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:gameuser:getUserGameState:' + game.getIdHex() + ':' + user.getIdHex();
+    const redisCacheKey = REDIS_KEY_ROOT + ':getUserGameState:' + game.getIdHex() + ':' + user.getIdHex();
 
     // Create a UserGameState object
     var userGameState = {
@@ -807,7 +813,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:gameuser:getGameUser' + game.toString() + ':' + user.toString();
+    var redisCacheKey = REDIS_KEY_ROOT + ':getGameUser' + game.toString() + ':' + user.toString();
 
     // Get the game user ID for this game and user through Redis
     if(RedisUtils.isReady()) {
