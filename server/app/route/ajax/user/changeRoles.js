@@ -202,7 +202,7 @@ router.post('/', function(req, res, next) {
                         newTeam = null;
 
                     else
-                    // TODO: Determine the new team value (random, and team IDs)
+                        // TODO: Determine the new team value (random, and team IDs)
                         newTeam = null;
 
                     // Create a fields object with the new field values
@@ -237,12 +237,23 @@ router.post('/', function(req, res, next) {
 
             // Send the result when we're done
             latch.then(function() {
-                // Send an OK response if not cancelled
-                if(!calledBack && !calledBack)
-                    res.json({
-                        status: 'ok',
-                        updatedUsers
-                    });
+                // Flush the game user model manager
+                Core.model.gameUserModelManager.flushCache(function(err) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            next(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Send an OK response if not cancelled
+                    if(!calledBack)
+                        res.json({
+                            status: 'ok',
+                            updatedUsers
+                        });
+                });
             });
         });
     });
