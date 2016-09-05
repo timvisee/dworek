@@ -42,6 +42,15 @@ $(document).bind("pageinit", function() {
 });
 
 /**
+ * Get the active jQuery mobile page.
+ *
+ * @return DOM element of the current page.
+ */
+function getActivePage() {
+    return $.mobile.pageContainer.pagecontainer('getActivePage');
+}
+
+/**
  * Show a notification as configured.
  * This function can be used to show in-page toast, or native notifications.
  *
@@ -134,7 +143,7 @@ function showNativeNotification() {
 }
 
 // Nickname randomization
-$(document).bind("pagecreate", function() {
+$(document).bind("pageinit", function() {
     // Get the elements
     const nicknameField = $('#field-nickname');
     const nicknameRandomizeButton = $('.nickname-random-btn');
@@ -172,10 +181,7 @@ $(document).bind("pagecreate", function() {
 });
 
 // User role modification
-$(document).bind("pagecreate", function() {
-    // Get the active mobile page
-    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
-
+$(document).bind("pageinit", function() {
     // Get the elements
     const buttonChangeRoles = $('.action-change-user-roles');
     const popup = $('#popupChangeUserRole');
@@ -193,10 +199,10 @@ $(document).bind("pagecreate", function() {
         e.preventDefault();
 
         // Find the user checkboxes on the page that is currently active
-        const checkboxes = activePage.find(checkboxSelector);
+        const checkboxes = getActivePage().find(checkboxSelector);
 
         // Show a warning if no user is selected
-        if(checkboxes.length == 0) {
+        if(checkboxes.length === 0) {
             showNotification('Please select the users to change', {
                 toast: true,
                 native: false,
@@ -280,7 +286,7 @@ $(document).bind("pagecreate", function() {
                 // Revert the checkbox states
                 userIds.forEach(function(userId) {
                     // Find it's checkbox
-                    const checkbox = activePage.find(checkboxSelectorUser(userId));
+                    const checkbox = getActivePage().find(checkboxSelectorUser(userId));
 
                     // Enable the checkbox
                     checkbox.parent().removeClass('ui-disabled');
@@ -320,7 +326,7 @@ $(document).bind("pagecreate", function() {
                     // Loop through the list of updated users and remove their checkboxes
                     updatedUsers.forEach(function(userId) {
                         // Find it's checkbox
-                        const checkbox = activePage.find(checkboxSelectorUser(userId));
+                        const checkbox = getActivePage().find(checkboxSelectorUser(userId));
 
                         // Remove the parent checkbox from the page
                         checkbox.parent().remove();
@@ -333,7 +339,7 @@ $(document).bind("pagecreate", function() {
                             return;
 
                         // Find it's checkbox
-                        const checkbox = activePage.find(checkboxSelectorUser(userId));
+                        const checkbox = getActivePage().find(checkboxSelectorUser(userId));
 
                         // Enable the checkbox
                         checkbox.parent().removeClass('ui-disabled');
@@ -352,17 +358,14 @@ $(document).bind("pagecreate", function() {
 });
 
 // Team creation
-$(document).bind("pagecreate", function() {
-    // Get the active mobile page
-    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
-
+$(document).bind("pageinit", function() {
     // Get the elements
     const buttonCreateTeam = $('.action-create-team');
     const popup = $('#popupCreateTeam');
     const popupGameField = 'input[name=field-game]';
     const popupTeamNameField = 'input[name=field-team-name]';
-    const teamList = activePage.find('.team-list');
-    const noTeamLabel = activePage.find('.no-teams');
+    const teamList = getActivePage().find('.team-list');
+    const noTeamLabel = getActivePage().find('.no-teams');
 
     // Handle button click events
     buttonCreateTeam.click(function(e) {
@@ -457,7 +460,7 @@ $(document).bind("pagecreate", function() {
                     noTeamLabel.remove();
 
                     // Trigger page creation, to properly style the new checkbox
-                    activePage.trigger('create');
+                    getActivePage().trigger('create');
 
                     // Enable the create team button
                     buttonCreateTeam.removeClass('ui-disabled');
@@ -472,10 +475,7 @@ $(document).bind("pagecreate", function() {
 });
 
 // Team deletion
-$(document).bind("pagecreate", function() {
-    // Get the active mobile page
-    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
-
+$(document).bind("pageinit", function() {
     // Get the elements
     const buttonDeleteSelected = $('.action-delete-selected');
     const popup = $('#popupDeleteTeam');
@@ -490,7 +490,7 @@ $(document).bind("pagecreate", function() {
         e.preventDefault();
 
         // Find the user checkboxes on the page that is currently active
-        const checkboxes = activePage.find(checkboxSelector);
+        const checkboxes = getActivePage().find(checkboxSelector);
 
         // Show a warning if no user is selected
         if(checkboxes.length == 0) {
@@ -560,7 +560,7 @@ $(document).bind("pagecreate", function() {
                 // Revert the checkbox states
                 teamIds.forEach(function(teamId) {
                     // Find it's checkbox
-                    const checkbox = activePage.find(checkboxSelectorUser(teamId));
+                    const checkbox = getActivePage().find(checkboxSelectorUser(teamId));
 
                     // Enable the checkbox
                     checkbox.parent().removeClass('ui-disabled');
@@ -600,7 +600,7 @@ $(document).bind("pagecreate", function() {
                     // Loop through the list of deleted teams and remove their checkboxes
                     deletedTeams.forEach(function(teamId) {
                         // Find it's checkbox
-                        const checkbox = activePage.find(checkboxSelectorUser(teamId));
+                        const checkbox = getActivePage().find(checkboxSelectorUser(teamId));
 
                         // Remove the parent checkbox from the page
                         checkbox.parent().remove();
@@ -613,7 +613,7 @@ $(document).bind("pagecreate", function() {
                             return;
 
                         // Find it's checkbox
-                        const checkbox = activePage.find(checkboxSelectorUser(teamId));
+                        const checkbox = getActivePage().find(checkboxSelectorUser(teamId));
 
                         // Enable the checkbox
                         checkbox.parent().removeClass('ui-disabled');
