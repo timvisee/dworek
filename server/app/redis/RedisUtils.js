@@ -22,8 +22,12 @@
 
 // TODO: Implement Redis connection pool!
 
+var _ = require('lodash');
+
 var config = require('../../config');
 var redis = require('redis');
+
+var CallbackLatch = require('../util/CallbackLatch');
 
 /**
  * Defines whether the Redis client is ready.
@@ -141,6 +145,121 @@ RedisUtils.getConnection = function() {
 RedisUtils.isReady = function() {
     return ready;
 };
+
+/**
+ * Flush the given keys from Redis.
+ * Wildcards are supported using '*' to remove multiple keys.
+ * Keys won't be flushed if Redis isn't ready when the function is invoked. Zero will be called back in that case.
+ * Given keys that don't exist are ignored.
+ *
+ * @param {Array|string} keys Array of keys or a single key as a string.
+ * @param {RedisUtils~flushKeysCallback} [callback] Called on success or on error.
+ */
+RedisUtils.flushKeys = function(keys, callback) {
+    // Convert the keys parameter to an array, if it isn't an array already
+    if(!_.isArray(keys)) {
+        // Return if the key isn't a string
+        if(!_.isString(keys))
+            throw new Error('Invalid key');
+
+        // Convert the key into an array
+        keys = [keys];
+    }
+
+    // Make sure Redis is ready
+    if(!RedisUtils.isReady())
+        return 0;
+
+    // Keep track whether we called back or not
+    var calledBack = false;
+
+    // Create a callback latch for all keys
+    var latch = new CallbackLatch();
+
+    // Create a list with keys to delete
+    var deleteKeys = [];
+
+    // Loop through the list of keys
+    keys.forEach(function(key) {
+        // Make sure the key is a string
+        if(!_.isString(key))
+            return;
+
+        // Trim the key
+        key = key.trim();
+
+        // Add the key to the list of keys to delete if it doesn't contain a wildcard character
+        if(key.includes('*')) {
+            deleteKeys.push(key);
+            return;
+        }
+
+        // Add a callback latch
+        latch.add();
+
+        // Fetch all keys for this wildcard key
+        redis.keys(key, function(err, replyKeys) {
+            // Call back if an error occurred
+            if(err !== null) {
+                // Return if we called back already
+                if(calledBack)
+                    return;
+
+                // Encapsulate the error
+                const error = new Error(err);
+
+                // Call back with the error, updated the called back flag and return
+                if(callback !== undefined)
+                    callback(error, 0);
+                calledBack = true;
+                return;
+            }
+
+            // Add the fetched keys to the keys array
+            deleteKeys = deleteKeys.concat(replyKeys);
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    });
+
+    // Call back with the number of deleted keys when we're done
+    latch.then(function() {
+        // Get the Redis instance
+        const redis = RedisUtils.getConnection();
+
+        // Delete the list of keys
+        redis.del(deleteKeys, function(err, reply) {
+            // Call back errors
+            if(err !== null) {
+                // Return if we called back already
+                if(calledBack)
+                    return;
+
+                // Encapsulate the error
+                const error = new Error(err);
+
+                // Call back with the error, updated the called back flag and return
+                if(callback !== undefined)
+                    callback(error, 0);
+                calledBack = true;
+                return;
+            }
+
+            // Call back the number of deleted keys
+            if(callback !== undefined)
+                callback(null, parseInt(reply, 10));
+        });
+    });
+};
+
+/**
+ * Called on success or on error.
+ *
+ * @callback RedisUtils~flushKeysCallback
+ * @param {Error|null} Error instance if an error occurred, false on success.
+ * @param {Number} Number of deleted Redis keys.
+ */
 
 // Export the class
 module.exports = RedisUtils;
