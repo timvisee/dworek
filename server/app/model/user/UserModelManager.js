@@ -32,6 +32,12 @@ var ModelInstanceManager = require('../ModelInstanceManager');
 var UserModel = require('./UserModel');
 
 /**
+ * Redis key root for cache.
+ * @type {string}
+ */
+const REDIS_KEY_ROOT = 'model:user';
+
+/**
  * UserModelManager class.
  *
  * @class
@@ -73,7 +79,7 @@ UserModelManager.prototype.isValidUserId = function(id, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:user:' + id.toString() + ':exists';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
 
     // Check whether the user is valid through Redis if ready
     if(RedisUtils.isReady()) {
