@@ -366,8 +366,8 @@ $(document).bind("pageinit", function() {
     const popup = $('#popupCreateTeam');
     const popupGameField = 'input[name=field-game]';
     const popupTeamNameField = 'input[name=field-team-name]';
-    const teamList = getActivePage().find('.team-list');
-    const noTeamLabel = getActivePage().find('.no-teams');
+    const teamListSelector = '.team-list';
+    const noTeamLabelSelector = '.no-teams';
 
     // Handle button click events
     buttonCreateTeam.click(function(e) {
@@ -453,13 +453,13 @@ $(document).bind("pageinit", function() {
 
                     // Append the team to the team list
                     // TODO: Append team ID here
-                    teamList.append('<div class="wow fadeInUp">' +
+                    getActivePage().find(teamListSelector).append('<div class="wow fadeInUp">' +
                         '    <input type="checkbox" name="checkbox-team-' + teamId + '" id="checkbox-team-' + teamId + '">' +
                         '    <label for="checkbox-team-' + teamId + '">' + teamName + '</label>' +
                         '</div>');
 
                     // Remove the no teams label if it exists
-                    noTeamLabel.remove();
+                    getActivePage().find(noTeamLabelSelector).remove();
 
                     // Trigger page creation, to properly style the new checkbox
                     getActivePage().trigger('create');
