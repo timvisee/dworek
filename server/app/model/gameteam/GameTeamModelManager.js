@@ -428,7 +428,7 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
  */
 GameTeamModelManager.prototype.flushCache = function(callback) {
     // Determine the cache key for this manager and wildcard it
-    const cacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':*';
+    const cacheKey = REDIS_KEY_ROOT + ':*';
 
     // Flush the cache
     RedisUtils.flushKeys(cacheKey, function(err, keyCount) {
