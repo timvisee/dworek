@@ -60,6 +60,10 @@ Validator.isValidMail = (mail) => validator.isEmail(mail.trim().replace(/\s/g, '
  * @return {boolean} True if the password is valid/allowed, false if not.
  */
 Validator.isValidPassword = function(password) {
+    // Make sure the password isn't undefined or null
+    if(password === undefined || password === null)
+        return false;
+
     // Count the number of characters
     var charCount = password.length;
 
@@ -90,6 +94,10 @@ Validator.formatFirstName = function(firstName) {
  * @return {boolean} True if the first name is valid, false if not.
  */
 Validator.isValidFirstName = function(firstName) {
+    // Make sure the first name isn't undefined or null
+    if(firstName === undefined || firstName === null)
+        return false;
+
     // Trim the first name
     firstName = firstName.trim();
 
@@ -128,6 +136,10 @@ Validator.formatLastName = function(lastName) {
  * @return {boolean} True if the last name is valid, false if not.
  */
 Validator.isValidLastName = function(lastName) {
+    // Make sure the last name isn't undefined or null
+    if(lastName === undefined || lastName === null)
+        return false;
+
     // Trim the last name
     lastName = lastName.trim();
 
@@ -158,6 +170,10 @@ Validator.formatNickname = function(nickname) {
  * @return {boolean} True if the nickname is valid, false if not.
  */
 Validator.isValidNickname = function(nickname) {
+    // Make sure the nickname isn't undefined or null
+    if(nickname === undefined || nickname === null)
+        return false;
+
     // Trim the nickname
     nickname = nickname.trim();
 
@@ -189,6 +205,10 @@ Validator.formatTeamName = function(teamName) {
  * @return {boolean} True if the team name is valid, false if not.
  */
 Validator.isValidTeamName = function(teamName) {
+    // Make sure the team name isn't undefined or null
+    if(teamName === undefined || teamName === null)
+        return false;
+
     // Trim the team name
     teamName = teamName.trim();
 
