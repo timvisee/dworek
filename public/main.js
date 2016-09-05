@@ -482,11 +482,13 @@ $(document).bind("pageinit", function() {
     const buttonDeleteSelected = $('.action-delete-selected');
     const popup = $('#popupDeleteTeam');
     const checkboxNamePrefix = 'checkbox-team-';
-    const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
+    const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']';
+    const checkboxSelectedSelector = checkboxSelector + ':checked';
     const checkboxSelectorUser = function(userId) {
         return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
     };
     const popupGameSelector = 'input[name=field-game]';
+    const teamListSelector = '.team-list';
 
     // Handle button click events
     buttonDeleteSelected.click(function(e) {
@@ -494,7 +496,7 @@ $(document).bind("pageinit", function() {
         e.preventDefault();
 
         // Find the user checkboxes on the page that is currently active
-        const checkboxes = getActivePage().find(checkboxSelector);
+        const checkboxes = getActivePage().find(checkboxSelectedSelector);
 
         // Show a warning if no user is selected
         if(checkboxes.length == 0) {
@@ -625,6 +627,15 @@ $(document).bind("pageinit", function() {
 
                     // Enable the delete selected button
                     buttonDeleteSelected.removeClass('ui-disabled');
+
+                    // Count the number of teams that is left in the list
+                    const teamsLeft = getActivePage().find(checkboxSelectedSelector).length;
+
+                    // Show a information label if the list is empty
+                    if(teamsLeft === 0)
+                        getActivePage().find(teamListSelector).append('<p class="wow fadeInUp no-teams">' +
+                            '<i>No teams here...</i>' +
+                            '</p>');
                 },
                 error: onError
             });
