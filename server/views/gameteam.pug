@@ -20,7 +20,6 @@ block content
             input(type='text', name='field-team-name', id='field-team-name', value='', data-clear-btn='true')
 
             //- Game ID
-            //- TODO: Make sure the game ID is given!
             input(type='hidden', name='field-game', value=game.id)
 
             //- Action buttons
@@ -29,6 +28,29 @@ block content
                 a.ui-btn.clr-primary.action-create(href='#', data-inline='true')
                     i.zmdi.zmdi-check
                     | &nbsp;&nbsp;Create
+                a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
+                    i.zmdi.zmdi-cancel
+                    | &nbsp;Cancel
+
+    //- Delete team popup
+    #popupDeleteTeam(data-role='popup')
+        div(data-role='header')
+            a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+                i.zmdi.zmdi-close
+            h1.nd-title Delete team
+
+        div(data-role='content')
+            p Are you sure you want to delete the selected teams?
+
+            //- Game ID
+            input(type='hidden', name='field-game', value=game.id)
+
+            //- Action buttons
+            br
+            .button-list
+                a.ui-btn.clr-warning.action-delete(href='#', data-inline='true')
+                    i.zmdi.zmdi-delete
+                    | &nbsp;&nbsp;Delete
                 a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
                     i.zmdi.zmdi-cancel
                     | &nbsp;Cancel
