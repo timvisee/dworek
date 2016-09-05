@@ -155,6 +155,7 @@ router.post('/', function(req, res, next) {
             var deletedTeams = [];
 
             // Loop through the team ids
+            latch.add(teamIds.length);
             teamIds.forEach(function(teamId) {
                 // Format the team ID
                 teamId = teamId.trim();
@@ -163,10 +164,8 @@ router.post('/', function(req, res, next) {
                 if(cancelled)
                     return;
 
-                // Get the game for this game and user
-                // TODO: Delete the team here!
-                latch.add();
-                Core.model.gameUserModelManager.getGameUser(game, teamId, function(err, gameUser) {
+                // Get the team instance
+                Core.model.gameTeamModelManager.getTeamById(teamId, function(err, team) {
                     // Call back errors
                     if(err !== null) {
                         if(!cancelled)
@@ -175,11 +174,19 @@ router.post('/', function(req, res, next) {
                         return;
                     }
 
-                    // Add the user to the updated users list
-                    deletedTeams.push(teamId);
+                    // Delete the team
+                    team.delete(function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!cancelled)
+                                next(err);
+                            cancelled = true;
+                            return;
+                        }
 
-                    // Resolve the latch
-                    latch.resolve();
+                        // Resolve the latch
+                        latch.resolve();
+                    });
                 });
             });
 
