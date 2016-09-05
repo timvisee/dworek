@@ -32,6 +32,12 @@ var ModelInstanceManager = require('../ModelInstanceManager');
 var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
+ * Redis key root for cache.
+ * @type {string}
+ */
+const REDIS_KEY_ROOT = 'model:gameteam';
+
+/**
  * GameTeamModelManager class.
  *
  * @class
@@ -45,12 +51,6 @@ var GameTeamModelManager = function() {
      */
     this._instanceManager = new ModelInstanceManager(GameTeamModel);
 };
-
-/**
- * Redis key root for cache.
- * @type {string}
- */
-GameTeamModelManager.REDIS_KEY_ROOT = 'model:gameteam';
 
 /**
  * Check whether the given game team ID is valid and exists.
@@ -79,7 +79,7 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -210,7 +210,7 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':getGameTeams:' + game.toString();
+    var redisCacheKey = REDIS_KEY_ROOT + ':getGameTeams:' + game.toString();
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -343,7 +343,7 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = GameTeamModelManager.REDIS_KEY_ROOT + ':getGameTeamCount:' + game.toString();
+    var redisCacheKey = REDIS_KEY_ROOT + ':getGameTeamCount:' + game.toString();
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
