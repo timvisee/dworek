@@ -33,6 +33,12 @@ var CallbackLatch = require('../../util/CallbackLatch');
 var MergeUtils = require('../../util/MergeUtils');
 
 /**
+ * Redis key root for cache.
+ * @type {string}
+ */
+const REDIS_KEY_ROOT = 'model:game';
+
+/**
  * GameModelManager class.
  *
  * @class
@@ -74,7 +80,7 @@ GameModelManager.prototype.isValidGameId = function(id, callback) {
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
-    var redisCacheKey = 'model:game:' + id.toString() + ':exists';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + id.toString() + ':exists';
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -239,7 +245,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
     const self = this;
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:game:gamesWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+    const redisCacheKey = REDIS_KEY_ROOT + ':gamesWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -414,7 +420,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = 'model:game:gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+    const redisCacheKey = REDIS_KEY_ROOT + ':gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
