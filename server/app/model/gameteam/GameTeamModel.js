@@ -220,5 +220,21 @@ GameTeamModel.prototype.setName = function(name, callback) {
     this.setField('name', name, callback);
 };
 
+/**
+ * Delete the game team.
+ *
+ * @param {GameTeamModel~deleteCallback} callback Called on success, or when an error occurred.
+ */
+GameTeamModel.prototype.delete = function(callback) {
+    this._baseModel.flush(undefined, callback);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback GameTeamModel~deleteCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
 // Export the user class
 module.exports = GameTeamModel;

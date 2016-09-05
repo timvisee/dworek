@@ -348,9 +348,9 @@ SessionModel.prototype.setExpireDate = function(expireDate, callback) {
 };
 
 /**
- * Delete t he session.
+ * Delete the session.
  *
- * @param {BaseModel~deleteCallback} callback Called on success, or when an error occurred.
+ * @param {SessionModel~deleteCallback} callback Called on success, or when an error occurred.
  */
 SessionModel.prototype.delete = function(callback) {
     this._baseModel.flush(undefined, callback);
@@ -359,7 +359,7 @@ SessionModel.prototype.delete = function(callback) {
 /**
  * Called on success, or when an error occurred.
  *
- * @callback BaseModel~deleteCallback
+ * @callback SessionModel~deleteCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
