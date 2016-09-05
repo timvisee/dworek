@@ -9,18 +9,32 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='info')
-        if (user.isHost || user.isAdmin) && game.usersCount.requested > 0
-            .nd2-card.wow.fadeInUp
-                .card-title.has-supporting-text
-                    h3.card-primary-title Users awaiting approval
+        if (user.isHost || user.isAdmin)
+            if game.teamCount == 0
+                .nd2-card.wow.fadeInUp
+                    .card-title.has-supporting-text
+                        h3.card-primary-title Missing teams
 
-                .card-supporting-text.has-action.has-title.
-                    #{game.usersCount.requested} user#{game.usersCount.requested == 1 ? '' : 's'} requested to join this game and are awaiting your approval.
-                    Visit the players page to accept or reject these users.
+                    .card-supporting-text.has-action.has-title.
+                        The game is missing teams for users to play in.
+                        Visit the players teams to create and manage teams.
 
-                .card-action
-                    .row.between-xs: .col-xs-12: .box
-                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
+                    .card-action
+                        .row.between-xs: .col-xs-12: .box
+                            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/teams', data-transition='slide') Teams
+
+            if game.usersCount.requested > 0
+                .nd2-card.wow.fadeInUp
+                    .card-title.has-supporting-text
+                        h3.card-primary-title Users awaiting approval
+
+                    .card-supporting-text.has-action.has-title.
+                        #{game.usersCount.requested} user#{game.usersCount.requested == 1 ? '' : 's'} requested to join this game and are awaiting your approval.
+                        Visit the players page to accept or reject these users.
+
+                    .card-action
+                        .row.between-xs: .col-xs-12: .box
+                            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
 
         //- Show a proper card if the user hasn't joined this game
         unless game.userState.player || game.userState.spectator || game.userState.special
