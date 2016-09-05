@@ -166,8 +166,8 @@ RedisUtils.flushKeys = function(keys, callback) {
         keys = [keys];
     }
 
-    // Make sure Redis is ready
-    if(!RedisUtils.isReady()) {
+    // Call back if the array is empty or if Redis isn't ready yet
+    if(keys.length === 0 || !RedisUtils.isReady()) {
         // Call back with zero
         callback(null, 0);
         return;
@@ -228,6 +228,12 @@ RedisUtils.flushKeys = function(keys, callback) {
 
     // Call back with the number of deleted keys when we're done
     latch.then(function() {
+        // Call back zero if the array of keys to be deleted is empty
+        if(deleteKeys.length === 0) {
+            callback(null, 0);
+            return;
+        }
+
         // Get the Redis instance
         const redis = RedisUtils.getConnection();
 
