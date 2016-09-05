@@ -181,6 +181,9 @@ router.post('/', function(req, res, next) {
                             return;
                         }
 
+                        // Add the team ID to the list of deleted teams
+                        deletedTeams.push(teamId);
+
                         // Resolve the latch
                         latch.resolve();
                     });
