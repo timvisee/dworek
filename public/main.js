@@ -173,6 +173,9 @@ $(document).bind("pagecreate", function() {
 
 // User role modification
 $(document).bind("pagecreate", function() {
+    // Get the active mobile page
+    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
+
     // Get the elements
     const buttonChangeRoles = $('.action-change-user-roles');
     const popup = $('#popupChangeUserRole');
@@ -190,7 +193,7 @@ $(document).bind("pagecreate", function() {
         e.preventDefault();
 
         // Find the user checkboxes on the page that is currently active
-        const checkboxes = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelector);
+        const checkboxes = activePage.find(checkboxSelector);
 
         // Show a warning if no user is selected
         if(checkboxes.length == 0) {
@@ -231,7 +234,7 @@ $(document).bind("pagecreate", function() {
             const specialField = popup.find(popupSpecialSelector);
             const spectatorField = popup.find(popupSpectatorSelector);
 
-            // Get the game ID
+            // Get the game
             const gameId = gameField.val();
 
             // Get the team selector value
@@ -261,9 +264,14 @@ $(document).bind("pagecreate", function() {
             buttonChangeRoles.addClass('ui-disabled');
 
             // Callback on error
-            var onError = function() {
+            const onError = function(message) {
+                // Define the error message
+                if(typeof message !== 'string')
+                    message = 'Failed to change user roles';
+                const errorMessage = 'Error: ' + message;
+
                 // Show an error notification
-                showNotification('Failed to change user roles!', {
+                showNotification(errorMessage, {
                     toast: true,
                     native: false,
                     vibrate: true
@@ -272,7 +280,7 @@ $(document).bind("pagecreate", function() {
                 // Revert the checkbox states
                 userIds.forEach(function(userId) {
                     // Find it's checkbox
-                    const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+                    const checkbox = activePage.find(checkboxSelectorUser(userId));
 
                     // Enable the checkbox
                     checkbox.parent().removeClass('ui-disabled');
@@ -293,7 +301,7 @@ $(document).bind("pagecreate", function() {
                 success: function(data) {
                     // Show an error message if any kind of error occurred
                     if(data.status != 'ok' || data.hasOwnProperty('error')) {
-                        onError();
+                        onError(typeof data.error.message === 'string' ? data.error.message : undefined);
                         return;
                     }
 
@@ -312,7 +320,7 @@ $(document).bind("pagecreate", function() {
                     // Loop through the list of updated users and remove their checkboxes
                     updatedUsers.forEach(function(userId) {
                         // Find it's checkbox
-                        const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+                        const checkbox = activePage.find(checkboxSelectorUser(userId));
 
                         // Remove the parent checkbox from the page
                         checkbox.parent().remove();
@@ -325,7 +333,7 @@ $(document).bind("pagecreate", function() {
                             return;
 
                         // Find it's checkbox
-                        const checkbox = $.mobile.pageContainer.pagecontainer('getActivePage').find(checkboxSelectorUser(userId));
+                        const checkbox = activePage.find(checkboxSelectorUser(userId));
 
                         // Enable the checkbox
                         checkbox.parent().removeClass('ui-disabled');
@@ -395,11 +403,11 @@ $(document).bind("pagecreate", function() {
             buttonCreateTeam.addClass('ui-disabled');
 
             // Callback on error
-            var onError = function(message) {
+            const onError = function(message) {
                 // Define the error message
-                var error = 'Failed to create team!';
-                if(message !== undefined)
-                    error = 'Error: ' + message;
+                if(typeof message !== 'string')
+                    message = 'Failed to create team';
+                const error = 'Error: ' + message;
 
                 // Show an error notification
                 showNotification(error, {
@@ -423,7 +431,7 @@ $(document).bind("pagecreate", function() {
                 success: function(data) {
                     // Show an error message if any kind of error occurred
                     if(data.status != 'ok' || data.hasOwnProperty('error')) {
-                        onError(data.error.message);
+                        onError(typeof data.error.message === 'string' ? data.error.message : undefined);
                         return;
                     }
 
@@ -453,6 +461,166 @@ $(document).bind("pagecreate", function() {
 
                     // Enable the create team button
                     buttonCreateTeam.removeClass('ui-disabled');
+                },
+                error: onError
+            });
+
+            // Close the popup
+            popup.popup('close');
+        });
+    });
+});
+
+// Team deletion
+$(document).bind("pagecreate", function() {
+    // Get the active mobile page
+    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
+
+    // Get the elements
+    const buttonDeleteSelected = $('.action-delete-selected');
+    const popup = $('#popupDeleteTeam');
+    const checkboxNamePrefix = 'checkbox-team-';
+    const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']:checked';
+    const checkboxSelectorUser = (userId) => 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
+    const popupGameSelector = 'input[name=field-game]';
+
+    // Handle button click events
+    buttonDeleteSelected.click(function(e) {
+        // Prevent the default click operation
+        e.preventDefault();
+
+        // Find the user checkboxes on the page that is currently active
+        const checkboxes = activePage.find(checkboxSelector);
+
+        // Show a warning if no user is selected
+        if(checkboxes.length == 0) {
+            showNotification('Please select the teams to delete', {
+                toast: true,
+                native: false,
+                vibrate: true,
+                vibrationPattern: 50
+            });
+            return;
+        }
+
+        // Create a list of team IDs
+        var teamIds = [];
+
+        // Loop through all checkboxes and put the team ID in the list
+        checkboxes.each(function() {
+            teamIds.push($(this).attr('name').replace(checkboxNamePrefix, '').trim());
+        });
+
+        // Open the team deletion dialog
+        popup.popup('open', {
+            transition: 'pop'
+        });
+
+        // Find the delete button of the popup
+        const deleteButton = popup.find('.action-delete');
+
+        // Unbind the previous click event, and bind a new one
+        deleteButton.unbind('click');
+        deleteButton.click(function(e) {
+            // Prevent the default action
+            e.preventDefault();
+
+            // Get the game field, and the current game ID
+            const gameField = popup.find(popupGameSelector);
+            const gameId = gameField.val();
+
+            // Create an team delete object to send to the server
+            const updateObject = {
+                game: gameId,
+                teams: teamIds
+            };
+
+            // Disable all checkboxes for the selected teams
+            checkboxes.each(function() {
+                $(this).parent().addClass('ui-disabled');
+            });
+
+            // Disable the delete selected button
+            buttonDeleteSelected.addClass('ui-disabled');
+
+            // Callback on error
+            const onError = function(message) {
+                // Define the error message
+                if(typeof message !== 'string')
+                    message = 'Failed to delete teams';
+                const error = 'Error: ' + message;
+
+                // Show an error notification
+                showNotification(error, {
+                    toast: true,
+                    native: false,
+                    vibrate: true
+                });
+
+                // Revert the checkbox states
+                teamIds.forEach(function(teamId) {
+                    // Find it's checkbox
+                    const checkbox = activePage.find(checkboxSelectorUser(teamId));
+
+                    // Enable the checkbox
+                    checkbox.parent().removeClass('ui-disabled');
+                });
+
+                // Enable the delete selected button
+                buttonDeleteSelected.removeClass('ui-disabled');
+            };
+
+            // Do an request to change the user roles
+            $.ajax({
+                type: "POST",
+                url: '/ajax/team/deleteTeam',
+                data: {
+                    data: JSON.stringify(updateObject)
+                },
+                dataType: 'json',
+                success: function(data) {
+                    // Show an error message if any kind of error occurred
+                    if(data.status != 'ok' || data.hasOwnProperty('error')) {
+                        onError(typeof data.error.message === 'string' ? data.error.message : undefined);
+                        return;
+                    }
+
+                    // Get the list of updated teams
+                    const deletedTeams = data.deletedTeams;
+                    const deletedTeamCount = deletedTeams.length;
+
+                    // Show an error notification
+                    showNotification('Deleted ' + deletedTeamCount + ' team' + (deletedTeamCount != 1 ? 's' : ''), {
+                        toast: true,
+                        native: false,
+                        vibrate: true,
+                        vibrationPattern: 50
+                    });
+
+                    // Loop through the list of deleted teams and remove their checkboxes
+                    deletedTeams.forEach(function(teamId) {
+                        // Find it's checkbox
+                        const checkbox = activePage.find(checkboxSelectorUser(teamId));
+
+                        // Remove the parent checkbox from the page
+                        checkbox.parent().remove();
+                    });
+
+                    // Loop through the original list of team IDs
+                    teamIds.forEach(function(teamId) {
+                        // Check whether this team ID hasn't been covered
+                        if(deletedTeams.indexOf(teamId) !== -1)
+                            return;
+
+                        // Find it's checkbox
+                        const checkbox = activePage.find(checkboxSelectorUser(teamId));
+
+                        // Enable the checkbox
+                        checkbox.parent().removeClass('ui-disabled');
+                    });
+
+                    // Enable the delete selected button
+                    buttonDeleteSelected.removeClass('ui-disabled');
                 },
                 error: onError
             });
