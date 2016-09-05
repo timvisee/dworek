@@ -1943,23 +1943,22 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
         return;
     }
 
-    // Get the Redis instance
-    var redis = RedisUtils.getConnection();
-
-    // Create a callback latch
-    var latch = new CallbackLatch();
-
     // Create an array of keys to delete
     var keys = [];
-
-    // Add a latch to fetch the list of keys to delete
-    latch.add();
 
     // Flush a specific field if a field is given
     if(fields !== undefined && fields !== null) {
         // Convert the fields to an array
-        if(!Array.isArray(fields))
+        if(!_.isArray(fields)) {
+            // Make sure we're working with a string
+            if(!_.isString(fields)) {
+                callback(new Error('Invalid key, not an array or string'), 0);
+                return;
+            }
+
+            // Convert the field string into an array
             fields = [fields];
+        }
 
         // Loop through the fields, and push their Redis keys to the keys array
         fields.forEach(function(field) {
@@ -1967,58 +1966,22 @@ BaseModel.prototype.redisFlush = function(fields, callback) {
             keys.push(this.redisGetKey(field));
         });
 
-        // Resolve the latch
-        latch.resolve();
+    } else
+        // Push the base wildcard key into the array of keys
+        keys.push(this.redisGetKeyRoot() + ':*');
 
-    } else {
-        // Get the base wildcard key for this model object
-        var baseWildcardKey = this.redisGetKeyRoot() + ':*';
-
-        // Fetch all keys for this model object
-        redis.keys(baseWildcardKey, function(err, replyKeys) {
-            // Call back if an error occurred
-            if(err !== null) {
-                if(callback !== undefined)
-                    callback(null, 0);
-                return;
-            }
-
-            // Add the fetched keys to the keys array
-            keys = keys.concat(replyKeys);
-
-            // Resolve the latch
-            latch.resolve();
-        });
-    }
-
-    // Delete the keys after the keys that have to be deleted are fetched
-    latch.then(function() {
-        // Call back if there are no keys to delete
-        if(keys.length === 0) {
+    // Flush the list of keys from Redis
+    RedisUtils.flushKeys(keys, function(err, keyCount) {
+        // Call back errors
+        if(err !== null) {
             if(callback !== undefined)
-                callback(null, 0);
+                callback(err, 0);
             return;
         }
 
-        // Delete the keys from Redis
-        redis.del(keys, function(err, reply) {
-            // Call back if an error occurred
-            if(err !== null) {
-                // Encapsulate the error
-                const error = new Error(err);
-
-                // Call back or throw the error
-                if(callback !== undefined)
-                    callback(error, 0);
-                else
-                    throw error;
-                return;
-            }
-
-            // Call back with the result
-            if(callback !== undefined)
-                callback(null, reply);
-        });
+        // Call back the number of deleted keys
+        if(callback !== undefined)
+            callback(null, keyCount);
     });
 };
 
