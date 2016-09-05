@@ -904,5 +904,35 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
  * @param {GameUserModel=} GameUserModel instance or null if none was found.
  */
 
+/**
+ * Flush the cache for this model manager.
+ *
+ * @param {GameUserModelManager~flushCacheCallback} callback Called on success or when an error occurred.
+ */
+GameUserModelManager.prototype.flushCache = function(callback) {
+    // Determine the cache key for this manager and wildcard it
+    const cacheKey = REDIS_KEY_ROOT + ':*';
+
+    // Flush the cache
+    RedisUtils.flushKeys(cacheKey, function(err, keyCount) {
+        // Call back errors
+        if(err !== null) {
+            callback(err, 0);
+            return;
+        }
+
+        // Call back with the number of deleted cache keys
+        callback(null, keyCount);
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback GameUserModelManager~flushCacheCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Number} Number of deleted/flushed keys.
+ */
+
 // Return the created class
 module.exports = GameUserModelManager;

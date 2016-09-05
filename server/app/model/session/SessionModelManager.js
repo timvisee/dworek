@@ -23,7 +23,7 @@
 var config = require('../../../config');
 var Core = require('../../../Core');
 var SessionDatabase = require('./SessionDatabase');
-var RedisUtil = require('../../redis/RedisUtils');
+var RedisUtils = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var SessionModel = require('./SessionModel');
@@ -43,6 +43,12 @@ const SESSION_TOKEN_MIN_LENGTH = Math.min(config.session.tokenLength, 32);
  * Maximum length of a session token.
  */
 const SESSION_TOKEN_MAX_LENGTH = Math.max(config.session.tokenLength, 64);
+
+/**
+ * Redis key root for cache.
+ * @type {string}
+ */
+const REDIS_KEY_ROOT = 'model:session';
 
 /**
  * Constructor.
@@ -109,11 +115,11 @@ SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callbac
     // TODO: Update this caching method!
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':sessionId';
-    var redis = RedisUtil.getConnection();
+    var redis = RedisUtils.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(userId) {
-        if(RedisUtil.isReady()) {
+        if(RedisUtils.isReady()) {
             // Store the value
             redis.set(cacheKey, userId);
             redis.expire(cacheKey, CACHE_TOKEN_VALID_EXPIRE);
@@ -162,7 +168,7 @@ SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callbac
     };
 
     // Get the result from cache if cache is available
-    if(RedisUtil.isReady()) {
+    if(RedisUtils.isReady()) {
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, id) {
             // Handle errors
@@ -214,11 +220,11 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
     // Determine the cache key and get the Redis client
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':userId';
-    var redis = RedisUtil.getConnection();
+    var redis = RedisUtils.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(userId) {
-        if(RedisUtil.isReady()) {
+        if(RedisUtils.isReady()) {
             // Store the value
             redis.set(cacheKey, userId);
             redis.expire(cacheKey, CACHE_TOKEN_VALID_EXPIRE);
@@ -261,7 +267,7 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
     };
 
     // Get the result from cache if cache is available
-    if(RedisUtil.isReady()) {
+    if(RedisUtils.isReady()) {
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, userId) {
             // Handle errors
@@ -313,11 +319,11 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     // Determine the cache key and get the Redis client
     // TODO: Escape token, or at least make sure it's valid based on it's characters/length?
     var cacheKey = 'api:session:' + token + ':valid';
-    var redis = RedisUtil.getConnection();
+    var redis = RedisUtils.getConnection();
 
     // Cache the result if cache is ready
     var cacheResult = function(valid) {
-        if(RedisUtil.isReady()) {
+        if(RedisUtils.isReady()) {
             // Store the value
             redis.set(cacheKey, valid);
             redis.expire(cacheKey, CACHE_TOKEN_VALID_EXPIRE);
@@ -358,7 +364,7 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     };
 
     // Get the result from cache if cache is available
-    if(RedisUtil.isReady()) {
+    if(RedisUtils.isReady()) {
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, value) {
             // Handle errors
@@ -450,6 +456,36 @@ SessionModelManager.prototype.getUserSessions = function(user, callback) {
         callback(null, sessions);
     });
 };
+
+/**
+ * Flush the cache for this model manager.
+ *
+ * @param {SessionModelManager~flushCacheCallback} callback Called on success or when an error occurred.
+ */
+SessionModelManager.prototype.flushCache = function(callback) {
+    // Determine the cache key for this manager and wildcard it
+    const cacheKey = REDIS_KEY_ROOT + ':*';
+
+    // Flush the cache
+    RedisUtils.flushKeys(cacheKey, function(err, keyCount) {
+        // Call back errors
+        if(err !== null) {
+            callback(err, 0);
+            return;
+        }
+
+        // Call back with the number of deleted cache keys
+        callback(null, keyCount);
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback SessionModelManager~flushCacheCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Number} Number of deleted/flushed keys.
+ */
 
 // Return the created class
 module.exports = SessionModelManager;
