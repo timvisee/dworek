@@ -387,7 +387,9 @@ router.get('/:game/info', function(req, res, next) {
         }
 
         // Set the property
-        gameObject.usersCount = usersCount;
+        gameObject.users = {
+            usersCount
+        };
 
         // Resolve the latch
         latch.resolve();
@@ -403,7 +405,9 @@ router.get('/:game/info', function(req, res, next) {
         }
 
         // Set the number of teams
-        gameObject.teamCount = teamCount;
+        gameObject.teams = {
+            teamCount
+        };
 
         // Resolve the latch
         latch.resolve();
@@ -895,18 +899,21 @@ router.get('/:game/teams', function(req, res, next) {
 
     // Continue when we're done fetching the users permissions
     latch.then(function() {
-        // Render the game page if we didn't call back yet
-        if(!calledBack)
-            LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
-                page: {
-                    leftButton: 'back'
-                },
-                user: userObject,
-                game: gameObject,
-                teams: {
-                    teams: teams
-                }
-            });
+        // Cancel if we already called back
+        if(calledBack)
+            return;
+
+        // Render the game page
+        LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
+            page: {
+                leftButton: 'back'
+            },
+            user: userObject,
+            game: gameObject,
+            teams: {
+                teams: teams
+            }
+        });
     });
 });
 

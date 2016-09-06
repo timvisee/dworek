@@ -10,16 +10,16 @@ block content
                 tr: td Name
                     td= game.name
                 tr: td Teams
-                    td= game.teamCount
+                    td= game.teams.teamCount
                 tr: td In team
-                    td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
+                    td= game.users.usersCount.players
+                        span.gray  of #{game.user.usersCount.totalAccepted} player#{game.user.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Spectators
-                    td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
+                    td= game.user.usersCount.players
+                        span.gray  of #{game.user.usersCount.totalAccepted} player#{game.user.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Special
-                    td= game.usersCount.players
-                        span.gray  of #{game.usersCount.totalAccepted} player#{game.usersCount.totalAccepted == 1 ? '' : 's'}
+                    td= game.user.usersCount.players
+                        span.gray  of #{game.user.usersCount.totalAccepted} player#{game.user.usersCount.totalAccepted == 1 ? '' : 's'}
                 tr: td Requested
-                    td= game.usersCount.requested
-                        span.gray  user#{game.usersCount.requested == 1 ? '' : 's'}
+                    td= game.user.usersCount.requested
+                        span.gray  user#{game.user.usersCount.requested == 1 ? '' : 's'}
