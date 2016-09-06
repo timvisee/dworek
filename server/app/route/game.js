@@ -449,6 +449,11 @@ router.get('/:game/players', function(req, res, next) {
         }
     };
 
+    // Create a teams object
+    var teamsObject = {
+        teams: []
+    };
+
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
 
@@ -479,49 +484,6 @@ router.get('/:game/players', function(req, res, next) {
 
         // Set the property
         gameObject.users.count = usersCount;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Get the game teams
-    latch.add();
-    game.getTeams(function(err, teams) {
-        // Call back errors
-        if(err !== null) {
-            next(err);
-            return;
-        }
-
-        // Create an array of teams
-        gameObject.teams.teams = [];
-
-        // Loop through the list of teams
-        teams.forEach(function(team) {
-            // Create a team object
-            var teamObject = {
-                id: team.getIdHex()
-            };
-
-            // Get the team name
-            latch.add(0);
-            team.getName(function(err, name) {
-                // Call back errors
-                if(err !== null) {
-                    next(err);
-                    return;
-                }
-
-                // Set the name in the team object
-                teamObject.name = name;
-
-                // Add the team object to the list of teams
-                gameObject.teams.teams.push(teamObject);
-
-                // Resolve the latch
-                latch.resolve();
-            })
-        });
 
         // Resolve the latch
         latch.resolve();
@@ -573,9 +535,12 @@ function renderGameUserListPage(req, res, next, category) {
     // Create a callback latch to fetch the user rights
     var latch = new CallbackLatch();
 
-    // Create a game and user object
+    // Create a game, user and teams object
     var gameObject = {};
     var userObject = {};
+    var teamsObject = {
+        teams: []
+    };
 
     // Determine whether the user is game host
     latch.add();
@@ -631,6 +596,46 @@ function renderGameUserListPage(req, res, next, category) {
         latch.resolve();
     });
 
+    // Get the game teams
+    latch.add();
+    game.getTeams(function(err, teams) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Loop through the list of teams
+        teams.forEach(function(team) {
+            // Create a team object
+            var teamObject = {
+                id: team.getIdHex()
+            };
+
+            // Get the team name
+            latch.add();
+            team.getName(function(err, name) {
+                // Call back errors
+                if(err !== null) {
+                    next(err);
+                    return;
+                }
+
+                // Set the name in the team object
+                teamObject.name = name;
+
+                // Add the team object to the list of teams
+                teamsObject.teams.push(teamObject);
+
+                // Resolve the latch
+                latch.resolve();
+            })
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Render the page when everything is fetched successfully
     latch.then(function() {
         // Render the game page
@@ -639,7 +644,8 @@ function renderGameUserListPage(req, res, next, category) {
                 leftButton: 'back'
             },
             game: gameObject,
-            user: userObject
+            user: userObject,
+            teams: teamsObject
         });
     });
 }
