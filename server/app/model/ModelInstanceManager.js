@@ -126,9 +126,23 @@ ModelInstanceManager.prototype.count = function() {
 
 /**
  * Clear the list of instances.
+ *
+ * @param {boolean} [clearModelCache=true] True to also clear the internal cache of the managed models, false to ignore this.
  */
-ModelInstanceManager.prototype.clear = function() {
+ModelInstanceManager.prototype.clear = function(clearModelCache) {
+    // Clear the model cache
+    if(clearModelCache || clearModelCache === undefined)
+        this.clearModelCache();
+    
+    // Reset the instances weak map
     this._instances = new WeakMap();
+};
+
+/**
+ * Clear the cache for the managed model instances.
+ */
+ModelInstanceManager.prototype.clearModelCache = function() {
+    this._instances.forEach((instance) => instance._baseModel.cacheFlush());
 };
 
 // Export the class
