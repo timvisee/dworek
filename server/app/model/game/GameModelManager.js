@@ -501,22 +501,35 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
 /**
  * Flush the cache for this model manager.
  *
- * @param {GameModelManager~flushCacheCallback} callback Called on success or when an error occurred.
+ * @param {GameModelManager~flushCacheCallback} [callback] Called on success or when an error occurred.
  */
 GameModelManager.prototype.flushCache = function(callback) {
     // Determine the cache key for this manager and wildcard it
     const cacheKey = REDIS_KEY_ROOT + ':*';
 
+    // Create a latch
+    var latch = new CallbackLatch();
+
     // Flush the cache
+    latch.add();
     RedisUtils.flushKeys(cacheKey, function(err, keyCount) {
         // Call back errors
         if(err !== null) {
-            callback(err, 0);
+            callback(err);
             return;
         }
 
-        // Call back with the number of deleted cache keys
-        callback(null, keyCount);
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Delete the internal model cache
+    this._instanceManager.clear(true);
+
+    // Call back when we're done
+    latch.then(function() {
+        if(callback !== undefined)
+            callback(null);
     });
 };
 
@@ -525,7 +538,6 @@ GameModelManager.prototype.flushCache = function(callback) {
  *
  * @callback GameModelManager~flushCacheCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
- * @param {Number} Number of deleted/flushed keys.
  */
 
 // Return the created class
