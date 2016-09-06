@@ -197,41 +197,86 @@ router.post('/', function(req, res, next) {
                     // Determine the new team value
                     var newTeam;
 
-                    // Set the new team value to none
+                    // Create a team latch
+                    var teamLatch = new CallbackLatch();
+
+                    // Pick no team
                     if(teamValue === 'none' || teamValue === '')
                         newTeam = null;
 
-                    else
-                        // TODO: Determine the new team value (random, and team IDs)
-                        newTeam = null;
+                    // Pick a random team
+                    else if(teamValue === 'random') {
+                        // Get a list of teams
+                        teamLatch.add();
+                        game.getTeams(function(err, teams) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    next(err);
+                                calledBack = true;
+                                return;
+                            }
 
-                    // Create a fields object with the new field values
-                    const fields = {
-                        team: newTeam,
-                        is_special: isSpecial,
-                        is_spectator: isSpectator
-                    };
+                            // Pick a team
+                            if(teams.length === 0)
+                                newTeam = null;
+                            else
+                                newTeam = teams[Math.floor(Math.random() * teams.length)];
+
+                            // Resolve the latch
+                            teamLatch.resolve();
+                        })
+
+                    } else {
+                        // Get the team by ID
+                        teamLatch.add();
+                        Core.model.gameTeamModelManager.getTeamById(teamValue, function(err, team) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    next(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the new team
+                            newTeam = team;
+
+                            // Resolve the team latch
+                            teamLatch.resolve();
+                        });
+                    }
 
                     // Set the users special state
                     latch.add();
-                    gameUser.setFields(fields, function(err) {
-                        // Call back errors
-                        if(err !== null) {
-                            if(!calledBack)
-                                next(err);
-                            calledBack = true;
-                            return;
-                        }
+                    teamLatch.then(function() {
+                        // Create a fields object with the new field values
+                        const fields = {
+                            team: newTeam,
+                            is_special: isSpecial,
+                            is_spectator: isSpectator
+                        };
 
-                        // Add the user to the updated users list
-                        updatedUsers.push(userId);
+                        // Set the fields for the game user
+                        gameUser.setFields(fields, function(err) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    next(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Add the user to the updated users list
+                            updatedUsers.push(userId);
+
+                            // Resolve the latch
+                            latch.resolve();
+                        });
 
                         // Resolve the latch
                         latch.resolve();
                     });
-
-                    // Resolve the latch
-                    latch.resolve();
                 });
             });
 
