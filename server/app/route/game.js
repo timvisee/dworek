@@ -484,6 +484,49 @@ router.get('/:game/players', function(req, res, next) {
         latch.resolve();
     });
 
+    // Get the game teams
+    latch.add();
+    game.getTeams(function(err, teams) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Create an array of teams
+        gameObject.teams.teams = [];
+
+        // Loop through the list of teams
+        teams.forEach(function(team) {
+            // Create a team object
+            var teamObject = {
+                id: team.getIdHex()
+            };
+
+            // Get the team name
+            latch.add(0);
+            team.getName(function(err, name) {
+                // Call back errors
+                if(err !== null) {
+                    next(err);
+                    return;
+                }
+
+                // Set the name in the team object
+                teamObject.name = name;
+
+                // Add the team object to the list of teams
+                gameObject.teams.teams.push(teamObject);
+
+                // Resolve the latch
+                latch.resolve();
+            })
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Render the page when we're ready
     latch.then(function() {
         // Render the game page

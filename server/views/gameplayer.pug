@@ -35,12 +35,15 @@ block content
 
                 br
                 label.select(for='field-team') Team
-                select(name='field-team', id='field-team', data-native-menu='false')
-                    option(value='none') None
-                    option(value='random', selected='selected') Random
-                    option(disabled='disabled') ──────────
-                    //- TODO: Show team names here!
-                    option(value='none') Team names should show up here!
+                if teams.teams.length == 0
+                    select(name='field-team', id='field-team', data-native-menu='false', disabled='disabled')
+                else
+                    select(name='field-team', id='field-team', data-native-menu='false')
+                        option(value='none') None
+                        option(value='random', selected='selected') Random
+                        option(disabled='disabled') ──────────
+                        each team in teams.teams
+                            option(value=team.id)= team.name
 
                 //- Flip switches for special players and spectators
                 br
