@@ -57,8 +57,8 @@ block content
 
     //- Create a form and show a list of teams
     .team-list
-        if teams.length > 0
-            each entry in teams
+        if teams.teams.length > 0
+            each entry in teams.teams
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                     //- Checkbox, enabled or disabled based on the team name
                     if user.isHost || user.isAdmin

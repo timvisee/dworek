@@ -903,7 +903,9 @@ router.get('/:game/teams', function(req, res, next) {
                 },
                 user: userObject,
                 game: gameObject,
-                teams
+                teams: {
+                    teams: teams
+                }
             });
     });
 });
