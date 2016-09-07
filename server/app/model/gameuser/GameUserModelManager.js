@@ -916,15 +916,12 @@ GameUserModelManager.prototype.getTeamUserCount = function(team, callback) {
         team = team.getId();
     else if(team === null || team === undefined || !ObjectId.isValid(team)) {
         // Call back
-        callback(null, 0);
+        callback(null);
         return;
     }
 
     // Create a callback latch
     var latch = new CallbackLatch();
-
-    // Store the current instance
-    const self = this;
 
     // Determine the Redis cache key
     var redisCacheKey = REDIS_KEY_ROOT + ':getTeamUserCount:' + team.toString();
@@ -946,15 +943,8 @@ GameUserModelManager.prototype.getTeamUserCount = function(team, callback) {
                 return;
             }
 
-            // Call back zero
-            if(result === '0') {
-                // Call back the result
-                callback(null, 0);
-                return;
-            }
-
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -1007,7 +997,7 @@ GameUserModelManager.prototype.getTeamUserCount = function(team, callback) {
  *
  * @callback GameUserModelManager~getTeamUserCount
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Number} Number of users in the given team.
+ * @param {Number=} Number of users in the given team.
  */
 
 /**

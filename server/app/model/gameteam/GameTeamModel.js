@@ -226,7 +226,7 @@ GameTeamModel.prototype.setName = function(name, callback) {
  * @param {GameTeamModel~getUserCountCallback} callback Called with the result or when an error occurred.
  */
 GameTeamModel.prototype.getUserCount = function(callback) {
-    Core.model.gameUserModelManager.getTeamUserCount(this, callback);
+    Core.model.gameUserModelManager.getTeamUserCount(this.getId(), callback);
 };
 
 /**
@@ -234,7 +234,7 @@ GameTeamModel.prototype.getUserCount = function(callback) {
  *
  * @callback GameTeamModel~getUserCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Number} Number of users in this team.
+ * @param {Number=} Number of users in this team.
  */
 
 /**
