@@ -68,12 +68,17 @@ router.get('/:game', function(req, res, next) {
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Fetch the game name
     latch.add();
     game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -89,7 +94,9 @@ router.get('/:game', function(req, res, next) {
     game.getUsersCount(function(err, usersCount) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -105,7 +112,9 @@ router.get('/:game', function(req, res, next) {
     game.getUserState(user, function(err, userState) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -121,7 +130,9 @@ router.get('/:game', function(req, res, next) {
     game.getTeamCount(function(err, teamCount) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -137,7 +148,9 @@ router.get('/:game', function(req, res, next) {
     game.getUser(function(err, host) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -159,7 +172,9 @@ router.get('/:game', function(req, res, next) {
     user.isAdmin(function(err, isAdmin) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -199,11 +214,16 @@ router.get('/:game/join', function(req, res, next) {
         return;
     }
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Get the user's state for this game
     game.getUserState(user, function(err, userState) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -237,7 +257,9 @@ router.get('/:game/join', function(req, res, next) {
         GameUserDatabase.addGameUserRequest(game, user, function(err, gameUser) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -250,7 +272,9 @@ router.get('/:game/join', function(req, res, next) {
         user.hasNickname(function(err, result) {
             // Call back errors
             if(err !== null) {
-                next(err);
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
                 return;
             }
 
@@ -361,12 +385,17 @@ router.get('/:game/info', function(req, res, next) {
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Fetch the game name
     latch.add();
     game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -382,7 +411,9 @@ router.get('/:game/info', function(req, res, next) {
     game.getUsersCount(function(err, usersCount) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -400,7 +431,9 @@ router.get('/:game/info', function(req, res, next) {
     game.getTeamCount(function(err, teamCount) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -457,12 +490,17 @@ router.get('/:game/players', function(req, res, next) {
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Fetch the game name
     latch.add();
     game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -478,7 +516,9 @@ router.get('/:game/players', function(req, res, next) {
     Core.model.gameUserModelManager.getGameUsersCount(game, function(err, usersCount) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -542,12 +582,17 @@ function renderGameUserListPage(req, res, next, category) {
         teams: []
     };
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Determine whether the user is game host
     latch.add();
     game.getUser(function(err, host) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -569,7 +614,9 @@ function renderGameUserListPage(req, res, next, category) {
     user.isAdmin(function(err, isAdmin) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -585,7 +632,9 @@ function renderGameUserListPage(req, res, next, category) {
     getGameUserListObject(game, category, function(err, result) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -601,7 +650,9 @@ function renderGameUserListPage(req, res, next, category) {
     game.getTeams(function(err, teams) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -617,7 +668,9 @@ function renderGameUserListPage(req, res, next, category) {
             team.getName(function(err, name) {
                 // Call back errors
                 if(err !== null) {
-                    next(err);
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
                     return;
                 }
 
@@ -669,12 +722,17 @@ function getGameUserListObject(game, category, callback) {
     // Create a callback latch for the games properties
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Fetch the game name
     latch.add();
     game.getName(function(err, name) {
         // Call back errors
         if(err !== null) {
-            callback(err);
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
             return;
         }
 
@@ -701,7 +759,9 @@ function getGameUserListObject(game, category, callback) {
     Core.model.gameUserModelManager.getGameUsers(game, options, function(err, users) {
         // Call back errors
         if(err !== null) {
-            callback(err);
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
             return;
         }
 
@@ -725,7 +785,9 @@ function getGameUserListObject(game, category, callback) {
             user.getFirstName(function(err, firstName) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
@@ -741,7 +803,9 @@ function getGameUserListObject(game, category, callback) {
             user.getLastName(function(err, lastName) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
@@ -757,7 +821,9 @@ function getGameUserListObject(game, category, callback) {
             user.getMail(function(err, mail) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
@@ -787,7 +853,8 @@ function getGameUserListObject(game, category, callback) {
 
     // Call back with the game object
     latch.then(function() {
-        callback(null, gameObject);
+        if(!calledBack)
+            callback(null, gameObject);
     });
 }
 
