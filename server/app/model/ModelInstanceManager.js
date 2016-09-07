@@ -134,8 +134,8 @@ ModelInstanceManager.prototype.clear = function(clearModelCache) {
     if(clearModelCache || clearModelCache === undefined)
         this.clearModelCache();
     
-    // Reset the instances weak map
-    this._instances = new WeakMap();
+    // Reset the instances map
+    this._instances = new Map();
 };
 
 /**
