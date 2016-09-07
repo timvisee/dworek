@@ -352,7 +352,9 @@ router.post('/:game/join', function(req, res, next) {
     req.session.user.setNickname(nickname, function(err) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
@@ -375,7 +377,9 @@ router.get('/:game/info', function(req, res, next) {
 
     // Call back if the game is invalid
     if(game === undefined) {
-        next(new Error('Invalid game.'));
+        if(!calledBack)
+            next(new Error('Invalid game.'));
+        calledBack = true;
         return;
     }
 
@@ -448,13 +452,14 @@ router.get('/:game/info', function(req, res, next) {
 
     // Render the page when we're ready
     latch.then(function() {
-        // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameinfo', gameObject.name, {
-            page: {
-                leftButton: 'back'
-            },
-            game: gameObject
-        });
+        // Render the game page if we didn't call back yet
+        if(!calledBack)
+            LayoutRenderer.render(req, res, next, 'gameinfo', gameObject.name, {
+                page: {
+                    leftButton: 'back'
+                },
+                game: gameObject
+            });
     });
 });
 
@@ -531,13 +536,14 @@ router.get('/:game/players', function(req, res, next) {
 
     // Render the page when we're ready
     latch.then(function() {
-        // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
-            page: {
-                leftButton: 'back'
-            },
-            game: gameObject
-        });
+        // Render the game page if we didn't call back yet
+        if(!calledBack)
+            LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
+                page: {
+                    leftButton: 'back'
+                },
+                game: gameObject
+            });
     });
 });
 
@@ -658,6 +664,10 @@ function renderGameUserListPage(req, res, next, category) {
 
         // Loop through the list of teams
         teams.forEach(function(team) {
+            // Cancel the loop if we called back
+            if(calledBack)
+                return;
+
             // Create a team object
             var teamObject = {
                 id: team.getIdHex()
@@ -691,15 +701,16 @@ function renderGameUserListPage(req, res, next, category) {
 
     // Render the page when everything is fetched successfully
     latch.then(function() {
-        // Render the game page
-        LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
-            page: {
-                leftButton: 'back'
-            },
-            game: gameObject,
-            user: userObject,
-            teams: teamsObject
-        });
+        // Render the game page if we didn't call back yet
+        if(!calledBack)
+            LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
+                page: {
+                    leftButton: 'back'
+                },
+                game: gameObject,
+                user: userObject,
+                teams: teamsObject
+            });
     });
 }
 
