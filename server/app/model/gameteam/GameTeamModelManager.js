@@ -442,8 +442,8 @@ GameTeamModelManager.prototype.getGameTeamsUserCount = function(game, callback) 
             return;
         }
 
-        // Create an object with the team user count
-        var userCountObject = {};
+        // Create an map with the team user count
+        var userCountMap = new Map();
 
         // Create a callback latch
         var latch = new CallbackLatch();
@@ -465,7 +465,7 @@ GameTeamModelManager.prototype.getGameTeamsUserCount = function(game, callback) 
                 }
 
                 // Put the user count in the object
-                userCountObject[team.getIdHex()] = userCount;
+                userCountMap.set(team.getIdHex().toLowerCase(), userCount);
 
                 // Resolve the latch
                 latch.resolve();
@@ -473,7 +473,7 @@ GameTeamModelManager.prototype.getGameTeamsUserCount = function(game, callback) 
         });
 
         // Call back the object when we're done
-        latch.then(() => callback(null, userCountObject));
+        latch.then(() => callback(null, userCountMap));
     });
 };
 
@@ -482,15 +482,7 @@ GameTeamModelManager.prototype.getGameTeamsUserCount = function(game, callback) 
  *
  * @callback GameTeamModelManager~getGameTeamUserCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {TeamUserCountObject} Object with the user count for each team.
- */
-
-/**
- * Object with the user count for each listed team.
- * The keys in this object define the team ID's as hexadecimal string.
- * The values in each key define the number of users in the corresponding team.
- *
- * @typedef {Object} TeamUserCountObject
+ * @param {Map} A map with team IDs as keys, with the user count as values (integer).
  */
 
 /**
