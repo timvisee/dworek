@@ -188,7 +188,7 @@ GameTeamModelManager.prototype.getTeamById = function(id, callback) {
 /**
  * Get all the teams for the given game.
  *
- * @param {Game|ObjectId|string} game The game or the ID of the game to get the teams for.
+ * @param {GameModel|ObjectId|string} game The game or the ID of the game to get the teams for.
  * @param {GameTeamModelManager~getGameTeamsCallback} callback Called with the result or when an error occurred.
  */
 GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
