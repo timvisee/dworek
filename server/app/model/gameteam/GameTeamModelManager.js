@@ -337,9 +337,6 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // TODO: Check an instance for this ID is already available?
 
     // Determine the Redis cache key
@@ -419,6 +416,81 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
  * @callback GameTeamModelManager~getGameTeamCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number} Number of teams for this game.
+ */
+
+/**
+ * Get the number of users for each team in the given game.
+ *
+ * @param {GameModel|ObjectId|string} game Game instance or the game ID.
+ * @param {GameTeamModelManager~getGameTeamUserCountCallback} callback Called with the result or when an error occurred.
+ */
+GameTeamModelManager.prototype.getGameTeamsUserCount = function(game, callback) {
+    // Validate the object ID, or get the object ID if a game is given
+    if(game instanceof GameModel)
+        game = game.getId();
+    else if(game === null || game === undefined || !ObjectId.isValid(game)) {
+        // Call back
+        callback(null, false);
+        return;
+    }
+
+    // Get the teams for this game
+    this.getGameTeams(game, function(err, teams) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Create an object with the team user count
+        var userCountObject = {};
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Make sure we only call back once
+        var calledBack = false;
+
+        // Loop through the list of teams
+        teams.forEach(function(team) {
+            // Get the user count for this team
+            latch.add();
+            team.getUserCount(function(err, userCount) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Put the user count in the object
+                userCountObject[team.getIdHex()] = userCount;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+
+        // Call back the object when we're done
+        latch.then(() => callback(null, userCountObject));
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameTeamModelManager~getGameTeamUserCountCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {TeamUserCountObject} Object with the user count for each team.
+ */
+
+/**
+ * Object with the user count for each listed team.
+ * The keys in this object define the team ID's as hexadecimal string.
+ * The values in each key define the number of users in the corresponding team.
+ *
+ * @typedef {Object} TeamUserCountObject
  */
 
 /**
