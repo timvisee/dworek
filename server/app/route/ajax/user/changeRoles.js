@@ -49,18 +49,21 @@ router.post('/', function(req, res, next) {
     // Get the list of user IDs
     const gameId = data.game;
     const users = data.users;
-    const teamValue = data.role.team;
+    const teamValue = data.role.team.trim().toLowerCase();
     const isSpecial = data.role.special;
     const isSpectator = data.role.spectator;
 
     // Create a variable for the game
     var game = null;
 
+    // Map with game team IDs and their user counts
+    var teamUserCountMap = null;
+
     // Create a callback latch
     var latch = new CallbackLatch();
 
     // Get the game instance and make sure the game exists
-    latch.add();
+    latch.add(2);
     Core.model.gameModelManager.getGameById(gameId, function(err, result) {
         // Call back errors
         if(err !== null) {
@@ -81,6 +84,21 @@ router.post('/', function(req, res, next) {
             });
             return;
         }
+
+        // Get the teams for this game
+        Core.model.gameTeamModelManager.getGameTeamsUserCount(game, function(err, userCountMap) {
+            // Call back errors
+            if(err !== null) {
+                next(err);
+                return;
+            }
+
+            // Store the count map
+            teamUserCountMap = userCountMap;
+
+            // Resolve the latch
+            latch.resolve();
+        });
 
         // Resolve the latch
         latch.resolve();
@@ -197,82 +215,76 @@ router.post('/', function(req, res, next) {
                     // Determine the new team value
                     var newTeam;
 
-                    // Create a team latch
-                    var teamLatch = new CallbackLatch();
-
                     // Pick no team
                     if(teamValue === 'none' || teamValue === '')
                         newTeam = null;
 
                     // Pick a random team
                     else if(teamValue === 'random') {
-                        // Get a list of teams
-                        teamLatch.add();
-                        game.getTeams(function(err, teams) {
-                            // Call back errors
-                            if(err !== null) {
-                                if(!calledBack)
-                                    next(err);
-                                calledBack = true;
+                        // Create an array with candidate team IDs
+                        var candidateTeams = [];
+                        var candidateUserCount = -1;
+
+                        // Loop through the teams in the user count object
+                        teamUserCountMap.forEach(function(userCount, teamId) {
+                            // Check whether the team count equals the candidate count
+                            if(candidateUserCount === userCount) {
+                                // Put the team ID in the array
+                                candidateTeams.push(teamId);
                                 return;
                             }
 
-                            // Pick a team
-                            if(teams.length === 0)
-                                newTeam = null;
-                            else
-                                newTeam = teams[Math.floor(Math.random() * teams.length)];
+                            // Set a new user candidate count if the current team has a lower value, or if we didn't have a candidate yet
+                            if(candidateUserCount > userCount || candidateUserCount === -1) {
+                                // Update the candidate user count
+                                candidateUserCount = userCount;
 
-                            // Resolve the latch
-                            teamLatch.resolve();
-                        })
+                                // Flush the candidate list and push this team ID in it
+                                candidateTeams = [teamId];
+                            }
+                        });
+
+                        // Select a random team from the candidates, use no team if we don't have any
+                        if(candidateTeams.length > 0) {
+                            // Determine the new team ID for this user
+                            const newTeamId = candidateTeams[Math.floor(Math.random() * candidateTeams.length)];
+
+                            // Increase the user count for this team
+                            teamUserCountMap.set(newTeamId, teamUserCountMap.get(newTeamId) + 1);
+
+                            // Set the new team instance
+                            newTeam = Core.model.gameTeamModelManager._instanceManager.create(newTeamId);
+                        } else
+                            newTeam = null;
 
                     } else {
-                        // Get the team by ID
-                        teamLatch.add();
-                        Core.model.gameTeamModelManager.getTeamById(teamValue, function(err, team) {
-                            // Call back errors
-                            if(err !== null) {
-                                if(!calledBack)
-                                    next(err);
-                                calledBack = true;
-                                return;
-                            }
-
-                            // Set the new team
-                            newTeam = team;
-
-                            // Resolve the team latch
-                            teamLatch.resolve();
-                        });
+                        // Make sure the team value exists in the team user count object, set the team to null otherwise
+                        if(teamUserCountMap.has(teamValue))
+                            // Create a team instance for this, and set the new team
+                            newTeam = Core.model.gameTeamModelManager._instanceManager.create(teamValue);
+                        else
+                            newTeam = null;
                     }
 
-                    // Set the users special state
-                    latch.add();
-                    teamLatch.then(function() {
-                        // Create a fields object with the new field values
-                        const fields = {
-                            team: newTeam,
-                            is_special: isSpecial,
-                            is_spectator: isSpectator
-                        };
+                    // Create a fields object with the new field values
+                    const fields = {
+                        team: newTeam,
+                        is_special: isSpecial,
+                        is_spectator: isSpectator
+                    };
 
-                        // Set the fields for the game user
-                        gameUser.setFields(fields, function(err) {
-                            // Call back errors
-                            if(err !== null) {
-                                if(!calledBack)
-                                    next(err);
-                                calledBack = true;
-                                return;
-                            }
+                    // Set the fields for the game user
+                    gameUser.setFields(fields, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
 
-                            // Add the user to the updated users list
-                            updatedUsers.push(userId);
-
-                            // Resolve the latch
-                            latch.resolve();
-                        });
+                        // Add the user to the updated users list
+                        updatedUsers.push(userId);
 
                         // Resolve the latch
                         latch.resolve();
