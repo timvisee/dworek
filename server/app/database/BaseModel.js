@@ -591,18 +591,25 @@ BaseModel.prototype.hasFields = function(fields, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Check in MongoDB
     latch.add();
     this.mongoHasFields(fields, function(err, result) {
         // Call back errors
         if(err !== null) {
-            callback(err);
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
             return;
         }
 
         // Call back if the result is true
         if(result) {
-            callback(null, true);
+            if(!calledBack)
+                callback(null, true);
+            calledBack = true;
             return;
         }
 
@@ -659,7 +666,9 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                     result = false;
 
                     // Call back
-                    callback(null, false);
+                    if(!calledBack)
+                        callback(null, false);
+                    calledBack = true;
                 }
 
                 // Complete the task
@@ -687,7 +696,9 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                                 result = false;
 
                                 // Call back
-                                callback(null, false);
+                                if(!calledBack)
+                                    callback(null, false);
+                                calledBack = true;
                             }
                         }
 
@@ -717,7 +728,9 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                         result = false;
 
                         // Call back
-                        callback(null, false);
+                        if(!calledBack)
+                            callback(null, false);
+                        calledBack = true;
                     }
 
                     // Complete the task
@@ -731,7 +744,9 @@ BaseModel.prototype.hasFields = function(fields, callback) {
         async.parallelLimit(tasks, 6, function(err, results) {
             // Call back errors
             if(err !== null) {
-                callback(err);
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
                 return;
             }
 
@@ -740,7 +755,9 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                 return;
 
             // Call back true, everything seems to exist
-            callback(null, true);
+            if(!calledBack)
+                callback(null, true);
+            calledBack = true;
         });
     });
 };
@@ -880,17 +897,24 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
     // Create a results object
     var results = {};
 
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Fetch the field from MongoDB
     mongo.collection(this._modelConfig.mongo.collection).find(queryObject, projectionObject).toArray(function(err, reply) {
         // Call back errors
         if(err !== null) {
-            callback(new Error(err), undefined);
+            if(!calledBack)
+                callback(new Error(err), undefined);
+            calledBack = true;
             return;
         }
 
         // Call back undefined if no results were found
         if(reply.length === 0) {
-            callback(null, undefined);
+            if(!calledBack)
+                callback(null, undefined);
+            calledBack = true;
             return;
         }
 
@@ -912,7 +936,9 @@ BaseModel.prototype.mongoGetFields = function(fields, callback) {
         }
 
         // Call back with the result
-        callback(null, results);
+        if(!calledBack)
+            callback(null, results);
+        calledBack = true;
     });
 };
 
