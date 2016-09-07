@@ -1,0 +1,9 @@
+# Force GitHub to handle .pug files as .jade
+*.pug linguist-language=Jade
+
+# Set vendor status for paths
+bin/* linguist-vendored=false
+node_mobules/* linguist-vendored
+server/* linguist-vendored=false
+public/* linguist-vendored=false
+public/vendor/* linguist-vendored
