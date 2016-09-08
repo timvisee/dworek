@@ -1,5 +1,4 @@
 # Configuration for Circle CI
-
 machine:
   node:
     version: 4.5.0

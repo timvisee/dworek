@@ -85,3 +85,23 @@ h3.table-list,
 .ui-checkbox label img.ui-thumbnail.ui-thumbnail-square {
   border-radius: 10% !important;
 }
+
+// Make toast notifications multi-line
+.nd2-toast {
+  line-height: normal !important;
+  white-space: normal !important;
+  padding: 17px 0 10px 0 !important;
+  max-height: none !important;
+}
+
+.nd2-toast .nd2-toast-message {
+  padding: 0 24px 7px 24px !important;
+  line-height: 20px;
+}
+
+.nd2-toast .nd2-toast-action {
+  display: inline-block !important;
+  position: static !important;
+  margin: 0 24px 7px 24px !important;
+  float: right !important;
+}
