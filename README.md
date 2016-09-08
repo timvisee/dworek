@@ -14,7 +14,7 @@ Here are two random screenshots of the current project state:
 ![Game list](https://raw.githubusercontent.com/timvisee/Dworek/master/res/screenshot/GameList.png)
 
 # Builds
-The project is currently being build on [CircleCI](https://circleci.com/gh/timvisee/Dworek/) and TravisCI](https://travis-ci.org/timvisee/Dworek).
+The project is currently being build on [CircleCI](https://circleci.com/gh/timvisee/Dworek/) and [TravisCI](https://travis-ci.org/timvisee/Dworek).
 
 # Development progress
 An overview of the development progress is available at: https://trello.com/b/5Qvorw1e
