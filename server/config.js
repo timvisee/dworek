@@ -27,6 +27,7 @@ var config = {};
 config.debug = {};
 config.db = {};
 config.redis = {};
+config.cache = {};
 config.api = {};
 config.web = {};
 config.user = {};
@@ -120,6 +121,23 @@ config.redis.url = 'redis://' + config.redis.host + ':' + config.redis.port + '/
  * @type {number}
  */
 config.redis.cacheExpire = 60 * 5;
+
+
+/******************************************************************************
+ * Cache configuration.                                                       *
+ ******************************************************************************/
+
+/**
+ * Internal cache section.
+ * @type {Object}
+ */
+config.cache.internal = {};
+
+/**
+ * Interval in milliseconds to flush the internal cache.
+ * @type {*|number}
+ */
+config.cache.internal.flushInterval = 5 * 60 * 1000;
 
 
 /******************************************************************************

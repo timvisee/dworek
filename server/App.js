@@ -23,6 +23,8 @@
 var async = require('async');
 var express = require('express');
 
+var config = require('./config');
+
 var Core = require('./Core');
 var GameController = require('./app/game/GameController');
 var MongoUtils = require('./app/mongo/MongoUtils');
@@ -211,12 +213,25 @@ App.prototype._initRedis = function(callback) {
  * @param {function} [callback] Called when finished, or when an error occurred.
  */
 App.prototype._initModelManagers = function(callback) {
+    // Model manager instances
+    var modelManagers = [];
+
     // Instantiate the model managers
-    Core.model.userModelManager = new UserModelManager();
-    Core.model.sessionModelManager = new SessionModelManager();
-    Core.model.gameModelManager = new GameModelManager();
-    Core.model.gameTeamModelManager = new GameTeamModelManager();
-    Core.model.gameUserModelManager = new GameUserModelManager();
+    modelManagers.push(Core.model.userModelManager = new UserModelManager());
+    modelManagers.push(Core.model.sessionModelManager = new SessionModelManager());
+    modelManagers.push(Core.model.gameModelManager = new GameModelManager());
+    modelManagers.push(Core.model.gameTeamModelManager = new GameTeamModelManager());
+    modelManagers.push(Core.model.gameUserModelManager = new GameUserModelManager());
+
+    // Create an interval to clear all internal model caches
+    setInterval(function() {
+        // Loop through the list of model managers, and clear the instance managers
+        modelManagers.forEach((modelManager) => modelManager._instanceManager.clear(true));
+
+        // Log a message to the console
+        console.log('Cleared internally cached model instances');
+
+    }, config.cache.internal.flushInterval);
 
     // Call back
     if(callback !== undefined)
