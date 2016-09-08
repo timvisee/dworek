@@ -29,7 +29,7 @@
 
     "async": "2.0.0-rc.3",
 
-    "bcrypt": "0.8.5",
+    "bcryptjs": "2.3.0",
 
     "websocket": "1.0.23",
 

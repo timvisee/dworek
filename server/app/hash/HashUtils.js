@@ -21,7 +21,7 @@
  ******************************************************************************/
 
 var config = require('../../config');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 /**
  * Define whether to use the globally configured salt by default.
