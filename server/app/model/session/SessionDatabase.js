@@ -78,7 +78,7 @@ SessionDatabase.addSession = function(user, token, ip, callback) {
         }
 
         // Flush the model manager
-        Core.model.sessionModelManager.flush(function(err) {
+        Core.model.sessionModelManager.flushCache(function(err) {
             // Call back errors
             if(err !== null) {
                 callback(err);

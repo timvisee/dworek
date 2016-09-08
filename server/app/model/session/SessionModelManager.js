@@ -27,6 +27,7 @@ var RedisUtils = require('../../redis/RedisUtils');
 var TokenGenerator = require('../../token/TokenGenerator');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var SessionModel = require('./SessionModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Time in seconds for token validity to expire in cache.
