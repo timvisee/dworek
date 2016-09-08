@@ -1,3 +1,4 @@
+[![Build Status on TravisCI](https://travis-ci.org/timvisee/Dworek.svg?branch=master)](https://travis-ci.org/timvisee/Dworek)
 [![Build status on CircleCI](https://circleci.com/gh/timvisee/Dworek.svg?style=svg)](https://circleci.com/gh/timvisee/Dworek)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
@@ -13,7 +14,7 @@ Here are two random screenshots of the current project state:
 ![Game list](https://raw.githubusercontent.com/timvisee/Dworek/master/res/screenshot/GameList.png)
 
 # Builds
-The project is currently being build on [CircleCI](https://circleci.com/gh/timvisee/Dworek/).
+The project is currently being build on [TravisCI](https://travis-ci.org/timvisee/Dworek) and [CircleCI](https://circleci.com/gh/timvisee/Dworek/).
 
 # Development progress
 An overview of the development progress is available at: https://trello.com/b/5Qvorw1e
