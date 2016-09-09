@@ -22,8 +22,10 @@
 
 var async = require('async');
 var express = require('express');
+var http = require('http');
 
 var config = require('./config');
+var debug = require('debug')(config.debug.name);
 
 var Core = require('./Core');
 var GameController = require('./app/game/GameController');
@@ -37,6 +39,7 @@ var GameModelManager = require('./app/model/game/GameModelManager');
 var GameTeamModelManager = require('./app/model/gameteam/GameTeamModelManager');
 var GameUserModelManager = require('./app/model/gameuser/GameUserModelManager');
 var RealTime = require('./app/realtime/RealTime');
+var PortUtils = require('./app/util/PortUtils');
 
 /**
  * Constructor.
@@ -54,6 +57,13 @@ var App = function(init) {
      * @private
      */
     this._init = false;
+
+    /**
+     * The port that is used for the web interface.
+     * @type {Number}
+     * @private
+     */
+    this._webPort = null;
 
     // Initialize
     if(init != undefined && init)
@@ -89,16 +99,27 @@ App.prototype.init = function(callback) {
         (initComplete) => self._initGameController(initComplete),
 
         // Initialize the express application
-        (initComplete) => self._initExpressApp(initComplete),
+        (initComplete) => self._initExpressApp(function(err) {
+            // Call back errors
+            if(err !== null) {
+                initComplete(err);
+                return;
+            }
+
+            // Initialize the web server
+            //noinspection JSAccessibilityCheck
+            self._initWebServer();
+
+            // Initialize the real time server
+            //noinspection JSAccessibilityCheck
+            self._initRealTime(initComplete);
+        }),
 
         // Initialize the database
         (initComplete) => self._initDatabase(initComplete),
 
         // Initialize Redis
-        (initComplete) => self._initRedis(initComplete),
-
-        // Initialize real time
-        (initComplete) => self._initRealTime(initComplete)
+        (initComplete) => self._initRedis(initComplete)
 
     ], function(err) {
         // Make sure everything went right, callback or throw an error instead
@@ -167,6 +188,76 @@ App.prototype._initExpressApp = function(callback) {
     if(callback !== undefined)
         callback(null);
 };
+
+/**
+ * Initialize the web server.
+ *
+ * @private
+ */
+App.prototype._initWebServer = function() {
+    // Set the web listening port
+    Core._webPort = PortUtils.normalizePort(config.web.port);
+    Core.expressApp.set('port', Core._webPort);
+
+    // Create the HTTP server
+    Core.server = http.createServer(Core.expressApp);
+
+    // Listen on provided port, on all network interfaces.
+    Core.server.listen(Core._webPort);
+    Core.server.on('error', _webServerOnError);
+    Core.server.on('listening', _webServerOnListening);
+};
+
+/**
+ * Event listener for HTTP server error event.
+ *
+ * @throws
+ */
+function _webServerOnError(error) {
+    // Make sure this originates from the listen call
+    if(error.syscall !== 'listen')
+        throw error;
+
+    // Build a port/pipe string
+    var bind = typeof this._webPort === 'string'
+        ? 'Pipe ' + this._webPort
+        : 'Port ' + this._webPort;
+
+    // Handle specific listen errors with friendly messages
+    switch(error.code) {
+        case 'EACCES':
+            // No access to listen to the given port
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+
+        case 'EADDRINUSE':
+            // The port is already in use
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+
+        default:
+            // Throw the error
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server listening event.
+ */
+function _webServerOnListening() {
+    // Get the address
+    var address = Core.server.address();
+
+    // Build a port/pipe string
+    var bind = typeof address === 'string'
+        ? 'pipe ' + address
+        : 'port ' + address.port;
+
+    // Debug a listening message
+    debug('Web server listening on ' + bind);
+}
 
 /**
  * Initialize the router.

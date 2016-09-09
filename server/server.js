@@ -20,29 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var config = require('./config');
 var appInfo = require('./appInfo');
-var debug = require('debug')(config.debug.name);
-var http = require('http');
 var App = require('./App');
-var Core = require('./Core');
-var PortUtils = require('./app/util/PortUtils');
-
-/**
- * Server instance.
- */
-var server;
-
-/**
- * Web listening port.
- */
-var webPort;
-
-// Create an app instance
-var app = new App(false);
-
-// Initialize
-init();
 
 /**
  * Initialize.
@@ -53,79 +32,14 @@ function init() {
 
     // Initialize the application
     app.init(function(err) {
-        // Handle errors
+        // Throw errors
         if(err !== null)
             throw err;
-
-        // Start the web server
-        startWebServer();
     });
 }
 
-/**
- * Start the web server.
- */
-function startWebServer() {
-    // Set the web listening port
-    webPort = PortUtils.normalizePort(config.web.port);
-    Core.expressApp.set('port', webPort);
+// Create an app instance
+var app = new App(false);
 
-    // Create the HTTP server
-    Core.server = http.createServer(Core.expressApp);
-
-    // Listen on provided port, on all network interfaces.
-    Core.server.listen(webPort);
-    Core.server.on('error', onError);
-    Core.server.on('listening', onListening);
-}
-
-/**
- * Event listener for HTTP server error event.
- *
- * @throws
- */
-function onError(error) {
-    // Make sure this originates from the listen call
-    if(error.syscall !== 'listen')
-        throw error;
-
-    // Build a port/pipe string
-    var bind = typeof webPort === 'string'
-        ? 'Pipe ' + webPort
-        : 'Port ' + webPort;
-
-    // Handle specific listen errors with friendly messages
-    switch(error.code) {
-        case 'EACCES':
-            // No access to listen to the given port
-            console.error(bind + ' requires elevated privileges');
-            process.exit(1);
-            break;
-
-        case 'EADDRINUSE':
-            // The port is already in use
-            console.error(bind + ' is already in use');
-            process.exit(1);
-            break;
-
-        default:
-            // Throw the error
-            throw error;
-    }
-}
-
-/**
- * Event listener for HTTP server listening event.
- */
-function onListening() {
-    // Get the address
-    var address = server.address();
-
-    // Build a port/pipe string
-    var bind = typeof address === 'string'
-        ? 'pipe ' + address
-        : 'port ' + address.port;
-
-    // Debug a listening message
-    debug('Web server listening on ' + bind);
-}
+// Initialize
+init();
