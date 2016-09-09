@@ -232,9 +232,6 @@ App.prototype._initModelManagers = function(callback) {
         // Loop through the list of model managers, and clear the instance managers
         modelManagers.forEach((modelManager) => modelManager._instanceManager.clear(true));
 
-        // Log a message to the console
-        console.log('Cleared internally cached model instances');
-
     }, config.cache.internal.flushInterval);
 
     // Call back
