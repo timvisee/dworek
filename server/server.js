@@ -71,12 +71,12 @@ function startWebServer() {
     Core.expressApp.set('port', webPort);
 
     // Create the HTTP server
-    server = http.createServer(Core.expressApp);
+    Core.server = http.createServer(Core.expressApp);
 
     // Listen on provided port, on all network interfaces.
-    server.listen(webPort);
-    server.on('error', onError);
-    server.on('listening', onListening);
+    Core.server.listen(webPort);
+    Core.server.on('error', onError);
+    Core.server.on('listening', onListening);
 }
 
 /**

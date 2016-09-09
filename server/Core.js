@@ -71,6 +71,13 @@ Core.model.gameTeamModelManager = null;
 Core.model.gameUserModelManager = null;
 
 /**
+ * HTTP server instance.
+ *
+ * @type {*} Server instance.
+ */
+Core.server = null;
+
+/**
  * Express app instance.
  *
  * @type {*} Express app.
