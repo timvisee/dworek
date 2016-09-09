@@ -20,7 +20,11 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var io = require('socket.io')();
+var io = require('socket.io');
+
+var config = require('../../config');
+
+var Core = require('../../Core');
 
 /**
  * Real time class.
@@ -28,14 +32,50 @@ var io = require('socket.io')();
  * @class
  * @constructor
  */
-var RealTime = function() {};
+var RealTime = function() {
+    /**
+     * SocketIO server instance.
+     * @type {Server}
+     * @private
+     */
+    this._io = null;
+};
 
 /**
  * Start the real time server.
  */
 RealTime.prototype.start = function() {
-    // TODO: Start real time server here!
-    console.log('Starting real time core');
+    // Create the SocketIO server
+    this._io = io({
+        // Serve the SocketIO client to users
+        serveClient: true,
+
+        // Set the realtime SocketIO server path
+        path: config.realtime.path
+    });
+
+    // Attach the SocketIO server to the running HTTP server
+    if(config.realtime.port == undefined || config.realtime.port === config.web.port)
+        // Bind the realtime SocketIO server to the HTTP web server
+        this._io.attach(Core.server);
+    else
+        // Bind the realtime SocketIO server to the specified port
+        this._io.attach(config.realtime.port);
+
+    // Register the connection event
+    this._io.on('connection', function() {
+        console.log('### ON CONNECTION CALLED!');
+    });
+};
+
+/**
+ * Get the SocketIO server instance.
+ * Null might be returned if the server hasn't been started yet.
+ *
+ * @return {Server|*}
+ */
+RealTime.prototype.getServer = function() {
+    return this._io;
 };
 
 // Export the module

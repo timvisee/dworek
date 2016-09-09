@@ -28,8 +28,8 @@ config.debug = {};
 config.db = {};
 config.redis = {};
 config.cache = {};
-config.realtime = {};
 config.api = {};
+config.realtime = {};
 config.web = {};
 config.user = {};
 config.security = {};
@@ -142,17 +142,6 @@ config.cache.internal.flushInterval = 5 * 60 * 1000;
 
 
 /******************************************************************************
- * Real time configuration.                                                   *
- ******************************************************************************/
-
-/**
- * Port that is used for the real time server.
- * @type {*|number}
- */
-config.realtime.port = 3001;
-
-
-/******************************************************************************
  * Web configuration.                                                         *
  ******************************************************************************/
 
@@ -167,6 +156,24 @@ config.web.port = process.env.WEB_PORT || 3000;
  * @type {boolean}
  */
 config.web.fixUrl = true;
+
+
+/******************************************************************************
+ * Real time configuration.                                                   *
+ ******************************************************************************/
+
+/**
+ * Port that is used for the real time server.
+ * Uses the same port as the web interface by default.
+ * @type {*|number}
+ */
+config.realtime.port = config.web.port;
+
+/**
+ * The public path that is used for the real time server.
+ * @type {string}
+ */
+config.realtime.path = '/realtime';
 
 
 /******************************************************************************
