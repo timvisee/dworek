@@ -20,83 +20,23 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var io = require('socket.io')();
+
 /**
- * Core class.
+ * Real time class.
  *
  * @class
  * @constructor
  */
-var Core = function() {};
+var RealTime = function() {};
 
 /**
- * Model manager root.
- *
- * @type {Object}
+ * Start the real time server.
  */
-Core.model = {};
+RealTime.prototype.start = function() {
+    // TODO: Start real time server here!
+    console.log('Starting real time core');
+};
 
-/**
- * User model manager.
- *
- * @type {UserModelManager|null} User model manager, or null if it isn't instantiated yet.
- */
-Core.model.userModelManager = null;
-
-/**
- * Session model manager.
- *
- * @type {SessionModelManager|null} Session model manager, or null if it isn't instantiated yet.
- */
-Core.model.sessionModelManager = null;
-
-/**
- * Game model manager.
- *
- * @type {GameModelManager|null} Game model manager, or null if it isn't instantiated yet.
- */
-Core.model.gameModelManager = null;
-
-/**
- * Game team model manager.
- *
- * @type {GameTeamModelManager|null} Game team model manager, or null if it isn't instantiated yet.
- */
-Core.model.gameTeamModelManager = null;
-
-/**
- * Game user model manager.
- *
- * @type {GameUserModelManager|null} Game user model manager, or null if it isn't instantiated yet.
- */
-Core.model.gameUserModelManager = null;
-
-/**
- * Express app instance.
- *
- * @type {*} Express app.
- */
-Core.expressApp = null;
-
-/**
- * Router instance.
- *
- * @type {Router}
- */
-Core.router = null;
-
-/**
- * Game controller instance.
- *
- * @type {GameController|null} Game controller instance, or null if the core hasn't been initialized.
- */
-Core.gameController = null;
-
-/**
- * Real time server instance.
- *
- * @type {RealTime}
- */
-Core.realTime = null;
-
-// Export the class
-module.exports = Core;
+// Export the module
+module.exports = RealTime;

@@ -36,6 +36,7 @@ var SessionModelManager = require('./app/model/session/SessionModelManager');
 var GameModelManager = require('./app/model/game/GameModelManager');
 var GameTeamModelManager = require('./app/model/gameteam/GameTeamModelManager');
 var GameUserModelManager = require('./app/model/gameuser/GameUserModelManager');
+var RealTime = require('./app/realtime/RealTime');
 
 /**
  * Constructor.
@@ -94,7 +95,10 @@ App.prototype.init = function(callback) {
         (initComplete) => self._initDatabase(initComplete),
 
         // Initialize Redis
-        (initComplete) => self._initRedis(initComplete)
+        (initComplete) => self._initRedis(initComplete),
+
+        // Initialize real time
+        (initComplete) => self._initRealTime(initComplete)
 
     ], function(err) {
         // Make sure everything went right, callback or throw an error instead
@@ -237,6 +241,30 @@ App.prototype._initModelManagers = function(callback) {
     if(callback !== undefined)
         callback(null);
 };
+
+/**
+ * Initialize the real time server.
+ *
+ * @param {App~_initRealTimeCallback} callback Called on success, or when an error occurred.
+ * @private
+ */
+App.prototype._initRealTime = function(callback) {
+    // Initialize the real time server
+    Core.realTime = new RealTime();
+
+    // Start the real time server
+    Core.realTime.start();
+
+    // Call back
+    callback(null);
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback App~_initRealTimeCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 // Export the class
 module.exports = App;
