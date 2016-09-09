@@ -28,6 +28,7 @@ config.debug = {};
 config.db = {};
 config.redis = {};
 config.cache = {};
+config.realtime = {};
 config.api = {};
 config.web = {};
 config.user = {};
@@ -138,6 +139,17 @@ config.cache.internal = {};
  * @type {*|number}
  */
 config.cache.internal.flushInterval = 5 * 60 * 1000;
+
+
+/******************************************************************************
+ * Real time configuration.                                                   *
+ ******************************************************************************/
+
+/**
+ * Port that is used for the real time server.
+ * @type {*|number}
+ */
+config.realtime.port = 3001;
 
 
 /******************************************************************************
