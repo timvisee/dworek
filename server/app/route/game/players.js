@@ -289,16 +289,15 @@ module.exports = {
 
         // Render the page when everything is fetched successfully
         latch.then(function() {
-            // Render the game page if we didn't call back yet
-            if(!calledBack)
-                LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
-                    page: {
-                        leftButton: 'back'
-                    },
-                    game: gameObject,
-                    user: userObject,
-                    teams: teamsObject
-                });
+            // Render the game players page
+            LayoutRenderer.render(req, res, next, 'gameplayer', gameObject.name, {
+                page: {
+                    leftButton: 'back'
+                },
+                game: gameObject,
+                user: userObject,
+                teams: teamsObject
+            });
         });
     },
 
