@@ -32,29 +32,6 @@ block content
                     i.zmdi.zmdi-cancel
                     | &nbsp;Cancel
 
-    //- Delete team popup
-    #popupDeleteTeam(data-role='popup')
-        div(data-role='header')
-            a.ui-btn.ui-btn-left.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
-                i.zmdi.zmdi-close
-            h1.nd-title Delete team
-
-        div(data-role='content')
-            p Are you sure you want to delete the selected teams?
-
-            //- Game ID
-            input(type='hidden', name='field-game', value=game.id)
-
-            //- Action buttons
-            br
-            .button-list
-                a.ui-btn.clr-warning.action-delete(href='#', data-inline='true')
-                    i.zmdi.zmdi-delete
-                    | &nbsp;&nbsp;Delete
-                a.ui-btn.action-cancel(href='#', data-rel='back', data-inline='true')
-                    i.zmdi.zmdi-cancel
-                    | &nbsp;Cancel
-
     //- Create a form and show a list of teams
     .team-list
         if teams.teams.length > 0
@@ -77,3 +54,6 @@ block content
         .button-list
             a.ui-btn.ui-btn-raised.clr-primary.action-create-team.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
             a.ui-btn.ui-btn-raised.clr-primary.action-delete-selected.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected
+
+    //- Game ID
+    input(type='hidden', name='field-game', value=game.id)

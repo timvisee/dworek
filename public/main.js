@@ -651,14 +651,13 @@ $(document).bind("pageinit", function() {
 $(document).bind("pageinit", function() {
     // Get the elements
     const buttonDeleteSelected = $('.action-delete-selected');
-    const popup = $('#popupDeleteTeam');
     const checkboxNamePrefix = 'checkbox-team-';
     const checkboxSelector = 'input[type=checkbox][name^=' + checkboxNamePrefix + ']';
     const checkboxSelectedSelector = checkboxSelector + ':checked';
     const checkboxSelectorUser = function(userId) {
         return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
     };
-    const popupGameSelector = 'input[name=field-game]';
+    const gameIdSelector = 'input[name=field-game]';
     const teamListSelector = '.team-list';
 
     // Handle button click events
@@ -688,22 +687,10 @@ $(document).bind("pageinit", function() {
             teamIds.push($(this).attr('name').replace(checkboxNamePrefix, '').trim());
         });
 
-        // Open the team deletion dialog
-        popup.popup('open', {
-            transition: 'pop'
-        });
-
-        // Find the delete button of the popup
-        const deleteButton = popup.find('.action-delete');
-
-        // Unbind the previous click event, and bind a new one
-        deleteButton.unbind('click');
-        deleteButton.click(function(e) {
-            // Prevent the default action
-            e.preventDefault();
-
+        // Define the delete action
+        const deleteAction = function() {
             // Get the game field, and the current game ID
-            const gameField = popup.find(popupGameSelector);
+            const gameField = $.mobile.pageContainer.pagecontainer('getActivePage').find(gameIdSelector);
             const gameId = gameField.val();
 
             // Create an team delete object to send to the server
@@ -810,9 +797,23 @@ $(document).bind("pageinit", function() {
                 },
                 error: onError
             });
+        };
 
-            // Close the popup
-            popup.popup('close');
+        // Show the dialog box
+        showDialog({
+            title: 'Delete team',
+            message: 'Are you sure you want to delete the selected teams?',
+            actions: [
+                {
+                    text: 'Delete',
+                    icon: 'zmdi zmdi-delete',
+                    state: 'warning',
+                    action: deleteAction
+                },
+                {
+                    text: 'Cancel'
+                }
+            ]
         });
     });
 });
