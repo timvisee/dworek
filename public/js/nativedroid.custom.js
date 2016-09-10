@@ -738,11 +738,15 @@
 
             _self.options = $.extend(_self.defaults, options);
 
-            _self.build = function() {
+            _self.build = function(rebuild) {
+                // Set the rebuild property if it isn't defined
+                if(rebuild == undefined)
+                    rebuild = false;
 
                 _self.globalSettings();
                 _self.bindNavigationSwipe();
-                _self.iniWow();
+                if(!rebuild)
+                    _self.iniWow();
                 _self.iniWaves();
                 _self.iniSmoothTransition();
                 _self.iniGoogleAnalytics();
