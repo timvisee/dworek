@@ -877,6 +877,6 @@ $(document).ready(function() {
     // Listen to the test channel
     socket.on('test', function(message) {
         // Show a message
-        alert('Received: ' + message.message);
+        showNotification('Real time received: ' + message.message);
     });
 });
