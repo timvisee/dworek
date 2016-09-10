@@ -97,24 +97,6 @@ module.exports = {
             latch.resolve();
         });
 
-        // Get the game users count
-        latch.add();
-        Core.model.gameUserModelManager.getGameUsersCount(game, function(err, usersCount) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
-                return;
-            }
-
-            // Set the property
-            gameObject.users.count = usersCount;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
         // Determine whether the user is game host
         latch.add();
         game.getUser(function(err, host) {
