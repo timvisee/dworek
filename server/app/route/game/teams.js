@@ -33,8 +33,11 @@ module.exports = {
      * @param router Express router instance.
      */
     route: (router) => {
+        // Store the module instance
+        const self = module.exports;
+
         // Route the pages
-        router.get('/:game/teams', this.get);
+        router.get('/:game/teams', self.get);
     },
 
     /**

@@ -33,11 +33,11 @@ module.exports = {
      * @param router Express router instance.
      */
     route: (router) => {
-        // Route the pages
-        router.get('/:game/players', this.get);
+        // Store the module instance
+        const self = module.exports;
 
-        // Store this instance
-        const self = this;
+        // Route the pages
+        router.get('/:game/players', self.get);
 
         // Route the list pages
         router.get('/:game/players/requested', (req, res, next) => self.listPage(req, res, next, 'requested'));

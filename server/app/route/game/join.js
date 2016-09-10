@@ -36,9 +36,12 @@ module.exports = {
      * @param router Express router instance.
      */
     route: (router) => {
+        // Store the module instance
+        const self = module.exports;
+
         // Route the pages
-        router.get('/:game/join', this.get);
-        router.post('/:game/join', this.post);
+        router.get('/:game/join', self.get);
+        router.post('/:game/join', self.post);
     },
 
     /**
