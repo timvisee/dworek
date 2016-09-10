@@ -63,8 +63,14 @@ RealTime.prototype.start = function() {
         this._io.attach(config.realtime.port);
 
     // Register the connection event
-    this._io.on('connection', function() {
-        console.log('### ON CONNECTION CALLED!');
+    this._io.on('connection', function(socket) {
+        // Show a status message
+        console.log('A client connected to the real time server');
+
+        // Send a test message to the client socket
+        socket.emit('test', {
+            message: 'Test message'
+        });
     });
 };
 

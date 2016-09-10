@@ -702,3 +702,20 @@ function merge(a, b, recursive) {
     // Return the object
     return a;
 }
+
+// Real time test script
+$(document).ready(function() {
+    // Show a status message
+    console.log('Connecting to real time server...');
+
+    // Create a socket instance
+    var socket = io.connect({
+        path: '/realtime'
+    });
+
+    // Listen to the test channel
+    socket.on('test', function(message) {
+        // Show a message
+        alert('Received: ' + message.message);
+    });
+});
