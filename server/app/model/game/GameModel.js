@@ -27,6 +27,7 @@ var GameDatabase = require('./GameDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
 var UserModel = require('../user/UserModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * GameModel class.
@@ -433,6 +434,81 @@ GameModel.prototype.getTeamCount = function(callback) {
  * @callback GameModel~getTeamCountCallback
  * @param {Error|null} Error instance if an error occurred, null if not.
  * @param {Number} Number of teams in this game.
+ */
+
+/**
+ * Check whether the given user has permission to manage this game.
+ * A user will have permission if it's the host of the game, or if the user is administrator.
+ *
+ * @param {UserModel|ObjectId|string} user User to check.
+ * @param {GameModel~hasManagePermissionCallback} callback Called with the result or when an error occurred.
+ */
+GameModel.prototype.hasManagePermission = function(user, callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Keep track whether we called back or not
+    var calledBack = false;
+
+    // Check whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Call back true if the user is administrator
+        if(isAdmin) {
+            calledBack = true;
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Check whether the user is host of this game
+    this.getUser(function(err, host) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Make sure a valid user was fetched, resolve the latch if not
+        if(host == undefined) {
+            latch.resolve();
+            return;
+        }
+
+        // Call back true if the user is host of the game
+        if(host.getId().equals(user.getId())) {
+            calledBack = true;
+            callback(null, true);
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back false if we reach the callback latch
+    latch.then(() => callback(null, false));
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~hasManagePermissionCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {boolean} True if the user has permission to manage the game, false if not.
  */
 
 // Export the user class
