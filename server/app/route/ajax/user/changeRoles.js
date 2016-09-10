@@ -112,13 +112,12 @@ router.post('/', function(req, res, next) {
         // Make sure we only call back once
         var calledBack = false;
 
-        // Create flags to define whether the user is admin or host of the game
-        var isAdmin = false;
-        var isHost = false;
+        // Create a flag to store whether the user has permission
+        var hasPermission = false;
 
-        // Check whether the user is administrator
+        // Determine whether the user has permission to manage this game
         latch.add();
-        user.isAdmin(function(err, result) {
+        game.hasManagePermission(user, function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -127,34 +126,10 @@ router.post('/', function(req, res, next) {
                 return;
             }
 
-            // Set the admin flag
-            isAdmin = result;
+            // Set the permission flag
+            hasPermission = result;
 
             // Resolve the latch
-            latch.resolve();
-        });
-
-        // Check whether the user is host of the game
-        latch.add();
-        game.getUser(function(err, result) {
-            // Call back errors
-            if(err != null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
-                return;
-            }
-
-            // Make sure the host user isn't null
-            if(result === null) {
-                isHost = false;
-                return;
-            }
-
-            // Determine whether the user is host, and set the flag
-            isHost = result.getId().equals(user.getId());
-
-            // Resolve the host
             latch.resolve();
         });
 
@@ -163,8 +138,8 @@ router.post('/', function(req, res, next) {
             // Reset the latch back to it's identity
             latch.identity();
 
-            // Make sure the user is host or administrator
-            if(!isHost && !isAdmin) {
+            // Make sure the user has rights to manage this game
+            if(!hasPermission) {
                 next(new Error('You don\'t have permission to change user roles'));
                 return;
             }
