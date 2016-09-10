@@ -103,7 +103,7 @@ router.post('/', function(req, res, next) {
 
             // Make sure the user has permission to manage this game
             if(!hasPermission) {
-                next(new Error('You don\'t have permission to change user roles'));
+                next(new Error('You don\'t have permission to delete a team'));
                 return;
             }
 
