@@ -61,7 +61,7 @@ block content
             each entry in teams.teams
                 .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                     //- Checkbox, enabled or disabled based on the team name
-                    if user.isHost || user.isAdmin
+                    if user.hasPermission
                         input(type='checkbox', name='checkbox-team-' + entry.id, id='checkbox-team-' + entry.id)
                     else
                         input(type='checkbox', name='checkbox-team-' + entry.id, id='checkbox-team-' + entry.id, disabled='disabled')
@@ -73,7 +73,7 @@ block content
                 i No teams here...
 
     br
-    if user.isAdmin || user.isHost
+    if user.hasPermission
         .button-list
             a.ui-btn.ui-btn-raised.clr-primary.action-create-team.wow.fadeInUp(href='#popupCreateTeam', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Create team
             a.ui-btn.ui-btn-raised.clr-primary.action-delete-selected.wow.fadeInUp(href='#', data-wow-delay=(fadeDelay += 0.1) + 's') Delete selected

@@ -121,9 +121,9 @@ module.exports = {
             latch.resolve();
         });
 
-        // Check whether the user is host of the game
+        // Check whether the user has permission to manage this game
         latch.add();
-        game.getUser(function(err, result) {
+        game.hasManagePermission(user, function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -132,14 +132,8 @@ module.exports = {
                 return;
             }
 
-            // Make sure the user isn't null
-            if(result === null) {
-                userObject.isHost = false;
-                return;
-            }
-
-            // Determine whether the user is host of the game
-            userObject.isHost = result.getId().equals(user.getId());
+            // Set the result
+            userObject.hasPermission = result;
 
             // Resolve the latch
             latch.resolve();
