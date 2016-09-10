@@ -1,0 +1,11 @@
+extends page
+
+block content
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Game information
+
+        .card-supporting-text.has-action.has-title
+            table.table-list.ui-responsive
+                tr: td Name
+                    td= game.name

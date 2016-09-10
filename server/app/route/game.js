@@ -29,6 +29,7 @@ var pageJoin = require('./game/join');
 var pageInfo = require('./game/info');
 var pagePlayers = require('./game/players');
 var pageTeams = require('./game/teams');
+var pageManage = require('./game/manage');
 
 var Core = require('../../Core');
 var CallbackLatch = require('../util/CallbackLatch');
@@ -226,6 +227,9 @@ pagePlayers.route(router);
 
 // Route the game teams page
 pageTeams.route(router);
+
+// Route the game management page
+pageManage.route(router);
 
 // Export the module
 module.exports = router;
