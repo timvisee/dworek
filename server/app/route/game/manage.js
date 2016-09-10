@@ -25,7 +25,7 @@ var LayoutRenderer = require('../../layout/LayoutRenderer');
 var CallbackLatch = require('../../util/CallbackLatch');
 
 // Export the module
-module.export = {
+module.exports = {
 
     /**
      * Route the management pages.
