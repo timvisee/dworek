@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var crypto = require('crypto');
+
 var Core = require('../../../Core');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var CallbackLatch = require('../../util/CallbackLatch');
@@ -174,6 +176,9 @@ module.exports = {
         // Make sure we only call back once
         var calledBack = false;
 
+        // Store this instance
+        const self = module.exports;
+
         // Determine whether the user is game host
         latch.add();
         game.getUser(function(err, host) {
@@ -218,7 +223,7 @@ module.exports = {
 
         // Get the game object
         latch.add();
-        getGameUserListObject(game, category, function(err, result) {
+        self.getGameUserListObject(game, category, function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -295,5 +300,168 @@ module.exports = {
                     teams: teamsObject
                 });
         });
+    },
+
+    /**
+     * Create the game object for a game user list page.
+     *
+     * @param {GameModel} game Game model object.
+     * @param {string} category Player category.
+     * @param {getGameUserListObjectCallback} callback Called with the game object or when an error occurred.
+     */
+    getGameUserListObject: (game, category, callback) => {
+        // Create a game object
+        var gameObject = {
+            id: game.getIdHex(),
+            users: {
+                category: category
+            }
+        };
+
+        // Create a callback latch for the games properties
+        var latch = new CallbackLatch();
+
+        // Make sure we only call back once
+        var calledBack = false;
+
+        // Fetch the game name
+        latch.add();
+        game.getName(function(err, name) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the property
+            gameObject.name = name;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Create the query options object based on the category
+        var options = {};
+        if(category === 'requested')
+            options.requested = true;
+        else if(category === 'players')
+            options.players = true;
+        else if(category === 'specials')
+            options.specials = true;
+        else if(category === 'spectators')
+            options.spectators = true;
+
+        // Get the users in this category
+        latch.add();
+        Core.model.gameUserModelManager.getGameUsers(game, options, function(err, users) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Create an users array in the users object
+            gameObject.users.users = [];
+
+            // Loop through each user
+            latch.add(users.length);
+            users.forEach(function(user) {
+                // Create an user object
+                var userObject = {
+                    id: user.getIdHex()
+                };
+
+                // Create a user latch for fetching user data
+                var userLatch = new CallbackLatch();
+
+                // Get the first name of the user
+                // TODO: Move all these name queries in a single query
+                userLatch.add();
+                user.getFirstName(function(err, firstName) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Add the name to the user object
+                    userObject.firstName = firstName;
+
+                    // Resolve the user latch
+                    userLatch.resolve();
+                });
+
+                // Get the last name of the user
+                userLatch.add();
+                user.getLastName(function(err, lastName) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Add the name to the user object
+                    userObject.lastName = lastName;
+
+                    // Resolve the user latch
+                    userLatch.resolve();
+                });
+
+                // Get the avatar URL of the user
+                latch.add();
+                user.getMail(function(err, mail) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Create an MD5 of the mail address
+                    var mailHash = crypto.createHash('md5').update(mail).digest('hex');
+
+                    // Set the mail address, and define the avatar URL
+                    userObject.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=64&d=mm';
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Put the data in the object when we're done fetching the names
+                userLatch.then(function() {
+                    // Put the user object in the game object
+                    gameObject.users.users.push(userObject);
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+            });
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Call back with the game object
+        latch.then(function() {
+            if(!calledBack)
+                callback(null, gameObject);
+        });
     }
+
+    /**
+     * Called with the game object or when an error occurred.
+     *
+     * @callback getGameUserListObjectCallback
+     * @param {Error|null} Error instance if an error occurred, null otherwise.
+     * @param {Object=} Game object instance.
+     */
 };

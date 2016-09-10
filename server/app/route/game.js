@@ -20,7 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var crypto = require('crypto');
 var express = require('express');
 var router = express.Router();
 
@@ -210,4 +209,5 @@ pagePlayers.route(router);
 // Route the game teams page
 pageTeams.route(router);
 
+// Export the module
 module.exports = router;
