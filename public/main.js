@@ -51,6 +51,26 @@ function getActivePage() {
 }
 
 /**
+ * Unique ID counter, used for generateUniqueId function.
+ * @type {number}
+ */
+var uniqueIdCounter = 0;
+
+/**
+ * Generate an unique ID.
+ *
+ * @param {string} [prefix] Optional ID prefix.
+ * @return {string} Unique ID.
+ */
+function generateUniqueId(prefix) {
+    // Create an unique ID
+    var id = 'uid-' + ++uniqueIdCounter;
+
+    // Prefix and return
+    return prefix != undefined ? prefix + id : id;
+}
+
+/**
  * Show a notification as configured.
  * This function can be used to show in-page toast, or native notifications.
  *
