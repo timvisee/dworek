@@ -50,7 +50,7 @@ RealTime.prototype.start = function() {
         // Serve the SocketIO client to users
         serveClient: true,
 
-        // Set the realtime SocketIO server path
+        // Set the real time SocketIO server path
         path: config.realtime.path
     });
 
@@ -72,16 +72,6 @@ RealTime.prototype.start = function() {
             message: 'Test message'
         });
     });
-};
-
-/**
- * Get the SocketIO server instance.
- * Null might be returned if the server hasn't been started yet.
- *
- * @return {Server|*}
- */
-RealTime.prototype.getServer = function() {
-    return this._io;
 };
 
 // Export the module
