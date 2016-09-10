@@ -71,6 +71,146 @@ function generateUniqueId(prefix) {
 }
 
 /**
+ * Show a dialog box.
+ *
+ * @param {Object} options Dialog box configuration.
+ * @param {String} [options.title] Dialog box title.
+ * @param {String} [options.message] Dialog box message.
+ * @param {Array} [options.actions] Array of actions.
+ * @param {String} [options.actions.text] Action/button name.
+ * @param {String} [options.actions.state=normal] Action/button visual state, can be normal, primary or warning.
+ * @param {String} [options.actions.value=] Value returned through the callback when this action is invoked.
+ * @param {String} [options.actions.icon=] Icon classes to show an icon.
+ * @param {function} [options.actions.action=] Function to be called when the action is invoked.
+ * @param {function} callback Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
+ */
+function showDialog(options, callback) {
+    // Create a defaults object
+    const defaults = {
+        title: 'Popup',
+        message: '',
+        actions: []
+    };
+
+    // Merge the options
+    options = merge(defaults, options);
+
+    // Get the active page, generate an unique popup and button list ID
+    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
+    const popupId = generateUniqueId('popup-');
+    const buttonListId = generateUniqueId('button-list-');
+
+    // Create a flag to determine whether we called back
+    var calledBack = false;
+
+    // Create a map of actions to bind
+    var bindActions = new Map();
+
+    // Build the HTML for the popup
+    var popupHtml =
+        '<div id="' + popupId + '" data-role="popup">' +
+        '    <div data-role="header">' +
+        '        <a href="#" class="ui-btn ui-btn-left wow fadeIn" data-rel="back" data-direction="reverse" data-wow-delay="0.4s">' +
+        '            <i class="zmdi zmdi-close"></i>' +
+        '        </a>' +
+        '        <h1 class="nd-title wow fadeIn">' + options.title + '</h1>' +
+        '    </div>' +
+        '    <div data-role="content" class="ui-content" role="main">' +
+        '        <p>' + options.message + '</p>' +
+        '        <br />' +
+        '        <div id="' + buttonListId + '" class="button-list"></div>' +
+        '    </div>' +
+        '</div>';
+
+    // Append the popup HTML to the active page
+    activePage.append(popupHtml);
+
+    // Get the popup and button list DOM element
+    const popupElement = activePage.find('#' + popupId);
+    const buttonListElement = $('#' + buttonListId);
+
+    // Set the popup width before it's shown
+    popupElement.on('popupbeforeposition', function() {
+        popupElement.css('width', Math.min($(window).width() - 15 * 2, 430));
+    });
+
+    // Destroy the popup when it's closed
+    popupElement.on('popupafterclose', function() {
+        // Destroy the popup element
+        popupElement.remove();
+
+        // Call back, if we didn't do that yet
+        if(!calledBack) {
+            if(callback !== undefined)
+                callback();
+            calledBack = true;
+        }
+    });
+
+    // Build and open the popup
+    popupElement.popup();
+    popupElement.popup('open', {
+        transition: 'pop',
+        shadow: true,
+        positionTo: 'window'
+    }).trigger('create');
+
+    // Loop through all the actions
+    options.actions.forEach(function(action) {
+        // Create the button defaults
+        const buttonDefaults = {
+            text: 'Button',
+            value: undefined,
+            state: 'normal'
+        };
+
+        // Merge the action with the defaults
+        action = merge(buttonDefaults, action);
+
+        // Create the button
+        var button = $('<a>', {
+            text: action.text
+        }).buttonMarkup({
+            inline: false,
+            shadow: false
+        });
+
+        // Set the button text
+        if(action.icon != undefined)
+            button.html('<i class="' + action.icon + '"></i>&nbsp;&nbsp;' + button.html());
+
+        // Add a button state
+        if(action.state == 'primary')
+            button.addClass('clr-primary');
+        else if(action.state == 'warning')
+            button.addClass('clr-warning');
+
+        // Bind the click event to the button
+        button.bind('click', function() {
+            // Call the button action if any is set
+            if(typeof action.action === 'function')
+                action.action();
+
+            // Call back if we didn't call back yet
+            if(!calledBack) {
+                if(callback !== undefined)
+                    callback(action.value);
+                calledBack = true;
+            }
+
+            // Close the popup
+            popupElement.popup('close');
+        });
+
+        // Append the button to the popup
+        button.appendTo(buttonListElement);
+    });
+
+    // Rebuild native droid
+    nativeDroid.build(true);
+}
+
+/**
  * Show a notification as configured.
  * This function can be used to show in-page toast, or native notifications.
  *
