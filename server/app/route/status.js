@@ -41,7 +41,8 @@ router.get('/', function(req, res, next) {
                 uptime: Math.round(os.uptime())
             },
             socketio: {
-                online: false
+                online: Core.realTime.isOnline(),
+                connections: Core.realTime.getConnectionCount()
             },
             mongo: {
                 online: true

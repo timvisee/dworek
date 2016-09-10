@@ -39,6 +39,14 @@ var RealTime = function() {
      * @private
      */
     this._io = null;
+
+    /**
+     * Create a flag to define whether the server is online.
+     *
+     * @type {boolean}
+     * @private
+     */
+    this._online = false;
 };
 
 /**
@@ -62,6 +70,9 @@ RealTime.prototype.start = function() {
         // Bind the realtime SocketIO server to the specified port
         this._io.attach(config.realtime.port);
 
+    // Set the online flag
+    this._online = true;
+
     // Register the connection event
     this._io.on('connection', function(socket) {
         // Show a status message
@@ -72,6 +83,22 @@ RealTime.prototype.start = function() {
             message: 'Test message'
         });
     });
+};
+
+/**
+ * Check whether the real time server is online.
+ */
+RealTime.prototype.isOnline = function() {
+    return this._online;
+};
+
+/**
+ * Get the number of connected clients.
+ *
+ * @return {Number} Number of connected clients.
+ */
+RealTime.prototype.getConnectionCount = function() {
+    return this._io.engine.clientsCount;
 };
 
 // Export the module

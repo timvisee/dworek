@@ -26,6 +26,8 @@ block content
                             span(style='color: green;') Online
                         else
                             span(style='color: red;') Offline
+                tr: td Connected clients
+                    td= status.socketio.connections
 
             h3 Web server
             table.ui-responsive
