@@ -36,6 +36,17 @@ block content
                         .row.between-xs: .col-xs-12: .box
                             a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
 
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Game management
+
+                .card-supporting-text.has-action.has-title.
+                    Visit the management page to start the game.
+
+                .card-action
+                    .row.between-xs: .col-xs-12: .box
+                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Management
+
         //- Show a proper card if the user hasn't joined this game
         unless game.userState.player || game.userState.spectator || game.userState.special
             if game.userState.requested
@@ -68,6 +79,14 @@ block content
                 table.table-list.ui-responsive
                     tr: td Name
                         td= game.name
+                    tr: td Stage
+                        case game.stage
+                            when 0
+                                td Not yet started
+                            when 1
+                                td Started
+                            when 2
+                                td Finished
                     tr: td Teams
                         td= game.teamCount
                     tr: td Participants

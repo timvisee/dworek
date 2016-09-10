@@ -90,6 +90,24 @@ router.get('/:game', function(req, res, next) {
         latch.resolve();
     });
 
+    // Fetch the game stage
+    latch.add();
+    game.getStage(function(err, stage) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the property
+        gameObject.stage = stage;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
     // Fetch the game's users count
     latch.add();
     game.getUsersCount(function(err, usersCount) {

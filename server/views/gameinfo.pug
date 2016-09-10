@@ -9,6 +9,14 @@ block content
             table.table-list.ui-responsive
                 tr: td Name
                     td= game.name
+                tr: td Stage
+                    case game.stage
+                        when 0
+                            td Not yet started
+                        when 1
+                            td Started
+                        when 2
+                            td Finished
                 tr: td Teams
                     td= game.teams.teamCount
                 tr: td In team
