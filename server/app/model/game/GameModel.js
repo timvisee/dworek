@@ -473,6 +473,7 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
     });
 
     // Check whether the user is host of this game
+    latch.add();
     this.getUser(function(err, host) {
         // Call back errors
         if(err !== null) {
