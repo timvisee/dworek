@@ -179,9 +179,9 @@ module.exports = {
         // Store this instance
         const self = module.exports;
 
-        // Determine whether the user is game host
+        // Determine whether the user has permission to manage this game
         latch.add();
-        game.getUser(function(err, host) {
+        game.hasManagePermission(user, function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -190,32 +190,8 @@ module.exports = {
                 return;
             }
 
-            // Make sure the user isn't null
-            if(host === null) {
-                userObject.isHost = false;
-                return;
-            }
-
-            // Set whether the user is
-            userObject.isHost = host.getId().equals(user.getId());
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Determine whether the user is administrator
-        latch.add();
-        user.isAdmin(function(err, isAdmin) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
-                return;
-            }
-
-            // Set whether the user is administrator
-            userObject.isAdmin = isAdmin;
+            // Set the result
+            userObject.hasPermission = result;
 
             // Resolve the latch
             latch.resolve();

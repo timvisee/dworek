@@ -85,7 +85,7 @@ block content
                 each entry in game.users.users
                     .wow.fadeInUp(data-wow-delay=(fadeDelay += 0.1) + 's')
                         //- Checkbox, enabled or disabled based on the users' rights
-                        if user.isHost || user.isAdmin
+                        if user.hasPermission
                             input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id)
                         else
                             input(type='checkbox', name='checkbox-user-' + entry.id, id='checkbox-user-' + entry.id, disabled='disabled')
@@ -102,5 +102,5 @@ block content
         //- Show the change roles button if the user has proper rights
         if game.users.users.length > 0
             br
-            if user.isHost || user.isAdmin
+            if user.hasPermission
                 a.ui-btn.ui-btn-raised.clr-primary.action-change-user-roles.wow.fadeInUp(href='#popupChangeUserRole', data-rel='popup', data-position-to='window', data-transition='pop', data-wow-delay=(fadeDelay += 0.1) + 's') Change roles
