@@ -75,9 +75,8 @@ module.exports = {
         // Make sure we only call back once
         var calledBack = false;
 
-        // Create two flags to store whether the user is host or administrator
-        var isHost = false;
-        var isAdmin = false;
+        // Create a flag to store whether the user has permission to manage this game
+        var hasPermission = false;
 
         // Fetch the game name
         latch.add();
@@ -97,9 +96,9 @@ module.exports = {
             latch.resolve();
         });
 
-        // Determine whether the user is game host
+        // Determine whether the user has permission to manage this game
         latch.add();
-        game.getUser(function(err, host) {
+        game.hasManagePermission(user, function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -108,32 +107,8 @@ module.exports = {
                 return;
             }
 
-            // Make sure the user isn't null
-            if(host === null) {
-                isHost = false;
-                return;
-            }
-
-            // Set whether the user is
-            isHost = host.getId().equals(user.getId());
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Determine whether the user is administrator
-        latch.add();
-        user.isAdmin(function(err, admin) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    next(err);
-                calledBack = true;
-                return;
-            }
-
-            // Set whether the user is administrator
-            isAdmin = admin;
+            // Set whether the user has permission
+            hasPermission = result;
 
             // Resolve the latch
             latch.resolve();
@@ -141,8 +116,8 @@ module.exports = {
 
         // Render the page when we're ready
         latch.then(function() {
-            // Make sure the user is administrator or host
-            if(!isHost && !isAdmin) {
+            // Make sure the user has permission to manage the game
+            if(!hasPermission) {
                 LayoutRenderer.render(req, res, next, 'nopermission', 'Whoops!');
                 return;
             }
