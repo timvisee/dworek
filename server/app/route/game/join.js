@@ -35,7 +35,7 @@ module.exports = {
      *
      * @param router Express router instance.
      */
-    route: function(router) {
+    route: (router) => {
         // Route the pages
         router.get('/:game/join', this.get);
         router.post('/:game/join', this.post);
@@ -48,7 +48,7 @@ module.exports = {
      * @param res Express response object.
      * @param next Express next callback.
      */
-    get: function(req, res, next) {
+    get: (req, res, next) => {
         // Make sure the user is logged in
         if(!req.session.valid) {
             LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
@@ -157,7 +157,7 @@ module.exports = {
      * @param res Express response object.
      * @param next Express next callback.
      */
-    post: function(req, res, next) {
+    post: (req, res, next) => {
         // Get the nickname field
         var nickname = req.body['field-nickname'];
 

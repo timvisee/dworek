@@ -32,7 +32,7 @@ module.exports = {
      *
      * @param router Express router instance.
      */
-    route: function(router) {
+    route: (router) => {
         // Route the pages
         router.get('/:game/players', this.get);
 
@@ -53,7 +53,7 @@ module.exports = {
      * @param res Express response object.
      * @param next Express next callback.
      */
-    get: function(req, res, next) {
+    get: (req, res, next) => {
         // Make sure the user is logged in
         if(!req.session.valid) {
             LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
@@ -144,7 +144,7 @@ module.exports = {
      * @param {function} next Express next callback.
      * @param {string} category Game user category.
      */
-    listPage: function(req, res, next, category) {
+    listPage: (req, res, next, category) => {
         // Make sure the user is logged in
         if(!req.session.valid) {
             LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
