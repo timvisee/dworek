@@ -24,6 +24,11 @@ block page
                     a.ui-btn.ui-btn-right.wow.fadeIn(href='#optionspanel', data-wow-delay='0.4s')
                         i.zmdi.zmdi-more-vert
 
+            //- Device status button
+            a.ui-btn.ui-btn-right.ui-btn-right-2.wow.fadeIn.action-device-status(href='#', data-wow-delay='0.4s')
+                i.zmdi.zmdi-network-off
+                //- TODO: Animate the above icon with: .animated.infinite.flash
+
             //- Header title
             h1.wow.fadeIn= page.title
 

@@ -34,6 +34,11 @@ table.table-list tr td:first-child,
   text-align: right;
 }
 
+table.table-list tr td.left,
+.table-list table tr td.left {
+  text-align: left;
+}
+
 h3.table-list,
 .table-list h3 {
   margin: 16px 0 6px 0;
@@ -104,4 +109,8 @@ h3.table-list,
   position: static !important;
   margin: 0 24px 7px 0 !important;
   float: right !important;
+}
+
+.ui-btn-right-2 {
+  right: 2.4em !important;
 }

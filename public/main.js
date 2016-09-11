@@ -914,3 +914,64 @@ $(document).ready(function() {
         showNotification('Real time received: ' + message.message);
     });
 });
+
+// Show a device status popup
+$(document).bind("pageinit", function() {
+    // Find the device status button
+    const deviceStatusButton = $('.action-device-status');
+
+    // Bind a click event
+    deviceStatusButton.click(function(e) {
+        // Prevent the default action
+        e.preventDefault();
+
+        // Define the start action
+        const gameStartAction = function() {
+            showNotification('TODO: Game should start!');
+        };
+
+        // Create the status dialog body
+        var statusBody = '<div align="center" class="table-list">' +
+            '<table>' +
+            '    <tr>' +
+            '        <td class="left"><i class="zmdi zmdi-network zmdi-hc-fw"></i> Network</td><td class="status-network-label">Unknown</td>' +
+            '    </tr>' +
+            '    <tr>' +
+            '        <td class="left"><i class="zmdi zmdi-gps-dot zmdi-hc-fw"></i> GPS</td><td class="status-gps-label">Unknown</td>' +
+            '    </tr>' +
+            '    <tr>' +
+            '        <td class="left"><i class="zmdi zmdi-battery zmdi-hc-fw"></i> Battery</td><td class="status-battery-label">Unknown</td>' +
+            '    </tr>' +
+            '</table>' +
+            '</div>';
+
+        // Show a dialog, and ask whether the user is sure
+        showDialog({
+            title: 'Device status',
+            message: statusBody,
+            actions: [
+                {
+                    text: 'Reload application'
+                },
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+
+        updateStatusLabels();
+    });
+});
+
+/**
+ * Update all status labels.
+ */
+function updateStatusLabels() {
+    // Get the labels
+    const batteryStatusLabel = $('.status-battery-label');
+
+    // Get a battery promise, and update the battery status label
+    navigator.getBattery().then(function(battery) {
+        batteryStatusLabel.html(battery.level * 100 + '%')
+    });
+}
