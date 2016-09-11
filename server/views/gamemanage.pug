@@ -3,9 +3,11 @@ extends page
 block content
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
-            h3.card-primary-title Game information
+            h3.card-primary-title Start game
 
         .card-supporting-text.has-action.has-title
-            table.table-list.ui-responsive
-                tr: td Name
-                    td= game.name
+            p The game is ready. Click the button below to start.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-game-start(href='#', data-transition='slide', data-rel='popup') Start game

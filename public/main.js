@@ -818,6 +818,40 @@ $(document).bind("pageinit", function() {
     });
 });
 
+// Game start button
+$(document).bind("pageinit", function() {
+    // Find the start game button
+    const startGameButton = $('.action-game-start');
+
+    // Bind a click event
+    startGameButton.click(function(e) {
+        // Prevent the default action
+        e.preventDefault();
+
+        // Define the start action
+        const gameStartAction = function() {
+            showNotification('TODO: Game should start!');
+        };
+
+        // Show a dialog, and ask whether the user is sure
+        showDialog({
+            title: 'Start game',
+            message: 'Are you sure you want to start the game?',
+            actions: [
+                {
+                    text: 'Start game',
+                    icon: 'zmdi zmdi-check',
+                    state: 'primary',
+                    action: gameStartAction
+                },
+                {
+                    text: 'Cancel'
+                }
+            ]
+        });
+    });
+});
+
 /**
  * Check whether the given value is a JavaScript object.
  *
