@@ -23,6 +23,167 @@
 // Native droid instance
 var nativeDroid = null;
 
+/**
+ * Dworek client application.
+ * @type {Object}
+ */
+var Dworek = {
+    /**
+     * Start the client.
+     */
+    start: function() {
+        // Start native droid
+        // TODO: Enable this again
+        //this.startNativeDroid();
+
+        // Connect to the real time server
+        this.realtime.connect();
+    },
+
+    /**
+     * Start NativeDroid and related modules.
+     */
+    startNativeDroid: function() {
+        // Initialize NativeDroid, and store it's instance
+        nativeDroid = $.nd2();
+
+        // Build
+        nativeDroid.build();
+    },
+
+    /**
+     * Real time section.
+     */
+    realtime: {
+        /**
+         * Real time socket connection.
+         */
+        _socket: null,
+
+        /**
+         * Create a flag to define whether the user is connected.
+         */
+        _connected: false,
+
+        /**
+         * Define whether this is the users first connection.
+         */
+        _firstConnection: true,
+
+        /**
+         * Connect to the real time server.
+         */
+        connect: function() {
+            // Show a status message
+            console.log('Connecting to real time server...');
+
+            // Create a socket instance
+            this._socket = io.connect({
+                path: '/realtime'
+            });
+
+            // Listen to the test channel
+            // TODO: Remove this test
+            this._socket.on('test', function(message) {
+                // Show a message
+                showNotification('Real time received: ' + message.message);
+            });
+
+            // Handle connection events
+            this._socket.on('connect', function() {
+                // Set the connection state
+                this._connected = true;
+
+                // Show a notification if this isn't the first time the user disconnected
+                if(!this._firstConnection)
+                    showNotification('Successfully reconnected!', {
+                        vibrate: true
+                    });
+            });
+
+            // Handle connection errors
+            this._socket.on('connect_error', function() {
+                // Set the connection state
+                this._connected = false;
+
+                // Show a notification
+                showNotification('Failed to connect');
+            });
+
+            // Handle connection timeouts
+            this._socket.on('connect_timeout', function() {
+                // Set the connection state
+                this._connected = false;
+
+                // Show a notification
+                showNotification('The connection timed out');
+            });
+
+            // Handle reconnection attempts
+            this._socket.on('reconnect_attempt', function(attemptCount) {
+                // Show a notification
+                showNotification('Trying to reconnect...' + (attemptCount > 1 ? ' (attempt ' + attemptCount + ')' : ''));
+            });
+
+            // Handle reconnection failures
+            this._socket.on('reconnect_failed', function() {
+                // Set the connection state
+                this._connected = false;
+
+                // Show a notification
+                showNotification('Failed to reconnect');
+            });
+
+            // Handle disconnects
+            this._socket.on('disconnect', function() {
+                // Set the connection state, and reset the first connection flag
+                this._connected = false;
+                this._firstConnection = false;
+
+                // Show a notification regarding the disconnect
+                showNotification('You\'ve lost connection...', {
+                    vibrate: true,
+                    vibrationPattern: [1000]
+                });
+            });
+        }
+    },
+
+    /**
+     * Utility functions.
+     */
+    utils: {
+        /**
+         * Get a cookie value.
+         * @param {string} cookieName Cookie name.
+         * @return {string}
+         */
+        getCookie: function(cookieName) {
+            // Determine the cookie selector, and get an array of cookies
+            var selector = cookieName + "=";
+            var cookies = document.cookie.split(';');
+
+            // Loop through the list of cookies, find the requested cookie and return it's value
+            for(var i = 0; i <cookies.length; i++) {
+                var cookie = cookies[i];
+                while(cookie.charAt(0) == ' ')
+                    cookie = cookie.substring(1);
+                if(cookie.indexOf(selector) == 0)
+                    return cookie.substring(selector.length,cookie.length);
+            }
+
+            // No cookie found, return an empty string
+            return '';
+        }
+    }
+};
+
+// Wait for initialization
+$(function() {
+   // Start Dworek
+    Dworek.start();
+});
+
 $(function() {
     // Initialize NativeDroid, and store it's instance
     nativeDroid = $.nd2();
@@ -246,6 +407,9 @@ function showNotification(message, options) {
     // Parse the vibration pattern option if set
     if(!Array.isArray(options.vibrationPattern))
         options.vibrationPattern = [options.vibrationPattern];
+
+    // Print the message to the console
+    console.log(message);
 
     // Show a toast notification
     if(options.toast) {
@@ -854,12 +1018,17 @@ $(document).bind("pageinit", function() {
 
 /**
  * Check whether the given value is a JavaScript object.
+ * Arrays are not considered objects.
  *
  * @param {*} value The value to check.
  * @return {boolean} True if the value is an object, false if not.
  */
 // TODO: Move this function to some utilities file
 function isObject(value) {
+    // Return false if the value is an array
+    if(Array.isArray(value))
+        return false;
+
     // Get the value type
     const type = typeof value;
 
@@ -897,23 +1066,6 @@ function merge(a, b, recursive) {
     // Return the object
     return a;
 }
-
-// Real time test script
-$(document).ready(function() {
-    // Show a status message
-    console.log('Connecting to real time server...');
-
-    // Create a socket instance
-    var socket = io.connect({
-        path: '/realtime'
-    });
-
-    // Listen to the test channel
-    socket.on('test', function(message) {
-        // Show a message
-        showNotification('Real time received: ' + message.message);
-    });
-});
 
 // Show a device status popup
 $(document).bind("pageinit", function() {
