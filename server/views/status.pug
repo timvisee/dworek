@@ -22,12 +22,12 @@ block content
             table.ui-responsive
                 tr: td Status
                     td
-                        if status.socketio.online
+                        if status.realtime.online
                             span(style='color: green;') Online
                         else
                             span(style='color: red;') Offline
                 tr: td Connected clients
-                    td= status.socketio.connections
+                    td= status.realtime.connections
 
             h3 Web server
             table.ui-responsive

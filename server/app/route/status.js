@@ -40,7 +40,7 @@ router.get('/', function(req, res, next) {
                 online: true,
                 uptime: Math.round(os.uptime())
             },
-            socketio: {
+            realtime: {
                 online: Core.realTime.isOnline(),
                 connections: Core.realTime.getConnectionCount()
             },
