@@ -74,16 +74,20 @@ var Dworek = {
          * Connect to the real time server.
          */
         connect: function() {
-            // Show a status message
-            console.log('Connecting to real time server...');
-
             // Create a socket instance
             this._socket = io.connect({
                 path: '/realtime'
             });
 
+            // Register the event handlers
+            this.registerHandlers();
+        },
+
+        /**
+         * Register all required basic event handlers for the real time server.
+         */
+        registerHandlers: function() {
             // Listen to the test channel
-            // TODO: Remove this test
             this._socket.on('test', function(message) {
                 // Show a message
                 showNotification('Real time received: ' + message.message);
