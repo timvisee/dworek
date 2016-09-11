@@ -951,7 +951,8 @@ $(document).bind("pageinit", function() {
             message: statusBody,
             actions: [
                 {
-                    text: 'Reload application'
+                    text: 'Reload application',
+                    action: () => location.reload()
                 },
                 {
                     text: 'Close'
