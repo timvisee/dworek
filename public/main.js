@@ -71,6 +71,11 @@ var Dworek = {
         _firstConnection: true,
 
         /**
+         * Define whether we're authenticated.
+         */
+        _auth: false,
+
+        /**
          * Connect to the real time server.
          */
         connect: function() {
@@ -80,13 +85,14 @@ var Dworek = {
             });
 
             // Register the event handlers
-            this.registerHandlers();
+            this.registerCoreHandlers();
         },
 
         /**
-         * Register all required basic event handlers for the real time server.
+         * Register all core handlers for the real time server.
+         * These handlers track the connection state of the real time socket.
          */
-        registerHandlers: function() {
+        registerCoreHandlers: function() {
             // Listen to the test channel
             this._socket.on('test', function(message) {
                 // Show a message
@@ -103,12 +109,16 @@ var Dworek = {
                     showNotification('Successfully reconnected!', {
                         vibrate: true
                     });
+
+                // Start the authentication process
+                this.startAuthentication();
             });
 
             // Handle connection errors
             this._socket.on('connect_error', function() {
                 // Set the connection state
                 this._connected = false;
+                this._auth = false;
 
                 // Show a notification
                 showNotification('Failed to connect');
@@ -118,6 +128,7 @@ var Dworek = {
             this._socket.on('connect_timeout', function() {
                 // Set the connection state
                 this._connected = false;
+                this._auth = false;
 
                 // Show a notification
                 showNotification('The connection timed out');
@@ -133,6 +144,7 @@ var Dworek = {
             this._socket.on('reconnect_failed', function() {
                 // Set the connection state
                 this._connected = false;
+                this._auth = false;
 
                 // Show a notification
                 showNotification('Failed to reconnect');
@@ -143,6 +155,7 @@ var Dworek = {
                 // Set the connection state, and reset the first connection flag
                 this._connected = false;
                 this._firstConnection = false;
+                this._auth = false;
 
                 // Show a notification regarding the disconnect
                 showNotification('You\'ve lost connection...', {
@@ -150,6 +163,22 @@ var Dworek = {
                     vibrationPattern: [1000]
                 });
             });
+        },
+
+        /**
+         * Start the authentication process for the current user.
+         */
+        startAuthentication: function() {
+            // Create the package object
+            var packageObject = {
+                type: 1, // TODO: Authentication type here! AUTH_REQUEST
+                session: this.utils.getCookie('session_token')
+            };
+
+            // Emit the package
+            this._io.emit('default', packageObject);
+
+            // TODO: Listen for answers from the server!
         }
     },
 
