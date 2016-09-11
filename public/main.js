@@ -33,8 +33,7 @@ var Dworek = {
      */
     start: function() {
         // Start native droid
-        // TODO: Enable this again
-        //this.startNativeDroid();
+        this.startNativeDroid();
 
         // Connect to the real time server
         this.realtime.connect();
@@ -49,6 +48,16 @@ var Dworek = {
 
         // Build
         nativeDroid.build();
+
+        // Build NativeDroid on page initialization
+        $(document).bind("pageinit", function() {
+            // Make sure the native droid instance is available
+            if(nativeDroid === null)
+                return;
+
+            // Build the page
+            nativeDroid.build();
+        });
     },
 
     /**
@@ -217,23 +226,7 @@ $(function() {
     Dworek.start();
 });
 
-$(function() {
-    // Initialize NativeDroid, and store it's instance
-    nativeDroid = $.nd2();
 
-    // Build
-    nativeDroid.build();
-});
-
-// Initialize NativeDroid on page initialization
-$(document).bind("pageinit", function() {
-    // Make sure the native droid instance is available
-    if(nativeDroid === null)
-        return;
-
-    // Build the page
-    nativeDroid.build();
-});
 
 /**
  * Get the active jQuery mobile page.
