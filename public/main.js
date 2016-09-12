@@ -110,6 +110,11 @@ var Dworek = {
 
             // Register the event handlers
             this.registerCoreHandlers();
+
+            // Pass received packets to the packet processor
+            this._socket.on(PACKET_ROOM_DEFAULT, function(packet) {
+                Dworek.packetProcessor.receivePacked(packet, self._socket);
+            });
         },
 
         /**
