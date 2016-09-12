@@ -107,6 +107,14 @@ RealTime.prototype.isOnline = function() {
 RealTime.prototype.getConnectionCount = function() {
     return this._io.engine.clientsCount;
 };
+/**
+ * Get the packet processor.
+ *
+ * @returns {PacketProcessor} Packet processor instance.
+ */
+RealTime.prototype.getPacketProcessor = function() {
+    return this.packetProcessor;
+};
 
 // Export the module
 module.exports = RealTime;
