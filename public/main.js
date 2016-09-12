@@ -490,8 +490,10 @@ function updateActiveGame() {
         return;
 
     // Return if we're not on a game page
-    if(!Dworek.utils.isGamePage())
+    if(!Dworek.utils.isGamePage()) {
+        Dworek.utils.lastViewedGame = null;
         return;
+    }
 
     // Get the ID of the game page
     const gameId = Dworek.utils.getGameId();
@@ -514,11 +516,12 @@ function updateActiveGame() {
             // Ask the user whether to select this as active game
             showDialog({
                 title: 'Change active game',
-                message: 'You can only have one active game at a time to play. Would you like to change your active game to this game now?',
+                message: 'You may only have one active game to play at a time.<br /><br />Would you like to change your active game to this game now?',
                 actions: [
                     {
                         text: 'Change active game',
                         state: 'primary',
+                        icon: 'zmdi zmdi-swap',
                         action: function() {
                             // Set the active game ID
                             Dworek.state.activeGame = gameId;
