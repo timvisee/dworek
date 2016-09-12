@@ -20,8 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var PacketType = require('../PacketType');
 var Core = require('../../../Core');
+var PacketType = require('../PacketType');
 
 /**
  * Type of packets to handle by this handler.
@@ -61,9 +61,34 @@ AuthenticationRequestHandler.prototype.init = function() {
  * @param {Object} packet Packet object.
  * @param socket SocketIO socket.
  */
-AuthenticationRequestHandler.prototype.handler = function(packet) {
-    // TODO: Create handler here!
-    console.log('### CALLED AUTH HANDLER!');
+AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
+    // Make sure a session is given
+    if(!packet.hasOwnProperty('session')) {
+        console.log('Received malformed packet, authentication packet doesn\'t contain user data');
+        return;
+    }
+
+    // Get the session value
+    const rawSession = packet.session;
+
+    // Return a success packet if the session is empty
+    if(rawSession.trim().length == 0) {
+        // TODO: Return success packet, user not signed in
+        return;
+    }
+
+    // Validate the session
+    Core.model.sessionModelManager.isValidSessionToken(rawSession, function(err, result) {
+        // Handle errors
+        if(err !== null)
+            // Set the authentication result to false
+            result = false;
+
+        // Send a response to the client
+        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
+            auth: result
+        }, socket);
+    });
 };
 
 // Export the module
