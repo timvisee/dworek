@@ -1287,12 +1287,3 @@ function updateStatusLabels() {
         batteryStatusLabel.html(battery.level * 100 + '%')
     });
 }
-
-
-
-
-
-
-Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, function (packet) {
-    alert('RECEIVED AUTH RESPONSE');
-});

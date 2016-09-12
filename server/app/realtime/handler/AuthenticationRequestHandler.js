@@ -75,25 +75,41 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
     const sendResponse = function(authenticated) {
         // Send a response to the client
         Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
-            authenticated
+            authenticated: authenticated
         }, socket);
     };
 
+    // Trim the session token
+    const sessionToken = rawSession.trim().toLowerCase();
+
     // Return a success packet if the session is empty
-    if(rawSession.trim().length == 0) {
+    if(sessionToken.length == 0) {
         sendResponse(false);
+
+        // Show a status message
+        console.log('Authenticated real time client (no session)');
         return;
     }
 
     // Validate the session
-    Core.model.sessionModelManager.isValidSessionToken(rawSession, function(err, result) {
+    Core.model.sessionModelManager.getSessionUserByTokenIfValid(sessionToken, function(err, user) {
+        // Determine whether the session is valid
+        var isValid = user !== null;
+
         // Handle errors
-        if(err !== null)
+        if(err !== null) {
+            // Failed to validate session, show the error in the console
+            console.error('Failed to validate session, invalidating session for security reasons');
+
             // Set the authentication result to false
-            result = false;
+            isValid = false;
+        }
 
         // Send a response
-        sendResponse(result);
+        sendResponse(isValid);
+
+        // Show a status message
+        console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');
     });
 };
 

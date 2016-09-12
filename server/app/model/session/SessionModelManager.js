@@ -309,11 +309,13 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
  * @param token The session token.
  * @param {function} callback (err, {boolean} valid) Callback with the result as boolean.
  */
+// TODO: This method might give incorrect results, fix that! (possible callback latch glitch)
 SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     // Make sure this token is allowed
     if(!this.isAllowedSessionToken(token)) {
         // Call back
         callback(null, false);
+        console.log('A');
         return;
     }
 
