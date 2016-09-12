@@ -359,6 +359,24 @@ $(function() {
     Dworek.start();
 });
 
+// Register an authentication response packet handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, function(packet) {
+    // Set the authentication state
+    Dworek.realtime._auth = !!packet.authenticated;
+
+    // Show an error notification if we failed to authenticate
+    if(!packet.authenticated) {
+        showNotification('Failed to authenticate', {
+            action: {
+                text: 'Login',
+                action: function() {
+                    window.location.href = '/login';
+                }
+            },
+            ttl: 1000 * 60
+        });
+    }
+});
 
 
 /**
@@ -541,6 +559,9 @@ function showDialog(options, callback) {
  * @param {boolean} [options.vibrate=false] True to vibrate the user's device if supported, false if not.
  * @param {Array} [options.vibrationPattern=[500, 250, 500]] Array with vibration pattern timings in milliseconds.
  * @param {Number} [options.ttl=4000] Notification time to live in milliseconds, if supported.
+ * @param {Array} [options.actions] Array of actions to show on the notification, if supported.
+ * @param {String} [options.actions.text] Action name.
+ * @param {function} [options.actions.action=] Action function.
  */
 // TODO: Make vibrations configurable
 // TODO: Implement native notifications
@@ -572,14 +593,26 @@ function showNotification(message, options) {
 
     // Show a toast notification
     if(options.toast) {
+        // Create an array of actions to show on the notification
+        var notificationAction = {
+            title: "Close",
+            fn: function() {},
+            color: 'lime'
+        };
+
+        // Parse the actions if set, use a default action if not
+        if(options.action !== undefined)
+            // Create an action object, and add it to the array
+            notificationAction = {
+                title: options.action.text,
+                fn: options.action.action || function() {},
+                color: 'lime'
+            };
+
         // Show the toast notification
         new $.nd2Toast({
             message,
-            action: {
-                title: "Close",
-                fn: function() {},
-                color: 'lime'
-            },
+            action: notificationAction,
             ttl: options.ttl
         });
     }
@@ -1284,6 +1317,6 @@ function updateStatusLabels() {
 
     // Get a battery promise, and update the battery status label
     navigator.getBattery().then(function(battery) {
-        batteryStatusLabel.html(battery.level * 100 + '%')
+        batteryStatusLabel.html(battery.level * 100 + '%');
     });
 }
