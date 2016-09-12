@@ -24,6 +24,20 @@
 var nativeDroid = null;
 
 /**
+ * Packet types.
+ * @type {Object}
+ */
+const PacketType = {
+    AUTH_REQUEST: 1
+};
+
+/**
+ * Default real time packet room type.
+ * @type {string}
+ */
+const PACKET_ROOM_DEFAULT = 'default';
+
+/**
  * Dworek client application.
  * @type {Object}
  */
@@ -120,7 +134,7 @@ var Dworek = {
                     });
 
                 // Start the authentication process
-                this.startAuthentication();
+                Dworek.realtime.startAuthentication();
             });
 
             // Handle connection errors
@@ -180,12 +194,12 @@ var Dworek = {
         startAuthentication: function() {
             // Create the package object
             var packageObject = {
-                type: 1, // TODO: Authentication type here! AUTH_REQUEST
-                session: this.utils.getCookie('session_token')
+                type: PacketType.AUTH_REQUEST,
+                session: Dworek.utils.getCookie('session_token')
             };
 
             // Emit the package
-            this._io.emit('default', packageObject);
+            Dworek.realtime._socket.emit('default', packageObject);
 
             // TODO: Listen for answers from the server!
         }
