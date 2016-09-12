@@ -145,6 +145,9 @@ function renderGameList(req, res, next, stage, limit, category, pageTitle) {
 
         // Render the games page
         LayoutRenderer.render(req, res, next, 'gamelist', pageTitle, {
+            page: {
+                leftButton: 'back'
+            },
             games: {
                 category: category,
                 games: games
