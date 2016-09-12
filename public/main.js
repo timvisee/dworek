@@ -169,7 +169,7 @@ var Dworek = {
                 // Set the connection state
                 Dworek.realtime._connected = false;
 
-                // De authenticate
+                // De-authenticate
                 this._deauthenticate();
 
                 // Show a notification
@@ -181,7 +181,7 @@ var Dworek = {
                 // Set the connection state
                 Dworek.realtime._connected = false;
 
-                // De authenticate
+                // De-authenticate
                 this._deauthenticate();
 
                 // Show a notification
@@ -199,7 +199,7 @@ var Dworek = {
                 // Set the connection state
                 Dworek.realtime._connected = false;
 
-                // De authenticate
+                // De-authenticate
                 this._deauthenticate();
 
                 // Show a notification
@@ -212,7 +212,7 @@ var Dworek = {
                 Dworek.realtime._connected = false;
                 this._firstConnection = false;
 
-                // De authenticate
+                // De-authenticate
                 this._deauthenticate();
 
                 // Show a notification regarding the disconnect
@@ -254,7 +254,7 @@ var Dworek = {
         },
 
         /**
-         * Deauthenticate.
+         * De-authenticate.
          * @private
          */
         _deauthenticate: function() {
@@ -381,6 +381,32 @@ var Dworek = {
      * Utility functions.
      */
     utils: {
+        /**
+         * Determine whether we're on a game page.
+         *
+         * @return {boolean} True if we're on a game related page, false if not.
+         */
+        isGamePage: function() {
+            return this.getGameId() !== null;
+        },
+
+        /**
+         * Get the game ID of the game pages we're currently on.
+         *
+         * @return {string|null} Game ID or null if we're not on a game page.
+         */
+        getGameId: function() {
+            // Create a regular expression to fetch the game ID from the URL
+            const result = window.location.pathname.trim().match(/^\/game\/([a-f0-9]{24})(\/.*)?$/);
+
+            // Make sure any result was found
+            if(result === null || result.length < 2)
+                return null;
+
+            // Get and return the game ID
+            return result[1];
+        },
+
         /**
          * Get a cookie value.
          * @param {string} cookieName Cookie name.
