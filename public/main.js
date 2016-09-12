@@ -1363,25 +1363,36 @@ $(document).bind("pageinit", function() {
     });
 });
 
-// Game start button
+// Game state buttons
 $(document).bind("pageinit", function() {
-    // Find the start game button
+    // Find the game state buttons
     const startGameButton = $('.action-game-start');
+    const stopGameButton = $('.action-game-stop');
+    const resumeGameButton = $('.action-game-resume');
 
-    // Bind a click event
+    // Define the start action
+    const gameStartAction = function() {
+        // Set the active game of the user to the current if the user is on a game page
+        if(Dworek.utils.isGamePage())
+            setActiveGame(Dworek.utils.getGameId());
+
+        // TODO: Start the game here!
+        showNotification('TODO: Game should start!');
+    };
+
+    // Define the stop action
+    const gameStopAction = function() {
+        // TODO: Stop the game here!
+        showNotification('TODO: Game should stop!');
+    };
+
+    // Define the resume action
+    const gameResumeAction = gameStartAction;
+
+    // Bind a game start button
     startGameButton.click(function(e) {
         // Prevent the default action
         e.preventDefault();
-
-        // Define the start action
-        const gameStartAction = function() {
-            // Set the active game of the user to the current if the user is on a game page
-            if(Dworek.utils.isGamePage())
-                setActiveGame(Dworek.utils.getGameId());
-
-            // TODO: Start the game here!
-            showNotification('TODO: Game should start!');
-        };
 
         // Show a dialog, and ask whether the user is sure
         showDialog({
@@ -1393,6 +1404,52 @@ $(document).bind("pageinit", function() {
                     icon: 'zmdi zmdi-play',
                     state: 'primary',
                     action: gameStartAction
+                },
+                {
+                    text: 'Cancel'
+                }
+            ]
+        });
+    });
+
+    // Bind a game stop button
+    stopGameButton.click(function(e) {
+        // Prevent the default action
+        e.preventDefault();
+
+        // Show a dialog, and ask whether the user is sure
+        showDialog({
+            title: 'Finish game',
+            message: 'Are you sure you want to stop and finish this game?',
+            actions: [
+                {
+                    text: 'Finish game',
+                    icon: 'zmdi zmdi-stop',
+                    state: 'warning',
+                    action: gameStopAction
+                },
+                {
+                    text: 'Cancel'
+                }
+            ]
+        });
+    });
+
+    // Bind a game resume button
+    resumeGameButton.click(function(e) {
+        // Prevent the default action
+        e.preventDefault();
+
+        // Show a dialog, and ask whether the user is sure
+        showDialog({
+            title: 'Resume game',
+            message: 'Are you sure you want to resume the game from the current state?',
+            actions: [
+                {
+                    text: 'Resume game',
+                    icon: 'zmdi zmdi-fast-forward',
+                    state: 'primary',
+                    action: gameResumeAction
                 },
                 {
                     text: 'Cancel'

@@ -22,8 +22,24 @@ block content
                     h3.card-primary-title Stop game
 
                 .card-supporting-text.has-action.has-title
-                    p The game is currently active. Click the button below to stop the game.
+                    p The game is currently active. Click the button below to finish the game.
 
                 .card-action
                     .row.between-xs: .col-xs-12: .box
-                        a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-game-stop(href='#', data-transition='slide', data-rel='popup') Stop game
+                        a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-game-stop(href='#', data-transition='slide', data-rel='popup')
+                            i.zmdi.zmdi-stop
+                            | &nbsp;&nbsp;Finish game
+
+        when 2
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Game finished
+
+                .card-supporting-text.has-action.has-title
+                    p The game has been finished. You may click the button below to resume the game form the current state.
+
+                .card-action
+                    .row.between-xs: .col-xs-12: .box
+                        a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-game-resume(href='#', data-transition='slide', data-rel='popup')
+                            i.zmdi.zmdi-fast-forward
+                            | &nbsp;&nbsp;Resume game
