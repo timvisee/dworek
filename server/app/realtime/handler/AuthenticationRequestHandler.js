@@ -64,3 +64,6 @@ AuthenticationRequestHandler.prototype.handler = function(packet) {
     // TODO: Create handler here!
     console.log('### CALLED AUTH HANDLER!');
 };
+
+// Export the module
+module.exports = AuthenticationRequestHandler;
