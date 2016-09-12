@@ -99,12 +99,6 @@ RealTime.prototype.start = function() {
         // Show a status message
         console.log('A client connected to the real time server, setting things up');
 
-        // Send a test message to the client socket
-        // TODO: Remove this test message!
-        socket.emit('test', {
-            message: 'Test message'
-        });
-
         // Listen for packets from the client
         socket.on(config.realtime.defaultRoom, function(rawPacket) {
             self.packetProcessor.receivePacked(rawPacket, socket);

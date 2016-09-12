@@ -155,12 +155,6 @@ var Dworek = {
             // Store this instance
             const self = this;
 
-            // Listen to the test channel
-            this._socket.on('test', function(message) {
-                // Show a message
-                showNotification('Real time received: ' + message.message);
-            });
-
             // Handle connection events
             this._socket.on('connect', function() {
                 // Set the connection state
