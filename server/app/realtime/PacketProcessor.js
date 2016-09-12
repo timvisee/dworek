@@ -115,3 +115,6 @@ PacketProcessor.prototype.invokeHandlers = function(packet, packetType) {
         handler(packet);
     });
 };
+
+// Export the module
+module.exports = PacketProcessor;
