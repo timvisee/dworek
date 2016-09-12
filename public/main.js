@@ -414,6 +414,39 @@ var Dworek = {
         },
 
         /**
+         * Flush all pages that match the URL matcher.
+         *
+         * @param {RegExp|undefined} [urlMatcher] A regex to flush pages that have a matching URL, undefined to flush all.
+         * @param {boolean} [reloadCurrent] True to reload the current page, false if not.
+         */
+        flushPages: function(urlMatcher, reloadCurrent) {
+            // Get all hidden/cached pages
+            const pages = $('div[data-role=page]:hidden');
+
+            // Loop through the list of pages
+            pages.each(function() {
+                // Match the URL, continue if it doesn't match
+                if(urlMatcher !== undefined && $(this).data('url').toString().match(urlMatcher) === null)
+                    return;
+
+                // Flush the page
+                $(this).remove();
+            });
+
+            // Reload the current page
+            if(reloadCurrent) {
+                // Reload the current page
+                $.mobile.changePage(window.location.href, {
+                    allowSamePageTransition: true,
+                    transition: 'fade',
+                    reloadPage: true,
+                    reverse: false,
+                    changeHash: false
+                });
+            }
+        },
+
+        /**
          * Get a cookie value.
          * @param {string} cookieName Cookie name.
          * @return {string}
