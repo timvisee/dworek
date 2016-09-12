@@ -203,6 +203,119 @@ var Dworek = {
             Dworek.realtime._socket.emit('default', packageObject);
 
             // TODO: Listen for answers from the server!
+        },
+
+        /**
+         * Packet processor.
+         */
+        packetProcessor: {
+            /**
+             * Registered handlers.
+             */
+            _handlers: new Map(),
+
+            /**
+             * Process a received raw packet.
+             *
+             * @param {Object} rawPacket Raw packet object.
+             * @param socket SocketIO socket.
+             */
+            receivePacket: function(rawPacket, socket) {
+                // Make sure we received an object
+                if(!(typeof rawPacket === 'object')) {
+                    console.log('Received malformed packet, packet data isn\'t an object, ignoring');
+                    return;
+                }
+
+                // Make sure a packet type is given
+                if(!rawPacket.hasOwnProperty('type')) {
+                    console.log('Received malformed packet, packet type not specified, ignoring');
+                    return;
+                }
+
+                // Get the packet type
+                const packetType = rawPacket.type;
+
+                // Invoke the handlers for this packet type
+                this.invokeHandlers(packetType, rawPacket, socket);
+            },
+
+            /**
+             * Send a packet object to the given
+             *
+             * @param {Number} packetType Packet type value.
+             * @param {Object} packet Packet object to send.
+             * @param socket SocketIO socket to send the packet over.
+             */
+            sendPacket: function(packetType, packet, socket) {
+                // Make sure we're connected
+                if(!Dworek.realtime._connected) {
+                    console.log('Unable to send packet to server, not connected');
+                    return;
+                }
+
+                // Use the default socket if not specified
+                if(socket == undefined)
+                    socket = Dworek.realtime._socket;
+
+                // Put the packet type in the packet object
+                packet.type = packetType;
+
+                // Send the packet over the socket
+                socket.emit(PACKET_ROOM_DEFAULT, packet);
+            },
+
+            /**
+             * Register a handler.
+             *
+             * @param {Number} packetType Packet type.
+             * @param {function} handler Handler function.
+             */
+            registerHandler: function(packetType, handler) {
+                // Array of handlers for this packet type
+                var handlers = [];
+
+                // Get the current array of handlers if defined
+                if(this._handlers.has(packetType))
+                    handlers = this._handlers.get(packetType);
+
+                // Add the handler
+                handlers.push(handler);
+
+                // Put the array of handlers back into the handlers map
+                this._handlers.set(packetType, handlers);
+            },
+
+            /**
+             * Get the handler functions for the given packet type.
+             *
+             * @param {Number} packetType Packet type.
+             */
+            getHandlers: function(packetType) {
+                // Return an empty array if nothing is defined for this packet type
+                if(this._handlers.has(packetType))
+                    return [];
+
+                // Get and return the handlers
+                return this._handlers.get(packetType);
+            },
+
+            /**
+             * Invoke the handlers for the given packet type.
+             *
+             * @param {Number} packetType Packet type.
+             * @param {Object} packet Packet object.
+             * @param socket SocketIO socket.
+             */
+            invokeHandlers: function(packetType, packet, socket) {
+                // Get the handlers for this packet type
+                const handlers = this.getHandlers(packetType);
+
+                // Loop through the handlers
+                handlers.forEach(function(handler) {
+                    handler(packet, socket);
+                });
+            }
         }
     },
 
