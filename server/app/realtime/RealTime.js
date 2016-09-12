@@ -21,11 +21,19 @@
  ******************************************************************************/
 
 var io = require('socket.io');
+var path = require('path');
+var fs = require('fs');
 
 var config = require('../../config');
 
 var Core = require('../../Core');
 var PacketProcessor = require('./PacketProcessor');
+
+/**
+ * Directory of the handlers.
+ * @type {string} Directory.
+ */
+const HANDLERS_DIRECTORY = './handler';
 
 /**
  * Real time class.
@@ -90,6 +98,9 @@ RealTime.prototype.start = function() {
             message: 'Test message'
         });
     });
+
+    // Register all handlers
+    this.registerHandlers();
 };
 
 /**
@@ -114,6 +125,37 @@ RealTime.prototype.getConnectionCount = function() {
  */
 RealTime.prototype.getPacketProcessor = function() {
     return this.packetProcessor;
+};
+
+/**
+ * Load and register all custom packet handlers.
+ *
+ * @return {Number} Number of loaded custom handlers.
+ */
+RealTime.prototype.registerHandlers = function() {
+    // Show a status message
+    console.log('Registering packet handlers...');
+
+    // Normalize the path
+    const normalizedPath = path.join(__dirname, HANDLERS_DIRECTORY);
+
+    // Keep track of the handler count
+    var handlerCount = 0;
+
+    // Read the directory for handlers, and initialize them
+    fs.readdirSync(normalizedPath).forEach(function(file) {
+        // Show a status message
+        console.log('Loading and registering ' + file + ' handler...');
+
+        // Require the file, and initialize the handler
+        require(HANDLERS_DIRECTORY + '/' + file)(true);
+
+        // Increase the handler count
+        handlerCount++;
+    });
+
+    // Return the handler count
+    return handlerCount;
 };
 
 // Export the module
