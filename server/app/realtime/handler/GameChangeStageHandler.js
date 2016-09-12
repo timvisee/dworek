@@ -207,23 +207,33 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     if(err !== null)
                         gameName = 'Unknown';
 
+                    // Loop through all connected clients, to send the game stage update
+                    Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
+                        // Get the socket
+                        const entrySocket = Core.realTime._io.sockets.sockets[socketId];
 
+                        // Skip the socket if not authenticated
+                        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
+                            return;
 
+                        // Get the user
+                        const user = entrySocket.session.user;
 
+                        // Check whether the user joined this game
+                        game.hasUser(user, function(err, joined) {
+                            // Handle errors
+                            if(err !== null)
+                                joined = false;
 
-                    // TODO: Update all relevant users, the stage of this game changed!
-                    // TODO: Remove this dummy response
-                    Core.realTime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGED, {
-                        game: game.getIdHex(),
-                        gameName,
-                        stage,
-                        joined: true
-                    }, socket);
-
-
-
-
-
+                            // Send a game stage changed packet to the user
+                            Core.realTime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGED, {
+                                game: game.getIdHex(),
+                                gameName,
+                                stage,
+                                joined
+                            }, entrySocket);
+                        });
+                    });
                 });
             });
         });
