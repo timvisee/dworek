@@ -66,7 +66,8 @@ module.exports = {
      * Data:
      * - message: message to show
      * - error: true if this is an error message, false if not
-     * - type: 'dialog' or 'toast' as message type
+     * - [dialog]: true to show a dialog, false to not
+     * - [toast]: true to show a toast notification, false to not
      */
     MESSAGE_RESPONSE: 4
 };

@@ -549,23 +549,21 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
     }
 
     // Show a dialog and notify the user about the state change
-    setTimeout(function() {
-        showDialog({
-            title,
-            message,
-            actions
+    showDialog({
+        title,
+        message,
+        actions
 
-        }, function(result) {
-            // Go back if the result equals false (because the close button was pressed)
-            if(result === false)
-                return;
+    }, function(result) {
+        // Go back if the result equals false (because the close button was pressed)
+        if(result === false)
+            return;
 
-            // TODO: Invalidate current page
+        // TODO: Invalidate current page
 
-            // Reload and/or navigate to the game page
-            $.mobile.navigate('/game/' + gameId);
-        });
-    }, 500);
+        // Reload and/or navigate to the game page
+        $.mobile.navigate('/game/' + gameId);
+    });
 });
 
 // Register an message response handler
@@ -577,10 +575,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     // Get all properties
     const message = packet.message;
     const error = packet.hasOwnProperty('error') ? !!packet.error : false;
-    const type = packet.type == 'dialog';
+    const dialog = packet.hasOwnProperty('dialog') && !!packet.dialog;
+    const toast = packet.hasOwnProperty('toast') && !!packet.toast;
 
-    // Show a dialog or toast notification
-    if(type) {
+    // Show a dialog
+    if(dialog) {
         // Show a dialog
         showDialog({
             title: error ? 'Error' : 'Message',
@@ -591,8 +590,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
                 }
             ]
         });
+    }
 
-    } else {
+    // Show a toast notification
+    if(toast || (!dialog && !toast)) {
         // Show a toast notification
         showNotification(message, {
             action: {
@@ -761,9 +762,6 @@ function showDialog(options, callback) {
 
     // Create a flag to determine whether we called back
     var calledBack = false;
-
-    // Create a map of actions to bind
-    var bindActions = new Map();
 
     // Build the HTML for the popup
     var popupHtml =

@@ -81,7 +81,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
             message: 'Failed to change game stage.',
-            type: 'dialog'
+            dialog: true
         }, socket);
         return;
     }
@@ -95,7 +95,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
             message: 'Failed to change game stage, you\'re not authenticated.',
-            type: 'dialog'
+            dialog: true
         }, socket);
         return;
     }
@@ -114,7 +114,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                 error: true,
                 message: 'Failed to change game stage.',
-                type: 'dialog'
+                dialog: true
             }, socket);
             return;
         }
@@ -134,7 +134,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                     error: true,
                     message: 'Failed to change game stage.',
-                    type: 'dialog'
+                    dialog: true
                 }, socket);
                 return;
             }
@@ -145,7 +145,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                     error: true,
                     message: 'You don\'t have permission to change the game stage.',
-                    type: 'dialog'
+                    dialog: true
                 }, socket);
                 return;
             }
@@ -166,7 +166,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                     error: true,
                     message: 'Failed to change game stage.',
-                    type: 'dialog'
+                    dialog: true
                 }, socket);
                 return;
             }
@@ -177,7 +177,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                     error: true,
                     message: 'Failed to change the game stage, the game is already in this stage.',
-                    type: 'dialog'
+                    dialog: true
                 }, socket);
                 return;
             }
@@ -196,7 +196,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                         error: true,
                         message: 'You don\'t have permission to change the game stage.',
-                        type: 'dialog'
+                        dialog: true
                     }, socket);
                     return;
                 }
