@@ -196,7 +196,7 @@ GameModel.prototype.setFields = function(fields, callback) {
 /**
  * Get the user that created this game.
  *
- * @param {GameTeamModel~getUserCallback} callback Called with the user or when an error occurred.
+ * @param {GameModel~getUserCallback} callback Called with the user or when an error occurred.
  */
 GameModel.prototype.getUser = function(callback) {
     this.getField('user', callback);
@@ -214,7 +214,7 @@ GameModel.prototype.getUser = function(callback) {
  * Set the user that created this game.
  *
  * @param {UserModel} user User.
- * @param {GameTeamModel~setFieldCallback} callback Called on success or when an error occurred.
+ * @param {GameModel~setFieldCallback} callback Called on success or when an error occurred.
  */
 GameModel.prototype.setUser = function(user, callback) {
     this.setField('user', user, callback);
@@ -223,7 +223,7 @@ GameModel.prototype.setUser = function(user, callback) {
 /**
  * Get the name of the game.
  *
- * @param {GameTeamModel~getNameCallback} callback Called with the name or when an error occurred.
+ * @param {GameModel~getNameCallback} callback Called with the name or when an error occurred.
  */
 GameModel.prototype.getName = function(callback) {
     this.getField('name', callback);
