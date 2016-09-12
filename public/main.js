@@ -1253,6 +1253,9 @@ $(document).bind("pageinit", function() {
                         getActivePage().find(userListSelector).append('<p class="wow fadeInUp no-users">' +
                             '    <i>No users here...</i>' +
                             '</p>');
+
+                    // Flush the other game pages
+                    Dworek.utils.flushPages(new RegExp('^\\/game\\/' + Dworek.utils.getGameId()), false);
                 },
                 error: onError
             });
@@ -1368,6 +1371,9 @@ $(document).bind("pageinit", function() {
 
                     // Enable the create team button
                     buttonCreateTeam.removeClass('ui-disabled');
+
+                    // Flush the other game pages
+                    Dworek.utils.flushPages(new RegExp('^\\/game\\/' + Dworek.utils.getGameId()), false);
                 },
                 error: onError
             });
@@ -1523,6 +1529,9 @@ $(document).bind("pageinit", function() {
                         getActivePage().find(teamListSelector).append('<p class="wow fadeInUp no-teams">' +
                             '    <i>No teams here...</i>' +
                             '</p>');
+
+                    // Flush the other game pages
+                    Dworek.utils.flushPages(new RegExp('^\\/game\\/' + Dworek.utils.getGameId()), false);
                 },
                 error: onError
             });
