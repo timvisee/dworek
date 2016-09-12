@@ -576,8 +576,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
 
     // Get all properties
     const message = packet.message;
-    var error = packet.hasOwnProperty('error') ? !!packet.error : false;
-    var type = packet.hasOwnProperty('type') ? packet.type == 'dialog' : false;
+    const error = packet.hasOwnProperty('error') ? !!packet.error : false;
+    const type = packet.type == 'dialog';
 
     // Show a dialog or toast notification
     if(type) {

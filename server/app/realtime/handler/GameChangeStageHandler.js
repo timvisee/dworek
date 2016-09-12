@@ -24,6 +24,7 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -118,7 +119,11 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             return;
         }
 
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
         // Make sure the user has management rights
+        latch.add();
         game.hasManagePermission(user, function(err, hasPermission) {
             // Handle errors
             if(err !== null || game == null) {
@@ -145,6 +150,44 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 return;
             }
 
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Make sure the stage is changing
+        latch.add();
+        game.getStage(function(err, result) {
+            // Handle errors
+            if(err !== null) {
+                // Print the error to the console
+                console.error(err);
+
+                // Send a message response to the user
+                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                    error: true,
+                    message: 'Failed to change game stage.',
+                    type: 'dialog'
+                }, socket);
+                return;
+            }
+
+            // Make sure the game stage will be changed
+            if(stage == result) {
+                // Send a message response to the user
+                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                    error: true,
+                    message: 'Failed to change the game stage, the game is already in this stage.',
+                    type: 'dialog'
+                }, socket);
+                return;
+            }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Continue when we're done
+        latch.then(function() {
             // Set the game stage
             game.setStage(stage, function(err) {
                 // Handle errors
