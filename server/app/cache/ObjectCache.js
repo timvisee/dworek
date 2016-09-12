@@ -29,7 +29,7 @@ var ObjectCache = function() {
     /**
      * Map of cached data.
      *
-     * @type {WeakMap}
+     * @type {Map}
      * @private
      */
     this._cache = new Map();
