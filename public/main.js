@@ -298,7 +298,7 @@ var Dworek = {
              */
             getHandlers: function(packetType) {
                 // Return an empty array if nothing is defined for this packet type
-                if(this._handlers.has(packetType))
+                if(!this._handlers.has(packetType))
                     return [];
 
                 // Get and return the handlers
@@ -1287,3 +1287,12 @@ function updateStatusLabels() {
         batteryStatusLabel.html(battery.level * 100 + '%')
     });
 }
+
+
+
+
+
+
+Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, function (packet) {
+    alert('RECEIVED AUTH RESPONSE');
+});
