@@ -417,7 +417,7 @@ var Dworek = {
          * Flush all pages that match the URL matcher.
          *
          * @param {RegExp|undefined} [urlMatcher] A regex to flush pages that have a matching URL, undefined to flush all.
-         * @param {boolean} [reloadCurrent] True to reload the current page, false if not.
+         * @param {boolean} [reloadCurrent=false] True to reload the current page, false if not.
          */
         flushPages: function(urlMatcher, reloadCurrent) {
             // Get all hidden/cached pages
@@ -426,7 +426,7 @@ var Dworek = {
             // Loop through the list of pages
             pages.each(function() {
                 // Match the URL, continue if it doesn't match
-                if(urlMatcher !== undefined && $(this).data('url').toString().match(urlMatcher) === null)
+                if(urlMatcher !== undefined && $(this).data('url').toString().trim().match(urlMatcher) === null)
                     return;
 
                 // Flush the page
@@ -436,7 +436,7 @@ var Dworek = {
             // Reload the current page
             if(reloadCurrent) {
                 // Reload the current page
-                $.mobile.changePage(window.location.href, {
+                $.mobile.navigate(window.location.href, {
                     allowSamePageTransition: true,
                     transition: 'fade',
                     reloadPage: true,
@@ -528,10 +528,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
                 action: {
                     text: 'Refresh',
                     action: function() {
-                        window.location.reload();
+                        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
                     }
                 }
-            })
+            });
         }
 
         // We're done, return
@@ -592,10 +592,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
         if(result === false)
             return;
 
-        // TODO: Invalidate current page
+        // Flush pages
+        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
 
         // Reload and/or navigate to the game page
-        $.mobile.navigate('/game/' + gameId);
+        //$.mobile.navigate('/game/' + gameId);
     });
 });
 
@@ -903,6 +904,9 @@ function showDialog(options, callback) {
 
         // Bind the click event to the button
         button.bind('click', function() {
+            // Close the popup
+            popupElement.popup('close');
+
             // Call the button action if any is set
             if(typeof action.action === 'function')
                 action.action();
@@ -913,9 +917,6 @@ function showDialog(options, callback) {
                     callback(action.value);
                 calledBack = true;
             }
-
-            // Close the popup
-            popupElement.popup('close');
         });
 
         // Append the button to the popup
