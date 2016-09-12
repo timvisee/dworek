@@ -30,7 +30,7 @@ var nativeDroid = null;
 const PacketType = {
     AUTH_REQUEST: 1,
     AUTH_RESPONSE: 2,
-    GAME_CHANGE_STAGE: 3,
+    GAME_STAGE_CHANGE: 3,
     MESSAGE_RESPONSE: 4
 };
 
@@ -1416,7 +1416,7 @@ $(document).bind("pageinit", function() {
         showNotification('Starting game...');
 
         // Send a game starting packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 1
         });
@@ -1428,7 +1428,7 @@ $(document).bind("pageinit", function() {
         showNotification('Stopping game...');
 
         // Send a game stopping packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 2
         });
@@ -1444,7 +1444,7 @@ $(document).bind("pageinit", function() {
         showNotification('Resuming game...');
 
         // Send a game starting packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 1
         });

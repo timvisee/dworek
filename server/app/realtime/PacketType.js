@@ -24,6 +24,6 @@
 module.exports = {
     AUTH_REQUEST: 1,
     AUTH_RESPONSE: 2,
-    GAME_CHANGE_STAGE: 3,
+    GAME_STATE_CHANGE: 3,
     MESSAGE_RESPONSE: 4
 };

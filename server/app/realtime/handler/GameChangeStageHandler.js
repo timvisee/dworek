@@ -29,7 +29,7 @@ var PacketType = require('../PacketType');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.GAME_CHANGE_STAGE;
+const HANDLER_PACKET_TYPE = PacketType.GAME_STATE_CHANGE;
 
 /**
  * Game change state handler.
