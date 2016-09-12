@@ -25,6 +25,7 @@ var io = require('socket.io');
 var config = require('../../config');
 
 var Core = require('../../Core');
+var PacketProcessor = require('./PacketProcessor');
 
 /**
  * Real time class.
@@ -33,6 +34,12 @@ var Core = require('../../Core');
  * @constructor
  */
 var RealTime = function() {
+    /**
+     * Packet processor instance.
+     * @type {PacketProcessor}
+     */
+    this.packetProcessor = new PacketProcessor();
+
     /**
      * SocketIO server instance.
      * @type {Server}
