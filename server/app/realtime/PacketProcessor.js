@@ -41,8 +41,9 @@ var PacketProcessor = function() {
  * Process a raw packet.
  *
  * @param {Object} rawPacket Raw packet to process.
+ * @param socket SocketIO socket this packet was received from.
  */
-PacketProcessor.prototype.process = function(rawPacket) {
+PacketProcessor.prototype.process = function(rawPacket, socket) {
     // Make sure the packet is an object
     if(!_.isObject(rawPacket)) {
         console.log('Received malformed packet, packet isn\'t an object, ignoring');
@@ -59,7 +60,7 @@ PacketProcessor.prototype.process = function(rawPacket) {
     const packetType = rawPacket.type;
 
     // Invoke all packet handlers for this packet
-    this.invokeHandlers(rawPacket, packetType);
+    this.invokeHandlers(rawPacket, packetType, socket);
 };
 
 /**
@@ -104,15 +105,16 @@ PacketProcessor.prototype.getHandlers = function(packetType) {
  *
  * @param {Object} packet Packet object.
  * @param {Number} packetType Packet type.
+ * @param socket SocketIO socket.
  */
-PacketProcessor.prototype.invokeHandlers = function(packet, packetType) {
+PacketProcessor.prototype.invokeHandlers = function(packet, packetType, socket) {
     // Get the handlers for this packet type
     const handlers = this.getHandlers(packetType);
 
     // Loop through all the handlers
     handlers.forEach(function(handler) {
         // Call the handler
-        handler(packet);
+        handler(packet, socket);
     });
 };
 

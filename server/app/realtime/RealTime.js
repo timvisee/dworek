@@ -79,10 +79,10 @@ RealTime.prototype.start = function() {
 
     // Attach the SocketIO server to the running HTTP server
     if(config.realtime.port == undefined || config.realtime.port === config.web.port)
-        // Bind the realtime SocketIO server to the HTTP web server
+        // Bind the real time SocketIO server to the HTTP web server
         this._io.attach(Core.server);
     else
-        // Bind the realtime SocketIO server to the specified port
+        // Bind the real time SocketIO server to the specified port
         this._io.attach(config.realtime.port);
 
     // Set the online flag
@@ -100,13 +100,14 @@ RealTime.prototype.start = function() {
         console.log('A client connected to the real time server, setting things up');
 
         // Send a test message to the client socket
+        // TODO: Remove this test message!
         socket.emit('test', {
             message: 'Test message'
         });
 
         // Listen for packets from the client
         socket.on(config.realtime.defaultRoom, function(rawPacket) {
-            self.packetProcessor.process(rawPacket);
+            self.packetProcessor.process(rawPacket, socket);
         });
     });
 };
@@ -124,6 +125,7 @@ RealTime.prototype.isOnline = function() {
  * @return {Number} Number of connected clients.
  */
 RealTime.prototype.getConnectionCount = function() {
+    //noinspection JSUnresolvedVariable
     return this._io.engine.clientsCount;
 };
 /**

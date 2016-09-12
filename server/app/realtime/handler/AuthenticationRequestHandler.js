@@ -59,6 +59,7 @@ AuthenticationRequestHandler.prototype.init = function() {
  * Handle the packet.
  *
  * @param {Object} packet Packet object.
+ * @param socket SocketIO socket.
  */
 AuthenticationRequestHandler.prototype.handler = function(packet) {
     // TODO: Create handler here!
