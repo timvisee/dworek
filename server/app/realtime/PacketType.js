@@ -22,8 +22,40 @@
 
 // Export the module, with the packet types
 module.exports = {
+    /**
+     * Authentication request from the client to the server.
+     *
+     * Data:
+     * - session: session token or an empty string
+     */
     AUTH_REQUEST: 1,
+
+    /**
+     * Authentication response from the server to the client.
+     *
+     * Data:
+     * - loggedIn: true if the user is logged in, false if not
+     * - [valid]: true if the session was valid, false if not
+     * - user: session user ID
+     */
     AUTH_RESPONSE: 2,
+
+    /**
+     * Change the stage of the given game.
+     *
+     * Data:
+     * - game: ID of the game to change.
+     * - stage: new stage value
+     */
     GAME_STATE_CHANGE: 3,
+
+    /**
+     * Show a message from the server on the client.
+     *
+     * Data:
+     * - message: message to show
+     * - error: true if this is an error message, false if not
+     * - type: 'dialog' or 'toast' as message type
+     */
     MESSAGE_RESPONSE: 4
 };
