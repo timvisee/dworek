@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
+
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 
@@ -81,6 +83,13 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
             loggedIn: false
         }, socket);
 
+        // Set the session state in the socket
+        if(!_.has(socket, 'session'))
+            socket.session = {};
+
+        // Set the logged in state
+        socket.session.valid = false;
+
         // Show a status message
         console.log('Authenticated real time client (no session)');
         return;
@@ -100,11 +109,28 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
             isValid = false;
         }
 
-        // Send a response to the client
-        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
+        // Create the packet object
+        var packetObject = {
             loggedIn: isValid,
             valid: isValid
-        }, socket);
+        };
+
+        // Set the user if there is any
+        if(isValid)
+            packetObject.user = user.getIdHex();
+
+        // Send a response to the client
+        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, packetObject, socket);
+
+        // Set the session state in the socket
+        if(!_.has(socket, 'session'))
+            socket.session = {};
+
+        // Set the logged in state and user
+        socket.session.valid = isValid;
+        socket.session.user = user;
+
+        // TODO: Invalidate other sessions with this user!
 
         // Show a status message
         console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');

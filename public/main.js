@@ -388,9 +388,12 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
             ttl: 1000 * 60
         });
 
-    } else
+    } else {
         // Show a console message, we authenticated successfully through the real time server
         console.log('Successfully authenticated through real time server');
+
+        // TODO: Store additional data, such as the active game
+    }
 });
 
 
