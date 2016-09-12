@@ -71,20 +71,15 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
     // Get the session value
     const rawSession = packet.session;
 
-    // Create a function to send a response to the client
-    const sendResponse = function(authenticated) {
-        // Send a response to the client
-        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
-            authenticated: authenticated
-        }, socket);
-    };
-
     // Trim the session token
     const sessionToken = rawSession.trim().toLowerCase();
 
     // Return a success packet if the session is empty
     if(sessionToken.length == 0) {
-        sendResponse(false);
+        // Send a response to the client
+        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
+            loggedIn: false
+        }, socket);
 
         // Show a status message
         console.log('Authenticated real time client (no session)');
@@ -105,8 +100,11 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
             isValid = false;
         }
 
-        // Send a response
-        sendResponse(isValid);
+        // Send a response to the client
+        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
+            loggedIn: isValid,
+            valid: isValid
+        }, socket);
 
         // Show a status message
         console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');

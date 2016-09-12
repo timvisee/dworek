@@ -44,6 +44,23 @@ const PACKET_ROOM_DEFAULT = 'default';
  */
 var Dworek = {
     /**
+     * State section.
+     */
+    state: {
+        /**
+         * True if the user authenticated over the real time server, false if not.
+         * @type {boolean}
+         */
+        loggedIn: false,
+
+        /**
+         * ID of the currently active game.
+         * @type {string|null}
+         */
+        activeGame: null
+    },
+
+    /**
      * Start the client.
      */
     start: function() {
@@ -95,11 +112,6 @@ var Dworek = {
         _firstConnection: true,
 
         /**
-         * Define whether we're authenticated.
-         */
-        _auth: false,
-
-        /**
          * Connect to the real time server.
          */
         connect: function() {
@@ -147,7 +159,7 @@ var Dworek = {
             this._socket.on('connect_error', function() {
                 // Set the connection state
                 this._connected = false;
-                this._auth = false;
+                Dworek.state.loggedIn = false;
 
                 // Show a notification
                 showNotification('Failed to connect');
@@ -157,7 +169,7 @@ var Dworek = {
             this._socket.on('connect_timeout', function() {
                 // Set the connection state
                 this._connected = false;
-                this._auth = false;
+                Dworek.state.loggedIn = false;
 
                 // Show a notification
                 showNotification('The connection timed out');
@@ -173,7 +185,7 @@ var Dworek = {
             this._socket.on('reconnect_failed', function() {
                 // Set the connection state
                 this._connected = false;
-                this._auth = false;
+                Dworek.state.loggedIn = false;
 
                 // Show a notification
                 showNotification('Failed to reconnect');
@@ -184,7 +196,7 @@ var Dworek = {
                 // Set the connection state, and reset the first connection flag
                 this._connected = false;
                 this._firstConnection = false;
-                this._auth = false;
+                Dworek.state.loggedIn = false;
 
                 // Show a notification regarding the disconnect
                 showNotification('You\'ve lost connection...', {
@@ -361,11 +373,11 @@ $(function() {
 
 // Register an authentication response packet handler
 Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, function(packet) {
-    // Set the authentication state
-    Dworek.realtime._auth = !!packet.authenticated;
+    // Set the logged in state
+    Dworek.state.loggedIn = !!packet.loggedIn;
 
     // Show an error notification if we failed to authenticate
-    if(!packet.authenticated) {
+    if(packet.hasOwnProperty('valid') && !packet.valid) {
         showNotification('Failed to authenticate', {
             action: {
                 text: 'Login',
