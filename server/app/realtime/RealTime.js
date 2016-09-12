@@ -147,8 +147,11 @@ RealTime.prototype.registerHandlers = function() {
         // Show a status message
         console.log('Loading and registering ' + file + ' handler...');
 
-        // Require the file, and initialize the handler
-        new require(HANDLERS_DIRECTORY + '/' + file)(true);
+        // Require the file
+        const handler = require(HANDLERS_DIRECTORY + '/' + file);
+
+        // Dynamically create a handler instance
+        new handler(true);
 
         // Increase the handler count
         handlerCount++;
