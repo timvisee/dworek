@@ -528,7 +528,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
                 action: {
                     text: 'Refresh',
                     action: function() {
-                        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
+                        Dworek.utils.flushPages(undefined, true);
                     }
                 }
             });
@@ -540,7 +540,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
 
     // Define the title, message and actions to show to the user
     var title = 'Game changed';
-    var message = 'The stage of the game <i>' + gameName + '</i> has changed.';
+    var message = 'The stage of the game <b>' + gameName + '</b> has changed.';
     var actions = [];
 
     // Determine the title
@@ -553,9 +553,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
     if(Dworek.utils.getGameId() == gameId) {
         // Build a message to show to the user
         if(stage == 1)
-            message = 'This game has been started.';
+            message = 'The game has been started.';
         else if(stage == 2)
-            message = 'This game has been finished.';
+            message = 'The game has been finished.';
 
         // Create the dialog actions
         actions.push({
@@ -566,9 +566,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
     } else {
         // Build a message to show to the user
         if(stage == 1)
-            message = 'The game <i>' + gameName + '</i> has been started.';
+            message = 'The game <b>' + gameName + '</b> has been started.<br><br>You\'ve joined this game.';
         else if(stage == 2)
-            message = 'The game <i>' + gameName + '</i> has been finished.';
+            message = 'The game <b>' + gameName + '</b> has been finished.<br><br>You\'ve joined this game.';
 
         // Create the dialog actions
         actions.push({
@@ -593,7 +593,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
             return;
 
         // Flush pages
-        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), false);
+        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
 
         // Reload and/or navigate to the game page
         $.mobile.navigate('/game/' + gameId);
