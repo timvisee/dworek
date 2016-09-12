@@ -23,5 +23,7 @@
 // Export the module, with the packet types
 module.exports = {
     AUTH_REQUEST: 1,
-    AUTH_RESPONSE: 2
+    AUTH_RESPONSE: 2,
+    GAME_CHANGE_STAGE: 3,
+    MESSAGE_RESPONSE: 4
 };

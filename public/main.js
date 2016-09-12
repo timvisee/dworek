@@ -29,7 +29,9 @@ var nativeDroid = null;
  */
 const PacketType = {
     AUTH_REQUEST: 1,
-    AUTH_RESPONSE: 2
+    AUTH_RESPONSE: 2,
+    GAME_CHANGE_STAGE: 3,
+    MESSAGE_RESPONSE: 4
 };
 
 /**
@@ -473,6 +475,40 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
 
         // Update the active game page
         updateActiveGame();
+    }
+});
+
+// Register an message response handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, function(packet) {
+    // Make sure a message has been set
+    if(!packet.hasOwnProperty('message'))
+        return;
+
+    // Get all properties
+    const message = packet.message;
+    var error = packet.hasOwnProperty('error') ? !!packet.error : false;
+    var type = packet.hasOwnProperty('type') ? (packet.type == 'dialog') : false;
+
+    // Show a dialog or toast notification
+    if(type) {
+        // Show a dialog
+        showDialog({
+            title: error ? 'Error' : 'Message',
+            message,
+            actions: [
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+
+    } else {
+        // Show a toast notification
+        showNotification(message, {
+            action: {
+                text: 'Close'
+            }
+        });
     }
 });
 
@@ -1376,18 +1412,43 @@ $(document).bind("pageinit", function() {
         if(Dworek.utils.isGamePage())
             setActiveGame(Dworek.utils.getGameId());
 
-        // TODO: Start the game here!
-        showNotification('TODO: Game should start!');
+        // Show a status notification
+        showNotification('Starting game...');
+
+        // Send a game starting packet to the server
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+            game: Dworek.utils.getGameId(),
+            stage: 1
+        });
     };
 
     // Define the stop action
     const gameStopAction = function() {
-        // TODO: Stop the game here!
-        showNotification('TODO: Game should stop!');
+        // Show a status notification
+        showNotification('Stopping game...');
+
+        // Send a game stopping packet to the server
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+            game: Dworek.utils.getGameId(),
+            stage: 2
+        });
     };
 
     // Define the resume action
-    const gameResumeAction = gameStartAction;
+    const gameResumeAction = function() {
+        // Set the active game of the user to the current if the user is on a game page
+        if(Dworek.utils.isGamePage())
+            setActiveGame(Dworek.utils.getGameId());
+
+        // Show a status notification
+        showNotification('Resuming game...');
+
+        // Send a game starting packet to the server
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_CHANGE_STAGE, {
+            game: Dworek.utils.getGameId(),
+            stage: 1
+        });
+    };
 
     // Bind a game start button
     startGameButton.click(function(e) {
