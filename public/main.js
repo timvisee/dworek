@@ -731,6 +731,13 @@ function generateUniqueId(prefix) {
 }
 
 /**
+ * Queue of dialogs to show.
+ *
+ * @type {Array} Array of objects (options, callback).
+ */
+var dialogQueue = [];
+
+/**
  * Show a dialog box.
  *
  * @param {Object} options Dialog box configuration.
@@ -745,6 +752,13 @@ function generateUniqueId(prefix) {
  * @param {function} callback Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
  */
 function showDialog(options, callback) {
+    // Make sure a dialog isn't currently being shown
+    if($('.ui-popup').length) {
+        // Pus the dialog in the queue and return
+        dialogQueue.push({options, callback});
+        return;
+    }
+
     // Create a defaults object
     const defaults = {
         title: 'Popup',
@@ -756,7 +770,7 @@ function showDialog(options, callback) {
     options = merge(defaults, options);
 
     // Get the active page, generate an unique popup and button list ID
-    const activePage = $.mobile.pageContainer.pagecontainer('getActivePage');
+    const activePage = getActivePage();
     const popupId = generateUniqueId('popup-');
     const buttonListId = generateUniqueId('button-list-');
 
@@ -801,6 +815,18 @@ function showDialog(options, callback) {
             if(callback !== undefined)
                 callback();
             calledBack = true;
+        }
+
+        // Show any queued dialog
+        if(dialogQueue.length > 0) {
+            // Get the dialog data
+            const dialogData = dialogQueue[0];
+
+            // Shift the dialog queue
+            dialogQueue.shift();
+
+            // Call the show dialog function
+            showDialog(dialogData.options, dialogData.callback);
         }
     });
 
@@ -1488,7 +1514,7 @@ $(document).bind("pageinit", function() {
 });
 
 // Game state buttons
-$(document).bind("pageinit", function() {
+$(document).bind("pagecreate", function() {
     // Find the game state buttons
     const startGameButton = $('.action-game-start');
     const stopGameButton = $('.action-game-stop');
@@ -1530,6 +1556,7 @@ $(document).bind("pageinit", function() {
     };
 
     // Bind a game start button
+    startGameButton.unbind('click');
     startGameButton.click(function(e) {
         // Prevent the default action
         e.preventDefault();
@@ -1553,6 +1580,7 @@ $(document).bind("pageinit", function() {
     });
 
     // Bind a game stop button
+    stopGameButton.unbind('click');
     stopGameButton.click(function(e) {
         // Prevent the default action
         e.preventDefault();
@@ -1576,6 +1604,7 @@ $(document).bind("pageinit", function() {
     });
 
     // Bind a game resume button
+    resumeGameButton.unbind('click');
     resumeGameButton.click(function(e) {
         // Prevent the default action
         e.preventDefault();
