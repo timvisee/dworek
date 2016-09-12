@@ -326,7 +326,7 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     var cacheResult = function(valid) {
         if(RedisUtils.isReady()) {
             // Store the value
-            redis.set(cacheKey, valid);
+            redis.set(cacheKey, valid ? '1' : '0');
             redis.expire(cacheKey, CACHE_TOKEN_VALID_EXPIRE);
         }
     };
@@ -380,7 +380,7 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
 
             // If the value isn't null, return it
             if(value != null) {
-                callback(null, !!value);
+                callback(null, value == '1');
                 return;
             }
 
