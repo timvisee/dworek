@@ -171,9 +171,15 @@ config.realtime.port = config.web.port;
 
 /**
  * The public path that is used for the real time server.
- * @type {string}
+ * @type {string} Real time web path.
  */
 config.realtime.path = '/realtime';
+
+/**
+ * The default room name for real time packets.
+ * @type {string} Room name.
+ */
+config.realtime.defaultRoom = 'default';
 
 
 /******************************************************************************

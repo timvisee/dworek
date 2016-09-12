@@ -99,8 +99,15 @@ RealTime.prototype.start = function() {
         });
     });
 
+    // Store this instance
+    const self = this;
+
     // Register all handlers
     this.registerHandlers();
+
+    // Handle packets through the packet processor
+    console.log('Listening for packets...');
+    this._io.on(config.realtime.defaultRoom, self.getPacketProcessor().process);
 };
 
 /**
