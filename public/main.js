@@ -31,7 +31,7 @@ const PacketType = {
     AUTH_REQUEST: 1,
     AUTH_RESPONSE: 2,
     GAME_STAGE_CHANGE: 3,
-    GAME_STATE_CHANGED: 5,
+    GAME_STAGE_CHANGED: 5,
     MESSAGE_RESPONSE: 4
 };
 
@@ -479,6 +479,101 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
     }
 });
 
+// Register game stage change handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, function(packet) {
+    // Make sure the packet contains the required properties
+    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('gameName') || !packet.hasOwnProperty('stage') || !packet.hasOwnProperty('joined'))
+        return;
+
+    // Get the packet data
+    const gameId = packet.game;
+    const gameName = packet.gameName;
+    const stage = packet.stage;
+    const isJoined = packet.joined;
+
+    // TODO: Invalidate game related page cache!
+
+    // Invalidate game pages if the player didn't join this game
+    if(!isJoined) {
+        // Check whether the user is currently on the page of this game
+        if(gameId == Dworek.utils.getGameId()) {
+            showNotification('This game has been changed.', {
+                action: {
+                    text: 'Refresh',
+                    action: function() {
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+
+        // We're done, return
+        return;
+    }
+
+    // Define the title, message and actions to show to the user
+    var title = 'Game changed';
+    var message = 'The stage of the game <i>' + gameName + '</i> has changed.';
+    var actions = [];
+
+    // Determine the title
+    if(stage == 1)
+        title = 'Game started';
+    else if(stage == 2)
+        title = 'Game finished';
+
+    // Determine whether this game, or a different game has been started
+    if(Dworek.utils.getGameId() == gameId) {
+        // Build a message to show to the user
+        if(stage == 1)
+            message = 'This game has been started.';
+        else if(stage == 2)
+            message = 'This game has been finished.';
+
+        // Create the dialog actions
+        actions.push({
+            text: 'Refresh',
+            type: 'primary'
+        });
+
+    } else {
+        // Build a message to show to the user
+        if(stage == 1)
+            message = 'The game <i>' + gameName + '</i> has been started.';
+        else if(stage == 2)
+            message = 'The game <i>' + gameName + '</i> has been finished.';
+
+        // Create the dialog actions
+        actions.push({
+            text: 'View game',
+            type: 'primary'
+        });
+        actions.push({
+            text: 'Close',
+            value: false
+        });
+    }
+
+    // Show a dialog and notify the user about the state change
+    setTimeout(function() {
+        showDialog({
+            title,
+            message,
+            actions
+
+        }, function(result) {
+            // Go back if the result equals false (because the close button was pressed)
+            if(result === false)
+                return;
+
+            // TODO: Invalidate current page
+
+            // Reload and/or navigate to the game page
+            $.mobile.navigate('/game/' + gameId);
+        });
+    }, 500);
+});
+
 // Register an message response handler
 Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, function(packet) {
     // Make sure a message has been set
@@ -488,7 +583,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     // Get all properties
     const message = packet.message;
     var error = packet.hasOwnProperty('error') ? !!packet.error : false;
-    var type = packet.hasOwnProperty('type') ? (packet.type == 'dialog') : false;
+    var type = packet.hasOwnProperty('type') ? packet.type == 'dialog' : false;
 
     // Show a dialog or toast notification
     if(type) {
@@ -1413,11 +1508,8 @@ $(document).bind("pageinit", function() {
         if(Dworek.utils.isGamePage())
             setActiveGame(Dworek.utils.getGameId());
 
-        // Show a status notification
-        showNotification('Starting game...');
-
         // Send a game starting packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 1
         });
@@ -1425,11 +1517,8 @@ $(document).bind("pageinit", function() {
 
     // Define the stop action
     const gameStopAction = function() {
-        // Show a status notification
-        showNotification('Stopping game...');
-
         // Send a game stopping packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 2
         });
@@ -1441,11 +1530,8 @@ $(document).bind("pageinit", function() {
         if(Dworek.utils.isGamePage())
             setActiveGame(Dworek.utils.getGameId());
 
-        // Show a status notification
-        showNotification('Resuming game...');
-
         // Send a game starting packet to the server
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STATE_CHANGE, {
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGE, {
             game: Dworek.utils.getGameId(),
             stage: 1
         });

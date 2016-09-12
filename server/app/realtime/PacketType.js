@@ -47,17 +47,18 @@ module.exports = {
      * - game: ID of the game to change.
      * - stage: new stage value
      */
-    GAME_STATE_CHANGE: 3,
+    GAME_STAGE_CHANGE: 3,
 
     /**
      * Packet to a client if the state of a game changed.
      *
      * Data:
      * - game: ID of the game that is changed
+     * - gameName: name of the game
      * - stage: new stage value
      * - joined: true if the user joined this game, false if not.
      */
-    GAME_STATE_CHANGED: 5,
+    GAME_STAGE_CHANGED: 5,
 
     /**
      * Show a message from the server on the client.

@@ -29,7 +29,7 @@ var PacketType = require('../PacketType');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.GAME_STATE_CHANGE;
+const HANDLER_PACKET_TYPE = PacketType.GAME_STAGE_CHANGE;
 
 /**
  * Game change state handler.
@@ -158,12 +158,30 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     return;
                 }
 
-                // TODO: Update all relevant users, the stage of this game changed!
-                // TODO: Remove this dummy response
-                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                    message: 'Success',
-                    type: 'toast'
-                }, socket);
+                // Get the name of the game
+                game.getName(function(err, gameName) {
+                    // Handle errors
+                    if(err !== null)
+                        gameName = 'Unknown';
+
+
+
+
+
+                    // TODO: Update all relevant users, the stage of this game changed!
+                    // TODO: Remove this dummy response
+                    Core.realTime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGED, {
+                        game: game.getIdHex(),
+                        gameName,
+                        stage,
+                        joined: true
+                    }, socket);
+
+
+
+
+
+                });
             });
         });
     });
