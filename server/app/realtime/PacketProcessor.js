@@ -22,6 +22,8 @@
 
 var _ = require('lodash');
 
+var config = require('../../config');
+
 /**
  * Packet parser class.
  *
@@ -38,12 +40,12 @@ var PacketProcessor = function() {
 };
 
 /**
- * Process a raw packet.
+ * Process a received raw packet.
  *
  * @param {Object} rawPacket Raw packet to process.
  * @param socket SocketIO socket this packet was received from.
  */
-PacketProcessor.prototype.process = function(rawPacket, socket) {
+PacketProcessor.prototype.receivePacked = function(rawPacket, socket) {
     // Make sure the packet is an object
     if(!_.isObject(rawPacket)) {
         console.log('Received malformed packet, packet isn\'t an object, ignoring');
@@ -61,6 +63,21 @@ PacketProcessor.prototype.process = function(rawPacket, socket) {
 
     // Invoke all packet handlers for this packet
     this.invokeHandlers(rawPacket, packetType, socket);
+};
+
+/**
+ * Send a packet object to the given
+ *
+ * @param {Number} packetType Packet type value.
+ * @param {Object} packet Packet object to send.
+ * @param socket SocketIO socket to send the packet over.
+ */
+PacketProcessor.prototype.sendPacket = function(packetType, packet, socket) {
+    // Put the packet type in the packet object
+    packet.type = packetType;
+
+    // Send the packet over the socket
+    socket.emit(config.realtime.defaultRoom, packet);
 };
 
 /**
