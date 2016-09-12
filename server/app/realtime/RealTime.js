@@ -88,26 +88,27 @@ RealTime.prototype.start = function() {
     // Set the online flag
     this._online = true;
 
+    // Register all handlers
+    this.registerHandlers();
+
+    // Store this instance
+    const self = this;
+
     // Register the connection event
     this._io.on('connection', function(socket) {
         // Show a status message
-        console.log('A client connected to the real time server');
+        console.log('A client connected to the real time server, setting things up');
 
         // Send a test message to the client socket
         socket.emit('test', {
             message: 'Test message'
         });
+
+        // Listen for packets from the client
+        socket.on(config.realtime.defaultRoom, function(rawPacket) {
+            self.packetProcessor.process(rawPacket);
+        });
     });
-
-    // Store this instance
-    const self = this;
-
-    // Register all handlers
-    this.registerHandlers();
-
-    // Handle packets through the packet processor
-    console.log('Listening for packets...');
-    this._io.on(config.realtime.defaultRoom, self.getPacketProcessor().process);
 };
 
 /**
