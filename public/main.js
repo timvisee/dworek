@@ -436,7 +436,7 @@ var Dworek = {
             // Reload the current page
             if(reloadCurrent) {
                 // Reload the current page
-                $.mobile.navigate(window.location.href, {
+                $.mobile.navigate(window.location.path, {
                     allowSamePageTransition: true,
                     transition: 'fade',
                     reloadPage: true,
@@ -593,10 +593,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
             return;
 
         // Flush pages
-        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
+        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'));
 
         // Reload and/or navigate to the game page
-        //$.mobile.navigate('/game/' + gameId);
+        $.mobile.navigate('/game/' + gameId);
     });
 });
 
