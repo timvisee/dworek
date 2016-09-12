@@ -31,6 +31,7 @@ const PacketType = {
     AUTH_REQUEST: 1,
     AUTH_RESPONSE: 2,
     GAME_STAGE_CHANGE: 3,
+    GAME_STATE_CHANGED: 5,
     MESSAGE_RESPONSE: 4
 };
 
