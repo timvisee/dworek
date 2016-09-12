@@ -101,7 +101,7 @@ ObjectCache.prototype.setCacheMultiple = function(values) {
 ObjectCache.prototype.flushCache = function(fields) {
     // Flush all if no field is given
     if(fields === undefined) {
-        this._cache = new WeakMap();
+        this._cache = new Map();
         return;
     }
 
