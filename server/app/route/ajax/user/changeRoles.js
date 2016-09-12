@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
 var express = require('express');
 var router = express.Router();
 
@@ -49,7 +50,7 @@ router.post('/', function(req, res, next) {
     // Get the list of user IDs
     const gameId = data.game;
     const users = data.users;
-    const teamValue = data.role.team.trim().toLowerCase();
+    const teamValue = _.has(data, 'role.team') && data.role.team !== null ? data.role.team.trim().toLowerCase() : 'none';
     const isSpecial = data.role.special;
     const isSpectator = data.role.spectator;
 
