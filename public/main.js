@@ -216,9 +216,9 @@ var Dworek = {
          * @param {boolean=true} timer True to start the authentication timer.
          */
         startAuthentication: function(now, timer) {
-            // Authenticate each 15 minutes
+            // Authenticate each 5 minutes
             if(timer === undefined || !!timer)
-                setInterval(this._authenticate, 15 * 60 * 1000);
+                setInterval(this._authenticate, 5 * 60 * 1000);
 
             // Authenticate now
             if(now === undefined || !!now)
