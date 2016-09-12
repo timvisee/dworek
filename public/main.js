@@ -63,7 +63,13 @@ var Dworek = {
          * ID of the currently active game.
          * @type {string|null}
          */
-        activeGame: null
+        activeGame: null,
+
+        /**
+         * ID of the game that was last viewed by the user.
+         * @type {string|null}
+         */
+        lastViewedGame: null
     },
 
     /**
@@ -143,6 +149,9 @@ var Dworek = {
          * These handlers track the connection state of the real time socket.
          */
         registerCoreHandlers: function() {
+            // Store this instance
+            const self = this;
+
             // Listen to the test channel
             this._socket.on('test', function(message) {
                 // Show a message
@@ -152,25 +161,25 @@ var Dworek = {
             // Handle connection events
             this._socket.on('connect', function() {
                 // Set the connection state
-                Dworek.realtime._connected = true;
+                self._connected = true;
 
                 // Show a notification if this isn't the first time the user disconnected
-                if(!Dworek.realtime._firstConnection)
+                if(!self._firstConnection)
                     showNotification('Successfully reconnected!', {
                         vibrate: true
                     });
 
                 // Start the authentication process
-                Dworek.realtime.startAuthentication(true, false);
+                self.startAuthentication(true, false);
             });
 
             // Handle connection errors
             this._socket.on('connect_error', function() {
                 // Set the connection state
-                Dworek.realtime._connected = false;
+                self._connected = false;
 
                 // De-authenticate
-                this._deauthenticate();
+                self._deauthenticate();
 
                 // Show a notification
                 showNotification('Failed to connect');
@@ -179,10 +188,10 @@ var Dworek = {
             // Handle connection timeouts
             this._socket.on('connect_timeout', function() {
                 // Set the connection state
-                Dworek.realtime._connected = false;
+                self._connected = false;
 
                 // De-authenticate
-                this._deauthenticate();
+                self._deauthenticate();
 
                 // Show a notification
                 showNotification('The connection timed out');
@@ -197,10 +206,10 @@ var Dworek = {
             // Handle reconnection failures
             this._socket.on('reconnect_failed', function() {
                 // Set the connection state
-                Dworek.realtime._connected = false;
+                self._connected = false;
 
                 // De-authenticate
-                this._deauthenticate();
+                self._deauthenticate();
 
                 // Show a notification
                 showNotification('Failed to reconnect');
@@ -209,11 +218,11 @@ var Dworek = {
             // Handle disconnects
             this._socket.on('disconnect', function() {
                 // Set the connection state, and reset the first connection flag
-                Dworek.realtime._connected = false;
-                this._firstConnection = false;
+                self._connected = false;
+                self._firstConnection = false;
 
                 // De-authenticate
-                this._deauthenticate();
+                self._deauthenticate();
 
                 // Show a notification regarding the disconnect
                 showNotification('You\'ve lost connection...', {
@@ -404,7 +413,7 @@ var Dworek = {
                 return null;
 
             // Get and return the game ID
-            return result[1];
+            return result[1].toLowerCase();
         },
 
         /**
@@ -461,9 +470,86 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
 
         // Store the authenticated user
         Dworek.state.user = packet.user;
+
+        // Update the active game page
+        updateActiveGame();
     }
 });
 
+// Manage the active game
+$(document).bind("pageshow", function() {
+    updateActiveGame();
+});
+
+/**
+ * Update the active game.
+ */
+function updateActiveGame() {
+    // Return if we're not logged in
+    if(!Dworek.state.loggedIn)
+        return;
+
+    // Return if we're not on a game page
+    if(!Dworek.utils.isGamePage())
+        return;
+
+    // Get the ID of the game page
+    const gameId = Dworek.utils.getGameId();
+
+    // Return if the last viewed game is this game
+    if(Dworek.state.lastViewedGame == gameId)
+        return;
+
+    // Check whether this game is different than the active game
+    if(Dworek.state.activeGame != gameId) {
+        // Automatically select this as active game if we don't have an active game now
+        if(Dworek.state.activeGame === null) {
+            // Set the active game
+            Dworek.state.activeGame = gameId;
+
+            // Show a notification
+            showNotification('This is now your active game');
+
+        } else {
+            // Ask the user whether to select this as active game
+            showDialog({
+                title: 'Change active game',
+                message: 'You can only have one active game at a time to play. Would you like to change your active game to this game now?',
+                actions: [
+                    {
+                        text: 'Change active game',
+                        state: 'primary',
+                        action: function() {
+                            // Set the active game ID
+                            Dworek.state.activeGame = gameId;
+
+                            // Show a notification
+                            showNotification('This is now your active game');
+                        }
+                    },
+                    {
+                        text: 'Close',
+                        action: function() {
+                            showNotification('Switch to your active game', {
+                                action: {
+                                    text: 'Switch',
+                                    action: function() {
+                                        $.mobile.navigate('/game/' + Dworek.state.activeGame, {
+                                            transition: 'flow'
+                                        });
+                                    }
+                                }
+                            })
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
+    // Update the last viewed game
+    Dworek.state.lastViewedGame = gameId;
+}
 
 /**
  * Get the active jQuery mobile page.
@@ -793,7 +879,6 @@ $(document).bind("pageinit", function() {
     const checkboxSelectorUser = function(userId) {
         return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
     };
-    const popupGameSelector = 'input[name=field-game]';
     const popupTeamSelector = 'select[name=field-team]';
     const popupSpecialSelector = 'select[name=field-special]';
     const popupSpectatorSelector = 'select[name=field-spectator]';
@@ -841,13 +926,12 @@ $(document).bind("pageinit", function() {
             e.preventDefault();
 
             // Get the team, special and spectator fields
-            const gameField = popup.find(popupGameSelector);
             const teamField = popup.find(popupTeamSelector);
             const specialField = popup.find(popupSpecialSelector);
             const spectatorField = popup.find(popupSpectatorSelector);
 
             // Get the game
-            const gameId = gameField.val();
+            const gameId = Dworek.utils.getGameId();
 
             // Get the team selector value
             const teamValue = teamField.val();
@@ -977,7 +1061,6 @@ $(document).bind("pageinit", function() {
     // Get the elements
     const buttonCreateTeam = $('.action-create-team');
     const popup = $('#popupCreateTeam');
-    const popupGameField = 'input[name=field-game]';
     const popupTeamNameField = 'input[name=field-team-name]';
     const teamListSelector = '.team-list';
     const noTeamLabelSelector = '.no-teams';
@@ -1003,10 +1086,9 @@ $(document).bind("pageinit", function() {
 
             // Get the team name
             const teamField = popup.find(popupTeamNameField);
-            const gameField = popup.find(popupGameField);
 
             // Get the game ID
-            const gameId = gameField.val();
+            const gameId = Dworek.utils.getGameId();
 
             // Get the team selector value
             const teamName = teamField.val();
@@ -1099,7 +1181,6 @@ $(document).bind("pageinit", function() {
     const checkboxSelectorUser = function(userId) {
         return 'input[type=checkbox][name=' + checkboxNamePrefix + userId.trim() + ']';
     };
-    const gameIdSelector = 'input[name=field-game]';
     const teamListSelector = '.team-list';
 
     // Handle button click events
@@ -1132,8 +1213,7 @@ $(document).bind("pageinit", function() {
         // Define the delete action
         const deleteAction = function() {
             // Get the game field, and the current game ID
-            const gameField = $.mobile.pageContainer.pagecontainer('getActivePage').find(gameIdSelector);
-            const gameId = gameField.val();
+            const gameId = Dworek.utils.getGameId();
 
             // Create an team delete object to send to the server
             const updateObject = {
