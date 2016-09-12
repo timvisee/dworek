@@ -30,12 +30,11 @@ block content
 
                     .card-supporting-text.has-action.has-title.
                         #{game.usersCount.requested} user#{game.usersCount.requested == 1 ? '' : 's'} requested to join this game and are awaiting your approval.
-                        Visit the players page to accept or reject these users.
+                        Click the button below to visit the user approval page.
 
                     .card-action
                         .row.between-xs: .col-xs-12: .box
-                            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players/requested', data-transition='slide') Approve players
-                            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
+                            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players/requested', data-transition='slide') Approve users
 
             .nd2-card.wow.fadeInUp
                 .card-title.has-supporting-text
