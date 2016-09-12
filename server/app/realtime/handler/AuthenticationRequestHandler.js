@@ -71,9 +71,17 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
     // Get the session value
     const rawSession = packet.session;
 
+    // Create a function to send a response to the client
+    const sendResponse = function(authenticated) {
+        // Send a response to the client
+        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
+            authenticated
+        }, socket);
+    };
+
     // Return a success packet if the session is empty
     if(rawSession.trim().length == 0) {
-        // TODO: Return success packet, user not signed in
+        sendResponse(false);
         return;
     }
 
@@ -84,10 +92,8 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
             // Set the authentication result to false
             result = false;
 
-        // Send a response to the client
-        Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
-            auth: result
-        }, socket);
+        // Send a response
+        sendResponse(result);
     });
 };
 
