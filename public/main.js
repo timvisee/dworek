@@ -483,6 +483,7 @@ $(document).bind("pageshow", function() {
 
 /**
  * Update the active game.
+ * This will ask the user to change the active game, or will change it automatically if the user doens't have an active game.
  */
 function updateActiveGame() {
     // Return if we're not logged in
@@ -522,14 +523,7 @@ function updateActiveGame() {
                         text: 'Change active game',
                         value: true,
                         state: 'primary',
-                        icon: 'zmdi zmdi-swap',
-                        action: function() {
-                            // Set the active game ID
-                            Dworek.state.activeGame = gameId;
-
-                            // Show a notification
-                            showNotification('This is now your active game');
-                        }
+                        icon: 'zmdi zmdi-swap'
                     },
                     {
                         text: 'Close'
@@ -537,9 +531,11 @@ function updateActiveGame() {
                 ]
 
             }, function(value) {
-                // Ignore this if the value is true
-                if(!!value)
+                // Set the active game
+                if(!!value) {
+                    setActiveGame(gameId);
                     return;
+                }
 
                 // Show a notification to switch to the active game
                 showNotification('Switch to your active game', {
@@ -558,6 +554,24 @@ function updateActiveGame() {
 
     // Update the last viewed game
     Dworek.state.lastViewedGame = gameId;
+}
+
+/**
+ * Set the active game of this user.
+ *
+ * @param gameId Game ID.
+ */
+function setActiveGame(gameId) {
+    // Show a notification if the active game is changing
+    if(Dworek.state.activeGame != gameId) {
+        // Show a notification
+        showNotification('This is now your active game');
+
+        // TODO: Send packet to server to change the user's active game
+    }
+
+    // Set the active game ID
+    Dworek.state.activeGame = gameId;
 }
 
 /**
@@ -1361,6 +1375,11 @@ $(document).bind("pageinit", function() {
 
         // Define the start action
         const gameStartAction = function() {
+            // Set the active game of the user to the current if the user is on a game page
+            if(Dworek.utils.isGamePage())
+                setActiveGame(Dworek.utils.getGameId());
+
+            // TODO: Start the game here!
             showNotification('TODO: Game should start!');
         };
 
@@ -1371,7 +1390,7 @@ $(document).bind("pageinit", function() {
             actions: [
                 {
                     text: 'Start game',
-                    icon: 'zmdi zmdi-check',
+                    icon: 'zmdi zmdi-play',
                     state: 'primary',
                     action: gameStartAction
                 },
