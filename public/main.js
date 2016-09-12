@@ -436,7 +436,7 @@ var Dworek = {
             // Reload the current page
             if(reloadCurrent) {
                 // Reload the current page
-                $.mobile.navigate(window.location.path, {
+                $.mobile.navigate(getActivePage().data('url'), {
                     allowSamePageTransition: true,
                     transition: 'fade',
                     reloadPage: true,
@@ -593,7 +593,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
             return;
 
         // Flush pages
-        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'));
+        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), false);
 
         // Reload and/or navigate to the game page
         $.mobile.navigate('/game/' + gameId);
