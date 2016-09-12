@@ -28,7 +28,8 @@ var nativeDroid = null;
  * @type {Object}
  */
 const PacketType = {
-    AUTH_REQUEST: 1
+    AUTH_REQUEST: 1,
+    AUTH_RESPONSE: 2
 };
 
 /**
