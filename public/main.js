@@ -123,6 +123,9 @@ var Dworek = {
             // Register the event handlers
             this.registerCoreHandlers();
 
+            // Start the authentication timer
+            Dworek.realtime.startAuthentication(false, true);
+
             // Pass received packets to the packet processor
             this._socket.on(PACKET_ROOM_DEFAULT, function(packet) {
                 Dworek.realtime.packetProcessor.receivePacket(packet, self._socket);
@@ -146,13 +149,13 @@ var Dworek = {
                 Dworek.realtime._connected = true;
 
                 // Show a notification if this isn't the first time the user disconnected
-                if(!this._firstConnection)
+                if(!Dworek.realtime._firstConnection)
                     showNotification('Successfully reconnected!', {
                         vibrate: true
                     });
 
                 // Start the authentication process
-                Dworek.realtime.startAuthentication();
+                Dworek.realtime.startAuthentication(true, false);
             });
 
             // Handle connection errors
@@ -208,13 +211,18 @@ var Dworek = {
 
         /**
          * Start the authentication process for the current user.
+         *
+         * @param {boolean=true} now True to immediately authenticate.
+         * @param {boolean=true} timer True to start the authentication timer.
          */
-        startAuthentication: function() {
+        startAuthentication: function(now, timer) {
             // Authenticate each 15 minutes
-            setInterval(this._authenticate, 15 * 60 * 1000);
+            if(timer === undefined || !!timer)
+                setInterval(this._authenticate, 15 * 60 * 1000);
 
             // Authenticate now
-            this._authenticate();
+            if(now === undefined || !!now)
+                this._authenticate();
         },
 
         /**
