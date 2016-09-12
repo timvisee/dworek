@@ -128,6 +128,7 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
         // Set the logged in state and user
         socket.session.valid = isValid;
+        socket.session.userId = user.getIdHex();
         socket.session.user = user;
 
         // TODO: Invalidate other sessions with this user!

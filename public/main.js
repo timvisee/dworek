@@ -54,6 +54,12 @@ var Dworek = {
         loggedIn: false,
 
         /**
+         * Active user.
+         * @type {string|null}
+         */
+        user: null,
+
+        /**
          * ID of the currently active game.
          * @type {string|null}
          */
@@ -162,7 +168,9 @@ var Dworek = {
             this._socket.on('connect_error', function() {
                 // Set the connection state
                 Dworek.realtime._connected = false;
-                Dworek.state.loggedIn = false;
+
+                // De authenticate
+                this._deauthenticate();
 
                 // Show a notification
                 showNotification('Failed to connect');
@@ -172,7 +180,9 @@ var Dworek = {
             this._socket.on('connect_timeout', function() {
                 // Set the connection state
                 Dworek.realtime._connected = false;
-                Dworek.state.loggedIn = false;
+
+                // De authenticate
+                this._deauthenticate();
 
                 // Show a notification
                 showNotification('The connection timed out');
@@ -188,7 +198,9 @@ var Dworek = {
             this._socket.on('reconnect_failed', function() {
                 // Set the connection state
                 Dworek.realtime._connected = false;
-                Dworek.state.loggedIn = false;
+
+                // De authenticate
+                this._deauthenticate();
 
                 // Show a notification
                 showNotification('Failed to reconnect');
@@ -199,7 +211,9 @@ var Dworek = {
                 // Set the connection state, and reset the first connection flag
                 Dworek.realtime._connected = false;
                 this._firstConnection = false;
-                Dworek.state.loggedIn = false;
+
+                // De authenticate
+                this._deauthenticate();
 
                 // Show a notification regarding the disconnect
                 showNotification('You\'ve lost connection...', {
@@ -237,6 +251,16 @@ var Dworek = {
 
             // Emit the package
             Dworek.realtime.packetProcessor.sendPacket(PacketType.AUTH_REQUEST, packetObject);
+        },
+
+        /**
+         * Deauthenticate.
+         * @private
+         */
+        _deauthenticate: function() {
+            // Reset some authentication related flags
+            Dworek.state.loggedIn = false;
+            Dworek.state.user = null;
         },
 
         /**
@@ -409,7 +433,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
         // Show a console message, we authenticated successfully through the real time server
         console.log('Successfully authenticated through real time server');
 
-        // TODO: Store additional data, such as the active game
+        // Store the authenticated user
+        Dworek.state.user = packet.user;
     }
 });
 
