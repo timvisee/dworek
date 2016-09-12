@@ -143,7 +143,7 @@ var Dworek = {
             // Handle connection events
             this._socket.on('connect', function() {
                 // Set the connection state
-                this._connected = true;
+                Dworek.realtime._connected = true;
 
                 // Show a notification if this isn't the first time the user disconnected
                 if(!this._firstConnection)
@@ -158,7 +158,7 @@ var Dworek = {
             // Handle connection errors
             this._socket.on('connect_error', function() {
                 // Set the connection state
-                this._connected = false;
+                Dworek.realtime._connected = false;
                 Dworek.state.loggedIn = false;
 
                 // Show a notification
@@ -168,7 +168,7 @@ var Dworek = {
             // Handle connection timeouts
             this._socket.on('connect_timeout', function() {
                 // Set the connection state
-                this._connected = false;
+                Dworek.realtime._connected = false;
                 Dworek.state.loggedIn = false;
 
                 // Show a notification
@@ -184,7 +184,7 @@ var Dworek = {
             // Handle reconnection failures
             this._socket.on('reconnect_failed', function() {
                 // Set the connection state
-                this._connected = false;
+                Dworek.realtime._connected = false;
                 Dworek.state.loggedIn = false;
 
                 // Show a notification
@@ -194,7 +194,7 @@ var Dworek = {
             // Handle disconnects
             this._socket.on('disconnect', function() {
                 // Set the connection state, and reset the first connection flag
-                this._connected = false;
+                Dworek.realtime._connected = false;
                 this._firstConnection = false;
                 Dworek.state.loggedIn = false;
 
@@ -210,16 +210,25 @@ var Dworek = {
          * Start the authentication process for the current user.
          */
         startAuthentication: function() {
+            // Authenticate each 15 minutes
+            setInterval(this._authenticate, 15 * 60 * 1000);
+
+            // Authenticate now
+            this._authenticate();
+        },
+
+        /**
+         * Send an authentication request.
+         * @private
+         */
+        _authenticate: function() {
             // Create the package object
-            var packageObject = {
-                type: PacketType.AUTH_REQUEST,
+            var packetObject = {
                 session: Dworek.utils.getCookie('session_token')
             };
 
             // Emit the package
-            Dworek.realtime._socket.emit('default', packageObject);
-
-            // TODO: Listen for answers from the server!
+            Dworek.realtime.packetProcessor.sendPacket(PacketType.AUTH_REQUEST, packetObject);
         },
 
         /**
