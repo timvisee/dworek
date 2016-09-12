@@ -520,6 +520,7 @@ function updateActiveGame() {
                 actions: [
                     {
                         text: 'Change active game',
+                        value: true,
                         state: 'primary',
                         icon: 'zmdi zmdi-swap',
                         action: function() {
@@ -531,21 +532,26 @@ function updateActiveGame() {
                         }
                     },
                     {
-                        text: 'Close',
-                        action: function() {
-                            showNotification('Switch to your active game', {
-                                action: {
-                                    text: 'Switch',
-                                    action: function() {
-                                        $.mobile.navigate('/game/' + Dworek.state.activeGame, {
-                                            transition: 'flow'
-                                        });
-                                    }
-                                }
-                            })
-                        }
+                        text: 'Close'
                     }
                 ]
+
+            }, function(value) {
+                // Ignore this if the value is true
+                if(!!value)
+                    return;
+
+                // Show a notification to switch to the active game
+                showNotification('Switch to your active game', {
+                    action: {
+                        text: 'Switch',
+                        action: function() {
+                            $.mobile.navigate('/game/' + Dworek.state.activeGame, {
+                                transition: 'flow'
+                            });
+                        }
+                    }
+                });
             });
         }
     }
