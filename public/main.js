@@ -783,11 +783,11 @@ var dialogQueue = [];
  * @param {String} [options.actions.value=] Value returned through the callback when this action is invoked.
  * @param {String} [options.actions.icon=] Icon classes to show an icon.
  * @param {function} [options.actions.action=] Function to be called when the action is invoked.
- * @param {function} callback Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
+ * @param {function} [callback] Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
  */
 function showDialog(options, callback) {
     // Make sure a dialog isn't currently being shown
-    if($('.ui-popup').length) {
+    if(getActivePage().find('.ui-popup-container').not('.ui-popup-hidden').length > 0) {
         // Pus the dialog in the queue and return
         dialogQueue.push({options, callback});
         return;
@@ -1213,7 +1213,7 @@ $(document).bind("pageinit", function() {
                     const updatedUsersCount = updatedUsers.length;
 
                     // Show an error notification
-                    showNotification('Changes roles for ' + updatedUsersCount + ' user' + (updatedUsersCount != 1 ? 's' : ''), {
+                    showNotification('Changed roles for ' + updatedUsersCount + ' user' + (updatedUsersCount != 1 ? 's' : ''), {
                         toast: true,
                         native: false,
                         vibrate: true,
