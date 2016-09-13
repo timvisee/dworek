@@ -316,7 +316,7 @@ var Dworek = {
             /**
              * Registered handlers.
              */
-            _handlers: new Map(),
+            _handlers: {},
 
             /**
              * Process a received raw packet.
@@ -380,14 +380,14 @@ var Dworek = {
                 var handlers = [];
 
                 // Get the current array of handlers if defined
-                if(this._handlers.has(packetType))
-                    handlers = this._handlers.get(packetType);
+                if(this._handlers.hasOwnProperty(packetType.toString()))
+                    handlers = this._handlers[packetType.toString()];
 
                 // Add the handler
                 handlers.push(handler);
 
                 // Put the array of handlers back into the handlers map
-                this._handlers.set(packetType, handlers);
+                this._handlers[packetType.toString()] = handlers;
             },
 
             /**
@@ -397,11 +397,11 @@ var Dworek = {
              */
             getHandlers: function(packetType) {
                 // Return an empty array if nothing is defined for this packet type
-                if(!this._handlers.has(packetType))
+                if(!this._handlers.hasOwnProperty(packetType.toString()))
                     return [];
 
                 // Get and return the handlers
-                return this._handlers.get(packetType);
+                return this._handlers[packetType.toString()];
             },
 
             /**
