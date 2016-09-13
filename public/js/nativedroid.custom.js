@@ -767,7 +767,7 @@
 
             _self.bindNavigationSwipe = function() {
                 // Select the element to attach the event to
-                const selector = $(".ui-page:not('.nd2-no-menu-swipe')");
+                var selector = $(".ui-page:not('.nd2-no-menu-swipe')");
 
                 // Detach previous handlers
                 selector.off("swiperight swipeleft", _self.sidebarSwipeHandler);
