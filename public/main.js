@@ -420,6 +420,11 @@ var Dworek = {
          * @param {boolean} [reloadCurrent=false] True to reload the current page, false if not.
          */
         flushPages: function(urlMatcher, reloadCurrent) {
+            if(reloadCurrent) {
+                window.location.reload();
+                return;
+            }
+
             // Get all hidden/cached pages
             const pages = $('div[data-role=page]:hidden');
 
@@ -432,18 +437,42 @@ var Dworek = {
                 // Flush the page
                 $(this).remove();
             });
+        },
+
+        /**
+         * Reload the current page.
+         */
+        reloadPage: function() {
+            // Force reload the application if we're in crazy Chrome
+            if(this.isChrome(true)) {
+                window.location.reload();
+                return;
+            }
 
             // Reload the current page
-            if(reloadCurrent) {
-                // Reload the current page
-                $.mobile.navigate(getActivePage().data('url'), {
-                    allowSamePageTransition: true,
-                    transition: 'fade',
-                    reloadPage: true,
-                    reverse: false,
-                    changeHash: false
-                });
-            }
+            this.navigateToPage(window.location.href, true, false, 'fade');
+        },
+
+        /**
+         * Navigate to the given page.
+         *
+         * @param page Page URL to navigate to.
+         * @param reload True to force reload the page if it's already cached.
+         * @param [changeHash=true] True to change the hash, false if not.
+         * @param [transition] Page transition.
+         */
+        navigateToPage: function(page, reload, changeHash, transition) {
+            // Create the options object
+            var options = {
+                allowSamePageTransition: true,
+                reloadPage: reload,
+                reload: reload,
+                transition: transition !== undefined ? transition : 'slide',
+                changeHash: changeHash !== undefined ? changeHash : true
+            };
+
+            // Navigate to the page
+            $.mobile.changePage(page, options);
         },
 
         /**
@@ -467,6 +496,32 @@ var Dworek = {
 
             // No cookie found, return an empty string
             return '';
+        },
+
+        /**
+         * Determine whether the current browser is Google's Crappy Chrome.
+         *
+         * @param {boolean} [ios=true] True to also return true if this is Chrome on iOS, false if not.
+         */
+        isChrome: function(ios) {
+            // Parse the parameter
+            if(ios == undefined)
+                ios = true;
+
+            // Prepare some things
+            var isChromium = window.chrome,
+                winNav = window.navigator,
+                vendorName = winNav.vendor,
+                isOpera = winNav.userAgent.indexOf("OPR") > -1,
+                isIEedge = winNav.userAgent.indexOf("Edge") > -1,
+                isIOSChrome = winNav.userAgent.match("CriOS");
+
+            // Determine whether we're on iOS Chrome
+            if(isIOSChrome)
+                return ios;
+
+            // Determine whether this is Chrome, return the result
+            return (isChromium != undefined && isOpera == false && isIEedge == false);
         }
     }
 };
@@ -526,11 +581,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
         if(gameId == Dworek.utils.getGameId()) {
             showNotification('This game has been changed.', {
                 action: {
-                    text: 'Refresh',
-                    action: function() {
-                        Dworek.utils.flushPages(undefined, true);
-                    }
+                    text: 'Refresh'
                 }
+            }, function() {
+                window.location.href = '/game/' + gameId;
             });
         }
 
@@ -592,11 +646,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
         if(result === false)
             return;
 
-        // Flush pages
-        Dworek.utils.flushPages(new RegExp('^\\/game\\/' + gameId, 'gi'), true);
-
-        // Reload and/or navigate to the game page
-        $.mobile.navigate('/game/' + gameId);
+        // Move to the games page
+        window.location.href = '/game/' + gameId;
     });
 });
 
