@@ -32,7 +32,9 @@ const PacketType = {
     AUTH_RESPONSE: 2,
     GAME_STAGE_CHANGE: 3,
     GAME_STAGE_CHANGED: 5,
-    MESSAGE_RESPONSE: 4
+    MESSAGE_RESPONSE: 4,
+    BROADCAST_MESSAGE_REQUEST: 6,
+    BROADCAST_MESSAGE: 7
 };
 
 /**
@@ -518,9 +520,9 @@ var Dworek = {
                     // Show the dialog
                     showDialog({
                         title: 'Whoops',
-                        message: 'Chrome is having problems reloading and navigating to pages.<br><br>' +
+                        message: 'Chrome is having problems navigating through the application properly.<br><br>' +
                         'Please click the link below to reload the application, and work around this problem.<br><br>' +
-                        '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Chrome</a></div>'
+                        '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Google Chrome</a></div>'
                     });
                 }, 100);
             }
@@ -767,6 +769,47 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
             }
         });
     }
+});
+
+// Broadcast
+Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, function(packet) {
+    // Make sure a message has been set
+    if(!packet.hasOwnProperty('message'))
+        return;
+
+    // Get all properties
+    const message = packet.message;
+    const gameId = packet.game;
+    const gameName = packet.gameName;
+
+    // Determine the message
+    var dialogMessage = 'You\'ve received a broadcast from the host of the game <b>' + gameName + '</b>:<br><br>' + message;
+    if(Dworek.utils.getGameId() == gameId)
+        dialogMessage = 'You\'ve received a broadcast from the host of this game:<br><br>' + message;
+
+    // Define the actions for the dialog
+    var actions = [];
+
+    // Add a 'view game' action if we're currently not viewing the game
+    if(Dworek.utils.getGameId() != gameId)
+        actions.push({
+            text: 'View game',
+            action: function() {
+                Dworek.utils.navigateToPath('/game/' + gameId);
+            }
+        });
+
+    // Add the close button
+    actions.push({
+        text: 'Close'
+    });
+
+    // Show the dialog
+    showDialog({
+        title: 'Broadcast',
+        message: dialogMessage,
+        actions: actions
+    });
 });
 
 // Manage the active game
@@ -1802,6 +1845,84 @@ $(document).bind("pagecreate", function() {
         });
     });
 });
+
+
+
+
+
+
+
+
+// Broadcast button
+$(document).bind("pagecreate", function() {
+    // Find the broadcast button
+    const broadcastButton = $('.action-broadcast');
+
+    broadcastButton.unbind('click');
+    broadcastButton.click(function(event) {
+        // Prevent the event
+        event.preventDefault();
+
+        // Get a random ID for the message field
+        const fieldId = generateUniqueId('field');
+
+        // Show a dialog, and ask whether the user is sure
+        showDialog({
+            title: 'Broadcast message',
+            message: 'Enter a message to broadcast to all users:<br><br>' +
+            '<label for="' + fieldId + '">Message</label>' +
+            '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />',
+            actions: [
+                {
+                    text: 'Broadcast message',
+                    icon: 'zmdi zmdi-mail-send',
+                    state: 'primary',
+                    action: function() {
+                        // Get the input field
+                        const messageField = $('#' + fieldId);
+
+                        // Get the message
+                        const message = messageField.val();
+
+                        // Make sure any message is entered
+                        if(message.trim().length <= 0) {
+                            // Show an error dialog to the user
+                            showDialog({
+                                title: 'Invalid message',
+                                message: 'The message you\'ve entered to broadcast is invalid.',
+                                actions: [{
+                                        text: 'Close'
+                                }]
+                            });
+                            return;
+                        }
+
+                        // Send a packet to the server with the broadcast
+                        Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE_REQUEST, {
+                            message: message,
+                            game: Dworek.utils.getGameId()
+                        });
+                    }
+                },
+                {
+                    text: 'Cancel'
+                }
+            ]
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Check whether the given value is a JavaScript object.

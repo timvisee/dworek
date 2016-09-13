@@ -69,5 +69,24 @@ module.exports = {
      * - [dialog]: true to show a dialog, false to not
      * - [toast]: true to show a toast notification, false to not
      */
-    MESSAGE_RESPONSE: 4
+    MESSAGE_RESPONSE: 4,
+
+    /**
+     * Broadcast a message to all users that joined this game. This is a request from a client to the server.
+     *
+     * Data:
+     * - message: message to broadcast
+     * - game: ID of the game to broadcast the message for
+     */
+    BROADCAST_MESSAGE_REQUEST: 6,
+
+    /**
+     * Broadcast a message from the server to the client.
+     *
+     * Data:
+     * - message: message to broadcast
+     * - game: ID of the game to broadcast a message for
+     * - gameName: name of the game a message is broadcasted for
+     */
+    BROADCAST_MESSAGE: 7
 };
