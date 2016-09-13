@@ -228,7 +228,7 @@
                 var tabElement = undefined;
 
                 // Select the proper tab element if a tab hash is given
-                if(window.location.hash.includes('tab=')) {
+                if(window.location.hash.indexOf('tab=') >= 0) {
                     // Get the hash as a string, remove the hash sign
                     var hashString = window.location.hash.substring(1);
 

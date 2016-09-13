@@ -403,7 +403,7 @@ var Dworek = {
          */
         getGameId: function() {
             // Create a regular expression to fetch the game ID from the URL
-            const result = window.location.pathname.trim().match(/^\/game\/([a-f0-9]{24})(\/.*)?$/);
+            const result = document.location.pathname.trim().match(/^\/game\/([a-f0-9]{24})(\/.*)?$/);
 
             // Make sure any result was found
             if(result === null || result.length < 2)
@@ -421,7 +421,7 @@ var Dworek = {
          */
         flushPages: function(urlMatcher, reloadCurrent) {
             if(reloadCurrent) {
-                window.location.reload();
+                document.location.reload();
                 return;
             }
 
@@ -445,12 +445,39 @@ var Dworek = {
         reloadPage: function() {
             // Force reload the application if we're in crazy Chrome
             if(this.isChrome(true)) {
-                window.location.reload();
+                document.location.reload();
                 return;
             }
 
             // Reload the current page
-            this.navigateToPage(window.location.href, true, false, 'fade');
+            this.navigateToPage(document.location.href, true, false, 'fade');
+        },
+
+        /**
+         * Navigate to the given URL path.
+         *
+         * @param {string} url Url with a prefixed slash.
+         */
+        navigateToPath: function(url) {
+            // Flush the cache for all other pages
+            this.flushPages(undefined, true);
+
+            // Determine the target URL
+            const targetUrl = document.location.protocol + '//' + document.location.host + url;
+
+            // Set the location of the user
+            window.location = targetUrl;
+
+            // Show an error dialog for Chrome users
+            if(Dworek.utils.isChrome(true)) {
+                showDialog({
+                    title: 'Whoops',
+                    message: 'Chrome is having problems refreshing the game pages.<br><br>' +
+                    'Please click the link below to work around this problem.<br><br>' +
+                    '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
+                    '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Chrome</a></div>'
+                });
+            }
         },
 
         /**
@@ -543,7 +570,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
             action: {
                 text: 'Login',
                 action: function() {
-                    window.location.href = '/login';
+                    document.location.href = '/login';
+                    return false;
                 }
             },
             ttl: 1000 * 60
@@ -584,7 +612,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
                     text: 'Refresh'
                 }
             }, function() {
-                window.location.href = '/game/' + gameId;
+                Dworek.utils.navigateToPath('/game/' + gameId);
+                return false;
             });
         }
 
@@ -637,9 +666,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
 
     // Show a dialog and notify the user about the state change
     showDialog({
-        title,
-        message,
-        actions
+        title: title,
+        message: message,
+        actions: actions
 
     }, function(result) {
         // Go back if the result equals false (because the close button was pressed)
@@ -647,7 +676,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
             return;
 
         // Move to the games page
-        window.location.href = '/game/' + gameId;
+        Dworek.utils.navigateToPath('/game/' + gameId);
     });
 });
 
@@ -668,7 +697,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
         // Show a dialog
         showDialog({
             title: error ? 'Error' : 'Message',
-            message,
+            message: message,
             actions: [
                 {
                     text: 'Close'
@@ -840,7 +869,7 @@ function showDialog(options, callback) {
     // Make sure a dialog isn't currently being shown
     if(getActivePage().find('.ui-popup-container').not('.ui-popup-hidden').length > 0) {
         // Pus the dialog in the queue and return
-        dialogQueue.push({options, callback});
+        dialogQueue.push({options: options, callback: callback});
         return;
     }
 
@@ -1041,7 +1070,7 @@ function showNotification(message, options) {
 
         // Show the toast notification
         new $.nd2Toast({
-            message,
+            message: message,
             action: notificationAction,
             ttl: options.ttl
         });
@@ -1204,8 +1233,8 @@ $(document).bind("pageinit", function() {
                 users: userIds,
                 role: {
                     team: teamValue,
-                    special,
-                    spectator
+                    special: special,
+                    spectator: spectator
                 }
             };
 
@@ -1810,7 +1839,9 @@ $(document).bind("pageinit", function() {
             actions: [
                 {
                     text: 'Reload application',
-                    action: () => location.reload()
+                    action: function() {
+                        location.reload();
+                    }
                 },
                 {
                     text: 'Close'
