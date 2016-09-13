@@ -72,7 +72,13 @@ var Dworek = {
          * ID of the game that was last viewed by the user.
          * @type {string|null}
          */
-        lastViewedGame: null
+        lastViewedGame: null,
+
+        /**
+         * The time the client was last connected at.
+         * @param {Number} Time as timestamp, or -1 if unspecified.
+         */
+        lastConnected: -1
     },
 
     /**
@@ -168,6 +174,36 @@ var Dworek = {
 
                 // Start the authentication process
                 self.startAuthentication(true, false);
+
+                // Check whether the user was disconnected for a long time
+                if(Dworek.state.lastConnected >= 0) {
+                    // Invalidate all other pages after 30 seconds
+                    if((Date.now() - Dworek.state.lastConnected) > 30 * 1000)
+                        Dworek.utils.flushPages(undefined, false);
+
+                    // Show a refresh notification after two minutes
+                    if((Date.now() - Dworek.state.lastConnected) > 2 * 60 * 1000)
+                        showDialog({
+                            title: 'Disconnected',
+                            message: 'You we\'re disconnected for too long. Because of this some game pages might be outdated.<br><br>' +
+                            'Please refresh the application.',
+                            actions: [{
+                                text: 'Refresh',
+                                state: 'primary',
+                                icon: 'zmdi zmdi-refresh'
+                            }]
+                        }, function() {
+                            // Determine the refresh path
+                            var refreshPath = getActivePage().data('url');
+
+                            // Redirect a user to a game page if he's on a game related page
+                            if(Dworek.utils.isGamePage())
+                                refreshPath = '/game/' + Dworek.utils.getGameId();
+
+                            // Redirect the user
+                            Dworek.utils.navigateToPath(refreshPath);
+                        });
+                }
             });
 
             // Handle connection errors
@@ -197,7 +233,8 @@ var Dworek = {
             // Handle reconnection attempts
             this._socket.on('reconnect_attempt', function(attemptCount) {
                 // Show a notification
-                showNotification('Trying to reconnect...' + (attemptCount > 1 ? ' (attempt ' + attemptCount + ')' : ''));
+                if(attemptCount <= 5 || attemptCount % 10 == 0)
+                    showNotification('Trying to reconnect...' + (attemptCount > 1 ? ' (attempt ' + attemptCount + ')' : ''));
             });
 
             // Handle reconnection failures
@@ -226,6 +263,9 @@ var Dworek = {
                     vibrate: true,
                     vibrationPattern: [1000]
                 });
+
+                // Set the last connected state
+                Dworek.state.lastConnected = Date.now();
             });
         },
 
@@ -470,13 +510,19 @@ var Dworek = {
 
             // Show an error dialog for Chrome users
             if(Dworek.utils.isChrome(true)) {
-                showDialog({
-                    title: 'Whoops',
-                    message: 'Chrome is having problems refreshing the game pages.<br><br>' +
-                    'Please click the link below to work around this problem.<br><br>' +
-                    '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
-                    '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Chrome</a></div>'
-                });
+                // Add the refresh meta to the page
+                getActivePage().append('<meta http-equiv="refresh" content="0; url=' + targetUrl + '">');
+
+                // Show a dialog after half a second
+                setTimeout(function() {
+                    // Show the dialog
+                    showDialog({
+                        title: 'Whoops',
+                        message: 'Chrome is having problems reloading and navigating to pages.<br><br>' +
+                        'Please click the link below to reload the application, and work around this problem.<br><br>' +
+                        '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Chrome</a></div>'
+                    });
+                }, 100);
             }
         },
 
@@ -553,6 +599,12 @@ var Dworek = {
     }
 };
 
+// Define the Date#now function if it isn't available
+if(!Date.now)
+    Date.now = function() {
+        return new Date().getTime();
+    };
+
 // Wait for initialization
 $(function() {
    // Start Dworek
@@ -570,7 +622,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
             action: {
                 text: 'Login',
                 action: function() {
-                    document.location.href = '/login';
+                    Dworek.utils.navigateToPath('/login');
                     return false;
                 }
             },
