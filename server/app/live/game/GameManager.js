@@ -56,7 +56,7 @@ GameManager.prototype.getGame = function(gameId, callback) {
         gameId = gameId.getId();
     else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
         gameId = new ObjectId(gameId);
-    else {
+    else if(!(gameId instanceof ObjectId)) {
         callback(new Error('Invalid game ID'));
         return;
     }
@@ -125,10 +125,8 @@ GameManager.prototype.getLoadedGame = function(gameId) {
         gameId = gameId.getId();
     else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
         gameId = new ObjectId(gameId);
-    else {
-        callback(new Error('Invalid game ID'));
-        return;
-    }
+    else if(!(gameId instanceof ObjectId))
+        throw new Error('Invalid game ID');
 
     // Keep track of the found game
     var result = null;
@@ -173,6 +171,9 @@ GameManager.prototype.getLoadedGameCount = function() {
  * @param {GameManager~loadCallback} [callback] Callback called when done loading.
  */
 GameManager.prototype.load = function(callback) {
+    // Show a status message
+    console.log('Loading all live games...');
+
     // Store this instance
     const self = this;
 
@@ -197,6 +198,7 @@ GameManager.prototype.load = function(callback) {
         // Loop through the list of games
         games.forEach(function(game) {
             // Load the game
+            latch.add();
             self.loadGame(game, function(err) {
                 // Handle errors
                 if(err !== null) {
@@ -237,7 +239,7 @@ GameManager.prototype.loadGame = function(gameId, callback) {
         gameId = gameId.getId();
     else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
         gameId = new ObjectId(gameId);
-    else {
+    else if(!(gameId instanceof ObjectId)) {
         callback(new Error('Invalid game ID'));
         return;
     }
@@ -251,6 +253,9 @@ GameManager.prototype.loadGame = function(gameId, callback) {
     // Create a new game instance
     const newGame = new Game(gameId);
 
+    // Store this instance
+    const self = this;
+
     // Load the game
     newGame.load(function(err) {
         // Call back errors
@@ -260,7 +265,7 @@ GameManager.prototype.loadGame = function(gameId, callback) {
         }
 
         // Add the game to the games list
-        this.games.push(newGame);
+        self.games.push(newGame);
 
         // Get the name of the game, and print a status message
         newGame.getGameModel().getName(function(err, name) {
@@ -291,7 +296,8 @@ GameManager.prototype.loadGame = function(gameId, callback) {
  */
 GameManager.prototype.unload = function() {
     // Show a status message
-    console.log('Unloading all live games...');
+    if(this.games.length > 0)
+        console.log('Unloading all live games...');
 
     // Loop through the list of games
     this.games.forEach(function(game) {
@@ -314,13 +320,8 @@ GameManager.prototype.unloadGame = function(gameId) {
         gameId = gameId.getId();
     else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
         gameId = new ObjectId(gameId);
-    else {
-        callback(new Error('Invalid game ID'));
-        return;
-    }
-
-    // Show a status message
-    console.log('Loading live game (id: ' + gameId.toString() + ')...');
+    else if(!(gameId instanceof ObjectId))
+        throw new Error('Invalid game ID');
 
     // Loop through the list of games, and determine what game to unload and what index to remove
     var removeIndex = -1;

@@ -64,7 +64,7 @@ UserManager.prototype.getUser = function(userId, callback) {
         userId = userId.getId();
     else if(!(userId instanceof ObjectId) && ObjectId.isValid(userId))
         userId = new ObjectId(userId);
-    else {
+    else if(!(userId instanceof ObjectId)) {
         callback(new Error('Invalid user ID'));
         return;
     }
@@ -133,10 +133,8 @@ UserManager.prototype.getLoadedUser = function(userId) {
         userId = userId.getId();
     else if(!(userId instanceof ObjectId) && ObjectId.isValid(userId))
         userId = new ObjectId(userId);
-    else {
-        callback(new Error('Invalid user ID'));
-        return;
-    }
+    else if(!(userId instanceof ObjectId))
+        throw new Error('Invalid user ID');
 
     // Keep track of the found user
     var result = null;

@@ -52,10 +52,10 @@ var User = function(user) {
         this._id = user.getId();
     else if(!(user instanceof ObjectId) && ObjectId.isValid(user))
         this._id = new ObjectId(user);
-    else {
+    else if(!(user instanceof ObjectId))
         throw new Error('Invalid user instance or ID');
-        return;
-    }
+    else
+        this._id = user;
 
     // Store the user model instance if any was given
     if(user instanceof UserModel)
@@ -83,10 +83,8 @@ User.prototype.isUser = function(user) {
         user = user.getId();
     else if(!(user instanceof ObjectId) && ObjectId.isValid(user))
         user = new ObjectId(user);
-    else {
-        callback(new Error('Invalid user ID'));
-        return;
-    }
+    else if(!(user instanceof ObjectId))
+        throw Error('Invalid user ID');
 
     // Compare the user ID
     return this._id.equals(user);

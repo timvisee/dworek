@@ -59,10 +59,10 @@ var Game = function(game) {
         this._id = game.getId();
     else if(!(game instanceof ObjectId) && ObjectId.isValid(game))
         this._id = new ObjectId(game);
-    else {
+    else if(!(game instanceof ObjectId))
         throw new Error('Invalid game instance or ID');
-        return;
-    }
+    else
+        this._id = game;
 
     // Store the game model instance if any was given
     if(game instanceof GameModel)
@@ -90,7 +90,7 @@ Game.prototype.isGame = function(game) {
         game = game.getId();
     else if(!(game instanceof ObjectId) && ObjectId.isValid(game))
         game = new ObjectId(game);
-    else {
+    else if(!(game instanceof ObjectId)) {
         callback(new Error('Invalid game ID'));
         return;
     }
