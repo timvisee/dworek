@@ -2277,6 +2277,9 @@ $(document).bind("pageinit", function() {
         var statusBody = '<div align="center" class="table-list">' +
             '<table>' +
             '    <tr>' +
+            '        <td class="left"><i class="zmdi zmdi-play zmdi-hc-fw"></i> Game</td><td class="status-game-label">Unknown</td>' +
+            '    </tr>' +
+            '    <tr>' +
             '        <td class="left"><i class="zmdi zmdi-network zmdi-hc-fw"></i> Network</td><td class="status-network-label">Unknown</td>' +
             '    </tr>' +
             '    <tr>' +
@@ -2328,6 +2331,7 @@ function updateStatusLabels() {
 
     // Get the icon and labels
     const statusIcon = $('.status-icon');
+    const gameStatusLabel = $('.status-game-label');
     const networkStatusLabel = $('.status-network-label');
     const gpsStatusLabel = $('.status-gps-label');
     const batteryStatusLabel = $('.status-battery-label');
@@ -2386,7 +2390,13 @@ function updateStatusLabels() {
         batteryStatusLabel.html(batteryLevel + '%');
 
     // Determine whether there is an error
-    var error = !hasGps;
+    const error = !isConnected || !isOnline || !hasGps || (hasBattery && batteryLevel >= 0 && batteryLevel <= 5);
+
+    // Set the game status label
+    if(error)
+        gameStatusLabel.html('<span style="color: red;">Not functional</span>');
+    else
+        gameStatusLabel.html(playing ? 'Playing' : 'Not playing');
 
     // Determine whether to animate the status icon
     const iconAnimate = playing;
@@ -2401,6 +2411,12 @@ function updateStatusLabels() {
         statusIcon.css({
             animationDuration: iconAnimateDuration + 's'
         });
+
+        // Set the color
+        if(error)
+            statusIcon.addClass('mdc-text-red-700');
+        else
+            statusIcon.removeClass('mdc-text-red-700');
 
     } else
         statusIcon.removeClass('animated flash');
