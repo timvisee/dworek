@@ -28,12 +28,12 @@ var Game = require('./Game');
 var GameModel = require('../../model/game/GameModel');
 
 /**
- * GameController class.
+ * GameManager class.
  *
  * @class
  * @constructor
  */
-var GameController = function() {
+var GameManager = function() {
     /**
      * List containing all loaded games.
      *
@@ -46,9 +46,9 @@ var GameController = function() {
  * Get the given game.
  *
  * @param {GameModel|ObjectId|string} gameId Game instance or the game ID to get the game for.
- * @param {GameController~getGameCallback} callback Called back with the game or when an error occurred.
+ * @param {GameManager~getGameCallback} callback Called back with the game or when an error occurred.
  */
-GameController.prototype.getGame = function(gameId, callback) {
+GameManager.prototype.getGame = function(gameId, callback) {
     // Get the game ID as an ObjectId
     if(gameId instanceof GameModel)
         gameId = gameId.getId();
@@ -117,7 +117,7 @@ GameController.prototype.getGame = function(gameId, callback) {
  *
  * @param {GameModel|ObjectId|string} gameId Game instance or the game ID to get the game for.
  */
-GameController.prototype.getLoadedGame = function(gameId) {
+GameManager.prototype.getLoadedGame = function(gameId) {
     // Get the game ID as an ObjectId
     if(gameId instanceof GameModel)
         gameId = gameId.getId();
@@ -152,7 +152,7 @@ GameController.prototype.getLoadedGame = function(gameId) {
  * @param {GameModel|ObjectId|string} gameId Game instance or the game ID.
  * @return {boolean} True if the game is currently loaded, false if not.
  */
-GameController.prototype.isGameLoaded = function(gameId) {
+GameManager.prototype.isGameLoaded = function(gameId) {
     return this.getLoadedGame(gameId) != null;
 };
 
@@ -161,16 +161,16 @@ GameController.prototype.isGameLoaded = function(gameId) {
  *
  * @returns {Number} Number of loaded games.
  */
-GameController.prototype.getLoadedGameCount = function() {
+GameManager.prototype.getLoadedGameCount = function() {
     return this.games.length;
 };
 
 /**
  * Load all active games, that aren't loaded yet.
  *
- * @param {GameController~loadActiveGamesCallback} [callback] Callback called when done loading.
+ * @param {GameManager~loadActiveGamesCallback} [callback] Callback called when done loading.
  */
-GameController.prototype.loadActiveGames = function(callback) {
+GameManager.prototype.loadActiveGames = function(callback) {
     // TODO: Load all active games here, that aren't loaded yet!
 
     // Call the callback
@@ -184,4 +184,4 @@ GameController.prototype.loadActiveGames = function(callback) {
  */
 
 // Export the class
-module.exports = GameController;
+module.exports = GameManager;

@@ -28,7 +28,7 @@ var config = require('./config');
 var debug = require('debug')(config.debug.name);
 
 var Core = require('./Core');
-var GameController = require('./app/live/game/GameController');
+var GameController = require('./app/live/game/GameManager');
 var MongoUtils = require('./app/mongo/MongoUtils');
 var RedisUtils = require('./app/redis/RedisUtils');
 var Router = require('./app/router/Router');

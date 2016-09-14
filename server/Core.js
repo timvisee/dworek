@@ -94,7 +94,7 @@ Core.router = null;
 /**
  * Game controller instance.
  *
- * @type {GameController|null} Game controller instance, or null if the core hasn't been initialized.
+ * @type {GameManager|null} Game controller instance, or null if the core hasn't been initialized.
  */
 Core.gameController = null;
 
