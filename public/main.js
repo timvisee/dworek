@@ -181,8 +181,8 @@ var Dworek = {
 
                 // Check whether the user was disconnected for a long time
                 if(Dworek.state.lastConnected >= 0) {
-                    // Invalidate all other pages after 30 seconds
-                    if((Date.now() - Dworek.state.lastConnected) > 30 * 1000)
+                    // Invalidate all other pages after 10 seconds
+                    if((Date.now() - Dworek.state.lastConnected) > 10 * 1000)
                         Dworek.utils.flushPages(undefined, false);
 
                     // Show a refresh notification after two minutes
