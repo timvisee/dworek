@@ -787,9 +787,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     const gameName = packet.gameName;
 
     // Determine the message
-    var dialogMessage = 'You\'ve received a broadcast from the host of the game <b>' + gameName + '</b>:<br><br>' + message;
+    var dialogMessage = message + '<br><hr><i>This broadcast was send by the host of the <b>' + gameName + '</b> game.</i>';
     if(Dworek.utils.getGameId() == gameId)
-        dialogMessage = 'You\'ve received a broadcast from the host of this game:<br><br>' + message;
+        dialogMessage = message + '<br><hr><i>This broadcast was send by the host of this game.</i>';
 
     // Define the actions for the dialog
     var actions = [];
