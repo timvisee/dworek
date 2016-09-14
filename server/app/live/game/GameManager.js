@@ -179,7 +179,7 @@ GameManager.prototype.load = function(callback) {
     var calledBack = false;
 
     // Load all active games
-    Core.model.gameModelManager.getGamesWithStage(1, {}, function(err, games) {
+    Core.model.gameModelManager.getGamesWithStage(1, function(err, games) {
         // Call back errors
         if(err !== null) {
             if(_.isFunction(callback))

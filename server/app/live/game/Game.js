@@ -25,6 +25,7 @@ var ObjectId = mongo.ObjectId;
 
 var Core = require('../../../Core');
 var GameModel = require('../../model/game/GameModel');
+var UserManager = require('../user/UserManager');
 
 /**
  * Game class.
@@ -46,6 +47,12 @@ var Game = function(game) {
      * @type {GameModel|null} Game model instance or null if no instance is currently available.
      */
     this._model = null;
+
+    /**
+     * User manager instance.
+     * @type {UserManager} User manager instance.
+     */
+    this.userManager = new UserManager(this);
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -121,9 +128,8 @@ Game.prototype.getName = function(callback) {
  * @param {Game~loadCallback} callback Called on success or when an error occurred.
  */
 Game.prototype.load = function(callback) {
-    // TODO: Load the user manager for this game?
-
-    callback(null);
+    // Load the user manager
+    this.userManager.load(callback);
 };
 
 /**

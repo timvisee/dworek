@@ -178,7 +178,7 @@ UserManager.prototype.getLoadedUserCount = function() {
 /**
  * Load all users for this game.
  *
- * @param {UserManager~loadActiveUsersCallback} [callback] Callback called when done loading.
+ * @param {UserManager~loadCallback} [callback] Callback called when done loading.
  */
 UserManager.prototype.load = function(callback) {
     // Store this instance
@@ -243,7 +243,7 @@ UserManager.prototype.load = function(callback) {
 };
 
 /**
- * @callback UserController~loadActiveUsersCallback
+ * @callback UserManager~loadCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
