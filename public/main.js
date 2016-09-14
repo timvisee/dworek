@@ -43,6 +43,19 @@ const PacketType = {
 };
 
 /**
+ * GEO states.
+ * @type {{UNKNOWN: number, WORKING: number, NOT_WORKING: number, NO_PERMISSION: number, TIMEOUT: number}}
+ */
+const GeoStates = {
+    UNKNOWN: 0,
+    WORKING: 1,
+    UNKNOWN_POSITION: 2,
+    NOT_WORKING: 3,
+    NO_PERMISSION: 4,
+    TIMEOUT: 5
+};
+
+/**
  * Default real time packet room type.
  * @type {string}
  */
@@ -107,8 +120,16 @@ var Dworek = {
 
         /**
          * Active GEO location watcher.
+         * @type {Number|null}
          */
         geoWatcher: null,
+
+        /**
+         * Last known GEO location state.
+         * Defined by GeoStates enum.
+         * @type {Number}
+         */
+        geoState: GeoStates.UNKNOWN,
 
         /**
          * The time the client was last connected at.
@@ -175,7 +196,7 @@ var Dworek = {
          */
         update: function() {
             // Determine whether we're playing
-            const playing = Dworek.state.activeGameStage == 1;
+            const playing = Dworek.state.activeGameStage == 1 && Dworek.realtime._connected;
 
             // Define whether the game worker is active
             this.active = playing;
@@ -197,7 +218,45 @@ var Dworek = {
                 console.log('Stopped game info update timer');
             }
 
-            // TODO: Start/stop the GEO location watcher
+            // TODO: Make sure geo location is supported
+
+            // Start the GEO location watcher if it needs to be started
+            if(playing && Dworek.state.geoWatcher == null) {
+                // Show a status message
+                console.log('Starting GPS wachter...');
+
+                // Start the position watcher
+                Dworek.state.geoWatcher = navigator.geolocation.watchPosition(function(position) {
+                    // Set the GPS status
+                    setGpsState(GeoStates.WORKING);
+
+                    // TODO: Send an update to the server
+
+                }, function(error) {
+                    // Handle error codes
+                    if(error.code == error.PERMISSION_DENIED)
+                        setGpsState(GeoStates.NO_PERMISSION);
+                    if(error.code == error.POSITION_UNAVAILABLE)
+                        setGpsState(GeoStates.UNKNOWN_POSITION);
+                    if(error.code == error.TIMEOUT)
+                        setGpsState(GeoStates.TIMEOUT);
+                    if(error.code == error.UNKNOWN_ERROR)
+                        setGpsState(GeoStates.NOT_WORKING);
+
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 30 * 1000,
+                    maximumAge: 3 * 1000
+                });
+
+            } else if(!playing && Dworek.state.geoWatcher != null) {
+                // Show a status message
+                console.log('Stopping GPS watcher...');
+
+                // Clear the watch
+                navigator.geolocation.clearWatch(Dworek.state.geoWatcher);
+                Dworek.state.geoWatcher = null;
+            }
 
             // Update the status labels
             updateStatusLabels();
@@ -280,8 +339,8 @@ var Dworek = {
                 // Reset reconnection attempt counter
                 Dworek.state.lastReconnectAttempt = 0;
 
-                // Update the status label
-                updateStatusLabels();
+                // Update the game worker
+                Dworek.gameWorker.update();
             });
 
             // Handle connection errors
@@ -357,8 +416,8 @@ var Dworek = {
                         showDisconnectedTooLongDialog();
                 }, 3 * 60 * 1000);
 
-                // Update the status labels
-                updateStatusLabels();
+                // Update the game worker
+                Dworek.gameWorker.update();
             });
         },
 
@@ -2376,8 +2435,18 @@ function updateStatusLabels() {
     // Set the GPS status label
     if(!hasGps)
         gpsStatusLabel.html('<span style="color: red;">Not supported</span>');
-    else
-        gpsStatusLabel.html('Supported');
+    else if(Dworek.state.geoState == GeoStates.UNKNOWN)
+        gpsStatusLabel.html('Supported<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active'));
+    else if(Dworek.state.geoState == GeoStates.WORKING)
+        gpsStatusLabel.html('Working<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active'));
+    else if(Dworek.state.geoState == GeoStates.NO_PERMISSION)
+        gpsStatusLabel.html('<span style="color: red;">No permission<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active') + '</span>');
+    else if(Dworek.state.geoState == GeoStates.TIMEOUT)
+        gpsStatusLabel.html('<span style="color: red;">Timed out<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active') + '</span>');
+    else if(Dworek.state.geoState == GeoStates.NOT_WORKING)
+        gpsStatusLabel.html('<span style="color: red;">Not working<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active') + '</span>');
+    else if(Dworek.state.geoState == GeoStates.UNKNOWN_POSITION)
+        gpsStatusLabel.html('<span style="color: red;">Unknown position<br>' + (Dworek.state.geoWatcher !== null ? 'Active' : 'Not active') + '</span>');
 
     // Battery the GPS status label
     if(!hasBattery)
@@ -2390,7 +2459,8 @@ function updateStatusLabels() {
         batteryStatusLabel.html(batteryLevel + '%');
 
     // Determine whether there is an error
-    const error = !isConnected || !isOnline || !hasGps || (hasBattery && batteryLevel >= 0 && batteryLevel <= 5);
+    const error = !isConnected || !isOnline || !hasGps || (hasBattery && batteryLevel >= 0 && batteryLevel <= 5)
+        || (Dworek.state.geoState != GeoStates.UNKNOWN && Dworek.state.geoState != GeoStates.WORKING);
 
     // Set the game status label
     if(error)
@@ -2399,7 +2469,7 @@ function updateStatusLabels() {
         gameStatusLabel.html(playing ? 'Playing' : 'Ready to play');
 
     // Determine whether to animate the status icon
-    const iconAnimate = error || playing;
+    const iconAnimate = playing;
     const iconAnimateDuration = !error ? 10 : 1.5;
 
     // Set the animation state of the icon
@@ -2426,6 +2496,7 @@ function updateStatusLabels() {
     statusIcon.removeClass('zmdi-play');
     statusIcon.removeClass('zmdi-network-alert');
     statusIcon.removeClass('zmdi-network-off');
+    statusIcon.removeClass('zmdi-gps');
     statusIcon.removeClass('zmdi-gps-off');
     statusIcon.removeClass('zmdi-battery-alert');
 
@@ -2436,8 +2507,10 @@ function updateStatusLabels() {
         statusIcon.addClass('zmdi-network-alert');
     else if(hasBattery && batteryLevel >= 0 && batteryLevel <= 5)
         statusIcon.addClass('zmdi-battery-alert');
-    else if(!hasGps)
+    else if(!hasGps || Dworek.state.geoState == GeoStates.NOT_WORKING || Dworek.state.geoState == GeoStates.NO_PERMISSION)
         statusIcon.addClass('zmdi-gps-off');
+    else if(Dworek.state.geoState == GeoStates.UNKNOWN_POSITION || Dworek.state.geoState == GeoStates.TIMEOUT)
+        statusIcon.addClass('zmdi-gps');
     else if(playing)
         statusIcon.addClass('zmdi-play');
     else
@@ -2458,10 +2531,23 @@ function testGps() {
 
     // Get the current GPS location
     navigator.geolocation.getCurrentPosition(function() {
+        // Set the GPS state
+        setGpsState(GeoStates.WORKING);
+
         // Show a notification
         showNotification('Your GPS is working');
 
-    }, function() {
+    }, function(error) {
+        // Handle error codes
+        if(error.code == error.PERMISSION_DENIED)
+            setGpsState(GeoStates.NO_PERMISSION);
+        if(error.code == error.POSITION_UNAVAILABLE)
+            setGpsState(GeoStates.UNKNOWN_POSITION);
+        if(error.code == error.TIMEOUT)
+            setGpsState(GeoStates.TIMEOUT);
+        if(error.code == error.UNKNOWN_ERROR)
+            setGpsState(GeoStates.NOT_WORKING);
+
         // Show a dialog, the GPS test failed
         showDialog({
             title: 'GPS test failed',
@@ -2481,4 +2567,21 @@ function testGps() {
     }, {
         enableHighAccuracy: true
     });
+}
+
+/**
+ * Set the GPS state.
+ *
+ * @param state GPS state.
+ */
+function setGpsState(state) {
+    // Make sure the state changes
+    if(Dworek.state.geoState == state)
+        return;
+
+    // Set the state
+    Dworek.state.geoState = state;
+
+    // Update the status labels
+    updateStatusLabels();
 }
