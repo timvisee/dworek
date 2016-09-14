@@ -201,46 +201,68 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     return;
                 }
 
-                // Get the name of the game
-                game.getName(function(err, gameName) {
-                    // Handle errors
-                    if(err !== null)
-                        gameName = 'Unknown';
+                // Create a function to broadcast the game state to all connected users
+                const broadcastStageFunction = function() {
+                    // Get the name of the game
+                    game.getName(function(err, gameName) {
+                        // Handle errors
+                        if(err !== null)
+                            gameName = 'Unknown';
 
-                    // Loop through all connected clients, to send the game stage update
-                    Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
-                        // Get the socket
-                        const entrySocket = Core.realTime._io.sockets.sockets[socketId];
+                        // Loop through all connected clients, to send the game stage update
+                        Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
+                            // Get the socket
+                            const entrySocket = Core.realTime._io.sockets.sockets[socketId];
 
-                        // Skip the socket if not authenticated
-                        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
-                            return;
+                            // Skip the socket if not authenticated
+                            if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
+                                return;
 
-                        // Get the user
-                        const user = entrySocket.session.user;
+                            // Get the user
+                            const user = entrySocket.session.user;
 
-                        // Check whether the user joined this game
-                        game.hasUser(user, function(err, joined) {
-                            // Handle errors
-                            if(err !== null)
-                                joined = false;
+                            // Check whether the user joined this game
+                            game.hasUser(user, function(err, joined) {
+                                // Handle errors
+                                if(err !== null)
+                                    joined = false;
 
-                            // Send a game stage changed packet to the user
-                            Core.realTime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGED, {
-                                game: game.getIdHex(),
-                                gameName,
-                                stage,
-                                joined
-                            }, entrySocket);
+                                // Send a game stage changed packet to the user
+                                Core.realTime.packetProcessor.sendPacket(PacketType.GAME_STAGE_CHANGED, {
+                                    game: game.getIdHex(),
+                                    gameName,
+                                    stage,
+                                    joined
+                                }, entrySocket);
+                            });
                         });
                     });
-                });
+                };
 
-                // Load or unload the game depending on it's stage
+                // Load/unload the game
                 if(stage == 1)
-                    Core.gameController.loadGame(game);
-                else
+                    // Load the game
+                    Core.gameController.loadGame(game, function(err) {
+                        // Handle errors
+                        if(err !== null) {
+                            // Send a message response to the user
+                            Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                error: true,
+                                message: 'An error occurred while loading the game, the game couldn\'t be started.',
+                                dialog: true
+                            }, socket);
+                            return;
+                        }
+
+                        // Broadcast the game stage
+                        broadcastStageFunction();
+                    });
+
+                else {
+                    // Unload the game if it's still loaded and broadcast the stage
                     Core.gameController.unloadGame(game);
+                    broadcastStageFunction();
+                }
             });
         });
     });
