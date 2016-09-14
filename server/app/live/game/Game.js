@@ -23,8 +23,8 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
-var Core = require('../../Core');
-var GameModel = require('../model/game/GameModel');
+var Core = require('../../../Core');
+var GameModel = require('../../model/game/GameModel');
 
 /**
  * Game class.

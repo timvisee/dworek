@@ -23,9 +23,9 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
-var Core = require('../../Core');
+var Core = require('../../../Core');
 var Game = require('./Game');
-var GameModel = require('../model/game/GameModel');
+var GameModel = require('../../model/game/GameModel');
 
 /**
  * GameController class.
