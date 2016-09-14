@@ -112,13 +112,13 @@ var Dworek = {
 
         /**
          * The time the client was last connected at.
-         * @param {Number} Time as timestamp, or -1 if unspecified.
+         * @type {Number} Time as timestamp, or -1 if unspecified.
          */
         lastConnected: -1,
 
         /**
          * Last known reconnection attempt count.
-         * @param {Number} Last known reconnection attempt count.
+         * @type {Number} Last known reconnection attempt count.
          */
         lastReconnectAttempt: 0
     },
@@ -153,6 +153,44 @@ var Dworek = {
             // Build the page
             nativeDroid.build();
         });
+    },
+
+    /**
+     * Game worker sub-system.
+     */
+    gameWorker: {
+        /**
+         * Number of the game update request timer handle, or null if none.
+         * @type {Number|null}
+         */
+        gameUpdateRequestTimer: null,
+
+        /**
+         * Update the current game worker state based on the active game and known game info.
+         */
+        updateWorker: function() {
+            // Determine whether we're playing
+            const playing = Dworek.state.activeGameStage == 1;
+
+            // Start/stop the timer to update the game info
+            if(playing && this.gameUpdateRequestTimer == null) {
+                // Start the interval
+                setInterval(requestGameInfo, 15 * 60 * 1000);
+
+                // Show a status message
+                console.log('Started game info request timer.');
+
+            } else if(!playing && this.gameUpdateRequestTimer != null) {
+                // Clear the interval and reset the variable
+                clearInterval(this.gameUpdateRequestTimer);
+                this.gameUpdateRequestTimer = null;
+
+                // Show a status message
+                console.log('Stopped game info request timer.');
+            }
+
+            // TODO: Start/stop the GEO location watcher
+        }
     },
 
     /**
@@ -998,10 +1036,7 @@ function updateActiveGame() {
 
     // Request new game info if the same game is still active
     if(Dworek.state.activeGame != null && (Dworek.state.activeGame == Dworek.utils.getGameId() || !Dworek.utils.isGamePage()))
-        // Send a game info update request
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_INFO_REQUEST, {
-            game: Dworek.state.activeGame
-        });
+        requestGameInfo();
 
     // Return if we're not on a game page
     if(!Dworek.utils.isGamePage()) {
@@ -1097,13 +1132,32 @@ function setActiveGame(gameId) {
     }
 
     // Send a request to the server for the latest game info
-    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_INFO_REQUEST, {
-        game: gameId
-    });
-    showNotification('Requesting latest game information...');
+    requestGameInfo(gameId);
 
     // Set the active game ID
     Dworek.state.activeGame = gameId;
+}
+
+/**
+ * Request the latest game info from the server.
+ * The game info is fetched and handled asynchronously.
+ *
+ * @param {string} [gameId] ID of the game to request the info for.
+ * The currently active game will be used if no game ID is given.
+ */
+function requestGameInfo(gameId) {
+    // Parse the game ID
+    if(gameId == undefined)
+        gameId = Dworek.state.activeGame;
+
+    // Skip the request if the game ID is invalid
+    if(gameId == undefined)
+        return;
+
+    // Send a game info update request
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_INFO_REQUEST, {
+        game: gameId
+    });
 }
 
 /**
