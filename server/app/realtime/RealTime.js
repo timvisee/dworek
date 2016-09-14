@@ -244,11 +244,47 @@ RealTime.prototype.hasBroadcasts = function(user) {
 };
 
 /**
- * Resolve the broadcasts for the given user.
+ * Resolve the broadcast with the given token.
+ *
+ * @param {UserModel|ObjectId|string} user User instance or user ID to resolve the broadcasts for.
+ * @param {string} token Broadcast token.
+ */
+RealTime.prototype.resolveBroadcast = function(user, token) {
+    // Get the user ID as a string
+    if(user instanceof UserModel)
+        user = user.getIdHex().toLowerCase();
+    else if(user instanceof ObjectId)
+        user = user.toString().toLowerCase();
+    else
+        user = user.toString().toLowerCase();
+
+    // Get the list of broadcasts
+    var broadcasts = this.getBroadcasts(user);
+
+    // Determine the index to remove
+    var removeIndex = -1;
+
+    // Loop through the list of broadcasts to find the correct one
+    broadcasts.forEach(function(broadcast, i) {
+        // Compare the token
+        if(broadcast.token == token)
+            removeIndex = i;
+    });
+
+    // Delete the broadcast
+    if(removeIndex >= 0)
+        broadcasts.splice(removeIndex, 1);
+
+    // Update the list of broadcasts
+    this._broadcastQueue.set(user, broadcasts);
+};
+
+/**
+ * Resolve all broadcasts for the given user.
  *
  * @param {UserModel|ObjectId|string} user User instance or user ID to resolve the broadcasts for.
  */
-RealTime.prototype.resolveBroadcasts = function(user) {
+RealTime.prototype.resolveAllBroadcasts = function(user) {
     // Get the user ID as a string
     if(user instanceof UserModel)
         user = user.getIdHex().toLowerCase();

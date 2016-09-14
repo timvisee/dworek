@@ -35,7 +35,8 @@ const PacketType = {
     MESSAGE_RESPONSE: 4,
     BROADCAST_MESSAGE_REQUEST: 6,
     BROADCAST_MESSAGE: 7,
-    BROADCAST_RESOLVE_ALL: 8
+    BROADCAST_RESOLVE_ALL: 8,
+    BROADCAST_RESOLVE: 9
 };
 
 /**
@@ -776,10 +777,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
 // Broadcast
 Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, function(packet) {
     // Make sure a message has been set
-    if(!packet.hasOwnProperty('message'))
+    if(!packet.hasOwnProperty('token') && !packet.hasOwnProperty('message'))
         return;
 
     // Get all properties
+    const token = packet.token;
     const message = packet.message;
     const gameId = packet.game;
     const gameName = packet.gameName;
@@ -801,14 +803,23 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
             }
         });
 
-    // Add the close button
+    // Add the mark as read button
     actions.push({
         text: 'Mark as read',
         icon: 'zmdi zmdi-check',
+        state: 'primary',
         action: function() {
             // Send a broadcast resolve packet
-            Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE_ALL, {});
+            Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE, {
+                token: token
+            });
         }
+    });
+
+    // Add the postpone button
+    actions.push({
+        text: 'Postpone',
+        icon: 'zmdi zmdi-time-restore'
     });
 
     // Show the dialog

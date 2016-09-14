@@ -29,7 +29,7 @@ var PacketType = require('../PacketType');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.BROADCAST_RESOLVE_ALL;
+const HANDLER_PACKET_TYPE = PacketType.BROADCAST_RESOLVE;
 
 /**
  * Authentication request handler.
@@ -64,6 +64,15 @@ BroadcastResolveAllHandler.prototype.init = function() {
  * @param socket SocketIO socket.
  */
 BroadcastResolveAllHandler.prototype.handler = function(packet, socket) {
+    // Make sure a session is given
+    if(!packet.hasOwnProperty('token')) {
+        console.log('Received malformed packet, broadcast resolve packet doesn\'t contain token');
+        return;
+    }
+
+    // Get the token
+    const token = packet.token.trim();
+
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid)
         return;
@@ -72,7 +81,7 @@ BroadcastResolveAllHandler.prototype.handler = function(packet, socket) {
     const user = socket.session.user;
 
     // Resolve the broadcasts for this user
-    Core.realTime.resolveAllBroadcasts(user.getIdHex());
+    Core.realTime.resolveBroadcast(user.getIdHex(), token);
 };
 
 // Export the module

@@ -84,6 +84,7 @@ module.exports = {
      * Broadcast a message from the server to the client.
      *
      * Data:
+     * - uid: unique broadcast ID
      * - message: message to broadcast
      * - game: ID of the game to broadcast a message for
      * - gameName: name of the game a message is broadcasted for
@@ -91,8 +92,17 @@ module.exports = {
     BROADCAST_MESSAGE: 7,
 
     /**
-     * Resolve all queued broadcasts for the given user.
+     * Resolve all broadcasts.
      * This packet is send from a client to the server.
      */
-    BROADCAST_RESOLVE_ALL: 8
+    BROADCAST_RESOLVE_ALL: 8,
+
+    /**
+     * Resolve the broadcast with the given token.
+     * This packet is send from a client to the server.
+     *
+     * Data:
+     * - token: Token of the broadcast to resolve.
+     */
+    BROADCAST_RESOLVE: 9
 };

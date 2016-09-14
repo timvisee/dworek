@@ -161,6 +161,7 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
                         // Send a broadcast to the socket
                         Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, {
+                            token: broadcast.token,
                             message: broadcast.message,
                             game: game.getIdHex().toLowerCase(),
                             gameName: gameName
