@@ -168,17 +168,17 @@ var Dworek = {
         /**
          * Update the current game worker state based on the active game and known game info.
          */
-        updateWorker: function() {
+        update: function() {
             // Determine whether we're playing
             const playing = Dworek.state.activeGameStage == 1;
 
             // Start/stop the timer to update the game info
             if(playing && this.gameUpdateRequestTimer == null) {
                 // Start the interval
-                setInterval(requestGameInfo, 15 * 60 * 1000);
+                this.gameUpdateRequestTimer = setInterval(requestGameInfo, 5 * 60 * 1000);
 
                 // Show a status message
-                console.log('Started game info request timer.');
+                console.log('Started game info update timer');
 
             } else if(!playing && this.gameUpdateRequestTimer != null) {
                 // Clear the interval and reset the variable
@@ -186,7 +186,7 @@ var Dworek = {
                 this.gameUpdateRequestTimer = null;
 
                 // Show a status message
-                console.log('Stopped game info request timer.');
+                console.log('Stopped game info update timer');
             }
 
             // TODO: Start/stop the GEO location watcher
@@ -807,6 +807,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_STAGE_CHANGED, f
         // Move to the games page
         Dworek.utils.navigateToPath('/game/' + gameId);
     });
+
+    // Update the active game stage, and request a game info update
+    Dworek.state.activeGameStage = stage;
+    requestGameInfo(gameId);
 });
 
 // Register an message response handler
@@ -989,8 +993,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
         requested: roles.requested
     };
 
-    showNotification('Received latest game information!');
-    // TODO: Start/stop the client side game
+    // Update the game worker
+    Dworek.gameWorker.update();
 });
 
 // Manage the active game
