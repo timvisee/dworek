@@ -520,11 +520,12 @@ var Dworek = {
                     // Show the dialog
                     showDialog({
                         title: 'Whoops',
-                        message: 'Chrome is having problems navigating through the application properly.<br><br>' +
+                        message: 'Dworek has detected that Chrome is having problems getting you to the proper page.<br><br>' +
                         'Please click the link below to reload the application, and work around this problem.<br><br>' +
+                        '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
                         '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Google Chrome</a></div>'
                     });
-                }, 100);
+                }, 500);
             }
         },
 
@@ -809,6 +810,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
         title: 'Broadcast',
         message: dialogMessage,
         actions: actions
+    }, function() {
+        // Send a broadcast resolve packet
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE_ALL, {});
     });
 });
 

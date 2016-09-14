@@ -23,11 +23,14 @@
 var io = require('socket.io');
 var path = require('path');
 var fs = require('fs');
+var mongo = require('mongodb');
+var ObjectId = mongo.ObjectId;
 
 var config = require('../../config');
 
 var Core = require('../../Core');
 var PacketProcessor = require('./PacketProcessor');
+var UserModel = require('../model/user/UserModel');
 
 /**
  * Directory of the handlers.
@@ -62,6 +65,14 @@ var RealTime = function() {
      * @private
      */
     this._online = false;
+
+    /**
+     * Create a new broadcast map queue.
+     *
+     * @type {Map} Map containing all queued broadcasts.
+     * @private
+     */
+    this._broadcastQueue = new Map();
 };
 
 /**
@@ -163,6 +174,91 @@ RealTime.prototype.registerHandlers = function() {
 
     // Return the handler count
     return handlerCount;
+};
+
+/**
+ * Queue a broadcast.
+ *
+ * @param {Object} broadcastObject Broadcast object.
+ * @param {UserModel|ObjectId|string} user User instance or user ID to queue the broadcast for.
+ */
+RealTime.prototype.queueBroadcast = function(broadcastObject, user) {
+    // Get the current broadcasts
+    var broadcasts = this.getBroadcasts(user);
+
+    // Add the broadcast to the list
+    broadcasts.push(broadcastObject);
+
+    // Get the user ID as a string
+    if(user instanceof UserModel)
+        user = user.getIdHex().toLowerCase();
+    else if(user instanceof ObjectId)
+        user = user.toString().toLowerCase();
+    else
+        user = user.toString().toLowerCase();
+
+    // Set the broadcasts
+    this._broadcastQueue.set(user, broadcasts);
+};
+
+/**
+ * Get the queued broadcasts for the given user.
+ *
+ * @param {UserModel|ObjectId|string} user User instance or user ID to get the broadcasts for.
+ * @return {Array} Array of queued broadcasts. An empty array is returned if there are no queued broadcasts.
+ */
+RealTime.prototype.getBroadcasts = function(user) {
+    // Return an empty array if the user doesn't have broadcasts
+    if(!this.hasBroadcasts(user))
+        return [];
+
+    // Get the user ID as a string
+    if(user instanceof UserModel)
+        user = user.getIdHex().toLowerCase();
+    else if(user instanceof ObjectId)
+        user = user.toString().toLowerCase();
+    else
+        user = user.toString().toLowerCase();
+
+    // Return the broadcasts for this user
+    return this._broadcastQueue.get(user);
+};
+
+/**
+ * Determine whether the given user has any queued broadcasts.
+ *
+ * @param {UserModel|ObjectId|string} user User instance or the ID of a user.
+ * @return {boolean} True if the user has any queued broadcasts, false if not.
+ */
+RealTime.prototype.hasBroadcasts = function(user) {
+    // Get the user ID as a string
+    if(user instanceof UserModel)
+        user = user.getIdHex().toLowerCase();
+    else if(user instanceof ObjectId)
+        user = user.toString().toLowerCase();
+    else
+        user = user.toString().toLowerCase();
+
+    // Return the result
+    this._broadcastQueue.has(user);
+};
+
+/**
+ * Resolve the broadcasts for the given user.
+ *
+ * @param {UserModel|ObjectId|string} user User instance or user ID to resolve the broadcasts for.
+ */
+RealTime.prototype.resolveBroadcasts = function(user) {
+    // Get the user ID as a string
+    if(user instanceof UserModel)
+        user = user.getIdHex().toLowerCase();
+    else if(user instanceof ObjectId)
+        user = user.toString().toLowerCase();
+    else
+        user = user.toString().toLowerCase();
+
+    // Delete the objects
+    this._broadcastQueue.delete(user);
 };
 
 // Export the module

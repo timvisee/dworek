@@ -131,38 +131,64 @@ BroadcastMessageHandler.prototype.handler = function(packet, socket) {
                 return;
             }
 
-            // Get the name of the game
-            game.getName(function(err, gameName) {
-                // Handle errors
-                if(err !== null)
-                    gameName = 'Unknown';
+            // Get all users that joined this game
+            Core.model.gameUserModelManager.getGameUsers(game, function(err, users) {
+                // Send error responses
+                if(err !== null) {
+                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                        error: true,
+                        message: 'An error occurred while sending a broadcast.',
+                        dialog: true
+                    }, socket);
+                    return;
+                }
 
-                // TODO: Make sure this broadcast is also send to users that aren't connected!
+                // Create the broadcast object
+                var broadcastObject = {
+                    message,
+                    game: game.getIdHex()
+                };
 
-                // Loop through all connected clients, to send the game stage update
-                Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
-                    // Get the socket
-                    const entrySocket = Core.realTime._io.sockets.sockets[socketId];
+                // Loop through the list of users
+                users.forEach(function(user) {
+                    // Add the user, and their broadcast to the broadcast queue
+                    Core.realTime.queueBroadcast(broadcastObject, user.getIdHex().toLowerCase());
+                });
 
-                    // Skip the socket if not authenticated
-                    if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
-                        return;
+                // Get the name of the game
+                game.getName(function(err, gameName) {
+                    // Handle errors
+                    if(err !== null)
+                        gameName = 'Unknown';
 
-                    // Get the user
-                    const user = entrySocket.session.user;
+                    // Set the game name in the broadcast object
+                    broadcastObject.gameName = gameName;
 
-                    // Check whether the user joined this game
-                    game.hasUser(user, function(err, joined) {
-                        // Handle errors
-                        if(err !== null)
-                            joined = false;
+                    // Loop through all connected clients, to send the game stage update
+                    Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
+                        // Get the socket
+                        const entrySocket = Core.realTime._io.sockets.sockets[socketId];
 
-                        // Send a broadcast packet to the user
-                        Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, {
-                            message,
-                            game: game.getIdHex(),
-                            gameName
-                        }, entrySocket);
+                        // Skip the socket if not authenticated
+                        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
+                            return;
+
+                        // Get the user
+                        const user = entrySocket.session.user;
+
+                        // Check whether the user joined this game
+                        game.hasUser(user, function(err, joined) {
+                            // Skip this socket if an error occurred
+                            if(err !== null)
+                                return;
+
+                            // Make sure the user joined
+                            if(!joined)
+                                return;
+
+                            // Send a broadcast packet to the user
+                            Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, broadcastObject, entrySocket);
+                        });
                     });
                 });
             });

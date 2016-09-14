@@ -135,6 +135,30 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
         // Show a status message
         console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');
+
+        // Check whether this user has any queued broadcasts
+        if(Core.realTime.hasBroadcasts(user.getIdHex().toLowerCase())) {
+            // Get the list of broadcasts
+            var broadcasts = Core.realTime.getBroadcasts(user.getIdHex().toLowerCase());
+
+            // Loop through the broadcasts
+            broadcasts.forEach(function(broadcast) {
+                // Get the game name for this broadcast
+                Core.model.gameModelManager.getGameById(broadcast.game, function(err, gameName) {
+                    // Handle errors
+                    if(err !== null) {
+                        console.error('An error occurred while fetching a game name, ignoring.');
+                        return;
+                    }
+
+                    // Append the game name to the broadcast
+                    broadcast.gameName = gameName;
+
+                    // Send a broadcast to the socket
+                    Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, broadcast, socket);
+                });
+            });
+        }
     });
 };
 

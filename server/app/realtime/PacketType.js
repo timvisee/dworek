@@ -88,5 +88,11 @@ module.exports = {
      * - game: ID of the game to broadcast a message for
      * - gameName: name of the game a message is broadcasted for
      */
-    BROADCAST_MESSAGE: 7
+    BROADCAST_MESSAGE: 7,
+
+    /**
+     * Resolve all queued broadcasts for the given user.
+     * This packet is send from a client to the server.
+     */
+    BROADCAST_RESOLVE_ALL: 8
 };
