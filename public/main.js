@@ -1021,7 +1021,7 @@ function updateActiveGame() {
                         }
                     },
                     {
-                        text: 'Close'
+                        text: 'Ignore'
                     }
                 ]
 
@@ -2151,6 +2151,7 @@ $(document).bind("pageinit", function() {
     const deviceStatusButton = $('.action-device-status');
 
     // Bind a click event
+    deviceStatusButton.unbind('click');
     deviceStatusButton.click(function(e) {
         // Prevent the default action
         e.preventDefault();
