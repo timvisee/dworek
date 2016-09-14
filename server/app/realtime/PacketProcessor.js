@@ -21,8 +21,14 @@
  ******************************************************************************/
 
 var _ = require('lodash');
+var mongo = require('mongodb');
+var ObjectId = mongo.ObjectId;
 
 var config = require('../../config');
+
+var Core = require('../../Core');
+var UserModel = require('../model/user/UserModel');
+var User = require('../live/user/User');
 
 /**
  * Packet parser class.
@@ -78,6 +84,64 @@ PacketProcessor.prototype.sendPacket = function(packetType, packet, socket) {
 
     // Send the packet over the socket
     socket.emit(config.realtime.defaultRoom, packet);
+};
+
+/**
+ * Send a packet to the given user.
+ *
+ * @param {Number} packetType Packet type value.
+ * @param {Object} packet Packet object to send.
+ * @param {UserModel|ObjectId|string} user User instance or user ID to send the packet to.
+ * @param {Object} [options] Options object.
+ * @param {boolean} [options.once=false] True to only send a packet to one socket, false to send to multiple if available.
+ * @return {Number} Number of sockets the packet was send to.
+ */
+PacketProcessor.prototype.sendPacket = function(packetType, packet, user, options) {
+    // Get the user ID as an ObjectId
+    if(user instanceof UserModel || user instanceof User)
+        user = user.getId();
+    else if(!(user instanceof ObjectId) && ObjectId.isValid(user))
+        user = new ObjectId(user);
+    else if(!(user instanceof ObjectId))
+        throw Error('Invalid user ID');
+
+    // Determine whether to send the packet once
+    var once = false;
+    if(options !== undefined && options.hasOwnProperty('once'))
+        once = !!options.once;
+
+    // Put the packet type in the packet object
+    packet.type = packetType;
+
+    // Count the number of found clients
+    var found = 0;
+
+    // Loop through all connected clients to find the correct ones
+    Object.keys(Core.realTime._io.sockets.sockets).forEach(function(socketId) {
+        // Skip if we only should send once and we found one
+        if(once && found >= 1)
+            return;
+
+        // Get the socket
+        const entrySocket = Core.realTime._io.sockets.sockets[socketId];
+
+        // Skip the socket if not authenticated
+        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
+            return;
+
+        // Compare the user and skip if it isn't the correct user
+        if(!entrySocket.session.user.getId().equals(user.getId()))
+            return;
+
+        // Send the packet over the socket
+        entrySocket.emit(config.realtime.defaultRoom, packet);
+
+        // Increase the found counter
+        found++;
+    });
+
+    // Return the number of found sockets
+    return found;
 };
 
 /**
