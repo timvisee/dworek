@@ -95,9 +95,6 @@ App.prototype.init = function(callback) {
         // Instantiate the model managers
         (initComplete) => self._initModelManagers(initComplete),
 
-        // Initialize the game controller
-        (initComplete) => self._initGameController(initComplete),
-
         // Initialize the express application
         (initComplete) => self._initExpressApp(function(err) {
             // Call back errors
@@ -116,7 +113,16 @@ App.prototype.init = function(callback) {
         }),
 
         // Initialize the database
-        (initComplete) => self._initDatabase(initComplete),
+        (initComplete) => self._initDatabase(function(err) {
+            // Call back errors
+            if(err !== null) {
+                initComplete(err);
+                return;
+            }
+
+            // Initialize the game controller
+            self._initGameController(initComplete);
+        }),
 
         // Initialize Redis
         (initComplete) => self._initRedis(initComplete)
