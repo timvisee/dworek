@@ -196,13 +196,9 @@ GameManager.prototype.load = function(callback) {
 
         // Loop through the list of games
         games.forEach(function(game) {
-            // Create a game instance
-            const gameInstance = new Game(game);
-
-            // Load the game instance
-            latch.add();
-            gameInstance.load(function(err) {
-                // Call back errors
+            // Load the game
+            self.loadGame(game, function(err) {
+                // Handle errors
                 if(err !== null) {
                     if(!calledBack)
                         if(_.isFunction(callback))
@@ -210,9 +206,6 @@ GameManager.prototype.load = function(callback) {
                     calledBack = true;
                     return;
                 }
-
-                // Add the game instance to the list
-                self.games.push(gameInstance);
 
                 // Resolve the latch
                 latch.resolve();
@@ -255,20 +248,33 @@ GameManager.prototype.loadGame = function(gameId, callback) {
     // Unload the game if it's already loaded
     this.unloadGame(gameId);
 
-    // Create a new game instance and add it to the list of games
+    // Create a new game instance
     const newGame = new Game(gameId);
-    this.games.push(newGame);
 
-    // Get the name of the game, and print a status message
-    newGame.getGameModel().getName(function(err, name) {
-        // Handle errors
+    // Load the game
+    newGame.load(function(err) {
+        // Call back errors
         if(err !== null) {
-            console.error('Failed to fetch game name, ignoring.');
+            callback(err);
             return;
         }
 
-        // Show a status message
-        console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
+        // Add the game to the games list
+        this.games.push(newGame);
+
+        // Get the name of the game, and print a status message
+        newGame.getGameModel().getName(function(err, name) {
+            // Handle errors
+            if(err !== null)
+                console.error('Failed to fetch game name, ignoring.');
+
+            else
+                // Show a status message
+                console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
+
+            // Call back
+            callback(null, newGame);
+        });
     });
 };
 
@@ -277,6 +283,7 @@ GameManager.prototype.loadGame = function(gameId, callback) {
  *
  * @callback GameManager~loadGameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Game=} Loaded game instance.
  */
 
 /**
