@@ -173,6 +173,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
             // Store the live game
             liveGame = result;
+
+            // Resolve the latch
+            latch.resolve();
         });
 
         // Continue
