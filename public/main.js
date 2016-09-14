@@ -2394,12 +2394,12 @@ function updateStatusLabels() {
 
     // Set the game status label
     if(error)
-        gameStatusLabel.html('<span style="color: red;">Not functional</span>');
+        gameStatusLabel.html('<span style="color: red;">Device not functional</span>');
     else
-        gameStatusLabel.html(playing ? 'Playing' : 'Not playing');
+        gameStatusLabel.html(playing ? 'Playing' : 'Ready to play');
 
     // Determine whether to animate the status icon
-    const iconAnimate = playing;
+    const iconAnimate = error || playing;
     const iconAnimateDuration = !error ? 10 : 1.5;
 
     // Set the animation state of the icon
@@ -2412,14 +2412,14 @@ function updateStatusLabels() {
             animationDuration: iconAnimateDuration + 's'
         });
 
-        // Set the color
-        if(error)
-            statusIcon.addClass('mdc-text-red-700');
-        else
-            statusIcon.removeClass('mdc-text-red-700');
-
     } else
         statusIcon.removeClass('animated flash');
+
+    // Set the status icon color
+    if(error)
+        statusIcon.addClass('mdc-text-red-700');
+    else
+        statusIcon.removeClass('mdc-text-red-700');
 
     // Remove the current icons
     statusIcon.removeClass('zmdi-check');
