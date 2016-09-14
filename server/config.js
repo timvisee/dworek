@@ -35,6 +35,7 @@ config.user = {};
 config.security = {};
 config.session = {};
 config.validation = {};
+config.game = {};
 
 
 /******************************************************************************
@@ -285,6 +286,17 @@ config.validation.teamNameMinLength = 1;
  * @type {int}
  */
 config.validation.teamNameMaxLength = 64;
+
+
+/******************************************************************************
+ * Game configuration.                                                        *
+ ******************************************************************************/
+
+/**
+ * Location decay time in milliseconds.
+ * @type {number}
+ */
+config.game.locationDecayTime = 30 * 1000;
 
 
 // Export the configuration
