@@ -230,7 +230,15 @@ var Dworek = {
                     // Set the GPS status
                     setGpsState(GeoStates.WORKING);
 
-                    // TODO: Send an update to the server
+                    // Make sure a game is active
+                    if(Dworek.state.activeGame === null)
+                        return;
+
+                    // Send a location update to the server
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
+                        game: Dworek.state.activeGame,
+                        location: position.coords
+                    });
 
                 }, function(error) {
                     // Handle error codes

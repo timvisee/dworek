@@ -113,6 +113,9 @@ module.exports = {
      * - game: Game ID this update is for
      * - location.latitude: latitude value
      * - location.longitude: longitude value
+     * - location.altitude: altitude value
+     * - location.accuracy: accuracy in meters
+     * - location.altitudeAccuracy: altitude accuracy in meters
      */
     LOCATION_UPDATE: 10,
 
