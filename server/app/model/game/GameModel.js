@@ -250,7 +250,7 @@ GameModel.prototype.setName = function(name, callback) {
 /**
  * Get the stage of the game.
  *
- * @param {GameTeamModel~getStageCallback} callback Called with the game stage or when an error occurred.
+ * @param {GameModel~getStageCallback} callback Called with the game stage or when an error occurred.
  */
 GameModel.prototype.getStage = function(callback) {
     this.getField('stage', callback);

@@ -20,26 +20,90 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var mongo = require('mongodb');
+var ObjectId = mongo.ObjectId;
+
+var Core = require('../../Core');
+var GameModel = require('../model/game/GameModel');
+
 /**
  * Game class.
  *
+ * @param {GameModel|ObjectId|string} game Game model instance or the ID of a game.
+ *
  * @class
  * @constructor
- *
- * @param {GameModel} gameModel Model of the game.
  */
-var Game = function(gameModel) {
-    // Set the game model
-    this.model = gameModel;
+var Game = function(game) {
+    /**
+     * ID of the game this object corresponds to.
+     * @type {ObjectId}
+     */
+    this._id = null;
+
+    /**
+     * Game model instance if available.
+     * @type {GameModel|null} Game model instance or null if no instance is currently available.
+     */
+    this._model = null;
+
+    // Get and set the game ID
+    if(game instanceof GameModel)
+        this._id = game.getId();
+    else if(!(game instanceof ObjectId) && ObjectId.isValid(game))
+        this._id = new ObjectId(game);
+    else {
+        throw new Error('Invalid game instance or ID');
+        return;
+    }
+
+    // Store the game model instance if any was given
+    if(game instanceof GameModel)
+        this._model = game;
+};
+
+/**
+ * Get the game ID for this game.
+ *
+ * @return {ObjectId} Game ID.
+ */
+Game.prototype.getId = function() {
+    return this._id;
+};
+
+/**
+ * Check whether the give game instance or ID equals this game.
+ *
+ * @param {GameModel|ObjectId|string} game Game instance or the game ID.
+ * @return {boolean} True if this game equals the given game instance.
+ */
+Game.prototype.isGame = function(game) {
+    // Get the game ID as an ObjectId
+    if(game instanceof GameModel)
+        game = game.getId();
+    else if(!(game instanceof ObjectId) && ObjectId.isValid(game))
+        game = new ObjectId(game);
+    else {
+        callback(new Error('Invalid game ID'));
+        return;
+    }
+
+    // Compare the game ID
+    return this._id.equals(game);
 };
 
 /**
  * Get the game model.
  *
- * @return {GameModel} Game model.
+ * @return {GameModel} Game model instance.
  */
-Game.prototype.getModel = function() {
-    return this.model;
+Game.prototype.getGameModel = function() {
+    // Return the model if it isn't null
+    if(this._model !== null)
+        return this._model;
+
+    // Create a game model for the known ID, store and return it
+    return this._model = Core.model.gameModelManager._instanceManager.create(this._id);
 };
 
 /**
@@ -47,9 +111,8 @@ Game.prototype.getModel = function() {
  *
  * @param {Game~getNameCallback} callback Callback with the result.
  */
-// TODO: Is this getter ever used?
 Game.prototype.getName = function(callback) {
-    this.model.getName(callback);
+    this.getGameModel().getName(callback);
 };
 
 /**
