@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
@@ -170,18 +171,75 @@ GameManager.prototype.getLoadedGameCount = function() {
  *
  * @param {GameManager~loadActiveGamesCallback} [callback] Callback called when done loading.
  */
-GameManager.prototype.loadActiveGames = function(callback) {
-    // TODO: Load all active games here, that aren't loaded yet!
+GameManager.prototype.load = function(callback) {
+    // Store this instance
+    const self = this;
 
-    // Call the callback
-    if(callback !== undefined)
-        callback(null);
+    // Determine whether we called back
+    var calledBack = false;
+
+    // Load all active games
+    Core.model.gameModelManager.getGamesWithStage(1, {}, function(err, games) {
+        // Call back errors
+        if(err !== null) {
+            if(_.isFunction(callback))
+                callback(err);
+            return;
+        }
+
+        // TODO: Unload all currently loaded games!
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Loop through the list of games
+        games.forEach(function(game) {
+            // Create a game instance
+            const gameInstance = new Game(game);
+
+            // Load the game instance
+            latch.add();
+            gameInstance.load(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        if(_.isFunction(callback))
+                            callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Add the game instance to the list
+                self.games.push(gameInstance);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+
+        // Call back when we're done loading
+        latch.add(function() {
+            if(_.isFunction(callback))
+                callback(null);
+        });
+    });
 };
 
 /**
  * @callback GameController~loadActiveGamesCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
+
+/**
+ * Unload all loaded games.
+ */
+GameManager.prototype.unload = function() {
+    // Loop through the list of games
+    this.games.forEach(function(game) {
+        // Unload the game
+        game.unload();
+    });
+};
 
 // Export the class
 module.exports = GameManager;

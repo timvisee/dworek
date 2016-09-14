@@ -169,7 +169,7 @@ App.prototype._initGameController = function(callback) {
     Core.gameController = new GameController();
 
     // Load all active games
-    Core.gameController.loadActiveGames(callback);
+    Core.gameController.load(callback);
 };
 
 /**

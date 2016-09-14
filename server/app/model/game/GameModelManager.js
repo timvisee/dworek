@@ -217,12 +217,6 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         limit: 3
     };
 
-    // Make sure the game stage value is valid, call back if not
-    if(!this.isValidStage(stage)) {
-        callback(new Error('Invalid game stage value.'));
-        return;
-    }
-
     // Set the callback parameter if the options parameter is left out
     if(_.isFunction(options)) {
         // Set the callback parameter and set the options to the default
@@ -237,6 +231,12 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
 
     // Merge the options
     options = MergeUtils.merge(options, defaultOptions);
+
+    // Make sure the game stage value is valid, call back if not
+    if(!this.isValidStage(stage)) {
+        callback(new Error('Invalid game stage value.'));
+        return;
+    }
 
     // Create a callback latch
     var latch = new CallbackLatch();

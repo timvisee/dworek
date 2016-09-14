@@ -116,6 +116,31 @@ Game.prototype.getName = function(callback) {
 };
 
 /**
+ * Unload this live game instance.
+ *
+ * @param {Game~loadCallback} callback Called on success or when an error occurred.
+ */
+Game.prototype.load = function(callback) {
+    // TODO: Load the user manager for this game?
+
+    callback(null);
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback Game~loadCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.kk
+ */
+
+/**
+ * Unload this live game instance.
+ */
+Game.prototype.unload = function() {
+    // TODO: Unload the user manager for this game?
+};
+
+/**
  * @callback Game~getNameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {string} Game name.
