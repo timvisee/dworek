@@ -20,20 +20,30 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
 var Core = require('../../../Core');
 var User = require('./User');
 var UserModel = require('../../model/user/UserModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * UserManager class.
  *
+ * @param {Game} game Live game instance.
+ *
  * @class
  * @constructor
  */
-var UserManager = function() {
+var UserManager = function(game) {
+    /**
+     * Live game instance.
+     * @type {Game}
+     */
+    this.game = game;
+
     /**
      * List containing all loaded users.
      *
@@ -166,22 +176,87 @@ UserManager.prototype.getLoadedUserCount = function() {
 };
 
 /**
- * Load all active users, that aren't loaded yet.
+ * Load all users for this game.
  *
  * @param {UserManager~loadActiveUsersCallback} [callback] Callback called when done loading.
  */
-UserManager.prototype.loadActiveUsers = function(callback) {
-    // TODO: Load all active users here, that aren't loaded yet!
+UserManager.prototype.load = function(callback) {
+    // Store this instance
+    const self = this;
 
-    // Call the callback
-    if(callback !== undefined)
-        callback(null);
+    // Determine whether we called back
+    var calledBack = false;
+
+    // Get the game mode
+    const gameModel = this.game.getGameModel();
+
+    // Load all users for this game that are approved
+    Core.model.gameUserModelManager.getGameUsers(gameModel, {
+        players: true,
+        spectators: true,
+        specials: true
+    }, function(err, users) {
+        // Call back errors
+        if(err !== null) {
+            if(_.isFunction(callback))
+                callback(err);
+            return;
+        }
+
+        // Unload all currently loaded users
+        self.unload();
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Loop through the list of users
+        users.forEach(function(user) {
+            // Create a user instance
+            const userInstance = new User(user);
+
+            // Load the user instance
+            latch.add();
+            userInstance.load(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        if(_.isFunction(callback))
+                            callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Add the user instance to the list
+                self.users.push(userInstance);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+
+        // Call back when we're done loading
+        latch.latch(function() {
+            if(_.isFunction(callback))
+                callback(null);
+        });
+    });
 };
 
 /**
  * @callback UserController~loadActiveUsersCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
+
+/**
+ * Unload all loaded users.
+ */
+UserManager.prototype.unload = function() {
+    // Loop through the list of users
+    this.users.forEach(function(user) {
+        // Unload the user
+        user.unload();
+    });
+};
 
 // Export the class
 module.exports = UserManager;

@@ -121,6 +121,27 @@ User.prototype.getName = function(callback) {
  * @param {string} User name.
  */
 
+/**
+ * Unload this live user instance.
+ *
+ * @param {User~loadCallback} callback Called on success or when an error occurred.
+ */
+User.prototype.load = function(callback) {
+    callback(null);
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~loadCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.kk
+ */
+
+/**
+ * Unload this live user instance.
+ */
+User.prototype.unload = function() {};
+
 // Export the class
 module.exports = User;
 
