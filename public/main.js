@@ -189,8 +189,8 @@ var Dworek = {
                     if((Date.now() - Dworek.state.lastConnected) > 2 * 60 * 1000)
                         showDialog({
                             title: 'Disconnected',
-                            message: 'You we\'re disconnected for too long. Because of this some game pages might be outdated.<br><br>' +
-                            'Please refresh the application.',
+                            message: 'You we\'re disconnected for too long.<br><br>' +
+                            'Please refresh the application to make sure everything is up-to-date.',
                             actions: [{
                                 text: 'Refresh',
                                 state: 'primary',
@@ -527,7 +527,7 @@ var Dworek = {
                         '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
                         '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Google Chrome</a></div>'
                     });
-                }, 500);
+                }, 1500);
             }
         },
 
