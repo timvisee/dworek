@@ -47,6 +47,22 @@ var User = function(user) {
      */
     this._model = null;
 
+    /**
+     * Last known location of the user.
+     *
+     * @type {null}
+     * @private
+     */
+    this._location = null;
+
+    /**
+     * Last time the location updated at.
+     *
+     * @type {Date|null}
+     * @private
+     */
+    this._locationTime = null;
+
     // Get and set the user ID
     if(user instanceof UserModel)
         this._id = user.getId();
@@ -139,6 +155,17 @@ User.prototype.load = function(callback) {
  * Unload this live user instance.
  */
 User.prototype.unload = function() {};
+
+/**
+ * Update the location.
+ *
+ * @param location New location.
+ */
+User.prototype.updateLocation = function(location) {
+    // Set the location and it's update time
+    this._location = location;
+    this._locationTime = new Date();
+};
 
 // Export the class
 module.exports = User;
