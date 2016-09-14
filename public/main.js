@@ -1002,10 +1002,23 @@ function updateActiveGame() {
                 message: 'You may only have one active game to play at a time.<br /><br />Would you like to change your active game to this game now?',
                 actions: [
                     {
-                        text: 'Change active game',
+                        text: 'Activate this game',
                         value: true,
                         state: 'primary',
-                        icon: 'zmdi zmdi-swap'
+                        icon: 'zmdi zmdi-swap',
+                        action: function() {
+                            // Set the active game
+                            setActiveGame(gameId);
+                        }
+                    },
+                    {
+                        text: 'View current game',
+                        value: true,
+                        icon: 'zmdi zmdi-long-arrow-return',
+                        action: function() {
+                            // Navigate to the game page
+                            Dworek.utils.navigateToPath('/game/' + Dworek.state.activeGame);
+                        }
                     },
                     {
                         text: 'Close'
@@ -1013,11 +1026,9 @@ function updateActiveGame() {
                 ]
 
             }, function(value) {
-                // Set the active game
-                if(!!value) {
-                    setActiveGame(gameId);
+                // Return if the action is already handled
+                if(!!true)
                     return;
-                }
 
                 // Show a notification to switch to the active game
                 showNotification('Switch to your active game', {
