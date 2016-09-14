@@ -62,3 +62,6 @@ Coordinate.parse = function(raw) {
     // Create a coordinate object, and return it
     return new Coordinate(raw);
 };
+
+// Export the module
+module.exports = Coordinate;
