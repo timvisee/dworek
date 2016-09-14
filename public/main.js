@@ -800,7 +800,12 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
             title: 'Broadcast',
             message: dialogMessage,
             actions: actions
-        }, function() {
+        }, function(value) {
+            // Don't show the postponed notification if the broadcast was resolved, or if the game is viewed
+            if(value === false)
+                return;
+
+            // Show the postponed notification
             showNotification('Broadcast postponed', {
                 action: {
                     text: 'View',
@@ -818,6 +823,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     if(Dworek.utils.getGameId() != gameId)
         actions.push({
             text: 'View game',
+            value: false,
             action: function() {
                 Dworek.utils.navigateToPath('/game/' + gameId);
             }
@@ -826,6 +832,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     // Add the mark as read button
     actions.push({
         text: 'Mark as read',
+        value: false,
         icon: 'zmdi zmdi-check',
         state: 'primary',
         action: function() {
@@ -1903,7 +1910,7 @@ $(document).bind("pagecreate", function() {
         // Show a dialog, and ask whether the user is sure
         showDialog({
             title: 'Broadcast message',
-            message: 'Enter a message to broadcast to all users:<br><br>' +
+            message: 'Enter a message to broadcast to all users in this game:<br><br>' +
             '<label for="' + fieldId + '">Message</label>' +
             '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />',
             actions: [
