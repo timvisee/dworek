@@ -800,6 +800,17 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
             title: 'Broadcast',
             message: dialogMessage,
             actions: actions
+        }, function() {
+            showNotification('Broadcast postponed', {
+                action: {
+                    text: 'View',
+                    action: function() {
+                        setTimeout(function() {
+                            _showDialog();
+                        }, 500);
+                    }
+                }
+            })
         });
     };
 
@@ -828,19 +839,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     // Add the postpone button
     actions.push({
         text: 'Postpone',
-        icon: 'zmdi zmdi-time-restore',
-        action: function() {
-            showNotification('Broadcast postponed', {
-                action: {
-                    text: 'View',
-                    action: function() {
-                        setTimeout(function() {
-                            _showDialog();
-                        }, 500);
-                    }
-                }
-            })
-        }
+        icon: 'zmdi zmdi-time-restore'
     });
 
     // Show the dialog
