@@ -34,7 +34,8 @@ const PacketType = {
     GAME_STAGE_CHANGED: 5,
     MESSAGE_RESPONSE: 4,
     BROADCAST_MESSAGE_REQUEST: 6,
-    BROADCAST_MESSAGE: 7
+    BROADCAST_MESSAGE: 7,
+    BROADCAST_RESOLVE_ALL: 8
 };
 
 /**
@@ -802,7 +803,12 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
 
     // Add the close button
     actions.push({
-        text: 'Close'
+        text: 'Mark as read',
+        icon: 'zmdi zmdi-check',
+        action: function() {
+            // Send a broadcast resolve packet
+            Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE_ALL, {});
+        }
     });
 
     // Show the dialog
@@ -810,9 +816,6 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
         title: 'Broadcast',
         message: dialogMessage,
         actions: actions
-    }, function() {
-        // Send a broadcast resolve packet
-        Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE_ALL, {});
     });
 });
 

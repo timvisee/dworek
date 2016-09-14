@@ -144,18 +144,28 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
             // Loop through the broadcasts
             broadcasts.forEach(function(broadcast) {
                 // Get the game name for this broadcast
-                Core.model.gameModelManager.getGameById(broadcast.game, function(err, gameName) {
+                Core.model.gameModelManager.getGameById(broadcast.game, function(err, game) {
                     // Handle errors
                     if(err !== null) {
                         console.error('An error occurred while fetching a game name, ignoring.');
                         return;
                     }
 
-                    // Append the game name to the broadcast
-                    broadcast.gameName = gameName;
+                    // Get the game name
+                    game.getName(function(err, gameName) {
+                        // Handle errors
+                        if(err !== null) {
+                            console.error('An error occurred while fetching a game name, ignoring.');
+                            return;
+                        }
 
-                    // Send a broadcast to the socket
-                    Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, broadcast, socket);
+                        // Send a broadcast to the socket
+                        Core.realTime.packetProcessor.sendPacket(PacketType.BROADCAST_MESSAGE, {
+                            message: broadcast.message,
+                            game: game.getIdHex().toLowerCase(),
+                            gameName: gameName
+                        }, socket);
+                    });
                 });
             });
         }

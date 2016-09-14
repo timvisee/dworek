@@ -240,7 +240,7 @@ RealTime.prototype.hasBroadcasts = function(user) {
         user = user.toString().toLowerCase();
 
     // Return the result
-    this._broadcastQueue.has(user);
+    return this._broadcastQueue.has(user);
 };
 
 /**
