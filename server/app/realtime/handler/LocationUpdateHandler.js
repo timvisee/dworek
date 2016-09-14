@@ -25,6 +25,7 @@ var _ = require('lodash');
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 var Coordinate = require('../../coordinate/Coordinate');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -65,14 +66,24 @@ GameChangeStageHandler.prototype.init = function() {
  * @param socket SocketIO socket.
  */
 GameChangeStageHandler.prototype.handler = function(packet, socket) {
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Create a function to call back an error
     const callbackError = function() {
+        // Only call back once
+        if(calledBack)
+            return;
+
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to send your location, an server error occurred.',
+            message: 'Failed to send your location, a server error occurred.',
             dialog: true
         }, socket);
+
+        // Set the called back flag
+        calledBack = true;
     };
 
     // Make sure a session is given
@@ -85,15 +96,6 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
     // Get the game and raw location
     const rawGame = packet.game;
     const rawLocation = packet.location;
-
-    // Make sure the raw location contains the required fields
-    if(!rawLocation.hasOwnProperty('latitude') || !rawLocation.hasOwnProperty('longitude')
-        || !rawLocation.hasOwnProperty('altitude') || !rawLocation.hasOwnProperty('accuracy')
-        || !rawLocation.hasOwnProperty('altitudeAccuracy')) {
-        // Call back an error
-        callbackError();
-        return;
-    }
 
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid) {
@@ -128,17 +130,54 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             return;
         }
 
-        // Get the live game
-        Core.gameController.getGame(game, function(err, liveGame) {
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Make sure the game is active
+        latch.add();
+        game.getStage(function(err, stage) {
             // Call back errors
-            if(err !== null || liveGame == null) {
+            if(err !== null || stage != 1) {
                 callbackError();
                 return;
             }
 
-            /**
-             * Get the game user
-             */
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Make sure this user is a player or a special player
+        latch.add();
+        game.getUserState(user, function(err, userState) {
+            // Call back errors and make sure the user has the correct state
+            if(err !== null || (!userState.player && !userState.special)) {
+                callbackError();
+                return;
+            }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Live game
+        var liveGame = null;
+
+        // Get the live game
+        latch.add();
+        Core.gameController.getGame(game, function(err, result) {
+            // Call back errors
+            if(err !== null || result == null) {
+                callbackError();
+                return;
+            }
+
+            // Store the live game
+            liveGame = result;
+        });
+
+        // Continue
+        latch.then(function() {
+            // Get the live game
             liveGame.getUser(user, function(err, liveUser) {
                 // Call back errors
                 if(err !== null || liveUser == null) {
