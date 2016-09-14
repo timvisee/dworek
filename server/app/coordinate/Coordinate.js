@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
+
 /**
  * Coordinate class.
  *
@@ -40,4 +42,23 @@ var Coordinate = function(raw) {
      * @type {Number}
      */
     this.longitude  = raw.longitude;
+};
+
+/**
+ * Parse a raw location.
+ *
+ * @param {Object} raw Raw location object.
+ * @return {Coordinate|null} Coordinate or null if parsing failed.
+ */
+Coordinate.parse = function(raw) {
+    // Make sure the object contains the required properties
+    if(!raw.hasOwnProperty('latitude') || !raw.hasOwnProperty('longitude'))
+        return null;
+
+    // Make sure both are numbers
+    if(!_.isNumber(raw.latitude) || !_.isNumber(raw.longitude))
+        return null;
+
+    // Create a coordinate object, and return it
+    return new Coordinate(raw);
 };
