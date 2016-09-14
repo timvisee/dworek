@@ -104,5 +104,15 @@ module.exports = {
      * Data:
      * - token: Token of the broadcast to resolve.
      */
-    BROADCAST_RESOLVE: 9
+    BROADCAST_RESOLVE: 9,
+
+    /**
+     * Location update from the client to the server.
+     *
+     * Data:
+     * - game: Game this update is for
+     * - location.latitude: latitude value
+     * - location.longitude: longitude value
+     */
+    LOCATION_UPDATE: 10
 };
