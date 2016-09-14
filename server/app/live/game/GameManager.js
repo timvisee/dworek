@@ -170,7 +170,7 @@ GameManager.prototype.getLoadedGameCount = function() {
 /**
  * Load all active games, that aren't loaded yet.
  *
- * @param {GameManager~loadActiveGamesCallback} [callback] Callback called when done loading.
+ * @param {GameManager~loadCallback} [callback] Callback called when done loading.
  */
 GameManager.prototype.load = function(callback) {
     // Store this instance
@@ -228,7 +228,54 @@ GameManager.prototype.load = function(callback) {
 };
 
 /**
- * @callback GameController~loadActiveGamesCallback
+ * @callback GameController~loadCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
+/**
+ * Load a specific game.
+ *
+ * @param {GameModel|ObjectId|string} gameId Game instance of game ID of the game to load.
+ * @param {GameManager~loadGameCallback} callback Called on success or when an error occurred.
+ */
+GameManager.prototype.loadGame = function(gameId, callback) {
+    // Get the game ID as an ObjectId
+    if(gameId instanceof GameModel)
+        gameId = gameId.getId();
+    else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
+        gameId = new ObjectId(gameId);
+    else {
+        callback(new Error('Invalid game ID'));
+        return;
+    }
+
+    // Show a status message
+    console.log('Loading live game... (id: ' + gameId.toString() + ')');
+
+    // Unload the game if it's already loaded
+    this.unloadGame(gameId);
+
+    // Create a new game instance and add it to the list of games
+    const newGame = new Game(gameId);
+    this.games.push(newGame);
+
+    // Get the name of the game, and print a status message
+    newGame.getGameModel().getName(function(err, name) {
+        // Handle errors
+        if(err !== null) {
+            console.error('Failed to fetch game name, ignoring.');
+            return;
+        }
+
+        // Show a status message
+        console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback GameManager~loadGameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
@@ -241,6 +288,59 @@ GameManager.prototype.unload = function() {
         // Unload the game
         game.unload();
     });
+};
+
+/**
+ * Unload the given game.
+ *
+ * @param {GameModel|ObjectId|string} gameId Game instance or game ID to unload.
+ */
+GameManager.prototype.unloadGame = function(gameId) {
+    // Get the game ID as an ObjectId
+    if(gameId instanceof GameModel)
+        gameId = gameId.getId();
+    else if(!(gameId instanceof ObjectId) && ObjectId.isValid(gameId))
+        gameId = new ObjectId(gameId);
+    else {
+        callback(new Error('Invalid game ID'));
+        return;
+    }
+
+    // Show a status message
+    console.log('Loading live game (id: ' + gameId.toString() + ')...');
+
+    // Loop through the list of games, and determine what game to unload and what index to remove
+    var removeIndex = -1;
+    this.games.forEach(function(game) {
+        // Skip if we're already moving one
+        if(removeIndex >= 0)
+            return;
+
+        // Check whether this is the correct game
+        if(game.isGame(gameId)) {
+            // Show a status message
+            game.getGameModel().getName(function(err, name) {
+                // Handle errors
+                if(err !== null) {
+                    console.error('Failed to fetch game name, ignoring.');
+                    return;
+                }
+
+                // Show a status message
+                console.log('Unloaded live game. (name: ' + name + ', id: ' + gameId.toString() + ')');
+            });
+
+            // Unload the game
+            game.unload();
+
+            // Set the remove index
+            removeIndex = -1;
+        }
+    });
+
+    // Remove the game at the given index
+    if(removeIndex >= 0)
+        this.games.splice(removeIndex, 1);
 };
 
 // Export the class
