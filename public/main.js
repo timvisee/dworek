@@ -794,6 +794,15 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     // Define the actions for the dialog
     var actions = [];
 
+    // Create a function to show the dialog
+    const _showDialog = function() {
+        showDialog({
+            title: 'Broadcast',
+            message: dialogMessage,
+            actions: actions
+        });
+    };
+
     // Add a 'view game' action if we're currently not viewing the game
     if(Dworek.utils.getGameId() != gameId)
         actions.push({
@@ -819,15 +828,23 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     // Add the postpone button
     actions.push({
         text: 'Postpone',
-        icon: 'zmdi zmdi-time-restore'
+        icon: 'zmdi zmdi-time-restore',
+        action: function() {
+            showNotification('Broadcast postponed', {
+                action: {
+                    text: 'View',
+                    action: function() {
+                        setTimeout(function() {
+                            _showDialog();
+                        }, 500);
+                    }
+                }
+            })
+        }
     });
 
     // Show the dialog
-    showDialog({
-        title: 'Broadcast',
-        message: dialogMessage,
-        actions: actions
-    });
+    _showDialog();
 });
 
 // Manage the active game
