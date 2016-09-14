@@ -106,6 +106,15 @@ User.prototype.getId = function() {
 };
 
 /**
+ * Get the hexadecimal ID representation of the user.
+ *
+ * @returns {string} User ID as hexadecimal string.
+ */
+User.prototype.getIdHex = function() {
+    return this.getId().toString();
+};
+
+/**
  * Check whether the give user instance or ID equals this user.
  *
  * @param {UserModel|ObjectId|string} user User instance or the user ID.
@@ -136,6 +145,15 @@ User.prototype.getUserModel = function() {
 
     // Create a user model for the known ID, store and return it
     return this._model = Core.model.userModelManager._instanceManager.create(this._id);
+};
+
+/**
+ * Get the team model for this user if the user is in any team.
+ *
+ * @return {TeamModel|null} Team model or null.
+ */
+User.prototype.getTeamModel = function() {
+    return this._teamModel;
 };
 
 /**

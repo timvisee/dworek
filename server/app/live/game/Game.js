@@ -79,6 +79,15 @@ Game.prototype.getId = function() {
 };
 
 /**
+ * Get the hexadecimal ID representation of the game.
+ *
+ * @returns {string} Game ID as hexadecimal string.
+ */
+Game.prototype.getIdHex = function() {
+    return this.getId().toString();
+};
+
+/**
  * Check whether the give game instance or ID equals this game.
  *
  * @param {GameModel|ObjectId|string} game Game instance or the game ID.
