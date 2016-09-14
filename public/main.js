@@ -113,7 +113,13 @@ var Dworek = {
          * The time the client was last connected at.
          * @param {Number} Time as timestamp, or -1 if unspecified.
          */
-        lastConnected: -1
+        lastConnected: -1,
+
+        /**
+         * Last known reconnection attempt count.
+         * @param {Number} Last known reconnection attempt count.
+         */
+        lastReconnectAttempt: 0
     },
 
     /**
@@ -220,6 +226,9 @@ var Dworek = {
                     if((Date.now() - Dworek.state.lastConnected) > 2 * 60 * 1000)
                         showDisconnectedTooLongDialog();
                 }
+
+                // Reset reconnection attempt counter
+                Dworek.state.lastReconnectAttempt = 0;
             });
 
             // Handle connection errors
@@ -230,8 +239,10 @@ var Dworek = {
                 // De-authenticate
                 self._deauthenticate();
 
-                // Show a notification
-                showNotification('Failed to connect');
+                // Show a notification if the last known reconnection attempt count is acceptable
+                const attemptCount = Dworek.state.lastReconnectAttempt;
+                if(attemptCount <= 5 || attemptCount % 10 == 0)
+                    showNotification('Failed to connect');
             });
 
             // Handle connection timeouts
@@ -251,6 +262,9 @@ var Dworek = {
                 // Show a notification
                 if(attemptCount <= 5 || attemptCount % 10 == 0)
                     showNotification('Trying to reconnect...' + (attemptCount > 1 ? ' (attempt ' + attemptCount + ')' : ''));
+
+                // Store the last known reconnection attempt count
+                Dworek.state.lastReconnectAttempt = attemptCount;
             });
 
             // Handle reconnection failures
