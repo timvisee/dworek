@@ -2467,13 +2467,13 @@ function updateStatusLabels() {
         batteryStatusLabel.html('<i>Not supported</i>');
     else if(batteryLevel < 0)
         batteryStatusLabel.html('<i>Unknown</i>');
-    else if(batteryLevel < 10)
+    else if(batteryLevel <= 10)
         batteryStatusLabel.html('<span style="color: red;">' + batteryLevel + '%</span>');
     else
         batteryStatusLabel.html(batteryLevel + '%');
 
     // Determine whether there is an error
-    const error = !isConnected || !isOnline || !hasGps || (hasBattery && batteryLevel >= 0 && batteryLevel <= 5)
+    var error = !isConnected || !isOnline || !hasGps
         || (Dworek.state.geoState != GeoStates.UNKNOWN && Dworek.state.geoState != GeoStates.WORKING);
 
     // Set the game status label
@@ -2481,6 +2481,9 @@ function updateStatusLabels() {
         gameStatusLabel.html('<span style="color: red;">Device not functional</span>');
     else
         gameStatusLabel.html(playing ? 'Playing' : 'Ready to play');
+
+    // Update the error state
+    error = error || (hasBattery && batteryLevel >= 0 && batteryLevel <= 10);
 
     // Determine whether to animate the status icon
     const iconAnimate = playing;
@@ -2519,11 +2522,11 @@ function updateStatusLabels() {
         statusIcon.addClass('zmdi-network-off');
     else if(!isConnected)
         statusIcon.addClass('zmdi-network-alert');
-    else if(hasBattery && batteryLevel >= 0 && batteryLevel <= 5)
+    else if(hasBattery && batteryLevel >= 0 && batteryLevel <= 10)
         statusIcon.addClass('zmdi-battery-alert');
     else if(!hasGps || Dworek.state.geoState == GeoStates.NOT_WORKING || Dworek.state.geoState == GeoStates.NO_PERMISSION)
         statusIcon.addClass('zmdi-gps-off');
-    else if(Dworek.state.geoState == GeoStates.UNKNOWN_POSITION || Dworek.state.geoState == GeoStates.TIMEOUT)
+    else if(playing && (Dworek.state.geoState == GeoStates.UNKNOWN_POSITION || Dworek.state.geoState == GeoStates.TIMEOUT))
         statusIcon.addClass('zmdi-gps');
     else if(playing)
         statusIcon.addClass('zmdi-play');
