@@ -139,5 +139,20 @@ module.exports = {
      * Data:
      * - game: Game ID this info is requested for
      */
-    GAME_INFO_REQUEST: 12
+    GAME_INFO_REQUEST: 12,
+
+    /**
+     * Location updates for users and other things in a game, relevant to the attached to the socket.
+     * This packet is send from the server to a client.
+     *
+     * Data:
+     * - game: ID of the game we're sending locations for
+     * - users[]: Array of user objects
+     * - users[].user: ID of the user
+     * - users[].userName: Display name of the user
+     * - users[].location: Location object of the user.
+     * - users[].location.latitude: Latitude
+     * - users[].location.longitude: Longitude
+     */
+    GAME_LOCATIONS_UPDATE: 13
 };
