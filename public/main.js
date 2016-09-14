@@ -198,6 +198,9 @@ var Dworek = {
             }
 
             // TODO: Start/stop the GEO location watcher
+
+            // Update the status labels
+            updateStatusLabels();
         }
     },
 
@@ -276,6 +279,9 @@ var Dworek = {
 
                 // Reset reconnection attempt counter
                 Dworek.state.lastReconnectAttempt = 0;
+
+                // Update the status label
+                updateStatusLabels();
             });
 
             // Handle connection errors
@@ -350,6 +356,9 @@ var Dworek = {
                     if(!Dworek.realtime._connected)
                         showDisconnectedTooLongDialog();
                 }, 3 * 60 * 1000);
+
+                // Update the status labels
+                updateStatusLabels();
             });
         },
 
@@ -1118,8 +1127,10 @@ function updateActiveGame() {
                 });
             });
         }
-
     }
+
+    // Update the status labels
+    updateStatusLabels();
 
     // Update the last viewed game
     Dworek.state.lastViewedGame = gameId;
@@ -2299,14 +2310,122 @@ $(document).bind("pageinit", function() {
 });
 
 /**
+ * Battery promise instance.
+ * @type {Object|null}
+ */
+var batteryInstance = null;
+
+/**
  * Update all status labels.
  */
 function updateStatusLabels() {
-    // Get the labels
+    // Check whether we're playing
+    const playing = Dworek.gameWorker.active;
+
+    // Get the icon and labels
+    const statusIcon = $('.status-icon');
+    const networkStatusLabel = $('.status-network-label');
+    const gpsStatusLabel = $('.status-gps-label');
     const batteryStatusLabel = $('.status-battery-label');
 
-    // Get a battery promise, and update the battery status label
-    navigator.getBattery().then(function(battery) {
-        batteryStatusLabel.html(battery.level * 100 + '%');
-    });
+    // Determine whether the user is connected
+    const isOnline = !!navigator.onLine;
+    const isConnected = Dworek.realtime._connected;
+
+    // Determine whether the user's device has GPS support
+    const hasGps = "geolocation" in navigator;
+
+    // Determine whether the user has battery support and get the battery level
+    const hasBattery = typeof navigator.getBattery === 'function';
+    var batteryLevel = -1;
+
+    // Get the battery instance if available
+    if(hasBattery && batteryInstance === null)
+        navigator.getBattery().then(function(battery) {
+            // Set the battery instance
+            batteryInstance = battery;
+
+            // Add an event listener for level change
+            battery.addEventListener('onlevelchange', function() {
+                alert('Level changed!');
+                // Update the status labels
+                updateStatusLabels();
+            });
+
+            // Update the status labels
+            updateStatusLabels();
+        });
+    else if(batteryInstance !== null)
+        batteryLevel = Math.round(batteryInstance.level * 100);
+
+    // Set the network status label
+    if(!isConnected && !isOnline)
+        networkStatusLabel.html('<span style="color: red;">Not online</span>');
+    else if(!isConnected)
+        networkStatusLabel.html('<span style="color: red;">Online, not connected</span>');
+    else
+        networkStatusLabel.html('Connected');
+
+    // Set the GPS status label
+    if(!hasGps)
+        gpsStatusLabel.html('<span style="color: red;">Not supported</span>');
+    else
+        gpsStatusLabel.html('Supported');
+
+    // Battery the GPS status label
+    if(!hasBattery)
+        batteryStatusLabel.html('<i>Not supported</i>');
+    else if(batteryLevel < 0)
+        batteryStatusLabel.html('<i>Unknown</i>');
+    else if(batteryLevel < 10)
+        batteryStatusLabel.html('<span style="color: red;">' + batteryLevel + '%</span>');
+    else
+        batteryStatusLabel.html(batteryLevel + '%');
+
+    // Determine whether there is an error
+    var error = !hasGps;
+
+    // Determine whether to animate the status icon
+    const iconAnimate = playing;
+    const iconAnimateDuration = !error ? 10 : 1.5;
+
+    // Set the animation state of the icon
+    if(iconAnimate) {
+        // Add the animated class
+        statusIcon.addClass('animated flash');
+
+        // Update the animation speed
+        statusIcon.css({
+            animationDuration: iconAnimateDuration + 's'
+        });
+
+    } else
+        statusIcon.removeClass('animated flash');
+
+    // Remove the current icons
+    statusIcon.removeClass('zmdi-check');
+    statusIcon.removeClass('zmdi-play');
+    statusIcon.removeClass('zmdi-network-alert');
+    statusIcon.removeClass('zmdi-network-off');
+    statusIcon.removeClass('zmdi-gps-off');
+    statusIcon.removeClass('zmdi-battery-alert');
+
+    // Set the new icon
+    if(!isConnected && !isOnline)
+        statusIcon.addClass('zmdi-network-off');
+    else if(!isConnected)
+        statusIcon.addClass('zmdi-network-alert');
+    else if(hasBattery && batteryLevel >= 0 && batteryLevel <= 5)
+        statusIcon.addClass('zmdi-battery-alert');
+    else if(!hasGps)
+        statusIcon.addClass('zmdi-gps-off');
+    else if(playing)
+        statusIcon.addClass('zmdi-play');
+    else
+        statusIcon.addClass('zmdi-check');
 }
+
+// Update the status label when the online status changes
+$(document).on('offline online', function() {
+    updateStatusLabels();
+});
