@@ -38,7 +38,8 @@ const PacketType = {
     BROADCAST_RESOLVE_ALL: 8,
     BROADCAST_RESOLVE: 9,
     LOCATION_UPDATE: 10,
-    GAME_INFO: 11
+    GAME_INFO: 11,
+    GAME_INFO_REQUEST: 12
 };
 
 /**

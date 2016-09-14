@@ -128,5 +128,13 @@ module.exports = {
      * - roles.special: True if the user is special, false if not.
      * - roles.requested: True if the user requested to join this game, false if not.
      */
-    GAME_INFO: 11
+    GAME_INFO: 11,
+
+    /**
+     * Request from a client to the server, to send the client the latest game information.
+     *
+     * Data:
+     * - game: Game ID this info is requested for
+     */
+    GAME_INFO_REQUEST: 12
 };
