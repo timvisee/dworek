@@ -105,6 +105,11 @@ var Dworek = {
         lastViewedGame: null,
 
         /**
+         * Active GEO location watcher.
+         */
+        geoWatcher: null,
+
+        /**
          * The time the client was last connected at.
          * @param {Number} Time as timestamp, or -1 if unspecified.
          */
