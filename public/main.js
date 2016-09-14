@@ -905,6 +905,35 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
         showNextBroadcast();
 });
 
+// Update the game info
+Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(packet) {
+    // Make sure the packet contains the required properties
+    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('stage') || !packet.hasOwnProperty('roles'))
+        return;
+
+    // Get the packet data
+    const gameId = packet.game;
+    const stage = packet.stage;
+    const roles = packet.roles;
+
+    // TODO: Invalidate game related page cache!
+
+    // Make sure the game ID equals our currently active game, ignore this packet if that's not the case
+    if(Dworek.state.activeGame != gameId || Dworek.state.activeGame == null)
+        return;
+
+    // Update the game stage and roles for the user
+    Dworek.state.activeGameStage = stage;
+    Dworek.state.activeGameRoles = {
+        player: roles.player,
+        spectator: roles.spectator,
+        special: roles.special,
+        requested: roles.requested
+    };
+    
+    // TODO: Start/stop the client side game
+});
+
 // Manage the active game
 $(document).bind("pageshow", function() {
     updateActiveGame();
