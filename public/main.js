@@ -166,11 +166,19 @@ var Dworek = {
         gameUpdateRequestTimer: null,
 
         /**
+         * Defines whether the game worker is active, and whether the user is playing the game.
+         */
+        active: false,
+
+        /**
          * Update the current game worker state based on the active game and known game info.
          */
         update: function() {
             // Determine whether we're playing
             const playing = Dworek.state.activeGameStage == 1;
+
+            // Define whether the game worker is active
+            this.active = playing;
 
             // Start/stop the timer to update the game info
             if(playing && this.gameUpdateRequestTimer == null) {
