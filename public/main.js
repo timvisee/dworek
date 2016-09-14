@@ -187,26 +187,7 @@ var Dworek = {
 
                     // Show a refresh notification after two minutes
                     if((Date.now() - Dworek.state.lastConnected) > 2 * 60 * 1000)
-                        showDialog({
-                            title: 'Disconnected',
-                            message: 'You we\'re disconnected for too long.<br><br>' +
-                            'Please refresh the application to make sure everything is up-to-date.',
-                            actions: [{
-                                text: 'Refresh',
-                                state: 'primary',
-                                icon: 'zmdi zmdi-refresh'
-                            }]
-                        }, function() {
-                            // Determine the refresh path
-                            var refreshPath = getActivePage().data('url');
-
-                            // Redirect a user to a game page if he's on a game related page
-                            if(Dworek.utils.isGamePage())
-                                refreshPath = '/game/' + Dworek.utils.getGameId();
-
-                            // Redirect the user
-                            Dworek.utils.navigateToPath(refreshPath);
-                        });
+                        showDisconnectedTooLongDialog();
                 }
             });
 
@@ -270,6 +251,13 @@ var Dworek = {
 
                 // Set the last connected state
                 Dworek.state.lastConnected = Date.now();
+
+                // Create a timer, to show the disconnected for too long if still disconnected after 3 minutes
+                setTimeout(function() {
+                    // Make sure we're disconnected, then show the dialog
+                    if(!Dworek.realtime._connected)
+                        showDisconnectedTooLongDialog();
+                }, 3 * 60 * 1000);
             });
         },
 
@@ -861,6 +849,33 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
 $(document).bind("pageshow", function() {
     updateActiveGame();
 });
+
+/**
+ * Show a dialog that we're disconnected for too long.
+ */
+function showDisconnectedTooLongDialog() {
+    // Show the dialog
+    showDialog({
+        title: 'Disconnected',
+        message: 'You ' + (Dworek.realtime._connected ? 'we\'re' : 'are') + ' disconnected for too long.<br><br>' +
+        'Please refresh the application to make sure everything is up-to-date.',
+        actions: [{
+            text: 'Refresh',
+            state: 'primary',
+            icon: 'zmdi zmdi-refresh'
+        }]
+    }, function() {
+        // Determine the refresh path
+        var refreshPath = getActivePage().data('url');
+
+        // Redirect a user to a game page if he's on a game related page
+        if(Dworek.utils.isGamePage())
+            refreshPath = '/game/' + Dworek.utils.getGameId();
+
+        // Redirect the user
+        Dworek.utils.navigateToPath(refreshPath);
+    });
+}
 
 /**
  * Update the active game.
