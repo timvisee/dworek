@@ -96,7 +96,7 @@ PacketProcessor.prototype.sendPacket = function(packetType, packet, socket) {
  * @param {boolean} [options.once=false] True to only send a packet to one socket, false to send to multiple if available.
  * @return {Number} Number of sockets the packet was send to.
  */
-PacketProcessor.prototype.sendPacket = function(packetType, packet, user, options) {
+PacketProcessor.prototype.sendPacketUser = function(packetType, packet, user, options) {
     // Get the user ID as an ObjectId
     if(user instanceof UserModel || user instanceof User)
         user = user.getId();
