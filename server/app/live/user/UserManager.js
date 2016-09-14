@@ -235,7 +235,7 @@ UserManager.prototype.load = function(callback) {
         });
 
         // Call back when we're done loading
-        latch.latch(function() {
+        latch.then(function() {
             if(_.isFunction(callback))
                 callback(null);
         });

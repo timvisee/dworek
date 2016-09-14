@@ -27,6 +27,7 @@ var ObjectId = mongo.ObjectId;
 var Core = require('../../../Core');
 var Game = require('./Game');
 var GameModel = require('../../model/game/GameModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * GameManager class.
@@ -219,7 +220,7 @@ GameManager.prototype.load = function(callback) {
         });
 
         // Call back when we're done loading
-        latch.latch(function() {
+        latch.then(function() {
             if(_.isFunction(callback))
                 callback(null);
         });
