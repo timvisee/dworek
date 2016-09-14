@@ -37,7 +37,8 @@ const PacketType = {
     BROADCAST_MESSAGE: 7,
     BROADCAST_RESOLVE_ALL: 8,
     BROADCAST_RESOLVE: 9,
-    LOCATION_UPDATE: 10
+    LOCATION_UPDATE: 10,
+    GAME_INFO: 11
 };
 
 /**
@@ -72,6 +73,30 @@ var Dworek = {
          * @type {string|null}
          */
         activeGame: null,
+
+        /**
+         * Stage the active game is in.
+         *
+         * @type {Number|null} Game stage, or null if it's unknown.
+         */
+        activeGameStage: null,
+
+        /**
+         * The roles the user has in the active game.
+         *
+         * @type {UserRoles|null} Object with the user type, or null if it's unknown.
+         */
+        activeGameRoles: null,
+
+        /**
+         * Object defining a users role.
+         *
+         * @typedef {Object} UserRoles
+         * @param {boolean} player True if the user is a player, false if not.
+         * @param {boolean} spectator True if the user is a spectator, false if not.
+         * @param {boolean} special True if the user is a special player, false if not.
+         * @param {boolean} requested True if the user requested to join the game, flase if not.
+         */
 
         /**
          * ID of the game that was last viewed by the user.
@@ -939,10 +964,7 @@ function updateActiveGame() {
         // Automatically select this as active game if we don't have an active game now
         if(Dworek.state.activeGame === null) {
             // Set the active game
-            Dworek.state.activeGame = gameId;
-
-            // Show a notification
-            showNotification('This is now your active game');
+            setActiveGame(gameId);
 
         } else {
             // Ask the user whether to select this as active game
@@ -999,6 +1021,10 @@ function setActiveGame(gameId) {
         showNotification('This is now your active game');
 
         // TODO: Send packet to server to change the user's active game
+
+        // Reset the game stage and user type
+        Dworek.state.activeGameStage = null;
+        Dworek.state.activeGameRoles = null;
     }
 
     // Set the active game ID

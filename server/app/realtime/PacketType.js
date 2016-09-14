@@ -110,9 +110,23 @@ module.exports = {
      * Location update from the client to the server.
      *
      * Data:
-     * - game: Game this update is for
+     * - game: Game ID this update is for
      * - location.latitude: latitude value
      * - location.longitude: longitude value
      */
-    LOCATION_UPDATE: 10
+    LOCATION_UPDATE: 10,
+
+    /**
+     * Packet containing the game/user info of a game.
+     * Send from the server to the client.
+     *
+     * Data:
+     * - game: Game ID this info is for
+     * - stage: Game stage number
+     * - roles.player: True if the user is a player, false if not.
+     * - roles.spectator: True if the user is a spectator, false if not.
+     * - roles.special: True if the user is special, false if not.
+     * - roles.requested: True if the user requested to join this game, false if not.
+     */
+    GAME_INFO: 11
 };
