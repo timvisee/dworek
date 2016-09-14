@@ -237,7 +237,13 @@ var Dworek = {
                     // Send a location update to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
                         game: Dworek.state.activeGame,
-                        location: position.coords
+                        location: {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            altitude: position.coords.altitude,
+                            accuracy: position.coords.accuracy,
+                            altitudeAccuracy: position.coords.altitudeAccuracy,
+                        }
                     });
 
                 }, function(error) {
