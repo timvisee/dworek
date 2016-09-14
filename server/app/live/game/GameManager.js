@@ -283,11 +283,17 @@ GameManager.prototype.loadGame = function(gameId, callback) {
  * Unload all loaded games.
  */
 GameManager.prototype.unload = function() {
+    // Show a status message
+    console.log('Unloading all live games...');
+
     // Loop through the list of games
     this.games.forEach(function(game) {
         // Unload the game
         game.unload();
     });
+
+    // Clear the list of games
+    this.games = [];
 };
 
 /**
