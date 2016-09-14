@@ -116,7 +116,9 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
         var calledBack = false;
 
         // Create a game info object
-        var gameInfoObject = {};
+        var gameInfoObject = {
+            game: rawGame
+        };
 
         // Get the game stage
         latch.add();
