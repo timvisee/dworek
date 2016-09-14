@@ -235,6 +235,12 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         });
                     });
                 });
+
+                // Load or unload the game depending on it's stage
+                if(stage == 1)
+                    Core.gameController.loadGame(game);
+                else
+                    Core.gameController.unloadGame(game);
             });
         });
     });

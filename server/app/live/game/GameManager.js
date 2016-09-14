@@ -325,7 +325,7 @@ GameManager.prototype.unloadGame = function(gameId) {
 
     // Loop through the list of games, and determine what game to unload and what index to remove
     var removeIndex = -1;
-    this.games.forEach(function(game) {
+    this.games.forEach(function(game, i) {
         // Skip if we're already moving one
         if(removeIndex >= 0)
             return;
@@ -348,7 +348,7 @@ GameManager.prototype.unloadGame = function(gameId) {
             game.unload();
 
             // Set the remove index
-            removeIndex = -1;
+            removeIndex = i;
         }
     });
 
