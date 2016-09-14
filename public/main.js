@@ -242,7 +242,7 @@ var Dworek = {
                 // Show a notification if the last known reconnection attempt count is acceptable
                 const attemptCount = Dworek.state.lastReconnectAttempt;
                 if(attemptCount <= 5 || attemptCount % 10 == 0)
-                    showNotification('Failed to connect');
+                    showNotification('Failed to connect' + (attemptCount > 1 ? ' (attempt ' + attemptCount + ')' : ''));
             });
 
             // Handle connection timeouts
