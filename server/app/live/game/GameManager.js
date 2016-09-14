@@ -187,7 +187,8 @@ GameManager.prototype.load = function(callback) {
             return;
         }
 
-        // TODO: Unload all currently loaded games!
+        // Unload all currently loaded games
+        self.unload();
 
         // Create a callback latch
         var latch = new CallbackLatch();
@@ -218,7 +219,7 @@ GameManager.prototype.load = function(callback) {
         });
 
         // Call back when we're done loading
-        latch.add(function() {
+        latch.latch(function() {
             if(_.isFunction(callback))
                 callback(null);
         });
