@@ -2346,8 +2346,7 @@ function updateStatusLabels() {
             batteryInstance = battery;
 
             // Add an event listener for level change
-            battery.addEventListener('onlevelchange', function() {
-                alert('Level changed!');
+            battery.addEventListener('levelchange', function() {
                 // Update the status labels
                 updateStatusLabels();
             });
