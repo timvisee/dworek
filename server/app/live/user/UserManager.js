@@ -210,7 +210,7 @@ UserManager.prototype.load = function(callback) {
         // Loop through the list of users
         users.forEach(function(user) {
             // Create a user instance
-            const userInstance = new User(user);
+            const userInstance = new User(user, self.game);
 
             // Load the user instance
             latch.add();

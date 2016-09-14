@@ -23,6 +23,8 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
+var config = require('../../../config');
+
 var Core = require('../../../Core');
 var UserModel = require('../../model/user/UserModel');
 
@@ -30,11 +32,12 @@ var UserModel = require('../../model/user/UserModel');
  * User class.
  *
  * @param {UserModel|ObjectId|string} user User model instance or the ID of a user.
+ * @param {Game} game Game instance.
  *
  * @class
  * @constructor
  */
-var User = function(user) {
+var User = function(user, game) {
     /**
      * ID of the user this object corresponds to.
      * @type {ObjectId}
@@ -46,6 +49,21 @@ var User = function(user) {
      * @type {UserModel|null} User model instance or null if no instance is currently available.
      */
     this._model = null;
+
+    /**
+     * Live game instance.
+     * @type {Game} Game.
+     * @private
+     */
+    this._game = game;
+
+    /**
+     * Team model of this user, if the user is in any team.
+     *
+     * @type {TeamModel|null} Team model if the user is in a team, or null if the user isn't in a team.
+     * @private
+     */
+    this._teamModel = null;
 
     /**
      * Last known location of the user.
@@ -136,12 +154,46 @@ User.prototype.getName = function(callback) {
  */
 
 /**
+ * Get the live game instance.
+ * @return {Game} Game.
+ */
+User.prototype.getGame = function() {
+    return this._game;
+};
+
+/**
  * Unload this live user instance.
  *
  * @param {User~loadCallback} callback Called on success or when an error occurred.
  */
 User.prototype.load = function(callback) {
-    callback(null);
+    // Get the user model and game
+    const userModel = this.getUserModel();
+    const gameModel = this.getGame().getGameModel();
+
+    // Get the user state
+    Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Get the game team
+        gameUser.getTeam(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the team
+            this._teamModel = result;
+
+            // Call back
+            callback(null);
+        });
+    });
 };
 
 /**
@@ -165,6 +217,57 @@ User.prototype.updateLocation = function(location) {
     // Set the location and it's update time
     this._location = location;
     this._locationTime = new Date();
+};
+
+/**
+ * Get the last known player location.
+ *
+ * @return {Coordinate|null} Null is returned if this player doesn't have a known location.
+ */
+User.prototype.getLocation = function() {
+    return this._location;
+};
+
+/**
+ * Get the age in milliseconds of the last location update.
+ *
+ * @return {Number|null} Location age in milliseconds, or null if no location is available yet.
+ */
+User.prototype.getLocationAge = function() {
+    // Make sure a location time is set
+    if(this._locationTime == null)
+        return null;
+
+    // Calculate and return the age
+    return Date.now() - this._locationTime.getTime();
+};
+
+/**
+ * Get the recent/last known player location.
+ * Null will be returned if the location hasn't been updated and/or is decayed.
+ *
+ * @return {Coordinate|null} Location or null.
+ */
+User.prototype.getRecentLocation = function() {
+    // Get the location age, and make sure it's valid
+    const locationAge = this.getLocationAge();
+    if(locationAge === null)
+        return null;
+
+    // Get the decay time
+    const decayTime = config.game.locationDecayTime;
+
+    // Return the location if it hasn't been decayed yet
+    return (locationAge < decayTime) ? this._location : null;
+};
+
+/**
+ * Check whether the user has a recently known location.
+ *
+ * @return {boolean} True if a recent location is known, false if not.
+ */
+User.prototype.hasRecentLocation = function() {
+    return this.getRecentLocation() !== null;
 };
 
 // Export the class
