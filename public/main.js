@@ -950,7 +950,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
         special: roles.special,
         requested: roles.requested
     };
-    
+
+    showNotification('Received latest game information!');
     // TODO: Start/stop the client side game
 });
 
@@ -994,6 +995,13 @@ function updateActiveGame() {
     // Return if we're not logged in
     if(!Dworek.state.loggedIn)
         return;
+
+    // Request new game info if the same game is still active
+    if(Dworek.state.activeGame != null && (Dworek.state.activeGame == Dworek.utils.getGameId() || !Dworek.utils.isGamePage()))
+        // Send a game info update request
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_INFO_REQUEST, {
+            game: Dworek.state.activeGame
+        });
 
     // Return if we're not on a game page
     if(!Dworek.utils.isGamePage()) {
@@ -1063,6 +1071,7 @@ function updateActiveGame() {
                 });
             });
         }
+
     }
 
     // Update the last viewed game
@@ -1086,6 +1095,12 @@ function setActiveGame(gameId) {
         Dworek.state.activeGameStage = null;
         Dworek.state.activeGameRoles = null;
     }
+
+    // Send a request to the server for the latest game info
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_INFO_REQUEST, {
+        game: gameId
+    });
+    showNotification('Requesting latest game information...');
 
     // Set the active game ID
     Dworek.state.activeGame = gameId;
