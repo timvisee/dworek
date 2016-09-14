@@ -2356,7 +2356,7 @@ $(document).bind("pageinit", function() {
             '        <td class="left"><i class="zmdi zmdi-network zmdi-hc-fw"></i> Network</td><td class="status-network-label">Unknown</td>' +
             '    </tr>' +
             '    <tr>' +
-            '        <td class="left"><i class="zmdi zmdi-gps-dot zmdi-hc-fw"></i> GPS</td><td class="status-gps-label">Unknown</td>' +
+            '        <td class="left"><i class="zmdi zmdi-gps-dot zmdi-hc-fw"></i> GPS<br>&nbsp;</td><td class="status-gps-label">Unknown</td>' +
             '    </tr>' +
             '    <tr>' +
             '        <td class="left"><i class="zmdi zmdi-battery zmdi-hc-fw"></i> Battery</td><td class="status-battery-label">Unknown</td>' +
@@ -2580,7 +2580,7 @@ function testGps() {
                     text: 'Close'
                 }
             ]
-        })
+        });
     }, {
         enableHighAccuracy: true
     });
