@@ -40,6 +40,9 @@ router.get('/', function(req, res, next) {
                 online: true,
                 uptime: Math.round(os.uptime())
             },
+            live: {
+                gameCount: Core.gameController.getLoadedGameCount()
+            },
             realtime: {
                 online: Core.realTime.isOnline(),
                 connections: Core.realTime.getConnectionCount()

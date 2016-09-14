@@ -1,13 +1,20 @@
 extends page
 
 block content
-    div(align='center')
-        p The application status is shown below.
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Application status
 
-        br
-        .table-list
-            h3 User session
-            table.ui-responsive
+        .card-supporting-text.has-action.has-title
+            p The cards below show the current status of the #{app.name} servers and sub-systems.
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Session
+
+        .card-supporting-text.has-action.has-title
+            p Status of your current session.
+            table.table-list.ui-responsive
                 tr: td Logged in
                     td
                         if session.valid
@@ -18,8 +25,29 @@ block content
                     tr: td Name
                         td: i= session.user.firstName
 
-            h3 Real-time server
-            table.ui-responsive
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Game Logic
+
+        .card-supporting-text.has-action.has-title
+            p Status of the sub-system processing the logic for all active games.
+            table.table-list.ui-responsive
+                tr: td Status
+                    td
+                        if status.live.gameCount > 0
+                            span(style='color: green;') Working
+                        else
+                            span Idle
+                tr: td Active games
+                    td= status.live.gameCount
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Real-time
+
+        .card-supporting-text.has-action.has-title
+            p Status of the server handling all real-time connections to clients.
+            table.table-list.ui-responsive
                 tr: td Status
                     td
                         if status.realtime.online
@@ -29,15 +57,25 @@ block content
                 tr: td Connected clients
                     td= status.realtime.connections
 
-            h3 Web server
-            table.ui-responsive
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Web Server
+
+        .card-supporting-text.has-action.has-title
+            p Status of the web server providing you this front-end.
+            table.table-list.ui-responsive
                 tr: td Status
                     td: span(style='color: green;') Online
                 tr: td Uptime
                     td #{status.web.uptime} seconds
 
-            h3 Database server
-            table.ui-responsive
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Database
+
+        .card-supporting-text.has-action.has-title
+            p Status of the database server.
+            table.table-list.ui-responsive
                 tr: td Status
                     td
                         if status.mongo.online
@@ -45,8 +83,13 @@ block content
                         else
                             span(style='color: red;') Offline
 
-            h3 Cache server
-            table.ui-responsive
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Cache
+
+        .card-supporting-text.has-action.has-title
+            p Status of the in-memory caching server.
+            table.table-list.ui-responsive
                 tr: td Status
                     td
                         if status.redis.online
@@ -55,16 +98,28 @@ block content
                             span(style='color: red;') Offline
                 tr: td Uptime
                     td #{status.redis.uptime} seconds
-                tr: td Queries
+                tr: td Queries processed
                     td= status.redis.commandCount
                 tr: td Cached fields
                     td= status.redis.keyCount
                 tr: td Used memory
                     td= status.redis.memory
 
-            h3 Internal cache
-            table.ui-responsive
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Internal Cache
+
+        .card-supporting-text.has-action.has-title
+            p Status of the high-performance internal caching sub-system.
+            table.table-list.ui-responsive
                 tr: td Cached objects
                     td= status.cache.objectCount
                 tr: td Cached fields
                     td #{status.cache.fieldCount}
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title And you?
+
+        .card-supporting-text.has-action.has-title
+            p And you? How are you doing today? What's your status?
