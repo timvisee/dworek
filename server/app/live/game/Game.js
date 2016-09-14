@@ -123,6 +123,24 @@ Game.prototype.getName = function(callback) {
 };
 
 /**
+ * Get a user from this game.
+ *
+ * @param {UserModel|ObjectId|string} user User instance or user ID.
+ * @param {Game~getUserCallback} callback Called with the user or when an error occurred.
+ */
+Game.prototype.getUser = function(user, callback) {
+    return this.userManager.getUser(user, callback);
+};
+
+/**
+ * Called with the user or when an error occurred.
+ *
+ * @callback Game~getUserCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {User=} User instance.
+ */
+
+/**
  * Unload this live game instance.
  *
  * @param {Game~loadCallback} callback Called on success or when an error occurred.
