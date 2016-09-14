@@ -762,26 +762,27 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     }
 });
 
-// Broadcast
-Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, function(packet) {
-    // Make sure a message has been set
-    if(!packet.hasOwnProperty('token') && !packet.hasOwnProperty('message'))
+/**
+ * Queue of broadcasts that need to be shown to the user.
+ * @type {Array}
+ */
+var broadcastQueue = [];
+
+/**
+ * Show the next queued broadcast.
+ */
+function showNextBroadcast() {
+    // Make sure there's any broadcast to show
+    if(broadcastQueue.length == 0)
         return;
 
-    // Skip this if there's any dialog in queue
-    if(dialogQueue.length > 0)
-        return;
-
-    // Get all properties
-    const token = packet.token;
-    const message = packet.message;
-    const gameId = packet.game;
-    const gameName = packet.gameName;
+    // Get the broadcast to show
+    const broadcast = broadcastQueue[0];
 
     // Determine the message
-    var dialogMessage = message + '<br><hr><i>This broadcast was send by the host of the <b>' + gameName + '</b> game.</i>';
-    if(Dworek.utils.getGameId() == gameId)
-        dialogMessage = message + '<br><hr><i>This broadcast was send by the host of this game.</i>';
+    var dialogMessage = broadcast.message + '<br><hr><i>This broadcast was send by the host of the <b>' + broadcast.gameName + '</b> game.</i>';
+    if(Dworek.utils.getGameId() == broadcast.game)
+        dialogMessage = broadcast.message + '<br><hr><i>This broadcast was send by the host of this game.</i>';
 
     // Define the actions for the dialog
     var actions = [];
@@ -793,6 +794,15 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
             message: dialogMessage,
             actions: actions
         }, function(value) {
+            // Remove the broadcast from the broadcast queue
+            var removeIndex = -1;
+            broadcastQueue.forEach(function(queuedBroadcast, i) {
+                if(queuedBroadcast.token == broadcast.token)
+                    removeIndex = i;
+            });
+            if(removeIndex >= 0)
+                broadcastQueue.splice(removeIndex, 1);
+
             // Don't show the postponed notification if the broadcast was resolved, or if the game is viewed
             if(value === false)
                 return;
@@ -812,12 +822,12 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     };
 
     // Add a 'view game' action if we're currently not viewing the game
-    if(Dworek.utils.getGameId() != gameId)
+    if(Dworek.utils.getGameId() != broadcast.game)
         actions.push({
             text: 'View game',
             value: false,
             action: function() {
-                Dworek.utils.navigateToPath('/game/' + gameId);
+                Dworek.utils.navigateToPath('/game/' + broadcast.game);
             }
         });
 
@@ -830,7 +840,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
         action: function() {
             // Send a broadcast resolve packet
             Dworek.realtime.packetProcessor.sendPacket(PacketType.BROADCAST_RESOLVE, {
-                token: token
+                token: broadcast.token
             });
         }
     });
@@ -843,6 +853,30 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
 
     // Show the dialog
     _showDialog();
+}
+
+// Broadcast
+Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, function(packet) {
+    // Make sure a message has been set
+    if(!packet.hasOwnProperty('token') && !packet.hasOwnProperty('message'))
+        return;
+
+    // Determine whether a broadcast with this token is already queued, and replace it in that case
+    var alreadyQueued = false;
+    broadcastQueue.forEach(function(entry, i) {
+        if(entry.token == packet.token) {
+            broadcastQueue[i] = entry;
+            alreadyQueued = true;
+        }
+    });
+
+    // Add the broadcast to the queue if it wasn't queued yet
+    if(!alreadyQueued)
+        broadcastQueue.push(packet);
+
+    // Show the next queued broadcast if no dialog is shown
+    if(!isDialogVisible())
+        showNextBroadcast();
 });
 
 // Manage the active game
@@ -1021,9 +1055,8 @@ var dialogQueue = [];
  * @param {function} [callback] Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
  */
 function showDialog(options, callback) {
-    // Make sure a dialog isn't currently being shown
-    if(getActivePage().find('.ui-popup-container').not('.ui-popup-hidden').length > 0) {
-        // Pus the dialog in the queue and return
+    // Queue the dialog if a dialog is already being shown
+    if(isDialogVisible()) {
         dialogQueue.push({options: options, callback: callback});
         return;
     }
@@ -1096,7 +1129,10 @@ function showDialog(options, callback) {
 
             // Call the show dialog function
             showDialog(dialogData.options, dialogData.callback);
-        }
+
+        } else
+            // No dialog to show anymore, show the next queued broadcast if there is any
+            showNextBroadcast();
     });
 
     // Build and open the popup
@@ -1160,6 +1196,13 @@ function showDialog(options, callback) {
 
     // Rebuild native droid
     nativeDroid.build(true);
+}
+
+/**
+ * Determine whether there's any dialog shown on the page.
+ */
+function isDialogVisible() {
+    return getActivePage().find('.ui-popup-container').not('.ui-popup-hidden').length > 0;
 }
 
 /**
