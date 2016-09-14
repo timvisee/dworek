@@ -780,6 +780,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.BROADCAST_MESSAGE, fu
     if(!packet.hasOwnProperty('token') && !packet.hasOwnProperty('message'))
         return;
 
+    // Skip this if there's any dialog in queue
+    if(dialogQueue.length > 0)
+        return;
+
     // Get all properties
     const token = packet.token;
     const message = packet.message;
