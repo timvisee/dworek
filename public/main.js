@@ -2294,6 +2294,10 @@ $(document).bind("pageinit", function() {
             message: statusBody,
             actions: [
                 {
+                    text: 'Test GPS',
+                    action: testGps
+                },
+                {
                     text: 'Reload application',
                     action: function() {
                         location.reload();
@@ -2428,3 +2432,37 @@ function updateStatusLabels() {
 $(document).on('offline online', function() {
     updateStatusLabels();
 });
+
+/**
+ * Test the GPS functionality on this device.
+ */
+function testGps() {
+    // Show a notification
+    showNotification('Testing GPS...');
+
+    // Get the current GPS location
+    navigator.geolocation.getCurrentPosition(function() {
+        // Show a notification
+        showNotification('Your GPS is working');
+
+    }, function() {
+        // Show a dialog, the GPS test failed
+        showDialog({
+            title: 'GPS test failed',
+            message: 'We were unable to determine your location using GPS.<br><br>' +
+            'Please make sure this application has permission to request your location, and that location services on your device are enabled.',
+            actions: [
+                {
+                    text: 'Test again',
+                    state: 'primary',
+                    action: testGps
+                },
+                {
+                    text: 'Close'
+                }
+            ]
+        })
+    }, {
+        enableHighAccuracy: true
+    });
+}
