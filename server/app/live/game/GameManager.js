@@ -513,7 +513,9 @@ GameManager.prototype.broadcastData = function(callback) {
  */
 GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
     // Create a data object to send back
-    var gameData = {};
+    var gameData = {
+        factories: []
+    };
 
     // Store this instance
     const self = this;
@@ -636,6 +638,41 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                 // Resolve the latch
                 latch.resolve();
+            });
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Add the factory data
+        latch.add();
+        self.factoryManager.getVisibleFactories(user, function(err, factories) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Loop through the factories
+            factories.forEach(function(factory) {
+                // Get the factory name
+                factory.getName(function(err, name) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the name in the factory object
+                    gameData.factories.push({
+                        id: factories.getIdHex(),
+                        name: name
+                    });
+                });
             });
 
             // Resolve the latch

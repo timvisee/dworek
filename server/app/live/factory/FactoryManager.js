@@ -300,7 +300,7 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
 
             // Add the factory to the array
             factories.push(factory);
-        })
+        });
     });
 
     // Call back the list of factories
