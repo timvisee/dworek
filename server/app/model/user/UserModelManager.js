@@ -23,6 +23,8 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
+var config = require('../../../config');
+
 var CallbackLatch = require('../../util/CallbackLatch');
 var RedisUtils = require('../../redis/RedisUtils');
 var Validator = require('../../validator/Validator');
