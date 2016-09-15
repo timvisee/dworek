@@ -478,5 +478,47 @@ GameUserModel.prototype.setGoods = function(goods, callback) {
     this.setField('goods', goods, callback);
 };
 
+GameUserModel.prototype.addMoney = function(amount, callback) {
+    // Store this instance
+    const self = this;
+    
+    // Get the current money value
+    this.getMoney(function(err, money) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+        
+        // Set the money
+        self.setMoney(money + amount, callback);
+    });
+};
+
+GameUserModel.prototype.subtractMoney = function(amount, callback) {
+    this.addMoney(-amount, callback);
+};
+
+GameUserModel.prototype.addGoods = function(amount, callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the current goods value
+    this.getGoods(function(err, goods) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the goods
+        self.setGoods(goods + amount, callback);
+    });
+};
+
+GameUserModel.prototype.subtractGoods = function(amount, callback) {
+    this.addGoods(-amount, callback);
+};
+
 // Export the user class
 module.exports = GameUserModel;

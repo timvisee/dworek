@@ -306,6 +306,166 @@ User.prototype.hasLocation = function() {
     return this.getLocation() !== null;
 };
 
+User.prototype.getMoney = function(callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the money
+        gameUser.getMoney(callback);
+    });
+};
+
+User.prototype.setMoney = function(money, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the money
+        gameUser.setMoney(money, callback);
+    });
+};
+
+User.prototype.addMoney = function(amount, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the money
+        gameUser.addMoney(amount, callback);
+    });
+};
+
+User.prototype.subtractMoney = function(amount, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the money
+        gameUser.subtractMoney(amount, callback);
+    });
+};
+
+User.prototype.getGoods = function(callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.getGoods(callback);
+    });
+};
+
+User.prototype.setGoods = function(goods, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.setGoods(goods, callback);
+    });
+};
+
+User.prototype.addGoods = function(amount, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.addGoods(amount, callback);
+    });
+};
+
+User.prototype.subtractGoods = function(amount, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.subtractGoods(amount, callback);
+    });
+};
+
 // Export the class
 module.exports = User;
 
