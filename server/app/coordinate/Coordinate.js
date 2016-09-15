@@ -63,5 +63,27 @@ Coordinate.parse = function(raw) {
     return new Coordinate(raw);
 };
 
+/**
+ * Serialize the coordinate to a string.
+ *
+ * @return {string} Serialized coordinate.
+ */
+Coordinate.prototype.serialize = function() {
+    // Stringify the coordinate and return it
+    return JSON.stringify(this);
+};
+
+/**
+ * Deserialize a previously serialized coordinate.
+ *
+ * @param {string} serialized Serialized coordinate.
+ *
+ * @return {Coordinate|null} Serialized coordinate, or null on error.
+ */
+Coordinate.deserialize = function(serialized) {
+    // Convert the serialize data into an object, and parse that as coordinate
+    return Coordinate.parse(JSON.parse(serialized));
+};
+
 // Export the module
 module.exports = Coordinate;
