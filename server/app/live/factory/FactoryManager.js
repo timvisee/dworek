@@ -312,7 +312,7 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
     });
 
     // Call back the list of factories
-    callback(null, factories);
+    latch.then(() => callback(null, factories));
 };
 
 // Export the class

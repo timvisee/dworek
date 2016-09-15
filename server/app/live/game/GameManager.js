@@ -640,39 +640,43 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                 latch.resolve();
             });
 
-            // Resolve the latch
-            latch.resolve();
-        });
+            // Add the factory data
+            latch.add();
+            liveGame.factoryManager.getVisibleFactories(user, function(err, factories) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
 
-        // Add the factory data
-        latch.add();
-        self.factoryManager.getVisibleFactories(user, function(err, factories) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
-                return;
-            }
+                // Loop through the factories
+                factories.forEach(function(factory) {
+                    // Get the factory name
+                    latch.add();
+                    factory.getName(function(err, name) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
 
-            // Loop through the factories
-            factories.forEach(function(factory) {
-                // Get the factory name
-                factory.getName(function(err, name) {
-                    // Call back errors
-                    if(err !== null) {
-                        if(!calledBack)
-                            callback(err);
-                        calledBack = true;
-                        return;
-                    }
+                        // Set the name in the factory object
+                        gameData.factories.push({
+                            id: factory.getIdHex(),
+                            name: name
+                        });
 
-                    // Set the name in the factory object
-                    gameData.factories.push({
-                        id: factories.getIdHex(),
-                        name: name
+                        // Resolve the latch
+                        latch.resolve();
                     });
                 });
+
+                // Resolve the latch
+                latch.resolve();
             });
 
             // Resolve the latch

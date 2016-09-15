@@ -450,11 +450,9 @@ Factory.prototype.isVisibleFor = function(user, callback) {
         return;
     }
 
-    // Get the factory model
+    // Get the factory model and make sure it's valid
     const factoryModel = this.getFactoryModel();
-
-    // Make sure the factory model is valid
-    if(factoryModel != null) {
+    if(factoryModel == null) {
         callback(null, false);
         return;
     }
@@ -471,7 +469,7 @@ Factory.prototype.isVisibleFor = function(user, callback) {
         }
 
         // Call back true if the creator is the same as the user
-        if(result.getId().equals(user)) {
+        if(creator.getId().equals(user.getId())) {
             callback(null, true);
             return;
         }
