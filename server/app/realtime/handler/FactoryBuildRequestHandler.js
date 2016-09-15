@@ -185,28 +185,56 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             return;
                         }
 
-                        // TODO: Make sure the user has enough money!
-
-                        FactoryDatabase.addFactory(factoryName, game, user, factoryLocation, function(err, factoryModel) {
+                        // Make sure the user has enough money
+                        liveUser.getMoney(function(err, money) {
                             // Call back errors
                             if(err !== null || liveUser == null) {
                                 callbackError();
                                 return;
                             }
 
-                            // Load the factory in the live game
-                            liveGame.factoryManager.getFactory(factoryModel, function(err, liveFactory) {
+                            // Make sure the user has enough money
+                            if(money < factoryCost) {
+                                // Send a message response to the user
+                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                    error: true,
+                                    message: 'You don\'t have enough money to build a factory.',
+                                    dialog: true
+                                }, socket);
+                                return;
+                            }
+
+                            // Subtract the money
+                            liveUser.subtractMoney(factoryCost, function(err, callback) {
                                 // Call back errors
                                 if(err !== null || liveUser == null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Send a response to the user
-                                Core.realTime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_RESPONSE, {
-                                    game: rawGame,
-                                    factory: factoryModel.getIdHex()
-                                }, socket);
+                                // Add the factory
+                                FactoryDatabase.addFactory(factoryName, game, user, factoryLocation, function(err, factoryModel) {
+                                    // Call back errors
+                                    if(err !== null || liveUser == null) {
+                                        callbackError();
+                                        return;
+                                    }
+
+                                    // Load the factory in the live game
+                                    liveGame.factoryManager.getFactory(factoryModel, function(err, liveFactory) {
+                                        // Call back errors
+                                        if(err !== null || liveUser == null) {
+                                            callbackError();
+                                            return;
+                                        }
+
+                                        // Send a response to the user
+                                        Core.realTime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_RESPONSE, {
+                                            game: rawGame,
+                                            factory: factoryModel.getIdHex()
+                                        }, socket);
+                                    });
+                                });
                             });
                         });
                     });
