@@ -8,12 +8,19 @@ block tabs
 
 block content
     div(data-role='nd2tab', data-tab='dashboard')
-        p Welcome #{session.user.firstName}! You're logged in.
+        p Welcome #{session.user.firstName}!
 
-        p Show some fancy game buttons...
+        p.
+            You're using an early prototype of #{app.name}, which is still an unfinished product.<br>
+            <br>
+            #{app.name} is currently in the pre-alpha stage and is still prone to bugs, glitches and other unwanted behaviour.<br>
+            <br>
+            Please contribute to the project and support the development on GitHub.
 
-        br
-        a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
+        .button-list
+            a.ui-btn(href='https://github.com/timvisee/Dworek', title='Support on GitHub') View on GitHub
+            a.ui-btn(href='/about', title='About') About
+            a.ui-btn.clr-warning(href='/logout', title='Logout') Logout
 
     div(data-role='nd2tab', data-tab='games')
         - var fadeDelay = -0.1;
