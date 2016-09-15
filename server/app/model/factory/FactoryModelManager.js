@@ -240,7 +240,7 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
 
         // Loop through the results, create an factories object for each user and add it to the array
         data.forEach(function(factoryData) {
-            factories.push(Core.model.factoryModelManager._instanceManager.create(factoryData.user_id));
+            factories.push(Core.model.factoryModelManager._instanceManager.create(factoryData._id));
         });
 
         // Call back with the factories
