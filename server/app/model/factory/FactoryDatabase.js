@@ -96,6 +96,7 @@ FactoryDatabase.addFactory = function(name, game, user, location, callback) {
             name,
             create_date: new Date(),
             user_id: user.getId(),
+            game_id: game.getId(),
             location,
             level: gameConfig.factory.initialLevel,
             defence: gameConfig.factory.initialDefence,
