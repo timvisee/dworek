@@ -42,7 +42,9 @@ const PacketType = {
     GAME_INFO_REQUEST: 12,
     GAME_LOCATIONS_UPDATE: 13,
     GAME_DATA_REQUEST: 14,
-    GAME_DATA: 15
+    GAME_DATA: 15,
+    FACTORY_BUILD_REQUEST: 16,
+    FACTORY_BUILD_RESPONSE: 17
 };
 
 /**
@@ -841,8 +843,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
         updateActiveGame();
     }
 
-    // Update the game data visuals
-    updateGameDataVisuals();
+    // Request new game data
+    requestGameData();
 });
 
 // Register game stage change handler
@@ -2926,6 +2928,9 @@ function buildFactory() {
         '<br><br>' +
         'Building this ' + NameConfig.factory.name + ' will cost you <span class="game-factory-cost">?</span> ' + NameConfig.currency.name + '.';
 
+    // Create a variable for the factory name
+    var nameField = null;
+
     // Show a dialog message
     showDialog({
         title: 'Build ' + capitalizeFirst(NameConfig.factory.name),
@@ -2933,13 +2938,26 @@ function buildFactory() {
         actions: [
             {
                 text: 'Build ' + capitalizeFirst(NameConfig.factory.name),
-                state: 'primary'
+                state: 'primary',
+                action: function() {
+                    // Send a factory creation request
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_REQUEST, {
+                        game: Dworek.utils.getGameId(),
+                        name: nameField.val()
+                    });
+
+                    // Show a notification
+                    showNotification('Building factory...');
+                }
             },
             {
                 text: 'Cancel'
             }
         ]
     });
+
+    // Select the field
+    nameField = getActivePage().find('#' + fieldId);
 
     // Update the game data visuals
     updateGameDataVisuals();

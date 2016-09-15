@@ -173,5 +173,23 @@ module.exports = {
      * - data: The actual game data.
      * - data.factory.cost: New factory cost
      */
-    GAME_DATA: 15
+    GAME_DATA: 15,
+
+    /**
+     * Request from a client to the server to build a factory.
+     *
+     * Data:
+     * - game: ID of the game.
+     * - name: Factory name.
+     */
+    FACTORY_BUILD_REQUEST: 16,
+
+    /**
+     * Response from the server to a client that a factory is build.
+     *
+     * Data:
+     * - game: ID of the game.
+     * - factory: ID of the factory that is build.
+     */
+    FACTORY_BUILD_RESPONSE: 17
 };
