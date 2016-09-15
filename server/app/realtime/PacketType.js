@@ -171,6 +171,7 @@ module.exports = {
      * Data:
      * - game: ID of the game the data is for.
      * - data: The actual game data.
+     * - data.factory.canBuild: True if the user can build a factory, false if not.
      * - data.factory.cost: New factory cost
      */
     GAME_DATA: 15,
@@ -191,5 +192,30 @@ module.exports = {
      * - game: ID of the game.
      * - factory: ID of the factory that is build.
      */
-    FACTORY_BUILD_RESPONSE: 17
+    FACTORY_BUILD_RESPONSE: 17,
+
+    /**
+     * Request from a client for the latest factory data.
+     *
+     * Data:
+     * - factory: ID of the factory.
+     */
+    FACTORY_DATA_REQUEST: 18,
+
+    /**
+     * Response from the server to a client with the latest factory data.
+     *
+     * Data:
+     * - game: ID of the game.
+     * - factory: ID of the factory.
+     * - data: Factory data.
+     * - data.name: Factory name.
+     * - data.level: Factory level.
+     * - data.creatorName: Creator name.
+     * - data.teamName: Team name.
+     * - data.defence: Defence value.
+     * - data.in: In value.
+     * - data.out: Out value.
+     */
+    FACTORY_DATA: 19
 };
