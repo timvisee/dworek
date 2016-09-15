@@ -91,18 +91,18 @@ PacketProcessor.prototype.sendPacket = function(packetType, packet, socket) {
  *
  * @param {Number} packetType Packet type value.
  * @param {Object} packet Packet object to send.
- * @param {UserModel|ObjectId|string} user User instance or user ID to send the packet to.
+ * @param {UserModel|ObjectId|string} userId User instance or user ID to send the packet to.
  * @param {Object} [options] Options object.
  * @param {boolean} [options.once=false] True to only send a packet to one socket, false to send to multiple if available.
  * @return {Number} Number of sockets the packet was send to.
  */
-PacketProcessor.prototype.sendPacketUser = function(packetType, packet, user, options) {
+PacketProcessor.prototype.sendPacketUser = function(packetType, packet, userId, options) {
     // Get the user ID as an ObjectId
-    if(user instanceof UserModel || user instanceof User)
-        user = user.getId();
-    else if(!(user instanceof ObjectId) && ObjectId.isValid(user))
-        user = new ObjectId(user);
-    else if(!(user instanceof ObjectId))
+    if(userId instanceof UserModel || userId instanceof User)
+        userId = userId.getId();
+    else if(!(userId instanceof ObjectId) && ObjectId.isValid(userId))
+        userId = new ObjectId(userId);
+    else if(!(userId instanceof ObjectId))
         throw Error('Invalid user ID');
 
     // Determine whether to send the packet once
@@ -126,11 +126,11 @@ PacketProcessor.prototype.sendPacketUser = function(packetType, packet, user, op
         const entrySocket = Core.realTime._io.sockets.sockets[socketId];
 
         // Skip the socket if not authenticated
-        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid)
+        if(!_.has(entrySocket, 'session.valid') || !_.has(entrySocket, 'session.user') || !entrySocket.session.valid || entrySocket.session.user == null)
             return;
 
         // Compare the user and skip if it isn't the correct user
-        if(!entrySocket.session.user.getId().equals(user.getId()))
+        if(!entrySocket.session.user.getId().equals(userId))
             return;
 
         // Send the packet over the socket
