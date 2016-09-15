@@ -26,6 +26,8 @@ var ObjectId = mongo.ObjectId;
 var Core = require('../../../Core');
 var GameModel = require('../../model/game/GameModel');
 var UserManager = require('../user/UserManager');
+var FactoryManager = require('../factory/FactoryManager');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Game class.
@@ -53,6 +55,12 @@ var Game = function(game) {
      * @type {UserManager} User manager instance.
      */
     this.userManager = new UserManager(this);
+
+    /**
+     * Factory manager instance.
+     * @type {FactoryManager} Factory manager instance.
+     */
+    this.factoryManager = new FactoryManager(this);
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -155,8 +163,44 @@ Game.prototype.getUser = function(user, callback) {
  * @param {Game~loadCallback} callback Called on success or when an error occurred.
  */
 Game.prototype.load = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Load the user manager
-    this.userManager.load(callback);
+    latch.add();
+    this.userManager.load(function(err) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Load the factory manager
+    latch.add();
+    this.factoryManager.load(function(err) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back
+    latch.then(() => callback(null));
 };
 
 /**
