@@ -201,6 +201,18 @@ var GameUserModel = function(id) {
                      */
                     to: (bool) => bool ? 1 : 0
                 }
+            },
+            money: {
+                redis: {
+                    from: (raw) => parseInt(raw),
+                    to: (value) => value.toString()
+                }
+            },
+            goods: {
+                redis: {
+                    from: (raw) => parseInt(raw),
+                    to: (value) => value.toString()
+                }
             }
         }
     });
@@ -412,6 +424,59 @@ GameUserModel.prototype.setSpecial = function(isSpecial, callback) {
     this.setField('is_special', isSpecial, callback);
 };
 
+/**
+ * Get the money the user has.
+ *
+ * @param {GameUserModel~getMoneyCallback} callback Called with result or when an error occurred.
+ */
+GameUserModel.prototype.getMoney = function(callback) {
+    this.getField('money', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~getMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Money.
+ */
+
+/**
+ * Set the money.
+ *
+ * @param {Number} money Money value.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setMoney = function(money, callback) {
+    this.setField('money', money, callback);
+};
+
+/**
+ * Get the goods the user has.
+ *
+ * @param {GameUserModel~getGoodsCallback} callback Called with result or when an error occurred.
+ */
+GameUserModel.prototype.getGoods = function(callback) {
+    this.getField('goods', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~getGoodsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Goods.
+ */
+
+/**
+ * Set the goods.
+ *
+ * @param {Number} goods Goods.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setGoods = function(goods, callback) {
+    this.setField('goods', goods, callback);
+};
 
 // Export the user class
 module.exports = GameUserModel;

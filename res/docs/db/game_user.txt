@@ -9,3 +9,5 @@ user_id : ID            User ID of the user that joined the game.
 team_id : ID, null      Team ID of the team that the user joined. Null if this user isn't in a team.
 is_special : bool       True if this user is a special player, false if not.
 is_spectator : bool     True if this user is a game spectator, false if not.
+money : int             Amount of money this user has.
+goods : int             Amount of goods this user has.
