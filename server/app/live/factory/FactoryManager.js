@@ -282,6 +282,9 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
     // Make sure we only call back once
     var calledBack = false;
 
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
     // Loop through all factories
     this.factories.forEach(function(factory) {
         // Skip if we called back
@@ -289,6 +292,7 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
             return;
 
         // Check whether the factory is visible
+        latch.add();
         factory.isVisibleFor(user, function(err, visible) {
             // Call back errors
             if(err !== null) {
@@ -298,8 +302,12 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
                 return;
             }
 
-            // Add the factory to the array
-            factories.push(factory);
+            // Add the factory to the array if visible
+            if(visible)
+                factories.push(factory);
+
+            // Resolve the latch
+            latch.resolve();
         });
     });
 
