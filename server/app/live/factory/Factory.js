@@ -437,19 +437,6 @@ Factory.prototype.getTeam = function(callback) {
     this.getFactoryModel().getTeam(callback);
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Check whether this factory is visible for the given user.
  *
@@ -471,9 +458,6 @@ Factory.prototype.isVisibleFor = function(user, callback) {
         callback(null, false);
         return;
     }
-
-    // Create a callback latch
-    var latch = new CallbackLatch();
 
     // Get the game model
     var game = this.getGame().getGameModel();
@@ -512,134 +496,94 @@ Factory.prototype.isVisibleFor = function(user, callback) {
                 return;
             }
 
-            // Get the game user
+            // Create a callback latch
+            var latch = new CallbackLatch();
+
+            // Make sure we only call back once
+            var calledBack = false;
+
+            // Get the factory team
+            var factoryTeam;
+            latch.add();
+            self.getTeam(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the team
+                factoryTeam = result;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the game user and team
+            var userTeam;
+            latch.add();
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
                 // Make sure the game user is valid
                 if(gameUser == null) {
-                    callback(null, false);
+                    if(!calledBack)
+                        callback(null, false);
+                    calledBack = true;
                     return;
                 }
 
                 // Get the user state
-                gameUser.getTeam(function(err, team) {
+                gameUser.getTeam(function(err, result) {
                     // Call back errors
                     if(err !== null) {
-                        callback(err);
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
                         return;
                     }
 
+                    // Call back if the team is null
+                    if(result == null) {
+                        if(!calledBack)
+                            callback(null, false);
+                        calledBack = true;
+                        return;
+                    }
 
+                    // Set the user team
+                    userTeam = result;
+
+                    // Resolve the latch
+                    latch.resolve();
                 });
             });
+
+            // Continue if the teams are fetched
+            latch.then(function() {
+                // Call back if the teams are equal
+                if(factoryTeam.getId().equals(userTeam.getId())) {
+                    if(!calledBack)
+                        callback(null, true);
+                    calledBack = true;
+                    return;
+                }
+
+                // TODO: Check the player positions! The player might be in range!
+
+                // The factory probably isn't visible, call back false
+                if(!calledBack)
+                    callback(null, false);
+            });
         });
-
-
-
-
-
-
-
-
-        // Get the game user
-        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            // Get the user roles
-            gameUser.getRok
-        });
-
-        // Get the game team
-        Core.model.gameUserModelManager.getGameUser(game, creator)
-    });
-
-
-
-
-    // Get the factory game
-    latch.add();
-    factoryModel.getGame(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                callback(err);
-            calledBack = true;
-            return;
-        }
-
-        // Set the game
-        game = result;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Continue if we're done fetching the required data
-    latch.then(function() {
-
-    });
-
-    // Get the user model
-    const userModel = this.get
-
-    // Get the live game and game model
-    const liveGame = this.getGame();
-    const gameModel = liveGame.getGameModel();
-
-    // Make sure the game model is valid
-    if(gameModel != null) {
-        callback(null, false);
-        return;
-    }
-
-    // Determine whether we've called back
-    var calledBack = false;
-
-    // Store this instance
-    const self = this;
-
-    // Get the roles
-    userModel.getGameState(gameModel, function(err, roles) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                callback(err);
-            calledBack = true;
-            return;
-        }
-
-        // Return if the user isn't a spectator or player
-        if(!roles.player && !roles.spectator) {
-            if(!calledBack)
-                callback(null, false);
-            calledBack = true;
-            return;
-        }
-
-        // Return true if the user is a spectator
-        if(roles.spectator) {
-            if(!calledBack)
-                callback(null, true);
-            calledBack = true;
-            return;
-        }
-
-        // Check whether the users are in the same team
-        const sameTeam = self.hasTeam() && user.hasTeam() && self.getTeamModel().getId().equals(user.getTeamModel().getId());
-
-        // Call back
-        if(!calledBack)
-            callback(null, sameTeam);
-        calledBack = true;
     });
 };
 
