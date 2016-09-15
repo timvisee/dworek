@@ -614,5 +614,66 @@ FactoryModel.prototype.getLiveFactory = function(callback) {
     });
 };
 
+/**
+ * Get the team of the factory.
+ *
+ * @param callback
+ */
+FactoryModel.prototype.getTeam = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create a variable for the game and user
+    var game;
+    var user;
+
+    // Get the creator of the factory
+    latch.add();
+    this.getUser(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the user
+        user = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the game of the factory
+    latch.add();
+    this.getGame(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the game
+        game = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Continue
+    latch.then(function() {
+        // Get the game user
+        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+            // Call back
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the game team
+            gameUser.getTeam(callback);
+        });
+    });
+};
+
 // Export the factory class
 module.exports = FactoryModel;
