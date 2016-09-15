@@ -2674,7 +2674,7 @@ $(document).bind("tab-switch", function(event, data) {
  */
 function updatePlayerPosition(position) {
     // Return if the user doesn't have the right roles
-    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player && Dworek.state.activeGameRoles.special))
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special))
         return;
 
     // Set the last known location
@@ -2705,7 +2705,7 @@ function updatePlayerPosition(position) {
         // Create a player range circle if we don't have one yet
         if(playerRange == null) {
             // Create the player range circle
-            playerRange = L.circle([position.coords.latitude, position.coords.longitude], Dworek.state.geoLastPlayerPosition.coords.accuracy);
+            playerRange = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
 
             // Add the circle to the map
             playerRange.addTo(map);
@@ -2726,6 +2726,10 @@ function updatePlayerPosition(position) {
 function updatePlayerMarkers(users) {
     // Make sure the map is loaded
     if(map == null)
+        return;
+
+    // Return if the user doesn't have the right roles
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special || Dworek.state.activeGameRoles.spectator))
         return;
 
     // Determine whether to fit all users in the map after updating
