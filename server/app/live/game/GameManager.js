@@ -373,8 +373,10 @@ GameManager.prototype.broadcastData = function(callback) {
     // Loop through the games
     this.games.forEach(function(game) {
         // Loop through the game users
-        latch.add();
         game.userManager.users.forEach(function(user) {
+            // Add a latch
+            latch.add();
+
             // Get the user model
             const userModel = user.getUserModel();
 
@@ -469,7 +471,7 @@ GameManager.prototype.broadcastData = function(callback) {
                 // Send the data to the proper sockets when done
                 gameLatch.then(function() {
                     // Create a packet and send it to the correct user
-                    var count = Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
+                    Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
                         game: game.getIdHex(),
                         users
                     }, user);
