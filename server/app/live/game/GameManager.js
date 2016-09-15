@@ -25,6 +25,7 @@ var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
 var Core = require('../../../Core');
+var PacketType = require('../../realtime/PacketType');
 var Game = require('./Game');
 var GameModel = require('../../model/game/GameModel');
 var CallbackLatch = require('../../util/CallbackLatch');
@@ -356,6 +357,143 @@ GameManager.prototype.unloadGame = function(gameId) {
     if(removeIndex >= 0)
         this.games.splice(removeIndex, 1);
 };
+
+/**
+ * Broadcast the status of all loaded games to all real-time connected clients.
+ *
+ * @param {GameManager~broadcastDataCallback} [callback] Called on success or when an error occurred.
+ */
+GameManager.prototype.broadcastData = function(callback) {
+    // Make sure we only call back once
+    var calledBack = false;
+
+    // Create a callback latch for all games
+    var latch = new CallbackLatch();
+
+    // Loop through the games
+    this.games.forEach(function(game) {
+        // Loop through the game users
+        latch.add();
+        game.userManager.users.forEach(function(user) {
+            // Get the user model
+            const userModel = user.getUserModel();
+
+            // Create a callback latch
+            var gameLatch = new CallbackLatch();
+
+            // Determine whether to show team and/or all players
+            var showTeamPlayers = false;
+            var showAllPlayers = false;
+
+            // Get the user state
+            gameLatch.add();
+            userModel.getGameState(game.getGameModel(), function(err, userState) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        if(_.isFunction(callback))
+                            callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Update the show flags
+                showTeamPlayers = userState.player;
+                showAllPlayers = userState.spectator || (!userState.player && userState.special);
+
+                // Resolve the latch
+                gameLatch.resolve();
+            });
+
+            // Create a list of users when the user state is fetched
+            gameLatch.then(function() {
+                // Reset the latch to it's identity
+                gameLatch.identity();
+
+                // Create a users list
+                var users = [];
+
+                // Loop through the list user
+                game.userManager.users.forEach(function(otherUser) {
+                    // Skip each user if we already called back
+                    if(calledBack)
+                        return;
+
+                    // Skip the current user
+                    if(otherUser.isUser(user.getId()))
+                        return;
+
+                    // Skip the user if he doesn't have a recent location
+                    // TODO: Don't skip if the user is a shop!
+                    if(!otherUser.hasRecentLocation())
+                        return;
+
+                    // Determine whether to add this user
+                    var addUser = showAllPlayers;
+
+                    // TODO: Also show if the user is a shop!
+
+                    // Check if only users in a specific team should be shown
+                    if(!addUser && showTeamPlayers) {
+                        // Check whether the user is in the correct team
+                        if(user.getTeamModel().getId().equals(otherUser.getTeamModel().getId()))
+                            addUser = true;
+                    }
+
+                    // Get the user location
+                    const location = otherUser.getLocation();
+
+                    // Get the name of the user
+                    gameLatch.add();
+                    otherUser.getName(function(err, name) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                if(_.isFunction(callback))
+                                    callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Create a user object and add it to the list
+                        users.push({
+                            user: otherUser.getIdHex(),
+                            userName: name,
+                            location
+                        });
+                    });
+                });
+
+                // Send the data to the proper sockets when done
+                gameLatch.then(function() {
+                    // Create a packet and send it to the correct user
+                    var count = Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
+                        game: game.getIdHex(),
+                        users
+                    }, user);
+
+                    // Resolve the latch
+                    latch.resolve();
+
+                    console.log('Location updates send to ' + count + ' sockets!');
+                });
+            });
+        });
+    });
+
+    // Call back when we're done
+    latch.then(function() {
+        if(!calledBack)
+            callback(null);
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback GameManager~broadcastDataCallback
+ * @type {Error|null} Error instance if an error occurred, null on success.
+ */
 
 // Export the class
 module.exports = GameManager;
