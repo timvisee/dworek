@@ -297,6 +297,15 @@ User.prototype.hasRecentLocation = function() {
     return this.getRecentLocation() !== null;
 };
 
+/**
+ * Check whether we know the last location of the user.
+ *
+ * @return {boolean} True if the last location is known.
+ */
+User.prototype.hasLocation = function() {
+    return this.getLocation() !== null;
+};
+
 // Export the class
 module.exports = User;
 
