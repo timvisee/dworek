@@ -3143,6 +3143,56 @@ function updateGameDataVisuals() {
         // Determine whether anything is changed
         var changed = false;
 
+        // Create an array with the factory IDs that are shown
+        var factoryIds = [];
+
+        // Define the factory card selector prefix
+        const factoryCardSelector = 'card-factory';
+
+        // Loop through the list of factories
+        data.factories.forEach(function(factory) {
+            // Add the factory ID to the array
+            factoryIds.push(factory.id);
+
+            // Determine the card selector for this factory´s card and get the elements for it
+            var factoryCardElement = activePage.find('.' + factoryCardSelector + '[data-factory-id=\'' + factory.id + '\']');
+
+            // Skip this run if it already exists
+            if(factoryCardElement.length > 0)
+                return;
+
+            // Create a new card for this factory
+            gameActionsList.append('<div class="nd2-card wow fadeInUp ' + factoryCardSelector + '" data-factory-id="' + factory.id + '">' +
+                '    <div class="card-title has-supporting-text">' +
+                '        <h3 class="card-primary-title">' + factory.name + '</h3>' +
+                '    </div>' +
+                '    <div class="card-supporting-text has-action has-title">' +
+                '        <p>Info here</p>' +
+                '    </div>' +
+                '    <div class="card-action">' +
+                '        <div class="row between-xs">' +
+                '            <div class="col-xs-12">' +
+                '                <div class="box">' +
+                '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn ui-btn-inline waves-effect waves-button">View ' + NameConfig.factory.name + '</a>' +
+                '                </div>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</div>');
+            changed = true;
+        });
+
+        // Find all factory cards, and loop through them
+        const factoryCards = activePage.find('.' + factoryCardSelector);
+        factoryCards.each(function() {
+            // Get the factory ID
+            const factoryId = $(this).data('factory-id');
+
+            // Delete the card if it's not in the factory IDs array
+            if(jQuery.inArray(factoryId, factoryIds))
+                $(this).remove();
+        });
+
         // Determine whether we should show the factory build button
         const showFactoryBuild = data.hasOwnProperty('factory') && data.factory.hasOwnProperty('canBuild') && data.factory.canBuild;
         if(showFactoryBuild)
