@@ -1,18 +1,18 @@
 //kut namen
 Drerrie
+Harambe
 Instahoertje
 Kringspiermusketier
-Harambe
 
 //namen uit breaking bad
-Whalter White
-Jesse Pinkman
-Saul Goodman
-Skyler White
-Hank Schrader
 Gustavo 'Gus' Fring
-Mike Ehrmantraut
-Huell
-Krazy-8
-Skinny Pete
+Hank Schrader
 Hector
+Huell
+Jesse Pinkman
+Krazy-8
+Mike Ehrmantraut
+Saul Goodman
+Skinny Pete
+Skyler White
+Whalter White
