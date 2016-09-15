@@ -175,6 +175,57 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
     if(user != null)
         queryObject.user_id = user.getId();
 
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the Redis cache key
+    var redisCacheKey = REDIS_KEY_ROOT + ':' +(game != null ? game.getIdHex() : '0' ) +
+        ':' +(user != null ? user.getIdHex() : '0' ) + ':getFactories';
+
+    // Store this instance
+    const self = this;
+
+    // Check whether the factory is valid through Redis if ready
+    if(RedisUtils.isReady()) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while fetching factories, falling back to MongoDB.')
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null or zero
+            if(result === undefined || result === null || result == 0) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Split the list of factories
+            const rawFactoryIds = result.split(',');
+
+            // Create an array of factories
+            var factories = [];
+
+            // Loop over the factory IDs and create factory models
+            rawFactoryIds.forEach(function(factoryId) {
+                factories.push(self._instanceManager.create(factoryId));
+            });
+
+            // Call back the list of factories
+            //noinspection JSCheckFunctionSignatures
+            callback(null, factories);
+        });
+    }
+
     // Fetch the result from MongoDB
     FactoryDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
         // Call back errors
@@ -194,6 +245,28 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
 
         // Call back with the factories
         callback(null, factories);
+
+        // Store the result in Redis if ready
+        if(RedisUtils.isReady()) {
+            // Create a list of raw factory IDs
+            var rawFactoryIds = [];
+            factories.forEach(function(factory) {
+                rawFactoryIds.push(factory.getIdHex());
+            });
+
+            // Join the factory IDs
+            var joined = rawFactoryIds.join(',');
+
+            // Store the results
+            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, joined, function(err) {
+                // Show a warning on error
+                if(err !== null && err !== undefined) {
+                    console.error('A Redis error occurred when storing fetched factories, ignoring.');
+                    console.error(new Error(err));
+                }
+            });
+        }
+
     });
 };
 
