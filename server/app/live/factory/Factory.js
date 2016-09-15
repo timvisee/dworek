@@ -428,6 +428,221 @@ Factory.prototype.sendData = function(user, sockets, callback) {
         sockets = [sockets];
 };
 
+/**
+ * Get the team of the factory.
+ *
+ * @param {function} callback callback(err, team)
+ */
+Factory.prototype.getTeam = function(callback) {
+    this.getFactoryModel().getTeam(callback);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Check whether this factory is visible for the given user.
+ *
+ * @param {User} user Given user.
+ * @param {function} callback callback(err, isVisible)
+ */
+Factory.prototype.isVisibleFor = function(user, callback) {
+    // Make sure a valid user is given
+    if(user == null) {
+        callback(null, false);
+        return;
+    }
+
+    // Get the factory model
+    const factoryModel = this.getFactoryModel();
+
+    // Make sure the factory model is valid
+    if(factoryModel != null) {
+        callback(null, false);
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Get the game model
+    var game = this.getGame().getGameModel();
+
+    // Get the factory creator
+    factoryModel.getUser(function(err, creator) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back true if the creator is the same as the user
+        if(result.getId().equals(user)) {
+            callback(null, true);
+            return;
+        }
+
+        // Get the user state
+        game.getUserState(user, function(err, userState) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back false if the user isn't a player or spectator
+            if(!userState.player && !userState.special) {
+                callback(null, false);
+                return;
+            }
+
+            // Call back true if the user is a spectator
+            if(userState.spectator) {
+                callback(null, true);
+                return;
+            }
+
+            // Get the game user
+            Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Make sure the game user is valid
+                if(gameUser == null) {
+                    callback(null, false);
+                    return;
+                }
+
+                // Get the user state
+                gameUser.getTeam(function(err, team) {
+                    // Call back errors
+                    if(err !== null) {
+                        callback(err);
+                        return;
+                    }
+
+
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+        // Get the game user
+        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the user roles
+            gameUser.getRok
+        });
+
+        // Get the game team
+        Core.model.gameUserModelManager.getGameUser(game, creator)
+    });
+
+
+
+
+    // Get the factory game
+    latch.add();
+    factoryModel.getGame(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game
+        game = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Continue if we're done fetching the required data
+    latch.then(function() {
+
+    });
+
+    // Get the user model
+    const userModel = this.get
+
+    // Get the live game and game model
+    const liveGame = this.getGame();
+    const gameModel = liveGame.getGameModel();
+
+    // Make sure the game model is valid
+    if(gameModel != null) {
+        callback(null, false);
+        return;
+    }
+
+    // Determine whether we've called back
+    var calledBack = false;
+
+    // Store this instance
+    const self = this;
+
+    // Get the roles
+    userModel.getGameState(gameModel, function(err, roles) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Return if the user isn't a spectator or player
+        if(!roles.player && !roles.spectator) {
+            if(!calledBack)
+                callback(null, false);
+            calledBack = true;
+            return;
+        }
+
+        // Return true if the user is a spectator
+        if(roles.spectator) {
+            if(!calledBack)
+                callback(null, true);
+            calledBack = true;
+            return;
+        }
+
+        // Check whether the users are in the same team
+        const sameTeam = self.hasTeam() && user.hasTeam() && self.getTeamModel().getId().equals(user.getTeamModel().getId());
+
+        // Call back
+        if(!calledBack)
+            callback(null, sameTeam);
+        calledBack = true;
+    });
+};
+
 // Export the class
 module.exports = Factory;
 
