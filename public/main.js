@@ -637,7 +637,7 @@ var Dworek = {
          * @return {boolean} True if we're on a game related page, false if not.
          */
         isGamePage: function() {
-            return this.getGameId() !== null;
+            return this.getGameId() != null;
         },
 
         /**
@@ -655,6 +655,32 @@ var Dworek = {
 
             // Get and return the game ID
             return result[1].toLowerCase();
+        },
+
+        /**
+         * Determine whether we're on a factory page.
+         *
+         * @return {boolean} True if we're on a factory related page, false if not.
+         */
+        isFactoryPage: function() {
+            return this.getFactoryId() != null;
+        },
+
+        /**
+         * Get the factory ID of the factory pages we're currently on.
+         *
+         * @return {string|null} Factory ID or null if we're not on a game page.
+         */
+        getFactoryId: function() {
+            // Create a regular expression to fetch the factory ID from the URL
+            const result = document.location.pathname.trim().match(/^\/game\/([a-f0-9]{24})\/factory\/([a-f0-9]{24})(\/.*)?$/);
+
+            // Make sure any result was found
+            if(result === null || result.length < 2)
+                return null;
+
+            // Get and return the factory ID
+            return result[2].toLowerCase();
         },
 
         /**
@@ -847,6 +873,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
 
     // Request new game data
     requestGameData();
+    requestFactoryData();
 });
 
 // Register game stage change handler
@@ -3058,7 +3085,7 @@ function requestGameData(game) {
 // Update the game info
 Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_DATA, function(packet) {
     // Make sure the packet contains the required properties
-    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('game'))
+    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('data'))
         return;
 
     // Get the packet data
@@ -3179,4 +3206,143 @@ function updateGameDataVisuals() {
     if(Dworek.state.activeGame == gameId)
         // Update the game stage
         Dworek.state.activeGameStage = data.stage;
+}
+
+/**
+ * Object containing the factory data of all loaded games.
+ * @type {Object}
+ */
+var factoryData = {};
+
+/**
+ * Check whether we've any data for the given factory ID.
+ * The ID of the viewed factory will be used if no ID is given.
+ *
+ * @param {string} [factory] Factory ID.
+ */
+function hasFactoryData(factory) {
+    // Parse the factory parameter
+    if(factory === undefined)
+        factory = Dworek.utils.getFactoryId();
+
+    // Make sure the factory ID is valid
+    if(factory == null)
+        return false;
+
+    // Check whether we've factory data
+    return factoryData.hasOwnProperty(factory);
+}
+
+/**
+ * Get the factory data of the given factory.
+ * The ID of the viewed factory will be used if no ID is given.
+ *
+ * @param {string} factory ID of the factory.
+ */
+function getFactoryData(factory) {
+    // Parse the factory parameter
+    if(factory == undefined)
+        factory = Dworek.utils.getFactoryId();
+
+    // Return null if we don't have any factory data
+    if(!hasFactoryData(factory))
+        return null;
+
+    // Get the factory data
+    return factoryData[factory];
+}
+
+/**
+ * Request the factory data for the given factory.
+ * The ID of the viewed factory will be used if no ID is given.
+ *
+ * @param {string} [factory] ID of the factory.
+ */
+function requestFactoryData(factory) {
+    // Parse the factory parameter
+    if(factory == undefined)
+        factory = Dworek.utils.getFactoryId();
+
+    // Don't request if we aren't authenticated yet
+    if(!Dworek.state.loggedIn)
+        return;
+
+    // Make sure the game isn't null
+    if(factory == null)
+        return;
+
+    // Show a status message
+    console.log('Requesting factory data...');
+
+    // Request the game data
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DATA_REQUEST, {
+        factory: factory
+    });
+}
+
+// Update the factory info
+Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, function(packet) {
+    // Make sure the packet contains the required properties
+    if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('game') || !packet.hasOwnProperty('data'))
+        return;
+
+    // Get the packet data
+    const factoryId = packet.factory;
+    const gameId = packet.game;
+    const data = packet.data;
+
+    // Set the factory data
+    factoryData[factoryId] = data;
+
+    // Update the factory data visuals
+    updateFactoryDataVisuals();
+});
+
+// Update the factory data visuals when initializing a page
+$(document).bind("pageinit", function() {
+    updateFactoryDataVisuals();
+});
+
+/**
+ * Update all visual things that depend on the game data.
+ */
+function updateFactoryDataVisuals() {
+    // Make sure we're on a factory page
+    if(!Dworek.utils.isFactoryPage())
+        return;
+
+    // Get the factory ID and make sure it's valid
+    const factoryId = Dworek.utils.getFactoryId();
+    if(factoryId == null)
+        return;
+
+    // Make sure we've any factory data for this factory, request new data and return if we don't have anything
+    if(!hasFactoryData(factoryId)) {
+        requestFactoryData(factoryId);
+        return;
+    }
+
+    // Get the factory data
+    var data = getFactoryData(factoryId);
+
+    // Get the active page
+    const activePage = getActivePage();
+
+    // Get the elements
+    const factoryNameLabel = activePage.find('.factory-name');
+    const factoryLevelLabel = activePage.find('.factory-level');
+    const factoryCreatorLabel = activePage.find('.factory-creator');
+    const factoryTeamLabel = activePage.find('.factory-team');
+    const factoryDefenceLabel = activePage.find('.factory-defence');
+    const factoryInLabel = activePage.find('.factory-in');
+    const factoryOutLabel = activePage.find('.factory-out');
+
+    // Update the elements
+    factoryNameLabel.html(data.name);
+    factoryLevelLabel.html(data.level);
+    factoryCreatorLabel.html(data.creatorName);
+    factoryTeamLabel.html(data.teamName);
+    factoryDefenceLabel.html(data.defence);
+    factoryInLabel.html(data.in);
+    factoryOutLabel.html(data.out);
 }

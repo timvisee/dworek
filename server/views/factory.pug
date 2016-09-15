@@ -8,16 +8,18 @@ block content
         .card-supporting-text.has-action.has-title
             table.table-list.ui-responsive
                 tr: td Name
-                    td= factory.name
+                    //td.factory-name= factory.name
+                    td.factory-name= factory.name
                 tr: td Level
-                    td= factory.level
+                    //td.factory-level= factory.level
+                    td.factory-level= factory.level
                 tr: td Creator
-                    td= factory.creatorName
+                    td.factory-creator= factory.creatorName
                 tr: td Team
-                    td= factory.teamName
+                    td.factory-team= factory.teamName
                 tr: td Defence
-                    td= factory.defence
+                    td.factory-defence= factory.defence
                 tr: td.game-label-input In
-                    td= factory.in
+                    td.factory-in= factory.in
                 tr: td.game-label-output Out
-                    td= factory.out
+                    td.factory-out= factory.out
