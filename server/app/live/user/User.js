@@ -466,6 +466,86 @@ User.prototype.subtractGoods = function(amount, callback) {
     });
 };
 
+/**
+ * Check whether this user is visible for the given user.
+ *
+ * @param {User} other Given user.
+ * @param {function} callback callback(err, isVisible)
+ */
+User.prototype.isVisibleFor = function(other, callback) {
+    // Make sure a valid user is given
+    if(other == null) {
+        callback(null, false);
+        return;
+    }
+
+    // Make sure it's not this user
+    if(this.isUser(other.getId())) {
+        callback(null, false);
+        return;
+    }
+
+    // Make sure this user has a recent location
+    if(!this.hasRecentLocation()) {
+        callback(null, false);
+        return;
+    }
+
+    // Get the user model
+    const userModel = this.getUserModel();
+
+    // Get the live game and game model
+    const liveGame = this.getGame();
+    const gameModel = liveGame.getGameModel();
+
+    // Make sure the game model is valid
+    if(gameModel != null) {
+        callback(null, false);
+        return;
+    }
+
+    // Determine whether we've called back
+    var calledBack = false;
+
+    // Store this instance
+    const self = this;
+
+    // Get the roles
+    userModel.getGameState(gameModel, function(err, roles) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Return if the user isn't a spectator or player
+        if(!roles.player && !roles.spectator) {
+            if(!calledBack)
+                callback(null, false);
+            calledBack = true;
+            return;
+        }
+
+        // Return true if the user is a spectator
+        if(roles.spectator) {
+            if(!calledBack)
+                callback(null, true);
+            calledBack = true;
+            return;
+        }
+
+        // Check whether the users are in the same team
+        const sameTeam = self.hasTeam() && other.hasTeam() && self.getTeamModel().getId().equals(other.getTeamModel().getId());
+
+        // Call back
+        if(!calledBack)
+            callback(null, sameTeam);
+        calledBack = true;
+    });
+};
+
 // Export the class
 module.exports = User;
 
