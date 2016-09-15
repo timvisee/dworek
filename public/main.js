@@ -221,8 +221,11 @@ var Dworek = {
 
             // TODO: Make sure geo location is supported
 
+            // Determine whether to send locations to the server
+            const sendLocationUpdates = playing && (Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special);
+
             // Start the GEO location watcher if it needs to be started
-            if(playing && Dworek.state.geoWatcher == null) {
+            if(sendLocationUpdates && Dworek.state.geoWatcher == null) {
                 // Show a status message
                 console.log('Starting GPS wachter...');
 
@@ -264,7 +267,7 @@ var Dworek = {
                     maximumAge: 3 * 1000
                 });
 
-            } else if(!playing && Dworek.state.geoWatcher != null) {
+            } else if(!sendLocationUpdates && Dworek.state.geoWatcher != null) {
                 // Show a status message
                 console.log('Stopping GPS watcher...');
 
@@ -2401,7 +2404,13 @@ var batteryInstance = null;
  */
 function updateStatusLabels() {
     // Check whether we're playing
-    const playing = Dworek.gameWorker.active;
+    var playing = Dworek.gameWorker.active;
+
+    // Make sure the user roles are fetched
+    if(Dworek.state.activeGameRoles != null)
+        playing = playing & (Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special);
+    else
+        playing = false;
 
     // Get the icon and labels
     const statusIcon = $('.status-icon');
