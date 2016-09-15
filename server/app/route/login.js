@@ -40,7 +40,11 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the login page
-    LayoutRenderer.render(req, res, next, 'login');
+    LayoutRenderer.render(req, res, next, 'login', 'Login', {
+        page: {
+            leftButton: 'back'
+        }
+    });
 });
 
 // Login index

@@ -41,7 +41,11 @@ router.get('/', function(req, res, next) {
     }
 
     // Show the registration page
-    LayoutRenderer.render(req, res, next, 'register', 'Registration');
+    LayoutRenderer.render(req, res, next, 'register', 'Registration', {
+        page: {
+            leftButton: 'back'
+        }
+    });
 });
 
 // Register index
