@@ -115,10 +115,82 @@ var FactoryModel = function(id) {
                     to: (location) => location.serialize()
                 }
             },
-            level: {},
-            defence: {},
-            in: {},
-            out: {}
+            level: {
+                redis: {
+                    /**
+                     * Convert the string back to a numeric value.
+                     *
+                     * @param {string} raw String value.
+                     * @return {Number} Numeric value.
+                     */
+                    from: (raw) => parseInt(raw),
+
+                    /**
+                     * Convert the numeric value to a string.
+                     *
+                     * @param {Number} value Numeric value.
+                     * @return {string} String value.
+                     */
+                    to: (value) => value.toString()
+                }
+            },
+            defence: {
+                redis: {
+                    /**
+                     * Convert the string back to a numeric value.
+                     *
+                     * @param {string} raw String value.
+                     * @return {Number} Numeric value.
+                     */
+                    from: (raw) => parseInt(raw),
+
+                    /**
+                     * Convert the numeric value to a string.
+                     *
+                     * @param {Number} value Numeric value.
+                     * @return {string} String value.
+                     */
+                    to: (value) => value.toString()
+                }
+            },
+            in: {
+                redis: {
+                    /**
+                     * Convert the string back to a numeric value.
+                     *
+                     * @param {string} raw String value.
+                     * @return {Number} Numeric value.
+                     */
+                    from: (raw) => parseInt(raw),
+
+                    /**
+                     * Convert the numeric value to a string.
+                     *
+                     * @param {Number} value Numeric value.
+                     * @return {string} String value.
+                     */
+                    to: (value) => value.toString()
+                }
+            },
+            out: {
+                redis: {
+                    /**
+                     * Convert the string back to a numeric value.
+                     *
+                     * @param {string} raw String value.
+                     * @return {Number} Numeric value.
+                     */
+                    from: (raw) => parseInt(raw),
+
+                    /**
+                     * Convert the numeric value to a string.
+                     *
+                     * @param {Number} value Numeric value.
+                     * @return {string} String value.
+                     */
+                    to: (value) => value.toString()
+                }
+            }
         }
     });
 };
