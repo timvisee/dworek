@@ -574,5 +574,45 @@ FactoryModel.prototype.setOut = function(value, callback) {
     this.setField('out', value, callback);
 };
 
+/**
+ * Get the live factory instance for this factory.
+ *
+ * @param {function} callback callback(err, liveFactory) The factory might be null if it's currently not loaded.
+ */
+FactoryModel.prototype.getLiveFactory = function(callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the factory game
+    this.getGame(function(err, game) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Get the live game this factory is in
+        Core.gameController.getGame(game, function(err, liveGame) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the live factory
+            liveGame.factoryManager.getFactory(self, function(err, liveFactory) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Call back the live factory
+                callback(null, liveFactory);
+            });
+        })
+    });
+};
+
 // Export the factory class
 module.exports = FactoryModel;
