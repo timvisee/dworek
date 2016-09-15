@@ -57,6 +57,9 @@ var RedisUtils = function() {};
  * @param {RedisUtils~connectCallback} [callback] Called when a connection has been made, or when failed to connect.
  */
 RedisUtils.connect = function(callback) {
+    // Make sure we only call back once
+    var calledBack = false;
+
     // Do not connect if Redis usage is disabled
     if(!config.redis.enable) {
         // Show a warning
@@ -64,7 +67,9 @@ RedisUtils.connect = function(callback) {
 
         // Call the callback if available
         if(callback != undefined)
-            callback(null, null);
+            if(!calledBack)
+                callback(null, null);
+        calledBack = true;
         return;
     }
 
@@ -93,7 +98,9 @@ RedisUtils.connect = function(callback) {
 
         // Call the callback
         if(callback != undefined)
-            callback(err, redisClient);
+            if(!calledBack)
+                callback(err, redisClient);
+        calledBack = true;
     });
 
     // Handle reconnecting
@@ -112,7 +119,9 @@ RedisUtils.connect = function(callback) {
 
         // Call the callback
         if(callback != undefined)
-            callback(err, undefined);
+            if(!calledBack)
+                callback(err, undefined);
+        calledBack = true;
     });
 
     // Handle end
