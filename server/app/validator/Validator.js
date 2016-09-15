@@ -250,7 +250,7 @@ Validator.isValidFactoryName = function(factoryName) {
     const charCount = factoryName.length;
 
     // Make sure the length is within bounds
-    return (charCount >= config.validation.factoryMinLength && charCount <= config.validation.factoryMaxLength);
+    return (charCount >= config.validation.factoryNameMinLength && charCount <= config.validation.factoryNameMaxLength);
 };
 
 // Export the class
