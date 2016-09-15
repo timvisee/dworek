@@ -6,6 +6,7 @@
 _id : ID                Factory ID.
 name : string           Factory name.
 create_date : Date      The date/time this factory was created at.
+game_id : ID            ID of the game this lab is part of.
 user_id : ID            ID of the user that created this factory.
 location : Object       Coordinate object defining the location.
 level : int             Level of the factory.

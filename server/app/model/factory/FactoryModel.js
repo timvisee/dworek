@@ -58,6 +58,44 @@ var FactoryModel = function(id) {
                     to: ConversionFunctions.dateToRedis
                 }
             },
+            game: {
+                mongo: {
+                    field: 'game_id',
+
+                    /**
+                     * Convert an ID to an Game model.
+                     *
+                     * @param {ObjectId} id
+                     * @return {GameModel} Game.
+                     */
+                    from: (id) => Core.model.gameModelManager._instanceManager.create(id),
+
+                    /**
+                     * Convert an Game model to an ID.
+                     *
+                     * @param {GameModel} game Game.
+                     * @return {ObjectId} ID.
+                     */
+                    to: (game) => game.getId()
+                },
+                redis: {
+                    /**
+                     * Convert a hexadecimal ID to a game model.
+                     *
+                     * @param {String} id
+                     * @return {GameModel} Game.
+                     */
+                    from: (id) => Core.model.gameModelManager._instanceManager.create(id),
+
+                    /**
+                     * Convert an game model to a hexadecimal ID.
+                     *
+                     * @param {GameModel} game Game.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (game) => game.getIdHex()
+                }
+            },
             user: {
                 mongo: {
                     field: 'user_id',
@@ -318,6 +356,33 @@ FactoryModel.prototype.getCreateDate = function(callback) {
  */
 FactoryModel.prototype.setCreateDate = function(date, callback) {
     this.setField('create_date', date, callback);
+};
+
+/**
+ * Get the game for the factory.
+ *
+ * @param {FactoryModel~getGameCallback} callback Called with user or when an error occurred.
+ */
+FactoryModel.prototype.getGame = function(callback) {
+    this.getField('game', callback);
+};
+
+/**
+ * Called with the game or when an error occurred.
+ *
+ * @callback FactoryModel~getGameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameModel} Game of the factory.
+ */
+
+/**
+ * Set the game of the factory.
+ *
+ * @param {GameModel} game Game.
+ * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+FactoryModel.prototype.setGame = function(game, callback) {
+    this.setField('game', game, callback);
 };
 
 /**
