@@ -133,6 +133,11 @@ var Dworek = {
         geoState: GeoStates.UNKNOWN,
 
         /**
+         * The last known player position.
+         */
+        geoLastPlayerPosition: null,
+
+        /**
          * The time the client was last connected at.
          * @type {Number} Time as timestamp, or -1 if unspecified.
          */
@@ -249,6 +254,9 @@ var Dworek = {
                             altitudeAccuracy: position.coords.altitudeAccuracy,
                         }
                     });
+
+                    // Update the player position
+                    updatePlayerPosition(position);
 
                 }, function(error) {
                     // Handle error codes
@@ -1101,7 +1109,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     const hasUsers = packet.hasOwnProperty('users');
 
     // Show a notification
-    showNotification('Received location data for ' + packet.users.length + ' users');
+    console.log('Received location data for ' + packet.users.length + ' users');
 });
 
 // Update the active game and status labels when a new page is being shown
@@ -2552,12 +2560,15 @@ function testGps() {
     showNotification('Testing GPS...');
 
     // Get the current GPS location
-    navigator.geolocation.getCurrentPosition(function() {
+    navigator.geolocation.getCurrentPosition(function(position) {
         // Set the GPS state
         setGpsState(GeoStates.WORKING);
 
         // Show a notification
         showNotification('Your GPS is working');
+
+        // Update the player location
+        updatePlayerPosition(position);
 
     }, function(error) {
         // Handle error codes
@@ -2606,4 +2617,98 @@ function setGpsState(state) {
 
     // Update the status labels
     updateStatusLabels();
+}
+
+var map = null;
+var playerMarker = null;
+var playerRange = null;
+
+// Update the active game and status labels when a new page is being shown
+$(document).bind("tab-switch", function(event, data) {
+    if(data.to.find('#map-container').length > 0) {
+        // Update the map container size
+        $('#map-container').height($(document).height() - getActivePage().find('.ui-header').height());
+
+        // Use the last known player location when possible
+        var latlng = [52.0705, 4.3007];
+        if(Dworek.state.geoLastPlayerPosition != null)
+            latlng = [Dworek.state.geoLastPlayerPosition.coords.latitude, Dworek.state.geoLastPlayerPosition.coords.longitude];
+
+        // Create a map if none has been created yet
+        // TODO: Make sure the map container still exists!?
+        if(map == null) {
+            // Create the map
+            map = L.map('map-container').setView(latlng, 18);
+
+            // Set up the tile layers
+            L.tileLayer('https://api.mapbox.com/styles/v1/timvisee/cirawmn8f001ch4m27llnb45d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGltdmlzZWUiLCJhIjoiY2lyZXY5cDhzMDAxM2lsbTNicGViaTZkYyJ9.RqbUkoWLWeh_WZoyoxxt-Q', {
+                attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>'
+            }).addTo(map);
+
+            // TODO: Request player positions from server
+
+            // Check whether we've a last known player position
+            if(Dworek.state.geoLastPlayerPosition != null) {
+                // Get the latlong position
+                var pos = [Dworek.state.geoLastPlayerPosition.coords.latitude, Dworek.state.geoLastPlayerPosition.coords.longitude];
+
+                // Create a player marker if we don't have one yet
+                if(playerMarker == null) {
+                    // Create the player marker
+                    playerMarker = L.marker(pos, {
+                        icon: L.spriteIcon('blue')
+                    });
+
+                    // Bind a popup
+                    playerMarker.bindPopup('Hey! This is you!');
+
+                    // Add the marker to the map
+                    playerMarker.addTo(map);
+
+                } else
+                    // Update the position
+                    playerMarker.setLatLng(pos);
+
+                // Create a player range circle if we don't have one yet
+                if(playerRange == null) {
+                    // Create the player range circle
+                    playerRange = L.circle(pos, Dworek.state.geoLastPlayerPosition.coords.accuracy);
+
+                    // Add the circle to the map
+                    playerRange.addTo(map);
+
+                } else {
+                    // Update the circle
+                    playerRange.setLatLng(pos);
+                    playerRange.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
+                }
+            }
+
+        }
+
+        // Invalidate the map size, because the container size might be changed
+        map.invalidateSize();
+    }
+});
+
+/**
+ * Update the last known player position.
+ * @param position Player position.
+ */
+function updatePlayerPosition(position) {
+    // Return if the user doesn't have the right roles
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player && Dworek.state.activeGameRoles.special))
+        return;
+
+    // Set the last known location
+    Dworek.state.geoLastPlayerPosition = position;
+
+    // Return if we don't have a player marker
+    if(playerMarker == null || playerRange == null)
+        return;
+
+    // Update the position
+    playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+    playerRange.setLatLng([position.coords.latitude, position.coords.longitude]);
+    playerRange.setRadius(position.coords.accuracy);
 }
