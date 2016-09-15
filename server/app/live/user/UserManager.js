@@ -80,15 +80,21 @@ UserManager.prototype.getUser = function(userId, callback) {
     const self = this;
 
     // Get the user for the given ID
-    Core.model.userModelManager.getUserById(userId, function(err, user) {
+    Core.model.userModelManager.isValidUserId(userId, function(err, valid) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
+        // Make sure the user is valid
+        if(!valid) {
+            callback(null, null);
+            return;
+        }
+
         // Make sure the stage of this user is active
-        user.getStage(function(err, stage) {
+        self.game.getGameModel().getStage(function(err, stage) {
             // Call back errors
             if(err !== null) {
                 callback(err);
@@ -102,7 +108,7 @@ UserManager.prototype.getUser = function(userId, callback) {
             }
 
             // Create a user instance for this model
-            var newUser = new User(user);
+            var newUser = new User(userId, this.game);
 
             // Add the user to the list of loaded users
             self.users.push(newUser);
@@ -190,9 +196,7 @@ UserManager.prototype.load = function(callback) {
 
     // Load all users for this game that are approved
     Core.model.gameUserModelManager.getGameUsers(gameModel, {
-        players: true,
-        spectators: true,
-        specials: true
+        requested: false
     }, function(err, users) {
         // Call back errors
         if(err !== null) {
