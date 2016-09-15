@@ -41,7 +41,7 @@ const HANDLER_PACKET_TYPE = PacketType.FACTORY_DATA_REQUEST;
  * @class
  * @constructor
  */
-var GameChangeStageHandler = function(init) {
+var FactoryDataRequestHandler = function(init) {
     // Initialize
     if(init)
         this.init();
@@ -50,7 +50,7 @@ var GameChangeStageHandler = function(init) {
 /**
  * Initialize the handler.
  */
-GameChangeStageHandler.prototype.init = function() {
+FactoryDataRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
     if(Core.realTime == null)
         throw new Error('Real time server not initialized yet');
@@ -65,7 +65,7 @@ GameChangeStageHandler.prototype.init = function() {
  * @param {Object} packet Packet object.
  * @param socket SocketIO socket.
  */
-GameChangeStageHandler.prototype.handler = function(packet, socket) {
+FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
     // Make sure we only call back once
     var calledBack = false;
 
@@ -154,30 +154,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             });
         });
     });
-
-    // Get the game instance by it's ID
-    Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
-        // Handle errors
-        if(err !== null || game == null) {
-            // Print the error to the console
-            console.error(err);
-
-            // Call back an error
-            callbackError();
-            return;
-        }
-
-        // Create a callback latch
-        var latch = new CallbackLatch();
-
-        // Send the game data to the user
-        Core.gameController.sendGameData(game, user, socket, function(err) {
-            // Call back errors
-            if(err !== null)
-                callbackError();
-        });
-    });
 };
 
 // Export the module
-module.exports = GameChangeStageHandler;
+module.exports = FactoryDataRequestHandler;
