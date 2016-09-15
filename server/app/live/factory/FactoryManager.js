@@ -269,5 +269,43 @@ FactoryManager.prototype.getGame = function() {
     return this.game;
 };
 
+/**
+ * Get the visible factories for the given user.
+ *
+ * @param {UserModel} user User to check for.
+ * @param {function} callback callback(err, factories) with an array of factories.
+ */
+FactoryManager.prototype.getVisibleFactories = function(user, callback) {
+    // Create an array of factories
+    var factories = [];
+
+    // Make sure we only call back once
+    var calledBack = false;
+
+    // Loop through all factories
+    this.factories.forEach(function(factory) {
+        // Skip if we called back
+        if(calledBack)
+            return;
+
+        // Check whether the factory is visible
+        factory.isVisibleFor(user, function(err, visible) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Add the factory to the array
+            factories.push(factory);
+        })
+    });
+
+    // Call back the list of factories
+    callback(null, factories);
+};
+
 // Export the class
 module.exports = FactoryManager;
