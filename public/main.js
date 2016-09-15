@@ -271,7 +271,7 @@ var Dworek = {
 
                 }, {
                     enableHighAccuracy: true,
-                    timeout: 30 * 1000,
+                    timeout: 2 * 60 * 1000,
                     maximumAge: 3 * 1000
                 });
 
@@ -1110,6 +1110,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
 
     // Show a notification
     console.log('Received location data for ' + packet.users.length + ' users');
+
+    // Update the users locations
+    if(hasUsers)
+        updatePlayerMarkers(packet.users);
 });
 
 // Update the active game and status labels when a new page is being shown
@@ -2622,6 +2626,7 @@ function setGpsState(state) {
 var map = null;
 var playerMarker = null;
 var playerRange = null;
+var playersMarkers = [];
 
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
@@ -2643,6 +2648,12 @@ $(document).bind("tab-switch", function(event, data) {
             // Set up the tile layers
             L.tileLayer('https://api.mapbox.com/styles/v1/timvisee/cirawmn8f001ch4m27llnb45d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGltdmlzZWUiLCJhIjoiY2lyZXY5cDhzMDAxM2lsbTNicGViaTZkYyJ9.RqbUkoWLWeh_WZoyoxxt-Q', {
                 attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>'
+            }).addTo(map);
+
+            // Add a fit button
+            L.easyButton('<i class="zmdi zmdi-gps"></i>', function() {
+                // Fit the map
+                fitMap();
             }).addTo(map);
 
             // TODO: Request player positions from server
@@ -2684,8 +2695,8 @@ function updatePlayerPosition(position) {
             // Add the marker to the map
             playerMarker.addTo(map);
 
-            // Zoom the map to the player
-            map.flyTo([position.coords.latitude, position.coords.longitude]);
+            // Fit the map
+            fitMap();
 
         } else
             // Update the position
@@ -2705,4 +2716,127 @@ function updatePlayerPosition(position) {
             playerRange.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
         }
     }
+}
+
+/**
+ * Update the markers for other visible users.
+ *
+ * @param users Users data.
+ */
+function updatePlayerMarkers(users) {
+    // Make sure the map is loaded
+    if(map == null)
+        return;
+
+    // Determine whether to fit all users in the map after updating
+    var fitUsers = playersMarkers.length == 0;
+
+    // Loop through the users
+    users.forEach(function(user) {
+        // Get the user position
+        const pos = [user.location.latitude, user.location.longitude];
+
+        // Find the correct marker for the user
+        var marker = null;
+        playersMarkers.forEach(function(entry) {
+            // Skip the loop if we found the marker
+            if(marker != null)
+                return;
+
+            // Check if this is the correct marker
+            if(entry.user.user == user.user)
+                marker = entry;
+        });
+
+        // Update or create a new marker
+        if(marker == null) {
+            // Create the marker
+            marker = L.marker(pos, {
+                icon: L.spriteIcon('green')
+            });
+
+            // Bind a popup
+            marker.bindPopup(user.userName);
+
+            // Add the marker to the map
+            marker.addTo(map);
+
+            // Set the user section
+            marker.user = {
+                user: user.user
+            };
+
+            // Add the marker to the markers list
+            playersMarkers.push(marker);
+
+        } else
+            // Update the position
+            marker.setLatLng(pos);
+    });
+
+    // Create an array of marker indices to remove
+    var toRemove = [];
+
+    // Loop through all markers and make sure it's user is in the user list
+    playersMarkers.forEach(function(entry, i) {
+        // Determine whether the user exists
+        var exists = false;
+
+        // Loop through the list of users and check whether the user exists
+        users.forEach(function(user) {
+            // Skip if it exists
+            if(exists)
+                return;
+
+            // Check whether this is the user
+            if(user.user == entry.user.user)
+                exists = true;
+        });
+
+        // Add the index if the user doens't exist
+        if(!exists)
+            toRemove.push(i);
+    });
+
+    // Remove the markers at the given indices
+    for(var i = toRemove.length - 1; i >= 0; i--) {
+        // Remove the marker
+        map.removeLayer(playersMarkers[toRemove[i]]);
+
+        // Remove the entry from the array
+        playersMarkers.splice(toRemove[i], 1);
+    }
+
+    // Make sure we still want to fit
+    if(fitUsers && playersMarkers.length == 0)
+        fitUsers = false;
+
+    // Create an array of markers to fit
+
+    // Fit all users
+    if(fitUsers)
+        fitMap();
+}
+
+/**
+ * Fit everything on the map.
+ */
+function fitMap() {
+    // Make sure the map isn't null
+    if(map == null)
+        return;
+
+    // Create an array of things to fit
+    var fitters = playersMarkers.slice(0);
+
+    // Add the player marker
+    if(playerMarker != null)
+        fitters.push(playerMarker);
+
+    // Make sure we have any fitters
+    if(fitters.length == 0)
+        return;
+
+    // Fly to the bounds
+    map.flyToBounds(L.featureGroup(fitters).getBounds());
 }
