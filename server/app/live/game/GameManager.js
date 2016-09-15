@@ -432,32 +432,9 @@ GameManager.prototype.broadcastData = function(callback) {
                     if(calledBack)
                         return;
 
-                    // Skip the current user
-                    if(otherUser.isUser(user.getId()))
-                        return;
-
-                    // Skip the user if he doesn't have a recent location
-                    // TODO: Don't skip if the user is a shop!
-                    if(!otherUser.hasRecentLocation())
-                        return;
-
-                    // Determine whether to add this user
-                    var addUser = showAllPlayers;
-
-                    // TODO: Also show if the user is a shop!
-
-                    // Check if only users in a specific team should be shown
-                    if(!addUser && showTeamPlayers)
-                        // Check whether the user is in the correct team
-                        if(user.hasTeam() && user.getTeamModel().getId().equals(otherUser.getTeamModel().getId()))
-                            addUser = true;
-
-                    // Get the user location
-                    const location = otherUser.getLocation();
-
-                    // Get the name of the user
-                    gameLatch.add();
-                    otherUser.getName(function(err, name) {
+                    // Check whether the other user is visible for the current user
+                    latch.add();
+                    otherUser.isVisibleFor(user, function(err, visible) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -467,15 +444,31 @@ GameManager.prototype.broadcastData = function(callback) {
                             return;
                         }
 
-                        // Create a user object and add it to the list
-                        users.push({
-                            user: otherUser.getIdHex(),
-                            userName: name,
-                            location
-                        });
+                        // Make sure the user is visible
+                        if(!visible)
+                            return;
 
-                        // Resolve the game latch
-                        gameLatch.resolve();
+                        // Get the name of the user
+                        otherUser.getName(function(err, name) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    if(_.isFunction(callback))
+                                        callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Create a user object and add it to the list
+                            users.push({
+                                user: otherUser.getIdHex(),
+                                userName: name,
+                                location
+                            });
+
+                            // Resolve the game latch
+                            gameLatch.resolve();
+                        });
                     });
                 });
 
