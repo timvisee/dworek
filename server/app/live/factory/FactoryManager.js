@@ -105,7 +105,7 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
             }
 
             // Make sure the factory is part of this game
-            if(!this.getGame().getId().equals(result.getId())) {
+            if(!self.getGame().getId().equals(result.getId())) {
                 callback(null, null);
                 return;
             }
@@ -259,6 +259,14 @@ FactoryManager.prototype.unload = function() {
         // Unload the factory
         factory.unload();
     });
+};
+
+/**
+ * Get the game this factory manager is for.
+ * @return {Game} Game.
+ */
+FactoryManager.prototype.getGame = function() {
+    return this.game;
 };
 
 // Export the class
