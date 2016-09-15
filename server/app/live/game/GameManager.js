@@ -460,6 +460,9 @@ GameManager.prototype.broadcastData = function(callback) {
                             userName: name,
                             location
                         });
+
+                        // Resolve the game latch
+                        gameLatch.resolve();
                     });
                 });
 
