@@ -287,6 +287,18 @@ config.validation.teamNameMinLength = 1;
  */
 config.validation.teamNameMaxLength = 64;
 
+/**
+ * Minimum number of factory name characters.
+ * @type {int}
+ */
+config.validation.factoryNameMinLength = 1;
+
+/**
+ * Maximum number of factory name characters.
+ * @type {int}
+ */
+config.validation.factoryNameMaxLength = 64;
+
 
 /******************************************************************************
  * Game configuration.                                                        *

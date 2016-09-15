@@ -216,7 +216,41 @@ Validator.isValidTeamName = function(teamName) {
     const charCount = teamName.length;
 
     // Make sure the length is within bounds
-    return (charCount >= config.validation.nicknameMinLength && charCount <= config.validation.nicknameMaxLength);
+    return (charCount >= config.validation.teamNameMinLength && charCount <= config.validation.teamNameMaxLength);
+};
+
+/**
+ * Format the the given factory name.
+ *
+ * @param {string} factoryName Factory name.
+ *
+ * @return {string} The formatted factory name.
+ */
+Validator.formatFactoryName = function(factoryName) {
+    // Trim the factory name, and return
+    return factoryName.trim();
+};
+
+/**
+ * Check whether the given factory name is valid.
+ *
+ * @param {string} factoryName Factory name.
+ *
+ * @return {boolean} True if the factory name is valid, false if not.
+ */
+Validator.isValidFactoryName = function(factoryName) {
+    // Make sure the factory name isn't undefined or null
+    if(factoryName === undefined || factoryName === null)
+        return false;
+
+    // Trim the factory name
+    factoryName = factoryName.trim();
+
+    // Count the number of characters
+    const charCount = factoryName.length;
+
+    // Make sure the length is within bounds
+    return (charCount >= config.validation.factoryMinLength && charCount <= config.validation.factoryMaxLength);
 };
 
 // Export the class
