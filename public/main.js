@@ -1585,8 +1585,24 @@ function showNotification(message, options) {
 
     // Vibrate the phone
     if(options.vibrate)
-        if("vibrate" in navigator)
-            window.navigator.vibrate(options.vibrationPattern);
+        vibrate(options.vibrationPattern);
+}
+
+/**
+ * Vibrate.
+ * @param {Array} [pattern] Vibration pattern. Array of values, alternating vibration time, and pause time in milliseconds.
+ */
+function vibrate(pattern) {
+    // Make sure we have vibration support
+    if(!("vibrate" in navigator))
+        return;
+
+    // Parse the pattern
+    if(pattern === null)
+        pattern = [500, 250, 500];
+
+    // Vibrate
+    window.navigator.vibrate(pattern);
 }
 
 /**
@@ -2947,7 +2963,7 @@ function buildFactory() {
                     });
 
                     // Show a notification
-                    showNotification('Building factory...');
+                    showNotification('Building ' + NameConfig.factory.name + '...');
                 }
             },
             {
