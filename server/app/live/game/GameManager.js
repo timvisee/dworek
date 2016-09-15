@@ -434,11 +434,10 @@ GameManager.prototype.broadcastData = function(callback) {
                     // TODO: Also show if the user is a shop!
 
                     // Check if only users in a specific team should be shown
-                    if(!addUser && showTeamPlayers) {
+                    if(!addUser && showTeamPlayers)
                         // Check whether the user is in the correct team
-                        if(user.getTeamModel().getId().equals(otherUser.getTeamModel().getId()))
+                        if(user.hasTeam() && user.getTeamModel().getId().equals(otherUser.getTeamModel().getId()))
                             addUser = true;
-                    }
 
                     // Get the user location
                     const location = otherUser.getLocation();

@@ -157,6 +157,15 @@ User.prototype.getTeamModel = function() {
 };
 
 /**
+ * Check whether this user has a team.
+ *
+ * @return {boolean} True if the user has a team, false if not.
+ */
+User.prototype.hasTeam = function() {
+    return this._teamModel != null;
+};
+
+/**
  * Get the user name.
  *
  * @param {User~getNameCallback} callback Callback with the result.
