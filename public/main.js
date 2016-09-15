@@ -1036,6 +1036,9 @@ function showNextBroadcast() {
                 }
             })
         });
+
+        // Vibrate
+        vibrate([500, 250, 1000]);
     };
 
     // Add a 'view game' action if we're currently not viewing the game
