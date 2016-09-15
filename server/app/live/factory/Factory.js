@@ -460,6 +460,9 @@ Factory.prototype.isVisibleFor = function(user, callback) {
     // Get the game model
     var game = this.getGame().getGameModel();
 
+    // Define the current instance
+    const self = this;
+
     // Get the factory creator
     factoryModel.getUser(function(err, creator) {
         // Call back errors

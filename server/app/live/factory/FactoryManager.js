@@ -111,7 +111,7 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
             }
 
             // Create a factory instance for this model
-            var newFactory = new Factory(factoryModel, this.game);
+            var newFactory = new Factory(factoryModel, self.game);
 
             // Add the factory to the list of loaded factories
             self.factories.push(newFactory);
