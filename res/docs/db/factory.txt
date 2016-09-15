@@ -1,0 +1,14 @@
+# factory
+# Collection containing all created factories
+
+# TODO: Not finished.
+
+_id : ID                Factory ID.
+name : string           Factory name.
+create_date : Date      The date/time this lab was created at.
+user_id : ID            ID of the user that created this lab.
+location : Object       Coordinate object defining the location.
+level : int             Level of the lab.
+defence : int           Defence value of this lab.
+raw : int               Raw goods in this lab.
+processed : int         Processed goods in this lab.
