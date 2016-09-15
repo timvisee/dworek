@@ -1104,8 +1104,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     showNotification('Received location data for ' + packet.users.length + ' users');
 });
 
-// Manage the active game
+// Update the active game and status labels when a new page is being shown
 $(document).bind("pageshow", function() {
+    // Update the active game
     updateActiveGame();
 });
 
@@ -2218,13 +2219,6 @@ $(document).bind("pagecreate", function() {
     });
 });
 
-
-
-
-
-
-
-
 // Broadcast button
 $(document).bind("pagecreate", function() {
     // Find the broadcast button
@@ -2283,18 +2277,6 @@ $(document).bind("pagecreate", function() {
         });
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * Check whether the given value is a JavaScript object.
