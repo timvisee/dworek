@@ -55,7 +55,19 @@ var gameConfig = {
          * Initial factory defence value, when the factory is created.
          * @type {Number}
          */
-        initialDefence: 10
+        initialDefence: 10,
+
+        /**
+         * Initial in value.
+         * @param {Number}
+         */
+        initialIn: 0,
+
+        /**
+         * Initial out value.
+         * @param {Number}
+         */
+        initialOut: 0
     }
 };
 
