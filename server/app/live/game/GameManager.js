@@ -508,5 +508,150 @@ GameManager.prototype.broadcastData = function(callback) {
  * @type {Error|null} Error instance if an error occurred, null on success.
  */
 
+/**
+ * Send the latest game data for the given game to the given user.
+ *
+ * @param {GameModel} game Game to send the data for.
+ * @param {UserModel} user User to send the data for.
+ * @param [sockets] SocketIO socket to send the data over, if known. This may be a single socket, or an array of sockets.
+ * @param {GameManager~sendGameDataCallback} callback Called on success or when an error occurred.
+ */
+GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
+    // Create a data object to send back
+    var gameData = {};
+
+    // Store this instance
+    const self = this;
+
+    // Make sure we only call back once
+    var calledBack = false;
+
+    // Create a function to send the game data packet
+    const sendGameData = function() {
+        // Create a packet object
+        const packetObject = {
+            game: game.getIdHex(),
+            data: gameData
+        };
+
+        // Check whether we've any sockets to send the data directly to
+        if(sockets.length > 0)
+            sockets.forEach(function(socket) {
+                Core.realTime.packetProcessor.sendPacket(PacketType.GAME_DATA, packetObject, socket);
+            });
+
+        else
+            Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_DATA, packetObject, user);
+    };
+
+    // Get the game stage
+    game.getStage(function(err, gameStage) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game stage
+        gameData.stage = gameStage;
+
+        // Send the game data if the game isn't active
+        if(gameStage != 1) {
+            sendGameData();
+            return;
+        }
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Get the user state
+        latch.add();
+        game.getUserState(user, function(err, userState) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set whether the user can build new factories
+            _.set(gameData, 'factory.canBuild', userState.player);
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the live game
+        latch.add();
+        self.getGame(game, function(err, liveGame) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Resolve the latch and continue if we didn't find a live game
+            if(liveGame === null) {
+                latch.resolve();
+                return;
+            }
+
+            // Get the live user
+            latch.add();
+            liveGame.getUser(user, function(err, liveUser) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch and continue if we didn't find a live user
+                if(liveUser === null) {
+                    latch.resolve();
+                    return;
+                }
+
+                // Get the users team
+                const team = liveUser.getTeamModel();
+
+                // TODO: Calculate the factory cost here!
+                _.set(gameData, 'factory.cost', 40);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Send the game data when we're done
+        latch.then(function() {
+            // Send the game data
+            sendGameData();
+        });
+    });
+
+    // Convert the sockets to an array
+    if(sockets === undefined)
+        sockets = [];
+    else if(!_.isArray(sockets))
+        sockets = [sockets];
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback GameManager~sendGameDataCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
 // Export the class
 module.exports = GameManager;

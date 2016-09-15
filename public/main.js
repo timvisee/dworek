@@ -40,7 +40,9 @@ const PacketType = {
     LOCATION_UPDATE: 10,
     GAME_INFO: 11,
     GAME_INFO_REQUEST: 12,
-    GAME_LOCATIONS_UPDATE: 13
+    GAME_LOCATIONS_UPDATE: 13,
+    GAME_DATA_REQUEST: 14,
+    GAME_DATA: 15
 };
 
 /**
@@ -54,6 +56,20 @@ const GeoStates = {
     NOT_WORKING: 3,
     NO_PERMISSION: 4,
     TIMEOUT: 5
+};
+
+/**
+ * Name configuration for the game.
+ * @type {Object}
+ */
+const NameConfig = {
+    currency: {
+        name: 'dollars',
+        sign: '$'
+    },
+    factory: {
+        name: 'lab'
+    }
 };
 
 /**
@@ -75,137 +91,137 @@ var Dworek = {
          * True if the user authenticated over the real time server, false if not.
          * @type {boolean}
          */
-        loggedIn: false,
+            loggedIn: false,
+
+            /**
+             * Active user.
+             * @type {string|null}
+             */
+            user: null,
+
+            /**
+             * ID of the currently active game.
+             * @type {string|null}
+             */
+            activeGame: null,
+
+            /**
+             * Stage the active game is in.
+             *
+             * @type {Number|null} Game stage, or null if it's unknown.
+             */
+            activeGameStage: null,
+
+            /**
+             * The roles the user has in the active game.
+             *
+             * @type {UserRoles|null} Object with the user type, or null if it's unknown.
+             */
+            activeGameRoles: null,
+
+            /**
+             * Object defining a users role.
+             *
+             * @typedef {Object} UserRoles
+             * @param {boolean} player True if the user is a player, false if not.
+             * @param {boolean} spectator True if the user is a spectator, false if not.
+             * @param {boolean} special True if the user is a special player, false if not.
+             * @param {boolean} requested True if the user requested to join the game, flase if not.
+             */
+
+            /**
+             * ID of the game that was last viewed by the user.
+             * @type {string|null}
+             */
+            lastViewedGame: null,
+
+            /**
+             * Active GEO location watcher.
+             * @type {Number|null}
+             */
+            geoWatcher: null,
+
+            /**
+             * Last known GEO location state.
+             * Defined by GeoStates enum.
+             * @type {Number}
+             */
+            geoState: GeoStates.UNKNOWN,
+
+            /**
+             * The last known player position.
+             */
+            geoLastPlayerPosition: null,
+
+            /**
+             * The time the client was last connected at.
+             * @type {Number} Time as timestamp, or -1 if unspecified.
+             */
+            lastConnected: -1,
+
+            /**
+             * Last known reconnection attempt count.
+             * @type {Number} Last known reconnection attempt count.
+             */
+            lastReconnectAttempt: 0
+        },
 
         /**
-         * Active user.
-         * @type {string|null}
+         * Start the client.
          */
-        user: null,
+        start: function() {
+            // Start native droid
+            this.startNativeDroid();
+
+            // Connect to the real time server
+            this.realtime.connect();
+        },
 
         /**
-         * ID of the currently active game.
-         * @type {string|null}
+         * Start NativeDroid and related modules.
          */
-        activeGame: null,
+        startNativeDroid: function() {
+            // Initialize NativeDroid, and store it's instance
+            nativeDroid = $.nd2();
 
-        /**
-         * Stage the active game is in.
-         *
-         * @type {Number|null} Game stage, or null if it's unknown.
-         */
-        activeGameStage: null,
-
-        /**
-         * The roles the user has in the active game.
-         *
-         * @type {UserRoles|null} Object with the user type, or null if it's unknown.
-         */
-        activeGameRoles: null,
-
-        /**
-         * Object defining a users role.
-         *
-         * @typedef {Object} UserRoles
-         * @param {boolean} player True if the user is a player, false if not.
-         * @param {boolean} spectator True if the user is a spectator, false if not.
-         * @param {boolean} special True if the user is a special player, false if not.
-         * @param {boolean} requested True if the user requested to join the game, flase if not.
-         */
-
-        /**
-         * ID of the game that was last viewed by the user.
-         * @type {string|null}
-         */
-        lastViewedGame: null,
-
-        /**
-         * Active GEO location watcher.
-         * @type {Number|null}
-         */
-        geoWatcher: null,
-
-        /**
-         * Last known GEO location state.
-         * Defined by GeoStates enum.
-         * @type {Number}
-         */
-        geoState: GeoStates.UNKNOWN,
-
-        /**
-         * The last known player position.
-         */
-        geoLastPlayerPosition: null,
-
-        /**
-         * The time the client was last connected at.
-         * @type {Number} Time as timestamp, or -1 if unspecified.
-         */
-        lastConnected: -1,
-
-        /**
-         * Last known reconnection attempt count.
-         * @type {Number} Last known reconnection attempt count.
-         */
-        lastReconnectAttempt: 0
-    },
-
-    /**
-     * Start the client.
-     */
-    start: function() {
-        // Start native droid
-        this.startNativeDroid();
-
-        // Connect to the real time server
-        this.realtime.connect();
-    },
-
-    /**
-     * Start NativeDroid and related modules.
-     */
-    startNativeDroid: function() {
-        // Initialize NativeDroid, and store it's instance
-        nativeDroid = $.nd2();
-
-        // Build
-        nativeDroid.build();
-
-        // Build NativeDroid on page initialization
-        $(document).bind("pageinit", function() {
-            // Make sure the native droid instance is available
-            if(nativeDroid === null)
-                return;
-
-            // Build the page
+            // Build
             nativeDroid.build();
-        });
-    },
 
-    /**
-     * Game worker sub-system.
-     */
-    gameWorker: {
-        /**
-         * Number of the game update request timer handle, or null if none.
-         * @type {Number|null}
-         */
-        gameUpdateRequestTimer: null,
+            // Build NativeDroid on page initialization
+            $(document).bind("pageinit", function() {
+                // Make sure the native droid instance is available
+                if(nativeDroid === null)
+                    return;
 
-        /**
-         * Defines whether the game worker is active, and whether the user is playing the game.
-         */
-        active: false,
+                // Build the page
+                nativeDroid.build();
+            });
+        },
 
         /**
-         * Update the current game worker state based on the active game and known game info.
+         * Game worker sub-system.
          */
-        update: function() {
-            // Determine whether we're playing
-            const playing = Dworek.state.activeGameStage == 1 && Dworek.realtime._connected;
+        gameWorker: {
+            /**
+             * Number of the game update request timer handle, or null if none.
+             * @type {Number|null}
+             */
+            gameUpdateRequestTimer: null,
 
-            // Define whether the game worker is active
-            this.active = playing;
+            /**
+             * Defines whether the game worker is active, and whether the user is playing the game.
+             */
+            active: false,
+
+            /**
+             * Update the current game worker state based on the active game and known game info.
+             */
+            update: function() {
+                // Determine whether we're playing
+                const playing = Dworek.state.activeGameStage == 1 && Dworek.realtime._connected;
+
+                // Define whether the game worker is active
+                this.active = playing;
 
             // Start/stop the timer to update the game info
             if(playing && this.gameUpdateRequestTimer == null) {
@@ -818,6 +834,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
         // Update the active game page
         updateActiveGame();
     }
+
+    // Update the game data visuals
+    updateGameDataVisuals();
 });
 
 // Register game stage change handler
@@ -2843,4 +2862,205 @@ function fitMap() {
 
     // Fly to the bounds
     map.flyToBounds(L.featureGroup(fitters).getBounds());
+}
+
+// Build NativeDroid on page initialization
+$(document).bind("pageinit", function() {
+    // Get the factory building button
+    const buildFactoryButton = $('.action-factory-build');
+
+    // Bind the click event
+    buildFactoryButton.unbind('click');
+    buildFactoryButton.click(function(event) {
+        // Cancel the default event
+        event.preventDefault();
+
+        // Show the factory building dialog
+        buildFactory();
+    });
+});
+
+/**
+ * Upper case the first character in a string.
+ * @param {string} string String to uppercase the first character of.
+ * @return {string} Processed string.
+ */
+function capitalizeFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * Build a factory at the current location of the user.
+ */
+function buildFactory() {
+    // Make sure a game is active
+    if(Dworek.state.activeGame == null) {
+        showNotification('You must be in an active game build a lab');
+        return;
+    }
+
+    // Make sure the user has the proper roles to build a lab
+    if(!Dworek.state.activeGameRoles.player) {
+        showNotification('You don\'t have permission to build');
+        return;
+    }
+
+    // Get a new unique ID
+    const fieldId = generateUniqueId('field-factory-name');
+
+    // Build the dialog message
+    var dialogMessage = 'Enter a name for the ' + NameConfig.factory.name + ':<br><br>' +
+        '<label for="' + fieldId + '">' + capitalizeFirst(NameConfig.factory.name) + ' name</label>' +
+        '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
+        '<br><br>' +
+        'This action will cost you <span class="game-factory-cost">?</span> ' + NameConfig.currency.name + '.';
+
+    // Show a dialog message
+    showDialog({
+        title: 'Build ' + capitalizeFirst(NameConfig.factory.name),
+        message: dialogMessage,
+        actions: [
+            {
+                text: 'Build ' + capitalizeFirst(NameConfig.factory.name),
+                state: 'primary'
+            },
+            {
+                text: 'Cancel'
+            }
+        ]
+    });
+
+    // Update the game data visuals
+    updateGameDataVisuals();
+}
+
+/**
+ * Object containing the game data of all loaded games.
+ * @type {Object}
+ */
+var gameData = {};
+
+/**
+ * Check whether we've any data for the given game ID.
+ * The ID of the active game will be used if no game ID is given
+ *
+ * @param {string} [game] Game ID.
+ */
+function hasGameData(game) {
+    // Parse the game parameter
+    if(game == undefined)
+        game = Dworek.state.activeGame;
+
+    // Make sure the game ID is valid
+    if(game == null)
+        return false;
+
+    // Check whether we've game data
+    return gameData.hasOwnProperty(game);
+}
+
+/**
+ * Get the game data of the given game.
+ * The ID of the active game will be used if no ID is given.
+ *
+ * @param {string} game ID of the game.
+ */
+function getGameData(game) {
+    // Parse the game parameter
+    if(game == undefined)
+        game = Dworek.state.activeGame;
+
+    // Return null if we don't have any game data
+    if(!hasGameData(game))
+        return null;
+
+    // Get the game data
+    return gameData[game];
+}
+
+/**
+ * Request the game data for the given game.
+ *
+ * @param {string} [game] ID of the game.
+ */
+function requestGameData(game) {
+    // Parse the game parameter
+    if(game == undefined)
+        game = Dworek.state.activeGame;
+
+    // Don't request if we aren't authenticated yet
+    if(!Dworek.state.loggedIn)
+        return;
+
+    // Make sure the game isn't null
+    if(game == null)
+        return;
+
+    // Request the game data
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_DATA_REQUEST, {
+        game: game
+    });
+}
+
+// Update the game info
+Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_DATA, function(packet) {
+    // Make sure the packet contains the required properties
+    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('game'))
+        return;
+
+    // Get the packet data
+    const gameId = packet.game;
+    const data = packet.data;
+
+    // Set the game data
+    gameData[gameId] = data;
+
+    // Update the game data visuals
+    updateGameDataVisuals();
+});
+
+// Update the game data visuals when initializing a page
+$(document).bind("pageinit", function() {
+    updateGameDataVisuals();
+});
+
+/**
+ * Update all visual things that depend on the game data.
+ */
+function updateGameDataVisuals() {
+    // Make sure we're on a game page
+    if(!Dworek.utils.isGamePage())
+        return;
+
+    // Get the game ID of the active page, and make sure it's valid
+    const gameId = Dworek.utils.getGameId();
+    if(gameId == null)
+        return;
+
+    // Make sure we've any game data for this game, request new data and return if we don't have anything
+    if(!hasGameData(gameId)) {
+        requestGameData(gameId);
+        return;
+    }
+
+    // Get the game data
+    var data = getGameData(gameId);
+
+    // Get the active page
+    const activePage = getActivePage();
+
+    // Remove the game data loading label
+    activePage.find('.game-data-load-label').remove();
+
+    // Check whether we have any factory data
+    if(data.hasOwnProperty('factory')) {
+        // Update the factory cost label
+        if(data.factory.hasOwnProperty('cost'))
+            $('.game-factory-cost').html(data.factory.cost);
+    }
+
+    // Check whether this is the active game
+    if(Dworek.state.activeGame == gameId)
+        // Update the game stage
+        Dworek.state.activeGameStage = data.stage;
 }

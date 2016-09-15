@@ -165,6 +165,12 @@ Factory.prototype.load = function(callback) {};
  */
 Factory.prototype.unload = function() {};
 
+/**
+ * @callback Factory~calculateCostCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {Number=} Factory cost.
+ */
+
 // Export the class
 module.exports = Factory;
 

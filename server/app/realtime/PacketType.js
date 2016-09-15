@@ -154,5 +154,24 @@ module.exports = {
      * - users[].location.latitude: Latitude
      * - users[].location.longitude: Longitude
      */
-    GAME_LOCATIONS_UPDATE: 13
+    GAME_LOCATIONS_UPDATE: 13,
+
+    /**
+     * Request a game data packet.
+     * This packet is send form a client to the server.
+     *
+     * Data:
+     * - game: ID of the game to request the game data for.
+     */
+    GAME_DATA_REQUEST: 14,
+
+    /**
+     * Game data packet.
+     *
+     * Data:
+     * - game: ID of the game the data is for.
+     * - data: The actual game data.
+     * - data.factory.cost: New factory cost
+     */
+    GAME_DATA: 15
 };
