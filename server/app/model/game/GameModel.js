@@ -22,6 +22,8 @@
 
 var util = require('util');
 
+var gameConfig = require('../../../gameConfig');
+
 var Core = require('../../../Core');
 var GameDatabase = require('./GameDatabase');
 var BaseModel = require('../../database/BaseModel');
@@ -511,6 +513,15 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
  * @param {Error|null} Error instance if an error occurred.
  * @param {boolean} True if the user has permission to manage the game, false if not.
  */
+
+/**
+ * Get the game-specific configuration for this game.
+ *
+ * @return {Object} Game configuration.
+ */
+GameModel.prototype.getConfig = function() {
+    return gameConfig;
+};
 
 // Export the user class
 module.exports = GameModel;
