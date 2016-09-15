@@ -69,6 +69,12 @@ const NameConfig = {
     },
     factory: {
         name: 'lab'
+    },
+    in: {
+        name: 'ingredients'
+    },
+    out: {
+        name: 'drugs'
     }
 };
 
@@ -2865,7 +2871,12 @@ function fitMap() {
 }
 
 // Build NativeDroid on page initialization
-$(document).bind("pageinit", function() {
+$(document).bind("pageinit", bindFactoryBuildButton);
+
+/**
+ * Bind the factory create button.
+ */
+function bindFactoryBuildButton() {
     // Get the factory building button
     const buildFactoryButton = $('.action-factory-build');
 
@@ -2878,7 +2889,7 @@ $(document).bind("pageinit", function() {
         // Show the factory building dialog
         buildFactory();
     });
-});
+}
 
 /**
  * Upper case the first character in a string.
@@ -2913,7 +2924,7 @@ function buildFactory() {
         '<label for="' + fieldId + '">' + capitalizeFirst(NameConfig.factory.name) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
-        'This action will cost you <span class="game-factory-cost">?</span> ' + NameConfig.currency.name + '.';
+        'Building this ' + NameConfig.factory.name + ' will cost you <span class="game-factory-cost">?</span> ' + NameConfig.currency.name + '.';
 
     // Show a dialog message
     showDialog({
@@ -2996,6 +3007,9 @@ function requestGameData(game) {
     if(game == null)
         return;
 
+    // Show a status message
+    console.log('Requesting game data...');
+
     // Request the game data
     Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_DATA_REQUEST, {
         game: game
@@ -3049,8 +3063,60 @@ function updateGameDataVisuals() {
     // Get the active page
     const activePage = getActivePage();
 
-    // Remove the game data loading label
-    activePage.find('.game-data-load-label').remove();
+    // Get the game actions list
+    const gameActionsList = activePage.find('.game-actions-list');
+
+    // Check whether we found a game actions list
+    if(gameActionsList.length > 0) {
+        // Remove the game data loading label
+        gameActionsList.find('.game-data-load-label').remove();
+
+        // Determine whether anything is changed
+        var changed = false;
+
+        // Determine whether we should show the factory build button
+        const showFactoryBuild = data.hasOwnProperty('factory') && data.factory.hasOwnProperty('canBuild') && data.factory.canBuild;
+
+        // Get the factory build card element if available
+        var factoryBuildCardElement = gameActionsList.find('.card-factory-build');
+
+        // Create the factory build card if it isn't available
+        if(showFactoryBuild && factoryBuildCardElement.length == 0) {
+            gameActionsList.append('<div class="nd2-card wow fadeInUp card-factory-build">' +
+                '    <div class="card-title has-supporting-text">' +
+                '        <h3 class="card-primary-title">Build a ' + capitalizeFirst(NameConfig.factory.name) + '</h3>' +
+                '    </div>' +
+                '    <div class="card-supporting-text has-action has-title">' +
+                '        <p>Build a ' + NameConfig.factory.name + ' at your current location and start producing more ' + NameConfig.out.name + '.</p>' +
+                '        <table class="table-list ui-responsive">' +
+                '            <tr>' +
+                '                <td>Cost</td>' +
+                '                <td><span class="game-factory-cost">?</span></td>' +
+                '            </tr>' +
+                '        </table>' +
+                '    </div>' +
+                '    <div class="card-action">' +
+                '        <div class="row between-xs">' +
+                '            <div class="col-xs-12">' +
+                '                <div class="box">' +
+                '                    <a href="#" class="ui-btn ui-btn-inline waves-effect waves-button action-factory-build">Build ' + NameConfig.factory.name + '</a>' +
+                '                </div>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</div>');
+            bindFactoryBuildButton();
+            changed = true;
+
+        } else if(!showFactoryBuild && factoryBuildCardElement.length > 0) {
+            factoryBuildCardElement.remove();
+            changed = true;
+        }
+
+        // Trigger the create event on the game actions list
+        if(changed)
+            gameActionsList.trigger('create');
+    }
 
     // Check whether we have any factory data
     if(data.hasOwnProperty('factory')) {

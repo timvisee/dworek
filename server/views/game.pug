@@ -107,20 +107,21 @@ block content
         #map-container
 
     div(data-role='nd2tab', data-tab='actions')
-        div(align='center')
-            p.game-data-load-label: i Loading...
+        .game-actions-list
+            div(align='center')
+                p.game-data-load-label: i Loading...
 
-        .nd2-card.wow.fadeInUp
-            .card-title.has-supporting-text
-                h3.card-primary-title Build a Lab
-
-            .card-supporting-text.has-action.has-title
-                p Build a lab at your current location and start producing more drugs.
-                table.table-list.ui-responsive
-                    tr: td Cost
-                        td: span.game-factory-cost ?
-
-            .card-action
-                .row.between-xs: .col-xs-12: .box
-                    a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button.action-factory-build(href='#', data-transition='slide') Build lab
+            //.nd2-card.wow.fadeInUp
+            //    .card-title.has-supporting-text
+            //        h3.card-primary-title Build a Lab
+            //
+            //    .card-supporting-text.has-action.has-title
+            //        p Build a lab at your current location and start producing more drugs.
+            //        table.table-list.ui-responsive
+            //            tr: td Cost
+            //                td: span.game-factory-cost ?
+            //
+            //    .card-action
+            //        .row.between-xs: .col-xs-12: .box
+            //            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button.action-factory-build(href='#', data-transition='slide') Build lab
 
