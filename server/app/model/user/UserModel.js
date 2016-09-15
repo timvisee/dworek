@@ -26,6 +26,7 @@ var Core = require('../../../Core');
 var UserDatabase = require('./UserDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * UserModel class.
@@ -430,6 +431,95 @@ UserModel.prototype.getGameState = function(game, callback) {
  * @callback GameModelManager~getGameStateCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {UserGameState=} User's game state.
+ */
+
+/**
+ * Get the display name of the user.
+ *
+ * @param {UserModel~getDisplayNameCallback} callback Called with the display name or when an error occurred.
+ */
+UserModel.prototype.getDisplayName = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create a variable for the first name, last name and nickname
+    var firstName, lastName, nickname;
+
+    // Make sure we only call back once
+    var calledBack = false;
+
+    // Get the first name
+    latch.add();
+    this.getFirstName(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the first name
+        firstName = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the last name
+    latch.add();
+    this.getLastName(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the last name
+        lastName = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the nickname
+    latch.add();
+    this.getNickname(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the nickname
+        nickname = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back the name
+    latch.then(function() {
+        // Combine the name
+        var name = firstName + ' ' + lastName;
+        if(nickname.trim().length > 0)
+            name = firstName = ' \'' + nickname + '\' ' + lastName;
+
+        // Call back the name
+        callback(null, name);
+    });
+};
+
+/**
+ * Called with the display name or when an error occurred.
+ *
+ * @callback UserModel~getDisplayNameCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {string=} Display name.
  */
 
 // Export the user class
