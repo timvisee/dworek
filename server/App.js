@@ -38,6 +38,7 @@ var SessionModelManager = require('./app/model/session/SessionModelManager');
 var GameModelManager = require('./app/model/game/GameModelManager');
 var GameTeamModelManager = require('./app/model/gameteam/GameTeamModelManager');
 var GameUserModelManager = require('./app/model/gameuser/GameUserModelManager');
+var FactoryModelManager = require('./app/model/factory/FactoryModelManager');
 var RealTime = require('./app/realtime/RealTime');
 var PortUtils = require('./app/util/PortUtils');
 
@@ -323,6 +324,7 @@ App.prototype._initModelManagers = function(callback) {
     modelManagers.push(Core.model.gameModelManager = new GameModelManager());
     modelManagers.push(Core.model.gameTeamModelManager = new GameTeamModelManager());
     modelManagers.push(Core.model.gameUserModelManager = new GameUserModelManager());
+    modelManagers.push(Core.model.factoryModelManager = new FactoryModelManager());
 
     // Create an interval to clear all internal model caches
     setInterval(function() {

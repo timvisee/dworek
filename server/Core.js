@@ -71,6 +71,13 @@ Core.model.gameTeamModelManager = null;
 Core.model.gameUserModelManager = null;
 
 /**
+ * Get the factory model manager.
+ *
+ * @type {FactoryModelManager|null} Factory model manager, or null if it isn't instantiated yet.
+ */
+Core.model.factoryModelManager = null;
+
+/**
  * HTTP server instance.
  *
  * @type {*} Server instance.
