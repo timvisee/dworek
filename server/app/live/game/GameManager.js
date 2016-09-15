@@ -474,8 +474,6 @@ GameManager.prototype.broadcastData = function(callback) {
 
                     // Resolve the latch
                     latch.resolve();
-
-                    console.log('Location updates send to ' + count + ' sockets!');
                 });
             });
         });
