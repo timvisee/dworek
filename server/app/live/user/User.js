@@ -162,13 +162,13 @@ User.prototype.getTeamModel = function() {
  * @param {User~getNameCallback} callback Callback with the result.
  */
 User.prototype.getName = function(callback) {
-    this.getUserModel().getName(callback);
+    this.getUserModel().getDisplayName(callback);
 };
 
 /**
  * @callback User~getNameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {string} User name.
+ * @param {string=} User name.
  */
 
 /**
