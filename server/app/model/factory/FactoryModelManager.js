@@ -158,6 +158,54 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
  */
 
 /**
+ * Get all factories for the given game or user.
+ *
+ * @param {GameModel} [game] Game to get the factories for.
+ * @param {UserModel} [user] User to get the factories for.
+ * @param {FactoryModelManager~getFactoriesCallback} callback Called with the result or when an error occurred.
+ */
+// TODO: Add Redis caching to this function?
+FactoryModelManager.prototype.getFactories = function(game, user, callback) {
+    // Create the query object
+    var queryObject = {};
+
+    // Add the game and user to the query object if specified
+    if(game != null)
+        queryObject.game_id = game.getId();
+    if(user != null)
+        queryObject.user_id = user.getId();
+
+    // Fetch the result from MongoDB
+    FactoryDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+        // Call back errors
+        if(err !== null && err !== undefined) {
+            // Encapsulate the error and call back
+            callback(new Error(err));
+            return;
+        }
+
+        // Create an array of factories
+        var factories = [];
+
+        // Loop through the results, create an factories object for each user and add it to the array
+        data.forEach(function(factoryData) {
+            factories.push(Core.model.factoryModelManager._instanceManager.create(factoryData.user_id));
+        });
+
+        // Call back with the factories
+        callback(null, factories);
+    });
+};
+
+/**
+ * Called with the array of factories for the given game and or user.
+ *
+ * @callback GameModelManager~getFactoriesCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Array=} Array of FactoryModel factories.
+ */
+
+/**
  * Flush the cache for this model manager.
  *
  * @param {FactoryModelManager~flushCacheCallback} [callback] Called on success or when an error occurred.
