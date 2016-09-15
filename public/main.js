@@ -2647,43 +2647,9 @@ $(document).bind("tab-switch", function(event, data) {
 
             // TODO: Request player positions from server
 
-            // Check whether we've a last known player position
-            if(Dworek.state.geoLastPlayerPosition != null) {
-                // Get the latlong position
-                var pos = [Dworek.state.geoLastPlayerPosition.coords.latitude, Dworek.state.geoLastPlayerPosition.coords.longitude];
-
-                // Create a player marker if we don't have one yet
-                if(playerMarker == null) {
-                    // Create the player marker
-                    playerMarker = L.marker(pos, {
-                        icon: L.spriteIcon('blue')
-                    });
-
-                    // Bind a popup
-                    playerMarker.bindPopup('Hey! This is you!');
-
-                    // Add the marker to the map
-                    playerMarker.addTo(map);
-
-                } else
-                    // Update the position
-                    playerMarker.setLatLng(pos);
-
-                // Create a player range circle if we don't have one yet
-                if(playerRange == null) {
-                    // Create the player range circle
-                    playerRange = L.circle(pos, Dworek.state.geoLastPlayerPosition.coords.accuracy);
-
-                    // Add the circle to the map
-                    playerRange.addTo(map);
-
-                } else {
-                    // Update the circle
-                    playerRange.setLatLng(pos);
-                    playerRange.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
-                }
-            }
-
+            // Force update the last player position if it's known
+            if(Dworek.state.geoLastPlayerPosition != null)
+                updatePlayerPosition(Dworek.state.geoLastPlayerPosition);
         }
 
         // Invalidate the map size, because the container size might be changed
@@ -2703,12 +2669,40 @@ function updatePlayerPosition(position) {
     // Set the last known location
     Dworek.state.geoLastPlayerPosition = position;
 
-    // Return if we don't have a player marker
-    if(playerMarker == null || playerRange == null)
-        return;
+    // Update the player markers if the map is created
+    if(map != null) {
+        // Create a player marker if we don't have one yet
+        if(playerMarker == null) {
+            // Create the player marker
+            playerMarker = L.marker([position.coords.latitude, position.coords.longitude], {
+                icon: L.spriteIcon('blue')
+            });
 
-    // Update the position
-    playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
-    playerRange.setLatLng([position.coords.latitude, position.coords.longitude]);
-    playerRange.setRadius(position.coords.accuracy);
+            // Bind a popup
+            playerMarker.bindPopup('Hey! This is you!');
+
+            // Add the marker to the map
+            playerMarker.addTo(map);
+
+            // Zoom the map to the player
+            map.flyTo([position.coords.latitude, position.coords.longitude]);
+
+        } else
+            // Update the position
+            playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+
+        // Create a player range circle if we don't have one yet
+        if(playerRange == null) {
+            // Create the player range circle
+            playerRange = L.circle([position.coords.latitude, position.coords.longitude], Dworek.state.geoLastPlayerPosition.coords.accuracy);
+
+            // Add the circle to the map
+            playerRange.addTo(map);
+
+        } else {
+            // Update the circle
+            playerRange.setLatLng([position.coords.latitude, position.coords.longitude]);
+            playerRange.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
+        }
+    }
 }
