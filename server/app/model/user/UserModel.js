@@ -507,7 +507,7 @@ UserModel.prototype.getDisplayName = function(callback) {
         // Combine the name
         var name = firstName + ' ' + lastName;
         if(nickname.trim().length > 0)
-            name = firstName = ' \'' + nickname + '\' ' + lastName;
+            name = firstName + ' \'' + nickname + '\' ' + lastName;
 
         // Call back the name
         callback(null, name);
