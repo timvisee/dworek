@@ -517,11 +517,17 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
 /**
  * Get the game-specific configuration for this game.
  *
- * @return {Object} Game configuration.
+ * @param {GameModel~getGameConfigCallback} callback Called with the game configuration or when an error occurred.
  */
-GameModel.prototype.getConfig = function() {
-    return gameConfig;
-};
+GameModel.prototype.getConfig = (callback) => callback(null, gameConfig);
+
+/**
+ * Called with the game configuration or when an error occurred.
+ *
+ * @callback GameModel~getGameConfigCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Object} Game configuration object.
+ */
 
 // Export the user class
 module.exports = GameModel;
