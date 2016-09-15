@@ -1091,6 +1091,19 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
     Dworek.gameWorker.update();
 });
 
+// Game location updates
+Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE, function(packet) {
+    // Make sure a message has been set
+    if(!packet.hasOwnProperty('game'))
+        return;
+
+    // Check whether this packet contains user data
+    const hasUsers = packet.hasOwnProperty('users');
+
+    // Show a notification
+    showNotification('Received location data for ' + packet.users.length + ' users');
+});
+
 // Manage the active game
 $(document).bind("pageshow", function() {
     updateActiveGame();
