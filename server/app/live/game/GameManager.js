@@ -445,8 +445,10 @@ GameManager.prototype.broadcastData = function(callback) {
                         }
 
                         // Make sure the user is visible
-                        if(!visible)
+                        if(!visible) {
+                            latch.resolve();
                             return;
+                        }
 
                         // Get the name of the user
                         otherUser.getName(function(err, name) {
