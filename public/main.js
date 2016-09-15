@@ -2569,7 +2569,7 @@ function testGps() {
         setGpsState(GeoStates.WORKING);
 
         // Show a notification
-        showNotification('Your GPS is working');
+        showNotification('Your GPS is working as expected');
 
         // Update the player location
         updatePlayerPosition(position);
