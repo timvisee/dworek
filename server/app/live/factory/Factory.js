@@ -151,7 +151,9 @@ Factory.prototype.getGame = function() {
  *
  * @param {Factory~loadCallback} callback Called on success or when an error occurred.
  */
-Factory.prototype.load = function(callback) {};
+Factory.prototype.load = function(callback) {
+    callback(null);
+};
 
 /**
  * Called on success or when an error occurred.
