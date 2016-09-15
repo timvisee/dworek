@@ -366,6 +366,12 @@
             window.setTimeout(function() {
                 _self.settings.switching = false;
             }, 400);
+
+            // Trigger a tab change event
+            $(document).trigger('tab-switch', {
+                from: oldContent,
+                to: newContent
+            });
         },
         prepareTabs: function() {
             var _self = this;
