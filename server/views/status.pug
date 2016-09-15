@@ -96,14 +96,15 @@ block content
                             span(style='color: green;') Online
                         else
                             span(style='color: red;') Offline
-                tr: td Uptime
-                    td #{status.redis.uptime} seconds
-                tr: td Queries processed
-                    td= status.redis.commandCount
-                tr: td Cached fields
-                    td= status.redis.keyCount
-                tr: td Used memory
-                    td= status.redis.memory
+                if status.redis.online
+                    tr: td Uptime
+                        td #{status.redis.uptime} seconds
+                    tr: td Queries processed
+                        td= status.redis.commandCount
+                    tr: td Cached fields
+                        td= status.redis.keyCount
+                    tr: td Used memory
+                        td= status.redis.memory
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
