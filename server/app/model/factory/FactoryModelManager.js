@@ -227,46 +227,47 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
     }
 
     // Fetch the result from MongoDB
-    FactoryDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
-        // Call back errors
-        if(err !== null && err !== undefined) {
-            // Encapsulate the error and call back
-            callback(new Error(err));
-            return;
-        }
+    latch.then(function() {
+        FactoryDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err));
+                return;
+            }
 
-        // Create an array of factories
-        var factories = [];
+            // Create an array of factories
+            var factories = [];
 
-        // Loop through the results, create an factories object for each user and add it to the array
-        data.forEach(function(factoryData) {
-            factories.push(Core.model.factoryModelManager._instanceManager.create(factoryData._id));
+            // Loop through the results, create an factories object for each user and add it to the array
+            data.forEach(function(factoryData) {
+                factories.push(Core.model.factoryModelManager._instanceManager.create(factoryData._id));
+            });
+
+            // Call back with the factories
+            callback(null, factories);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Create a list of raw factory IDs
+                var rawFactoryIds = [];
+                factories.forEach(function(factory) {
+                    rawFactoryIds.push(factory.getIdHex());
+                });
+
+                // Join the factory IDs
+                var joined = rawFactoryIds.join(',');
+
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, joined, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred when storing fetched factories, ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
         });
-
-        // Call back with the factories
-        callback(null, factories);
-
-        // Store the result in Redis if ready
-        if(RedisUtils.isReady()) {
-            // Create a list of raw factory IDs
-            var rawFactoryIds = [];
-            factories.forEach(function(factory) {
-                rawFactoryIds.push(factory.getIdHex());
-            });
-
-            // Join the factory IDs
-            var joined = rawFactoryIds.join(',');
-
-            // Store the results
-            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, joined, function(err) {
-                // Show a warning on error
-                if(err !== null && err !== undefined) {
-                    console.error('A Redis error occurred when storing fetched factories, ignoring.');
-                    console.error(new Error(err));
-                }
-            });
-        }
-
     });
 };
 
