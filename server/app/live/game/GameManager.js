@@ -24,6 +24,8 @@ var _ = require('lodash');
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
+var config = require('../../../config');
+
 var Core = require('../../../Core');
 var PacketType = require('../../realtime/PacketType');
 var Game = require('./Game');
@@ -43,6 +45,15 @@ var GameManager = function() {
      * @type {Array} Array of games.
      */
     this.games = [];
+
+    // Set up the location update interval
+    setInterval(function() {
+        Core.gameController.broadcastData(function(err) {
+            // Show errors in the console
+            if(err !== null)
+                console.error('An error occurred while broadcasting location data to clients, ignoring (' + err + ')');
+        });
+    }, config.game.locationUpdateInterval);
 };
 
 /**

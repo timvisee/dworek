@@ -298,6 +298,12 @@ config.validation.teamNameMaxLength = 64;
  */
 config.game.locationDecayTime = 30 * 1000;
 
+/**
+ * Update interval in milliseconds to send new location updates.
+ * @type {number}
+ */
+config.game.locationUpdateInterval = 5 * 1000;
+
 
 // Export the configuration
 module.exports = config;
