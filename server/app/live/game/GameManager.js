@@ -621,8 +621,23 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                 // Get the users team
                 const team = liveUser.getTeamModel();
 
-                // TODO: Calculate the factory cost here!
-                _.set(gameData, 'factory.cost', 40);
+                // Get the factory cost
+                latch.add();
+                liveGame.calculateFactoryCost(team, function(err, cost) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the cost
+                    _.set(gameData, 'factory.cost', 40);
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
 
                 // Resolve the latch
                 latch.resolve();

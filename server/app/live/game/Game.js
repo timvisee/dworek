@@ -223,5 +223,39 @@ Game.prototype.unload = function() {
  * @param {string} Game name.
  */
 
+/**
+ * Get the game configuration.
+ * @param callback callback(err, config)
+ */
+Game.prototype.getConfig = function(callback) {
+    this.getGameModel().getConfig(callback);
+};
+
+/**
+ * Calculate the cost to build a new factory.
+ *
+ * @param {TeamModel} team Team model the user is in.
+ * @param {Game~calculateFactoryCostCallback} callback
+ */
+Game.prototype.calculateFactoryCost = function(team, callback) {
+    // Get the game configuration
+    this.getConfig(function(err, config) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Calculate the factory cost
+        callback(null, config.factory.calculateCost());
+    });
+};
+
+/**
+ * @callback Game~calculateFactoryCostCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {Number} Cost.
+ */
+
 // Export the class
 module.exports = Game;

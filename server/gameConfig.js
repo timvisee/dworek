@@ -67,7 +67,14 @@ var gameConfig = {
          * Initial out value.
          * @param {Number}
          */
-        initialOut: 0
+        initialOut: 0,
+
+        /**
+         * Function to calculate the factory cost.
+         */
+        calculateCost: function() {
+            return 100;
+        }
     }
 };
 
