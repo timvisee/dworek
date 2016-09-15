@@ -3071,11 +3071,16 @@ function updateGameDataVisuals() {
         // Remove the game data loading label
         gameActionsList.find('.game-data-load-label').remove();
 
+        // Count the number of cards
+        var cardCount = 0;
+
         // Determine whether anything is changed
         var changed = false;
 
         // Determine whether we should show the factory build button
         const showFactoryBuild = data.hasOwnProperty('factory') && data.factory.hasOwnProperty('canBuild') && data.factory.canBuild;
+        if(showFactoryBuild)
+            cardCount++;
 
         // Get the factory build card element if available
         var factoryBuildCardElement = gameActionsList.find('.card-factory-build');
@@ -3112,6 +3117,12 @@ function updateGameDataVisuals() {
             factoryBuildCardElement.remove();
             changed = true;
         }
+
+        // Show a label if no card is shown
+        if(cardCount == 0)
+            gameActionsList.html('<div align="center" class="game-data-load-label">' +
+                '    <i>No actions available...</i>' +
+                '</div>');
 
         // Trigger the create event on the game actions list
         if(changed)
