@@ -456,7 +456,7 @@ User.prototype.subtractMoney = function(amount, callback) {
     });
 };
 
-User.prototype.getGoods = function(callback) {
+User.prototype.getIn = function(callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
         // Call back errors
@@ -472,11 +472,11 @@ User.prototype.getGoods = function(callback) {
         }
 
         // Get the goods
-        gameUser.getGoods(callback);
+        gameUser.getIn(callback);
     });
 };
 
-User.prototype.setGoods = function(goods, callback) {
+User.prototype.setIn = function(goods, callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
         // Call back errors
@@ -492,7 +492,7 @@ User.prototype.setGoods = function(goods, callback) {
         }
 
         // Get the goods
-        gameUser.setGoods(goods, callback);
+        gameUser.setIn(goods, callback);
     });
 };
 
