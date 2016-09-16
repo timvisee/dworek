@@ -177,35 +177,34 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 // Check whether we should use the maximum amount
                                 if(rawAll === true)
                                     depositAmount = userIn;
-                                else {
+                                else
                                     // Parse the raw amount
                                     depositAmount = parseInt(rawAmount);
 
-                                    // Make sure the amount isn't above the maximum
-                                    if(depositAmount > userIn) {
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: true,
-                                            message: 'Failed to deposit, you don\'t have this much goods available.',
-                                            dialog: true
-                                        }, socket);
-                                        return;
-                                    }
+                                // Make sure the amount isn't above the maximum
+                                if(depositAmount > userIn) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Failed to deposit, you don\'t have this much goods available.',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
 
-                                    // Make sure the amount isn't below zero
-                                    if(depositAmount < 0) {
-                                        callbackError();
-                                        return;
-                                    }
+                                // Make sure the amount isn't below zero
+                                if(depositAmount < 0) {
+                                    callbackError();
+                                    return;
+                                }
 
-                                    // Make the sure the amount isn't zero
-                                    if(depositAmount == 0) {
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: true,
-                                            message: '<i>You can\'t deposit no nothin\'.</i>',
-                                            dialog: true
-                                        }, socket);
-                                        return;
-                                    }
+                                // Make the sure the amount isn't zero
+                                if(depositAmount == 0) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: '<i>You can\'t deposit no nothin\'.</i>',
+                                        dialog: true
+                                    }, socket);
+                                    return;
                                 }
 
                                 // Decrease the in of the user

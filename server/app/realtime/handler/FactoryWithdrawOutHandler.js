@@ -177,35 +177,34 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 // Check whether we should use the maximum amount
                                 if(rawAll === true)
                                     withdrawAmount = factoryOut;
-                                else {
+                                else
                                     // Parse the raw amount
                                     withdrawAmount = parseInt(rawAmount);
 
-                                    // Make sure the amount isn't above the maximum
-                                    if(withdrawAmount > factoryOut) {
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: true,
-                                            message: 'Failed to withdraw, you\'re trying to withdraw more than there\'s available.',
-                                            dialog: true
-                                        }, socket);
-                                        return;
-                                    }
+                                // Make sure the amount isn't above the maximum
+                                if(withdrawAmount > factoryOut) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Failed to withdraw, you\'re trying to withdraw more than there\'s available.',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
 
-                                    // Make sure the amount isn't below zero
-                                    if(withdrawAmount < 0) {
-                                        callbackError();
-                                        return;
-                                    }
+                                // Make sure the amount isn't below zero
+                                if(withdrawAmount < 0) {
+                                    callbackError();
+                                    return;
+                                }
 
-                                    // Make the sure the amount isn't zero
-                                    if(withdrawAmount == 0) {
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: true,
-                                            message: '<i>You can\'t withdraw no nothin\'.</i>',
-                                            dialog: true
-                                        }, socket);
-                                        return;
-                                    }
+                                // Make the sure the amount isn't zero
+                                if(withdrawAmount == 0) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: '<i>You can\'t withdraw no nothin\'.</i>',
+                                        dialog: true
+                                    }, socket);
+                                    return;
                                 }
 
                                 // Decrease the in of the factory
