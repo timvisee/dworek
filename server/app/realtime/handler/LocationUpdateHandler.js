@@ -189,7 +189,13 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 }
 
                 // Update the user location
-                liveUser.updateLocation(coordinate);
+                liveUser.updateLocation(coordinate, socket, function(err) {
+                    // Handle errors
+                    if(err !== null) {
+                        console.error(err);
+                        console.error('Failed to update player location, ignoring');
+                    }
+                });
             });
         });
     });

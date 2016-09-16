@@ -27,6 +27,7 @@ var config = require('../../../config');
 
 var Core = require('../../../Core');
 var UserModel = require('../../model/user/UserModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * User class.
@@ -236,11 +237,11 @@ User.prototype.load = function(callback) {
 User.prototype.unload = function() {};
 
 /**
- * Update the location.
+ * Set the location.
  *
  * @param location New location.
  */
-User.prototype.updateLocation = function(location) {
+User.prototype.setLocation = function(location) {
     // Set the location and it's update time
     this._location = location;
     this._locationTime = new Date();
@@ -304,6 +305,75 @@ User.prototype.hasRecentLocation = function() {
  */
 User.prototype.hasLocation = function() {
     return this.getLocation() !== null;
+};
+
+/**
+ * Update the location.
+ *
+ * @param {Coordinate} location New location.
+ * @param socket Source socket.
+ * @param {function} callback callback(err) Called on success or on error.
+ */
+User.prototype.updateLocation = function(location, socket, callback) {
+    // Store this instance
+    const self = this;
+
+    // Set the location
+    this.setLocation(location);
+
+    // Get the live game
+    const liveGame = this.getGame();
+
+    // Define whether to update the game data
+    var updateGameData = false;
+
+    // Make sure we only call back once
+    var calledBack = false;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Loop through all the factories
+    liveGame.factoryManager.factories.forEach(function(liveFactory) {
+        // Skip if we called back
+        if(calledBack)
+            return;
+
+        // Update the visibility state for the user
+        latch.add();
+        liveFactory.updateVisibilityMemory(self, function(err, changed) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Check whether we should update the game data
+            if(changed)
+                updateGameData = true;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    });
+
+    // Continue when we're done
+    latch.then(function() {
+        // Update the game data
+        if(updateGameData)
+            Core.gameController.sendGameData(liveGame.getGameModel(), self.getUserModel(), undefined, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Call back normally
+                callback(null);
+            });
+    });
 };
 
 User.prototype.getMoney = function(callback) {
