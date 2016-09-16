@@ -2972,7 +2972,7 @@ function buildFactory() {
     const fieldId = generateUniqueId('field-factory-name');
 
     // Build the dialog message
-    // var dialogMessage = 'Enter a name for the ' + NameConfig.factory.name + ':<br><br>' +
+    var dialogMessage = 'Enter a name for the ' + NameConfig.factory.name + ':<br><br>' +
         '<label for="' + fieldId + '">' + capitalizeFirst(NameConfig.factory.name) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
@@ -3102,7 +3102,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_DATA, function(p
 });
 
 // Update the game data visuals when initializing a page
-$(document).bind("pageinit", function() {
+$(document).bind("pageshow", function() {
     updateGameDataVisuals();
 });
 
@@ -3362,7 +3362,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
     if(Dworek.utils.getFactoryId() == factoryId) {
         // Redirect the user if the factory is hidden
         if(!data.visible) {
-            showNotification({
+            showDialog({
                 title: 'Out of range',
                 message: 'You\'re outside of the ' + NameConfig.factory.name + ' range.<br><br>' +
                 'Please go back to the main game page.',
@@ -3382,7 +3382,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
 });
 
 // Update the factory data visuals when initializing a page
-$(document).bind("pageinit", function() {
+$(document).bind("pageshow", function() {
     updateFactoryDataVisuals(true);
 });
 

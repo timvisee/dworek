@@ -810,8 +810,17 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
         else
             self._userVisibleMem.splice(self._userVisibleMem.indexOf(liveUser), 1);
 
-        // Call back the result
-        callback(null, true);
+        // Send the factory data
+        self.sendData(liveUser.getUserModel(), null, function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back the result
+            callback(null, true);
+        });
     });
 };
 
