@@ -124,7 +124,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 return;
 
             // Set the found flag
-            found = true;
+            foundShop = true;
 
             // Get the game user
             Core.model.gameUserModelManager.getGameUser(liveGame.getGameModel(), user, function(err, gameUser) {
@@ -228,6 +228,17 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             });
         });
     });
+
+    // Call back an error if the shop wasn't found
+    if(!foundShop) {
+        // Send a message response to the user
+        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+            error: true,
+            message: 'Failed to sell goods, couldn\'t find shop. The shop you\'re trying to sell goods to might not be available anymore.',
+            dialog: true
+        }, socket);
+        return;
+    }
 };
 
 // Export the module
