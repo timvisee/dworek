@@ -581,6 +581,82 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             latch.resolve();
         });
 
+        // Get the game user if applicable
+        latch.add();
+        Core.model.gameUserModelManager.
+        getGameUser(game, user, function(err, gameUser) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Make sure the game user exists
+            if(gameUser == null) {
+                latch.resolve();
+                return;
+            }
+
+            // Get the money, in and out goods of the user
+            latch.add();
+            gameUser.getMoney(function(err, money) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the money
+                _.set(gameData, 'balance.money', money);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the money, in and out goods of the user
+            latch.add();
+            gameUser.getIn(function(err, value) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the in
+                _.set(gameData, 'balance.in', value);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the money, in and out goods of the user
+            latch.add();
+            gameUser.getOut(function(err, value) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the out
+                _.set(gameData, 'balance.out', value);
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
         // Get the live game
         latch.add();
         self.getGame(game, function(err, liveGame) {
