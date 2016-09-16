@@ -33,7 +33,7 @@ var gameConfig = {
          * Tick interval in milliseconds.
          * @type {Number}
          */
-        tickInterval: 30 * 1000
+        tickInterval: 15 * 1000
     },
 
     /**
@@ -43,7 +43,39 @@ var gameConfig = {
         /**
          * Initial money amount, when a user starts the game.
          */
-        initialMoney: 500
+        initialMoney: 500,
+
+        /**
+         * Get the upgrades and their cost.
+         *
+         * @param {Number} strength Current strength.
+         * @return {*[]}
+         */
+        getStrengthUpgrades: function(strength) {
+            // Create an array of defences
+            var strengths = [{
+                name: 'Energy',
+                cost: 1,
+                strength: 1
+            }];
+
+            // Add other defences when the defence is greater than the initial value
+            if(strength > 5) {
+                strengths.push({
+                    name: 'Pistol',
+                    cost: Math.round(5 + strength * 1.2),
+                    strength: 10
+                });
+                strengths.push({
+                    name: 'Rush B',
+                    cost: Math.round(15 + strength * 2),
+                    strength: strength * 2
+                });
+            }
+
+            // Return the defences
+            return strengths;
+        }
     },
 
     /**
@@ -171,7 +203,7 @@ var gameConfig = {
          * @return {Number} Production input for each tick.
          */
         getProductionIn: function(level) {
-            return 10 * level;
+            return 3 * level;
         },
 
         /**
@@ -180,7 +212,7 @@ var gameConfig = {
          * @return {Number} Production output for each tick.
          */
         getProductionOut: function(level) {
-            return 15 * level;
+            return 2 * level;
         },
 
         /**
