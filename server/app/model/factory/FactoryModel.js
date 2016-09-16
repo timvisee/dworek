@@ -135,6 +135,9 @@ var FactoryModel = function(id) {
                 }
             },
             location: {
+                mongo: {
+                    from: (raw) => Coordinate.parse(raw)
+                },
                 redis: {
                     /**
                      * Convert a serialized location to a location object.
