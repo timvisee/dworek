@@ -425,7 +425,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
             // Get the input production
             latch.add();
-            liveGame.calculateProductionIn(function(err, production) {
+            self.calculateProductionIn(function(err, production) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -443,7 +443,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
             // Get the output production
             latch.add();
-            liveGame.calculateProductionOut(function(err, production) {
+            self.calculateProductionOut(function(err, production) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)

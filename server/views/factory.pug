@@ -20,6 +20,12 @@ block content
                 tr: td Defence
                     td.factory-defence= factory.defence
                 tr: td.game-label-input In
-                    td.factory-in= factory.in
+                    td
+                        span.factory-in= factory.in
+                        | &nbsp;
+                        span(style="color: gray;") − <span class="factory-production-in">?</span> / tick
                 tr: td.game-label-output Out
-                    td.factory-out= factory.out
+                    td
+                        span.factory-out= factory.out
+                        | &nbsp;
+                        span(style="color: gray;") + <span class="factory-production-out">?</span> / tick
