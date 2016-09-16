@@ -221,7 +221,8 @@ Factory.prototype.sendData = function(user, sockets, callback) {
     };
 
     // Get the game
-    const game = this.getGame().getGameModel();
+    const liveGame = this.getGame();
+    const game = liveGame.getGameModel();
 
     // Get the factory model
     const factoryModel = this.getFactoryModel();
@@ -417,6 +418,42 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                         });
                     });
                 });
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the input production
+            latch.add();
+            liveGame.calculateProductionIn(function(err, production) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the production
+                factoryData.productionIn = production;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the output production
+            latch.add();
+            liveGame.calculateProductionOut(function(err, production) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the production
+                factoryData.productionOut = production;
 
                 // Resolve the latch
                 latch.resolve();
@@ -649,6 +686,118 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
  */
 Factory.prototype.isInVisibilityMemory = function(liveUser) {
     return this._userVisibleMem.indexOf(liveUser) >= 0;
+};
+
+/**
+ * Calculate the input production per tick.
+ *
+ * @param callback (err, productionValue)
+ */
+Factory.prototype.calculateProductionIn = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Get the game config and level
+    var gameConfig = null;
+    var level = null;
+
+    // Get the game config
+    latch.add();
+    this.getGame().getConfig(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the factory level
+    latch.add();
+    this.getFactoryModel().getLevel(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the level
+        level = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Calculate the production in
+    latch.then(function() {
+        callback(null, gameConfig.factory.calculateProductionIn(level));
+    });
+};
+
+/**
+ * Calculate the output production per tick.
+ *
+ * @param callback (err, productionValue)
+ */
+Factory.prototype.calculateProductionOut = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Get the game config and level
+    var gameConfig = null;
+    var level = null;
+
+    // Get the game config
+    latch.add();
+    this.getGame().getConfig(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the game level
+    latch.add();
+    this.getFactoryModel().getLevel(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the level
+        level = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Calculate the production in
+    latch.then(function() {
+        callback(null, gameConfig.factory.calculateProductionOut(level));
+    });
 };
 
 // Export the class
