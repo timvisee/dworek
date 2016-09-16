@@ -26,6 +26,17 @@
  */
 var gameConfig = {
     /**
+     * Game section.
+     */
+    game: {
+        /**
+         * Tick interval in milliseconds.
+         * @type {Number}
+         */
+        tickInterval: 30 * 1000
+    },
+
+    /**
      * Player configurations.
      */
     player: {
@@ -33,6 +44,41 @@ var gameConfig = {
          * Initial money amount, when a user starts the game.
          */
         initialMoney: 500
+    },
+
+    /**
+     * Shop configurations.
+     */
+    shop: {
+        /**
+         * Operation range in meters.
+         * @param {Number}
+         */
+        range: 15,
+
+        /**
+         * Get the price per unit the in goods are sold for.
+         * Fetched once when a shop is created.
+         * @type {Number}
+         */
+        getInSellPrice: function() {
+            const priceMin = 5;
+            const priceMax = 8;
+
+            return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
+        },
+
+        /**
+         * Get the price per unit the out goods are bought for.
+         * Fetched once when a shop is created.
+         * @type {Number}
+         */
+        getOutBuyPrice: function() {
+            const priceMin = 10;
+            const priceMax = 14;
+
+            return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
+        }
     },
 
     /**
@@ -46,7 +92,7 @@ var gameConfig = {
         name: 'Lab',
 
         /**
-         * Range in meters.
+         * Operation range in meters.
          * @param {Number}
          */
         range: 8,
