@@ -284,6 +284,10 @@ Shop.prototype.isLocactionInRange = function(location) {
  * @return {boolean} True if the user is in range, false if not.
  */
 Shop.prototype.isUserInRange = function(user) {
+    // Return true if the user is the same as the shop owner
+    if(this.getUser().getId().equals(user.getId()))
+        return true;
+
     // Make sure the user has a recent location
     if(!user.hasRecentLocation())
         return false;

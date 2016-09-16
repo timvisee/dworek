@@ -210,8 +210,10 @@ ShopManager.prototype.worker = function() {
                 }
 
                 // Skip if the team is null
-                if(userTeam == null)
+                if(userTeam == null) {
+                    latch.resolve();
                     return;
+                }
 
                 // Get the user's team ID
                 const userTeamId = userTeam.getIdHex();
