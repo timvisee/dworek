@@ -48,7 +48,11 @@ const PacketType = {
     FACTORY_DATA_REQUEST: 18,
     FACTORY_DATA: 19,
     FACTORY_DEFENCE_BUY: 20,
-    FACTORY_LEVEL_BUY: 21
+    FACTORY_LEVEL_BUY: 21,
+    FACTORY_DEPOSIT_IN: 22,
+    FACTORY_WITHDRAW_OUT: 23,
+    SHOP_BUY_IN: 24,
+    SHOP_SELL_OUT: 25
 };
 
 /**
@@ -3042,7 +3046,7 @@ function hasGameData(game) {
  * Get the game data of the given game.
  * The ID of the active game will be used if no ID is given.
  *
- * @param {string} game ID of the game.
+ * @param {string} [game] ID of the game.
  */
 function getGameData(game) {
     // Parse the game parameter
@@ -3301,7 +3305,7 @@ function hasFactoryData(factory) {
  * Get the factory data of the given factory.
  * The ID of the viewed factory will be used if no ID is given.
  *
- * @param {string} factory ID of the factory.
+ * @param {string} [factory] ID of the factory.
  */
 function getFactoryData(factory) {
     // Parse the factory parameter
@@ -3541,6 +3545,127 @@ function updateFactoryDataVisuals(firstShow) {
                 });
             });
         }
+
+        var depositButton = transferCard.find('.action-factory-deposit');
+        var withdrawButton = transferCard.find('.action-factory-withdraw');
+        depositButton.unbind('click');
+        withdrawButton.unbind('click');
+
+        depositButton.click(function() {
+            // Determine how many in the user currently has
+            var current = 10000;
+            if(hasGameData()) {
+                var gameData = getGameData();
+                if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('in'))
+                    current = gameData.balance.in;
+            }
+
+            // Generate an unique field ID
+            var amountFieldId = generateUniqueId('amount-field');
+
+            // Show the dialog
+            showDialog({
+                title: 'Deposit ' + NameConfig.in.name,
+                message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to deposit, or deposit all available to you.<br><br>' +
+                '<label for="' + amountFieldId + '">Deposit amount:</label>' +
+                '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                actions: [
+                    {
+                        text: 'Deposit',
+                        state: 'primary',
+                        action: function() {
+                            // Get the input field value
+                            var amount = $('#' + amountFieldId).val();
+
+                            // Send a packet to the server
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT_IN, {
+                                factory: factoryId,
+                                amount: amount,
+                                all: false
+                            });
+
+                            // Show a notification
+                            showNotification('Depositing ' + NameConfig.in.name + '...');
+                        }
+                    },
+                    {
+                        text: 'Deposit all',
+                        action: function() {
+                            // Send a packet to the server
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT_IN, {
+                                factory: factoryId,
+                                amount: 0,
+                                all: true
+                            });
+
+                            // Show a notification
+                            showNotification('Depositing all ' + NameConfig.in.name + '...');
+                        }
+                    },
+                    {
+                        text: 'Cancel'
+                    }
+                ]
+            });
+        });
+
+        withdrawButton.click(function() {
+            // Determine how many in the user currently has
+            var current = 10000;
+            if(hasFactoryData()) {
+                var factoryData = getFactoryData();
+                if(factoryData != null && factoryData.hasOwnProperty('out'))
+                    current = factoryData.out;
+            }
+
+            // Generate an unique field ID
+            var amountFieldId = generateUniqueId('amount-field');
+
+            // Show the dialog
+            showDialog({
+                title: 'Withdraw ' + NameConfig.out.name,
+                message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to withdraw, or withdraw all available.<br><br>' +
+                '<label for="' + amountFieldId + '">Withdraw amount:</label>' +
+                '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                actions: [
+                    {
+                        text: 'Withdraw',
+                        state: 'primary',
+                        action: function() {
+                            // Get the input field value
+                            var amount = $('#' + amountFieldId).val();
+
+                            // Send a packet to the server
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW_OUT, {
+                                factory: factoryId,
+                                amount: amount,
+                                all: false
+                            });
+
+                            // Show a notification
+                            showNotification('Withdrawing ' + NameConfig.out.name + '...');
+                        }
+                    },
+                    {
+                        text: 'Withdraw all',
+                        action: function() {
+                            // Send a packet to the server
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW_OUT, {
+                                factory: factoryId,
+                                amount: 0,
+                                all: true
+                            });
+
+                            // Show a notification
+                            showNotification('Withdrawing all ' + NameConfig.out.name + '...');
+                        }
+                    },
+                    {
+                        text: 'Cancel'
+                    }
+                ]
+            });
+        });
     }
 
     // Get the elements

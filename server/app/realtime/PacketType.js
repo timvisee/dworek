@@ -237,5 +237,39 @@ module.exports = {
      * - factory: ID of the factory
      * - cost: Cost of the upgrade (check)
      */
-    FACTORY_LEVEL_BUY: 21
+    FACTORY_LEVEL_BUY: 21,
+
+    /**
+     * Send from a client to the server to deposit goods.
+     *
+     * Data:
+     * - factory: ID of the factory
+     * - [amount]: amount
+     * - [all]: True to deposit all, false if not.
+     */
+    FACTORY_DEPOSIT_IN: 22,
+
+    /**
+     * Send from a client to the server to withdraw goods.
+     *
+     * Data:
+     * - factory: ID of the factory
+     * - [amount]: amount
+     * - [all]: True to withdraw all, false if not.
+     */
+    FACTORY_WITHDRAW_OUT: 23,
+
+    /**
+     * Send from a client to the server to buy in goods.
+     *
+     * TODO: Define data fields
+     */
+    SHOP_BUY_IN: 24,
+
+    /**
+     * Send from a client to the server to sell out goods.
+     *
+     * TODO: Define data fields
+     */
+    SHOP_SELL_OUT: 25
 };
