@@ -23,6 +23,7 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 var _ = require('lodash');
+var geolib = require('geolib');
 
 var config = require('../../../config');
 
@@ -67,6 +68,8 @@ var Factory = function(factory, game) {
      * @private
      */
     this._userVisibleMem = [];
+
+    this._range = null;
 
     // Get and set the factory ID
     if(factory instanceof FactoryModel)
@@ -227,8 +230,11 @@ Factory.prototype.sendData = function(user, sockets, callback) {
     // Get the factory model
     const factoryModel = this.getFactoryModel();
 
-    // Make sure the factory is part of this game
-    factoryModel.getGame(function(err, result) {
+    var firstLatch = new CallbackLatch();
+
+    // Get the game user
+    firstLatch.add();
+    this.getGame().getUser(user, function(err, liveUser) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -237,16 +243,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             return;
         }
 
-        // Compare the games
-        if(!game.getId().equals(result.getId())) {
-            if(!calledBack)
-                callback(new Error('The factory is not part of this game'));
-            calledBack = true;
-            return;
-        }
-
-        // Get the live factory
-        factoryModel.getLiveFactory(function(err, liveFactory) {
+        self.isVisibleFor(liveUser, function(err, visible) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -255,14 +252,54 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                 return;
             }
 
-            // TODO: Make sure the user has rights to view this factory!
+            factoryData.visible = visible;
 
-            // Create a callback latch
-            var latch = new CallbackLatch();
+            firstLatch.resolve();
+        });
+    });
 
-            // Get the factory name
-            latch.add();
-            factoryModel.getName(function(err, name) {
+    firstLatch.add();
+    self.canModify(user, function(err, canModify) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        factoryData.canModify = canModify;
+
+        firstLatch.resolve();
+    });
+
+    firstLatch.then(function() {
+        // Send the data if no visible
+        if(!factoryData.visible) {
+            sendFactoryData();
+            return;
+        }
+
+        // Make sure the factory is part of this game
+        factoryModel.getGame(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Compare the games
+            if(!game.getId().equals(result.getId())) {
+                if(!calledBack)
+                    callback(new Error('The factory is not part of this game'));
+                calledBack = true;
+                return;
+            }
+
+            // Get the live factory
+            factoryModel.getLiveFactory(function(err, liveFactory) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -271,99 +308,14 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                     return;
                 }
 
-                // Set the name
-                factoryData.name = name;
+                // TODO: Make sure the user has rights to view this factory!
 
-                // Resolve the latch
-                latch.resolve();
-            });
+                // Create a callback latch
+                var latch = new CallbackLatch();
 
-            // Get the factory level
-            latch.add();
-            factoryModel.getLevel(function(err, level) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set the level
-                factoryData.level = level;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-
-            // Get the defence value
-            latch.add();
-            factoryModel.getDefence(function(err, defence) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set the defence
-                factoryData.defence = defence;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-
-            // Get the input
-            latch.add();
-            factoryModel.getIn(function(err, input) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set the input
-                factoryData.in = input;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-
-            // Get the output
-            latch.add();
-            factoryModel.getOut(function(err, output) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set the defence
-                factoryData.out = output;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-
-            // Get the creator
-            latch.add();
-            factoryModel.getUser(function(err, creator) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Get the display name of the user
+                // Get the factory name
                 latch.add();
-                creator.getDisplayName(function(err, displayName) {
+                factoryModel.getName(function(err, name) {
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
@@ -372,16 +324,16 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                         return;
                     }
 
-                    // Set the display name
-                    factoryData.creatorName = displayName;
+                    // Set the name
+                    factoryData.name = name;
 
                     // Resolve the latch
                     latch.resolve();
                 });
 
-                // Get the game user
+                // Get the factory level
                 latch.add();
-                Core.model.gameUserModelManager.getGameUser(game, creator, function(err, gameUser) {
+                factoryModel.getLevel(function(err, level) {
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
@@ -390,8 +342,81 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                         return;
                     }
 
-                    // Get the team
-                    gameUser.getTeam(function(err, team) {
+                    // Set the level
+                    factoryData.level = level;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Get the defence value
+                latch.add();
+                factoryModel.getDefence(function(err, defence) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the defence
+                    factoryData.defence = defence;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Get the input
+                latch.add();
+                factoryModel.getIn(function(err, input) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the input
+                    factoryData.in = input;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Get the output
+                latch.add();
+                factoryModel.getOut(function(err, output) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the defence
+                    factoryData.out = output;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Get the creator
+                latch.add();
+                factoryModel.getUser(function(err, creator) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Get the display name of the user
+                    latch.add();
+                    creator.getDisplayName(function(err, displayName) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -400,8 +425,26 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                             return;
                         }
 
-                        // Get the team name
-                        team.getName(function(err, teamName) {
+                        // Set the display name
+                        factoryData.creatorName = displayName;
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Get the game user
+                    latch.add();
+                    Core.model.gameUserModelManager.getGameUser(game, creator, function(err, gameUser) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Get the team
+                        gameUser.getTeam(function(err, team) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)
@@ -410,58 +453,92 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                                 return;
                             }
 
-                            // Set the team name
-                            factoryData.teamName = teamName;
+                            // Get the team name
+                            team.getName(function(err, teamName) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        callback(err);
+                                    calledBack = true;
+                                    return;
+                                }
 
-                            // Resolve the latch
-                            latch.resolve();
+                                // Set the team name
+                                factoryData.teamName = teamName;
+
+                                // Resolve the latch
+                                latch.resolve();
+                            });
                         });
                     });
+
+                    // Resolve the latch
+                    latch.resolve();
                 });
 
-                // Resolve the latch
-                latch.resolve();
-            });
+                // Get the input production
+                latch.add();
+                self.getProductionIn(function(err, production) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
 
-            // Get the input production
-            latch.add();
-            self.calculateProductionIn(function(err, production) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
+                    // Set the production
+                    factoryData.productionIn = production;
 
-                // Set the production
-                factoryData.productionIn = production;
+                    // Resolve the latch
+                    latch.resolve();
+                });
 
-                // Resolve the latch
-                latch.resolve();
-            });
+                // Get the output production
+                latch.add();
+                self.getProductionOut(function(err, production) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
 
-            // Get the output production
-            latch.add();
-            self.calculateProductionOut(function(err, production) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
+                    // Set the production
+                    factoryData.productionOut = production;
 
-                // Set the production
-                factoryData.productionOut = production;
+                    // Resolve the latch
+                    latch.resolve();
+                });
 
-                // Resolve the latch
-                latch.resolve();
-            });
+                // Send the factory data
+                latch.then(function() {
+                    sendFactoryData();
+                });
 
-            // Send the factory data
-            latch.then(function() {
-                sendFactoryData();
+                // Get the defence upgrades
+                latch.add();
+                self.getDefenceUpgrades(function(err, defenceUpgrades) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the production
+                    factoryData.defenceUpgrades = defenceUpgrades;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
+                // Send the factory data
+                latch.then(function() {
+                    sendFactoryData();
+                });
             });
         });
     });
@@ -623,11 +700,22 @@ Factory.prototype.isVisibleFor = function(user, callback) {
                     return;
                 }
 
-                // TODO: Check the player positions! The player might be in range!
+                // Get the live user
+                self.getGame().getUser(user, function(err, liveUser) {
+                    // Call back if the teams are equal
+                    if(err !== null ) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
 
-                // The factory probably isn't visible, call back false
-                if(!calledBack)
-                    callback(null, false);
+                    self.isUserInRange(liveUser, function(err, inRange) {
+                        // The factory probably isn't visible, call back false
+                        if(!calledBack)
+                            callback(null, inRange);
+                    });
+                });
             });
         });
     });
@@ -797,6 +885,253 @@ Factory.prototype.getProductionOut = function(callback) {
     // Calculate the production in
     latch.then(function() {
         callback(null, gameConfig.factory.getProductionOut(level));
+    });
+};
+
+/**
+ * Calculate the cost of the next level.
+ *
+ * @param callback (err, levelCost)
+ */
+Factory.prototype.getNextLevelCost = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Get the game config and level
+    var gameConfig = null;
+    var level = null;
+
+    // Get the game config
+    latch.add();
+    this.getGame().getConfig(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the game level
+    latch.add();
+    this.getFactoryModel().getLevel(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the level
+        level = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Calculate the production in
+    latch.then(function() {
+        callback(null, gameConfig.factory.getLevelCost(level + 1));
+    });
+};
+
+/**
+ * Get the defence upgrades object.
+ *
+ * @param callback (err, upgradesObject)
+ */
+Factory.prototype.getDefenceUpgrades = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Get the game config and level
+    var gameConfig = null;
+    var defence = null;
+
+    // Get the game config
+    latch.add();
+    this.getGame().getConfig(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the game config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the defence
+    latch.add();
+    this.getFactoryModel().getDefence(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the defence
+        defence = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the upgrades
+    latch.then(function() {
+        callback(null, gameConfig.factory.getDefenceUpgrades(defence));
+    });
+};
+
+/**
+ * Check whether the given user can modify this factory.
+ * @param {UserModel} user
+ * @param callback callback(err, canModify)
+ */
+Factory.prototype.canModify = function(user, callback) {
+    var latch = new CallbackLatch();
+    const self = this;
+
+    var calledBack = false;
+
+    var factoryTeam = null;
+    var userTeam = null;
+
+    latch.add();
+    this.getTeam(function(err, team) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        factoryTeam = team;
+
+        latch.resolve();
+    });
+
+    latch.add();
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), user, function(err, gameUser) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        gameUser.getTeam(function(err, team) {
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            userTeam = team;
+
+            latch.resolve();
+        });
+    });
+
+    latch.then(function() {
+        if(factoryTeam == null || userTeam == null) {
+            callback(null, false);
+            return;
+        }
+
+        if(!factoryTeam.getId().equals(userTeam.getId())) {
+            callback(null, false);
+            return;
+        }
+
+        self.getGame().getUser(user, function(err, liveUser) {
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            self.isUserInRange(liveUser, function(err, inRange) {
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                callback(null, inRange);
+            });
+        });
+    });
+};
+
+/**
+ * Check whether the given live user is in range.
+ * @param liveUser Live user.
+ * @param callback (err, inRange)
+ */
+Factory.prototype.isUserInRange = function(liveUser, callback) {
+    // Make sure the user has a recent position
+    if(!liveUser.hasRecentLocation()) {
+        callback(null, false);
+        return;
+    }
+
+    var latch = new CallbackLatch();
+    const self = this;
+    var calledBack = false;
+
+    // Get the users location
+    if(this._range == null) {
+        latch.add();
+        this.getGame().getConfig(function(err, gameConfig) {
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            self._range = gameConfig.factory.range;
+
+            latch.resolve();
+        });
+    }
+
+    var factoryLocation;
+
+    // Get the factory location
+    latch.add();
+    this.getFactoryModel().getLocation(function(err, location) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        factoryLocation = location;
+
+        latch.resolve();
+    });
+
+    latch.then(function() {
+        callback(null, geolib.getDistance(factoryLocation, liveUser.getLocation()) <= self._range);
     });
 };
 

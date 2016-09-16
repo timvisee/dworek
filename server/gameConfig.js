@@ -46,6 +46,12 @@ var gameConfig = {
         name: 'Lab',
 
         /**
+         * Range in meters.
+         * @param {Number}
+         */
+        range: 8,
+
+        /**
          * Initial factory level, when the factory is created.
          * @type {Number}
          */
@@ -92,6 +98,42 @@ var gameConfig = {
          */
         getCost: function() {
             return 100;
+        },
+
+        /**
+         * Get the cost to upgrade a level.
+         *
+         * @param {Number} level Level to get the cost for.
+         * @return {Number} Level cost.
+         */
+        getLevelCost: function(level) {
+            return 10;
+        },
+
+        /**
+         * Get the upgrades and their cost.
+         *
+         * @param {Number} defence Current defence.
+         * @return {*[]}
+         */
+        getDefenceUpgrades: function(defence) {
+            return [
+                {
+                    name: 'Mexicans',
+                    cost: 1,
+                    defence: 1
+                },
+                {
+                    name: 'Wall',
+                    cost: Math.round(5 + defence * 1.2),
+                    defence: 10
+                },
+                {
+                    name: 'Alarm',
+                    cost: Math.round(15 + defence * 2),
+                    defence: defence * 2
+                }
+            ];
         }
     }
 };

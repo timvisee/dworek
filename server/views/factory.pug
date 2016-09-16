@@ -8,10 +8,8 @@ block content
         .card-supporting-text.has-action.has-title
             table.table-list.ui-responsive
                 tr: td Name
-                    //td.factory-name= factory.name
                     td.factory-name= factory.name
                 tr: td Level
-                    //td.factory-level= factory.level
                     td.factory-level= factory.level
                 tr: td Creator
                     td.factory-creator= factory.creatorName
@@ -29,3 +27,42 @@ block content
                         span.factory-out= factory.out
                         | &nbsp;
                         span(style="color: gray;") + <span class="factory-production-out">?</span> / tick
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Upgrade defence
+
+        .card-supporting-text.has-action.has-title
+            p Upgrading the defence makes it harder for enemies to take things over.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-plus
+                    | &nbsp;&nbsp;Mexicans ($123 / +400)
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-plus
+                    | &nbsp;&nbsp;Wall ($123 / +400)
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-plus
+                    | &nbsp;&nbsp;Alarm ($123 / +400)
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-plus
+                    | &nbsp;&nbsp;Mexicans ($123 / +400)
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-plus
+                    | &nbsp;&nbsp;Mexicans ($123 / +400)
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Upgrade level
+
+        .card-supporting-text.has-action.has-title
+            p Upgrading the level speeds up production.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-long-arrow-up
+                    | &nbsp;&nbsp;Upgrade level ($123)
+
