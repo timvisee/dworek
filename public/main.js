@@ -47,7 +47,8 @@ const PacketType = {
     FACTORY_BUILD_RESPONSE: 17,
     FACTORY_DATA_REQUEST: 18,
     FACTORY_DATA: 19,
-    FACTORY_DEFENCE_BUY: 20
+    FACTORY_DEFENCE_BUY: 20,
+    FACTORY_LEVEL_BUY: 21
 };
 
 /**
@@ -3455,7 +3456,7 @@ function updateFactoryDataVisuals(firstShow) {
 
         // Check whether there are any defence upgrades
         if(!data.hasOwnProperty('defenceUpgrades')) {
-            upgradeButtonlist.html('<i>No upgrades available...</i>');
+            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br></i></div>');
 
         } else {
             // Loop through the list of upgrades
@@ -3475,7 +3476,7 @@ function updateFactoryDataVisuals(firstShow) {
                 // Bind a click action
                 button.click(function() {
                     showDialog({
-                        title: 'Buy upgrade',
+                        title: 'Defence upgrade',
                         message: 'Are you sure you want to buy this upgrade for ' + upgrade.cost + ' ' + NameConfig.currency.name + '?<br><br>' +
                         'This will improve the ' + NameConfig.factory.name + ' with ' + upgrade.defence + ' defence.',
                         actions: [
@@ -3506,6 +3507,36 @@ function updateFactoryDataVisuals(firstShow) {
 
         // Trigger a create on the list
         upgradeButtonlist.trigger('create');
+
+        if(data.hasOwnProperty('nextLevelCost')) {
+            const levelUpgradeButton = levelCard.find('.action-factory-level-upgrade');
+            levelUpgradeButton.unbind('click');
+            levelUpgradeButton.click(function() {
+                showDialog({
+                    title: 'Level upgrade',
+                    message: 'Are you sure you want to upgrade one level for ' + data.nextLevelCost + ' ' + NameConfig.currency.name + '?',
+                    actions: [
+                        {
+                            text: 'Buy upgrade',
+                            state: 'primary',
+                            action: function() {
+                                // Send an upgrade packet
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_LEVEL_BUY, {
+                                    factory: factoryId,
+                                    cost: data.nextLevelCost
+                                });
+
+                                // Show a notification
+                                showNotification('Buying upgrade...');
+                            }
+                        },
+                        {
+                            text: 'Cancel'
+                        }
+                    ]
+                });
+            });
+        }
     }
 
     // Get the elements
@@ -3518,6 +3549,7 @@ function updateFactoryDataVisuals(firstShow) {
     const factoryProductionInLabel = activePage.find('.factory-production-in');
     const factoryOutLabel = activePage.find('.factory-out');
     const factoryProductionOutLabel = activePage.find('.factory-production-out');
+    const factoryNextLevelCostLabel = activePage.find('.factory-next-level-cost');
 
     // Update the elements
     if(data.hasOwnProperty('name'))
@@ -3538,4 +3570,6 @@ function updateFactoryDataVisuals(firstShow) {
         factoryOutLabel.html(data.out);
     if(data.hasOwnProperty('productionOut'))
         factoryProductionOutLabel.html(data.productionOut);
+    if(data.hasOwnProperty('nextLevelCost'))
+        factoryNextLevelCostLabel.html(data.nextLevelCost);
 }

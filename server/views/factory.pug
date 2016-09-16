@@ -37,7 +37,8 @@ block content
 
         .card-action
             .row.between-xs: .col-xs-12: .box.upgrade-button-list
-                i No upgrades available...
+                div(align="center")
+                    i No upgrades available...<br>
 
     .nd2-card.wow.fadeInUp.card-factory-level
         .card-title.has-supporting-text
@@ -49,6 +50,6 @@ block content
         .card-action
             .row.between-xs: .col-xs-12: .box
                 a.ui-btn.waves-effect.waves-button.action-factory-level-upgrade(href='#', data-transition='slide', data-rel='popup')
-                    i.zmdi.zmdi-long-arrow-up
-                    | &nbsp;&nbsp;Upgrade level ($123)
+                    i.zmdi.zmdi-star
+                    | &nbsp;&nbsp;Upgrade level (<span class="factory-next-level-cost">?</span>)
 

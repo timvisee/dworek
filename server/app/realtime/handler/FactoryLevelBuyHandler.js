@@ -31,7 +31,7 @@ var CallbackLatch = require('../../util/CallbackLatch');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.FACTORY_DEFENCE_BUY;
+const HANDLER_PACKET_TYPE = PacketType.FACTORY_LEVEL_BUY;
 
 /**
  * Location update handler.
@@ -78,7 +78,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to buy upgrade, a server error occurred.',
+            message: 'Failed to send your location, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -87,7 +87,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
     };
 
     // Make sure a session is given
-    if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('index') || !packet.hasOwnProperty('cost') || !packet.hasOwnProperty('defence')) {
+    if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('cost')) {
         console.log('Received malformed packet');
         callbackError();
         return;
@@ -95,16 +95,14 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
     // Get the raw parameters
     const rawFactory = packet.factory;
-    const index = packet.index;
     const cost = packet.cost;
-    const defence = packet.defence;
 
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to send your location, you\'re not authenticated.',
+            message: 'Failed to buy upgrade, you\'re not authenticated.',
             dialog: true
         }, socket);
         return;
@@ -159,37 +157,24 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
-                                    message: 'Failed to buy defence, you aren\'t enough or you don\'t have permission.',
+                                    message: 'Failed to buy upgrade, you aren\'t enough or you don\'t have permission.',
                                     dialog: true
                                 }, socket);
                                 return;
                             }
 
-                            // Get the factory defences
-                            liveFactory.getDefenceUpgrades(function(err, defences) {
+                            // Get the cost for a level upgrade
+                            liveFactory.getNextLevelCost(function(err, nextLevelCost) {
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Make sure the index is in-bound
-                                if(index < 0 || index >= defences.length) {
-                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                        error: true,
-                                        message: 'Failed to buy defence, prices have changed.',
-                                        dialog: true
-                                    }, socket);
-                                    return;
-                                }
-
-                                // Get the defence
-                                var selectedDefence = defences[index];
-
                                 // Compare the price and defence
-                                if(selectedDefence.cost != cost || selectedDefence.defence != defence) {
+                                if(nextLevelCost != cost) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
-                                        message: 'Failed to buy defence, prices have changed.',
+                                        message: 'Failed to buy upgrade, prices have changed.',
                                         dialog: true
                                     }, socket);
                                     return;
@@ -202,31 +187,29 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                         return;
                                     }
 
-                                    if(money < selectedDefence.cost) {
+                                    if(money < nextLevelCost) {
                                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                             error: true,
-                                            message: 'Failed to buy defence, you don\'t have enough money.',
+                                            message: 'Failed to buy upgrade, you don\'t have enough money.',
                                             dialog: true
                                         }, socket);
                                         return;
                                     }
 
                                     // Subtract the money
-                                    gameUser.subtractMoney(selectedDefence.cost, function(err) {
+                                    gameUser.subtractMoney(nextLevelCost, function(err) {
                                         if(err !== null) {
                                             callbackError();
                                             return;
                                         }
 
-                                        // Get the current defence
-                                        factoryModel.getDefence(function(err, defence) {
+                                        factoryModel.getLevel(function(err, level) {
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
                                             }
 
-                                            // Set the new defence
-                                            factoryModel.setDefence(defence + selectedDefence.defence, function(err) {
+                                            factoryModel.setLevel(level + 1, function(err) {
                                                 if(err !== null) {
                                                     callbackError();
                                                     return;

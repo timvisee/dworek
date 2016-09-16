@@ -541,6 +541,24 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                     latch.resolve();
                 });
 
+                // Get the next level cost
+                latch.add();
+                self.getNextLevelCost(function(err, nextLevelCost) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the production
+                    factoryData.nextLevelCost = nextLevelCost;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
                 // Send the factory data
                 latch.then(function() {
                     sendFactoryData();
