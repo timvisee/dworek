@@ -1,7 +1,7 @@
 extends page
 
 block content
-    .nd2-card.wow.fadeInUp
+    .nd2-card.wow.fadeInUp.card-factory-info
         .card-title.has-supporting-text
             h3.card-primary-title Factory information
 
@@ -28,7 +28,7 @@ block content
                         | &nbsp;
                         span(style="color: gray;") + <span class="factory-production-out">?</span> / tick
 
-    .nd2-card.wow.fadeInUp
+    .nd2-card.wow.fadeInUp.card-factory-defence
         .card-title.has-supporting-text
             h3.card-primary-title Upgrade defence
 
@@ -36,7 +36,7 @@ block content
             p Upgrading the defence makes it harder for enemies to take things over.
 
         .card-action
-            .row.between-xs: .col-xs-12: .box
+            .row.between-xs: .col-xs-12: .box.upgrade-button-list
                 a.ui-btn.waves-effect.waves-button.action-level-upgrade(href='#', data-transition='slide', data-rel='popup')
                     i.zmdi.zmdi-plus
                     | &nbsp;&nbsp;Mexicans ($123 / +400)
@@ -53,7 +53,7 @@ block content
                     i.zmdi.zmdi-plus
                     | &nbsp;&nbsp;Mexicans ($123 / +400)
 
-    .nd2-card.wow.fadeInUp
+    .nd2-card.wow.fadeInUp.card-factory-level
         .card-title.has-supporting-text
             h3.card-primary-title Upgrade level
 

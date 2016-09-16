@@ -46,7 +46,8 @@ const PacketType = {
     FACTORY_BUILD_REQUEST: 16,
     FACTORY_BUILD_RESPONSE: 17,
     FACTORY_DATA_REQUEST: 18,
-    FACTORY_DATA: 19
+    FACTORY_DATA: 19,
+    FACTORY_UPGRADE_BUY: 20
 };
 
 /**
@@ -3104,6 +3105,16 @@ $(document).bind("pageinit", function() {
     updateGameDataVisuals();
 });
 
+function cardAnimationSlideIn(element) {
+    element.addClass('animated bounceInLeft').hide().slideDown();
+}
+
+function cardAnimationSlideOut(element) {
+    element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(500).slideUp(function() {
+        $(this).remove();
+    });
+}
+
 /**
  * Update all visual things that depend on the game data.
  */
@@ -3131,16 +3142,6 @@ function updateGameDataVisuals() {
 
     // Get the game actions list
     const gameActionsList = activePage.find('.game-actions-list');
-
-    // Define a card animation
-    const cardAnimationSlideIn = function(element) {
-        element.addClass('animated bounceInLeft').hide().slideDown();
-    };
-    const cardAnimationSlideOut = function(element) {
-        element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(500).slideUp(function() {
-            $(this).remove();
-        });
-    };
 
     // Check whether we found a game actions list
     if(gameActionsList.length > 0) {
@@ -3381,13 +3382,17 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
 
 // Update the factory data visuals when initializing a page
 $(document).bind("pageinit", function() {
-    updateFactoryDataVisuals();
+    updateFactoryDataVisuals(true);
 });
 
 /**
  * Update all visual things that depend on the game data.
+ * @param {boolean} [firstShow] If this is the first time the page is shown.
  */
-function updateFactoryDataVisuals() {
+function updateFactoryDataVisuals(firstShow) {
+    if(firstShow == undefined)
+        firstShow = false;
+
     // Make sure we're on a factory page
     if(!Dworek.utils.isFactoryPage())
         return;
@@ -3398,16 +3403,110 @@ function updateFactoryDataVisuals() {
         return;
 
     // Make sure we've any factory data for this factory, request new data and return if we don't have anything
-    if(!hasFactoryData(factoryId)) {
+    if(!hasFactoryData(factoryId))
         requestFactoryData(factoryId);
-        return;
-    }
 
     // Get the factory data
     var data = getFactoryData(factoryId);
+    if(data == null)
+        data = {};
 
     // Get the active page
     const activePage = getActivePage();
+
+    // Check whether the user can modify
+    var visible = !data.hasOwnProperty('visible') || data.visible;
+    var canModify = data.hasOwnProperty('canModify') && data.canModify;
+
+    // Select the cards
+    var infoCard = activePage.find('.card-factory-info');
+    var defenceCard = activePage.find('.card-factory-defence');
+    var levelCard = activePage.find('.card-factory-level');
+
+    if(visible)
+        infoCard.slideDown();
+    else {
+        if(firstShow)
+            infoCard.hide();
+        else
+            infoCard.slideUp();
+    }
+
+    // Show the modification cards
+    if(canModify) {
+        defenceCard.slideDown();
+        levelCard.slideDown();
+
+    } else {
+        if(firstShow) {
+            defenceCard.hide();
+            levelCard.hide();
+        } else {
+            defenceCard.slideUp();
+            levelCard.slideUp();
+        }
+    }
+
+    // Update the upgrade buttons
+    if(canModify) {
+        // Get the upgrade button list element, and clear it
+        const upgradeButtonlist = defenceCard.find('.upgrade-button-list');
+        upgradeButtonlist.empty();
+
+        // Check whether there are any defence upgrades
+        if(!data.hasOwnProperty('defenceUpgrades')) {
+            upgradeButtonlist.html('<i>No upgrades available...</i>');
+
+        } else {
+            // Loop through the list of upgrades
+            data.defenceUpgrades.forEach(function(upgrade, i) {
+                // Get an unique button ID
+                var buttonId = generateUniqueId('button-upgrade-');
+
+                // Append a button
+                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                    '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
+                    '    ' + upgrade.name + ' (' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')' +
+                    '</a>');
+
+                // Get the button
+                var button = upgradeButtonlist.find('#' + buttonId);
+
+                // Bind a click action
+                button.click(function() {
+                    showDialog({
+                        title: 'Buy upgrade',
+                        message: 'Are you sure you want to buy this upgrade for ' + upgrade.cost + ' ' + NameConfig.currency.name + '?<br><br>' +
+                        'This will improve the ' + NameConfig.factory.name + ' with ' + upgrade.defence + ' defence.',
+                        actions: [
+                            {
+                                text: 'Buy upgrade',
+                                state: 'primary',
+                                action: function() {
+                                    // Send an upgrade packet
+                                    Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_UPGRADE_BUY, {
+                                        factory: factoryId,
+                                        index: i,
+                                        cost: upgrade.cost,
+                                        defence: upgrade.defence
+                                    });
+
+                                    // Show a notification
+                                    showNotification('Buying upgrade...');
+                                }
+                            },
+                            {
+                                text: 'Cancel'
+                            }
+                        ]
+                    })
+                });
+            });
+        }
+
+        // Trigger a create on the list
+        upgradeButtonlist.trigger('create');
+    }
 
     // Get the elements
     const factoryNameLabel = activePage.find('.factory-name');

@@ -217,5 +217,16 @@ module.exports = {
      * - data.in: In value.
      * - data.out: Out value.
      */
-    FACTORY_DATA: 19
+    FACTORY_DATA: 19,
+
+    /**
+     * Send from a client to the server to update a factory.
+     *
+     * Data:
+     * - factory: ID of the factory
+     * - index: Index of the upgrade to buy
+     * - cost: Cost of the upgrade (check)
+     * - defence: Defence level of the upgrade (check)
+     */
+    FACTORY_UPGRADE_BUY: 20
 };
