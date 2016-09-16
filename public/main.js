@@ -1170,8 +1170,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     if(!packet.hasOwnProperty('game'))
         return;
 
-    // Check whether this packet contains user data
+    // Check whether this packet contains specific data
     const hasUsers = packet.hasOwnProperty('users');
+    const hasFactories = packet.hasOwnProperty('factories');
 
     // Show a notification
     console.log('Received location data for ' + packet.users.length + ' users');
@@ -1179,6 +1180,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     // Update the users locations
     if(hasUsers)
         updatePlayerMarkers(packet.users);
+
+    // Update the factory locations
+    if(hasFactories)
+        updateFactoryMarkers(packet.factories);
 });
 
 // Update the active game and status labels when a new page is being shown
@@ -2708,6 +2713,7 @@ var map = null;
 var playerMarker = null;
 var playerRange = null;
 var playersMarkers = [];
+var factoryMarkers = [];
 
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
@@ -2901,6 +2907,97 @@ function updatePlayerMarkers(users) {
     // Fit all users
     if(fitUsers)
         fitMap();
+}
+
+/**
+ * Update the markers for visible factories.
+ *
+ * @param factories Factories data.
+ */
+function updateFactoryMarkers(factories) {
+    // Make sure the map is loaded
+    if(map == null)
+        return;
+
+    // Return if the user doesn't have the right roles
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special || Dworek.state.activeGameRoles.spectator))
+        return;
+
+    // Loop through the factories
+    factories.forEach(function(factory) {
+        // Get the factory position
+        const pos = [factory.location.latitude, factory.location.longitude];
+
+        // Find the correct marker for the user
+        var marker = null;
+        factoryMarkers.forEach(function(entry) {
+            // Skip the loop if we found the marker
+            if(marker != null)
+                return;
+
+            // Check if this is the correct marker
+            if(entry.factory.factory == factory.factory)
+                marker = entry;
+        });
+
+        // Update or create a new marker
+        if(marker == null) {
+            // Create the marker
+            marker = L.marker(pos, {
+                icon: L.spriteIcon('red')
+            });
+
+            // Bind a popup
+            marker.bindPopup(capitalizeFirst(NameConfig.factory.name) + ': ' + factory.name);
+
+            // Add the marker to the map
+            marker.addTo(map);
+
+            // Set the user section
+            marker.factory = {
+                factory: factory.factory
+            };
+
+            // Add the marker to the markers list
+            factoryMarkers.push(marker);
+
+        } else
+        // Update the position
+            marker.setLatLng(pos);
+    });
+
+    // Create an array of marker indices to remove
+    var toRemove = [];
+
+    // Loop through all markers and make sure it's user is in the user list
+    factoryMarkers.forEach(function(entry, i) {
+        // Determine whether the user exists
+        var exists = false;
+
+        // Loop through the list of factory and check whether the factory exists
+        factories.forEach(function(factory) {
+            // Skip if it exists
+            if(exists)
+                return;
+
+            // Check whether this is the factory
+            if(factory.factory == entry.factory.factory)
+                exists = true;
+        });
+
+        // Add the index if the user doens't exist
+        if(!exists)
+            toRemove.push(i);
+    });
+
+    // Remove the markers at the given indices
+    for(var i = toRemove.length - 1; i >= 0; i--) {
+        // Remove the marker
+        map.removeLayer(factoryMarkers[toRemove[i]]);
+
+        // Remove the entry from the array
+        factoryMarkers.splice(toRemove[i], 1);
+    }
 }
 
 /**

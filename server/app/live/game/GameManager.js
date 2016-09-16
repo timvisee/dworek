@@ -425,6 +425,7 @@ GameManager.prototype.broadcastData = function(callback) {
 
                 // Create a users list
                 var users = [];
+                var factories = [];
 
                 // Loop through the list user
                 game.userManager.users.forEach(function(otherUser) {
@@ -433,7 +434,7 @@ GameManager.prototype.broadcastData = function(callback) {
                         return;
 
                     // Check whether the other user is visible for the current user
-                    latch.add();
+                    gameLatch.add();
                     otherUser.isVisibleFor(user, function(err, visible) {
                         // Call back errors
                         if(err !== null) {
@@ -446,7 +447,7 @@ GameManager.prototype.broadcastData = function(callback) {
 
                         // Make sure the user is visible
                         if(!visible) {
-                            latch.resolve();
+                            gameLatch.resolve();
                             return;
                         }
 
@@ -478,12 +479,73 @@ GameManager.prototype.broadcastData = function(callback) {
                     });
                 });
 
+                // Loop through the list of factories
+                game.factoryManager.factories.forEach(function(liveFactory) {
+                    // Skip each user if we already called back
+                    if(calledBack)
+                        return;
+
+                    // Check whether the other user is visible for the current user
+                    gameLatch.add();
+                    liveFactory.isVisibleFor(user, function(err, visible) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                if(_.isFunction(callback))
+                                    callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Make sure the user is visible
+                        if(!visible) {
+                            gameLatch.resolve();
+                            return;
+                        }
+
+                        // Get the name of the user
+                        liveFactory.getName(function(err, name) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    if(_.isFunction(callback))
+                                        callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Get the factory location
+                            liveFactory.getFactoryModel().getLocation(function(err, location) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        if(_.isFunction(callback))
+                                            callback(err);
+                                    calledBack = true;
+                                    return;
+                                }
+
+                                // Create a user object and add it to the list
+                                factories.push({
+                                    factory: liveFactory.getIdHex(),
+                                    name: name,
+                                    location: location,
+                                });
+
+                                // Resolve the game latch
+                                gameLatch.resolve();
+                            });
+                        });
+                    });
+                });
+
                 // Send the data to the proper sockets when done
                 gameLatch.then(function() {
                     // Create a packet and send it to the correct user
                     Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
                         game: game.getIdHex(),
-                        users
+                        users,
+                        factories
                     }, user);
 
                     // Resolve the latch
