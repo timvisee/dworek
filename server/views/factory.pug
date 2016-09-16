@@ -28,6 +28,22 @@ block content
                         | &nbsp;
                         span(style="color: gray;") + <span class="factory-production-out">?</span> / tick
 
+    .nd2-card.wow.fadeInUp.card-factory-transfer
+        .card-title.has-supporting-text
+            h3.card-primary-title Deposit/Withdraw
+
+        .card-supporting-text.has-action.has-title
+            p Deposit and/or withdraw goods here.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.action-factory-deposit(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-arrow-right
+                    | &nbsp;&nbsp;Deposit
+                a.ui-btn.waves-effect.waves-button.action-factory-withdraw(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-arrow-left
+                    | &nbsp;&nbsp;Withdraw
+
     .nd2-card.wow.fadeInUp.card-factory-defence
         .card-title.has-supporting-text
             h3.card-primary-title Upgrade defence
@@ -52,4 +68,3 @@ block content
                 a.ui-btn.waves-effect.waves-button.action-factory-level-upgrade(href='#', data-transition='slide', data-rel='popup')
                     i.zmdi.zmdi-star
                     | &nbsp;&nbsp;Upgrade level (<span class="factory-next-level-cost">?</span>)
-

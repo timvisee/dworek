@@ -3421,6 +3421,7 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Select the cards
     var infoCard = activePage.find('.card-factory-info');
+    var transferCard = activePage.find('.card-factory-transfer');
     var defenceCard = activePage.find('.card-factory-defence');
     var levelCard = activePage.find('.card-factory-level');
 
@@ -3435,14 +3436,17 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Show the modification cards
     if(canModify) {
+        transferCard.slideDown();
         defenceCard.slideDown();
         levelCard.slideDown();
 
     } else {
         if(firstShow) {
+            transferCard.hide();
             defenceCard.hide();
             levelCard.hide();
         } else {
+            transferCard.slideUp();
             defenceCard.slideUp();
             levelCard.slideUp();
         }
