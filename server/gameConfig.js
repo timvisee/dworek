@@ -117,23 +117,29 @@ var gameConfig = {
          * @return {*[]}
          */
         getDefenceUpgrades: function(defence) {
-            return [
-                {
-                    name: 'Mexicans',
-                    cost: 1,
-                    defence: 1
-                },
-                {
-                    name: 'Wall',
+            // Create an array of defences
+            var defences = [{
+                name: 'Mexicans',
+                cost: 1,
+                defence: 1
+            }];
+
+            // Add other defences when the defence is greater than the initial value
+            if(defence > this.initialDefence) {
+                defences.push({
+                    name: 'Corrupt Agent',
                     cost: Math.round(5 + defence * 1.2),
                     defence: 10
-                },
-                {
-                    name: 'Alarm',
+                });
+                defences.push({
+                    name: 'Reinforcement',
                     cost: Math.round(15 + defence * 2),
                     defence: defence * 2
-                }
-            ];
+                });
+            }
+
+            // Return the defences
+            return defences;
         }
     }
 };
