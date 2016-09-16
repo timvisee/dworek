@@ -232,6 +232,12 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
     var firstLatch = new CallbackLatch();
 
+    // Parse the sockets
+    if(sockets == undefined)
+        sockets = [];
+    else if(!_.isArray(sockets))
+        sockets = [sockets];
+
     // Get the game user
     firstLatch.add();
     this.getGame().getUser(user, function(err, liveUser) {
@@ -542,12 +548,44 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             });
         });
     });
+};
 
-    // Parse the sockets
-    if(sockets == undefined)
-        sockets = [];
-    else if(!_.isArray(sockets))
-        sockets = [sockets];
+/**
+ * Broadcast the factory data to all relevant users.
+ *
+ * @param callback (err)
+ */
+Factory.prototype.broadcastData = function(callback) {
+    const self = this;
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    this.getGame().userManager.users.forEach(function(user) {
+        // Make sure the factory is visible for the user
+        latch.add();
+        self.isVisibleFor(user, function(err, visible) {
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            if(visible)
+                self.sendData(user.getUserModel(), undefined, function(err) {
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    latch.resolve();
+                });
+        });
+    });
+
+    latch.then(() => callback(null));
 };
 
 /**

@@ -228,5 +228,5 @@ module.exports = {
      * - cost: Cost of the upgrade (check)
      * - defence: Defence level of the upgrade (check)
      */
-    FACTORY_UPGRADE_BUY: 20
+    FACTORY_DEFENCE_BUY: 20
 };

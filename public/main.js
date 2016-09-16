@@ -47,7 +47,7 @@ const PacketType = {
     FACTORY_BUILD_RESPONSE: 17,
     FACTORY_DATA_REQUEST: 18,
     FACTORY_DATA: 19,
-    FACTORY_UPGRADE_BUY: 20
+    FACTORY_DEFENCE_BUY: 20
 };
 
 /**
@@ -3484,7 +3484,7 @@ function updateFactoryDataVisuals(firstShow) {
                                 state: 'primary',
                                 action: function() {
                                     // Send an upgrade packet
-                                    Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_UPGRADE_BUY, {
+                                    Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEFENCE_BUY, {
                                         factory: factoryId,
                                         index: i,
                                         cost: upgrade.cost,
