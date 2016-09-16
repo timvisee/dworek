@@ -3218,9 +3218,6 @@ function updateGameDataVisuals() {
                 '    <div class="card-title has-supporting-text">' +
                 '        <h3 class="card-primary-title">' + factory.name + '</h3>' +
                 '    </div>' +
-                '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>Info here</p>' +
-                '    </div>' +
                 '    <div class="card-action">' +
                 '        <div class="row between-xs">' +
                 '            <div class="col-xs-12">' +
@@ -3399,7 +3396,9 @@ function updateFactoryDataVisuals() {
     const factoryTeamLabel = activePage.find('.factory-team');
     const factoryDefenceLabel = activePage.find('.factory-defence');
     const factoryInLabel = activePage.find('.factory-in');
+    const factoryProductionInLabel = activePage.find('.factory-production-in');
     const factoryOutLabel = activePage.find('.factory-out');
+    const factoryProductionOutLabel = activePage.find('.factory-production-out');
 
     // Update the elements
     factoryNameLabel.html(data.name);
@@ -3408,5 +3407,7 @@ function updateFactoryDataVisuals() {
     factoryTeamLabel.html(data.teamName);
     factoryDefenceLabel.html(data.defence);
     factoryInLabel.html(data.in);
+    factoryProductionInLabel.html(data.productionIn);
     factoryOutLabel.html(data.out);
+    factoryProductionOutLabel.html(data.productionOut);
 }
