@@ -853,10 +853,27 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     if(!liveShop.isUserInRange(liveUser))
                         return;
 
-                    // Set the name in the factory object
-                    gameData.shops.push({
-                        token: liveShop.getToken(),
-                        name: 'SHOP NAME'
+                    // Get the name of the user
+                    latch.add();
+                    liveUser.getName(function(err, liveUserName) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Set the name in the factory object
+                        gameData.shops.push({
+                            token: liveShop.getToken(),
+                            name: liveUserName,
+                            inSellPrice: liveShop.getInSellPrice(),
+                            outBuyPrice: liveShop.getOutBuyPrice()
+                        });
+
+                        // Resolve the latch
+                        latch.resolve();
                     });
                 });
 

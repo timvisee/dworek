@@ -314,7 +314,8 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
 
         // Send a notification to the user
         Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-            message: 'You\'ve been selected to become a shop owner anytime soon.',
+            message: 'You\'re getting increasingly interested in the salesman job for special goods.' +
+            'You might become a special kind of merchant soon...',
             error: false,
             toast: false,
             dialog: true
@@ -336,9 +337,9 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
 
             // Send a notification to the user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message: 'You are now a shop owner.<br><br>' +
+                message: 'You became a dealer.<br><br>' +
                 'You and other players are now able to buy/sell goods when they\'re nearby you.<br><br>' +
-                'Watch out: you\'re now visible on the map for everyone, also for enemy players',
+                'Watch out: you\'re now visible on the map for everyone, also for enemy players.',
                 error: false,
                 toast: false,
                 dialog: true
@@ -350,6 +351,15 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
                 if(err !== null) {
                     console.error(err);
                     console.error('An error occurred while loading a shop, ignoring...');
+                }
+            });
+
+            // Update the game data for everyone
+            Core.gameController.sendGameDataToAll(self.game.getGameModel(), function(err) {
+                // Handle errors
+                if(err !== null) {
+                    console.error(err);
+                    console.error('An error occurred while sending game data to all users');
                 }
             });
 

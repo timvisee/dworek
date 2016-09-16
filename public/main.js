@@ -3271,19 +3271,16 @@ function updateGameDataVisuals() {
                 '        <h3 class="card-primary-title">Build a ' + capitalizeFirst(NameConfig.factory.name) + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>Build a ' + NameConfig.factory.name + ' at your current location and start producing more ' + NameConfig.out.name + '.</p>' +
-                '        <table class="table-list ui-responsive">' +
-                '            <tr>' +
-                '                <td>Cost</td>' +
-                '                <td><span class="game-factory-cost">?</span></td>' +
-                '            </tr>' +
-                '        </table>' +
+                '        <p>Build a ' + NameConfig.factory.name + ' at your current location to expand your fleet and start producing more ' + NameConfig.out.name + '.</p>' +
                 '    </div>' +
                 '    <div class="card-action">' +
                 '        <div class="row between-xs">' +
                 '            <div class="col-xs-12">' +
                 '                <div class="box">' +
-                '                    <a href="#" class="ui-btn ui-btn-inline waves-effect waves-button action-factory-build">Build ' + NameConfig.factory.name + '</a>' +
+                '                    <a href="#" class="ui-btn waves-effect waves-button action-factory-build">' +
+                '                        <i class="zmdi zmdi-pin"></i>&nbsp;' +
+                '                        Build ' + NameConfig.factory.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + '<span class="game-factory-cost">?</span>)' +
+                '                    </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
@@ -3326,7 +3323,10 @@ function updateGameDataVisuals() {
                 '        <div class="row between-xs">' +
                 '            <div class="col-xs-12">' +
                 '                <div class="box">' +
-                '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn ui-btn-inline waves-effect waves-button">View ' + NameConfig.factory.name + '</a>' +
+                '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn waves-effect waves-button">' +
+                '                        <i class="zmdi zmdi-zoom-in"></i>&nbsp;' +
+                '                        View ' + NameConfig.factory.name + '' +
+            '                        </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
@@ -3369,17 +3369,25 @@ function updateGameDataVisuals() {
             if(shopCardElement.length > 0)
                 return;
 
+            // Create an unique ID for the buy and sell button
+            const buyButtonId = generateUniqueId('button-buy-');
+            const sellButtonId = generateUniqueId('button-sell-');
+
             // Create a new card for this shop
             gameActionsList.prepend('<div class="nd2-card wow ' + shopCardSelector + '" data-shop-token="' + shop.token + '">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Your local dealer</h3>' +
+                '        <h3 class="card-primary-title">Local dealer</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>' + shop.name + ' is currently selling goods around your location.</p>' +
+                '        <p>' + shop.name + ' is currently dealing high quality goods around your location.</p>' +
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
-                '                <td>Cost</td>' +
-                '                <td><span class="game-factory-cost">?</span></td>' +
+                '                <td>Selling</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' per 1 ' + NameConfig.in.name + '</td>' +
+                '            </tr>' +
+                '            <tr>' +
+                '                <td>Buying</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' for 1 ' + NameConfig.out.name + '</td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
@@ -3387,14 +3395,140 @@ function updateGameDataVisuals() {
                 '        <div class="row between-xs">' +
                 '            <div class="col-xs-12">' +
                 '                <div class="box">' +
-                '                    <a href="#" class="ui-btn waves-effect waves-button">Buy ' + NameConfig.in.name + '</a>' +
-                '                    <a href="#" class="ui-btn waves-effect waves-button">Sell ' + NameConfig.out.name + '</a>' +
+                '                    <a href="#" id="' + buyButtonId + '" class="ui-btn waves-effect waves-button">' +
+                '                        <i class="zmdi zmdi-arrow-left"></i>&nbsp;' +
+                '                        Buy ' + NameConfig.in.name + '' +
+                '                    </a>' +
+                '                    <a href="#" id= "' + sellButtonId + '" class="ui-btn waves-effect waves-button">' +
+                '                        <i class="zmdi zmdi-arrow-right"></i>&nbsp;' +
+                '                        Sell ' + NameConfig.out.name + '' +
+                '                    </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
                 '    </div>' +
                 '</div>');
             changed = true;
+
+            // Select the buttons elements
+            const buyButtonElement = gameActionsList.find('#' + buyButtonId);
+            const sellButtonElement = gameActionsList.find('#' + sellButtonId);
+
+            buyButtonElement.click(function() {
+                // Determine how many in the user currently has
+                var current = 10000;
+                if(hasGameData()) {
+                    var gameData = getGameData();
+                    if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
+                        current = gameData.balance.money;
+                }
+
+                // Generate an unique field ID
+                var amountFieldId = generateUniqueId('amount-field');
+
+                // Show the dialog
+                showDialog({
+                    title: 'Buy ' + NameConfig.in.name,
+                    message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
+                    '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    actions: [
+                        {
+                            text: 'Buy',
+                            state: 'primary',
+                            action: function() {
+                                // Get the input field value
+                                var amount = $('#' + amountFieldId).val();
+
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_IN, {
+                                    shop: shop.token,
+                                    amount: amount,
+                                    all: false
+                                });
+
+                                // Show a notification
+                                showNotification('Buying ' + NameConfig.in.name + '...');
+                            }
+                        },
+                        {
+                            text: 'Full buy',
+                            action: function() {
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_IN, {
+                                    shop: shop.token,
+                                    amount: 0,
+                                    all: true
+                                });
+
+                                // Show a notification
+                                showNotification('Full buying ' + NameConfig.in.name + '...');
+                            }
+                        },
+                        {
+                            text: 'Goodbye'
+                        }
+                    ]
+                });
+            });
+
+            sellButtonElement.click(function() {
+                // Determine how many out the user currently has
+                var current = 10000;
+                if(hasGameData()) {
+                    var gameData = getGameData();
+                    if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
+                        current = gameData.balance.out;
+                }
+
+                // Generate an unique field ID
+                var amountFieldId = generateUniqueId('amount-field');
+
+                // Show the dialog
+                showDialog({
+                    title: 'Sell ' + NameConfig.out.name,
+                    message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
+                    '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.out.name) + ':</label>' +
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    actions: [
+                        {
+                            text: 'Sell',
+                            state: 'primary',
+                            action: function() {
+                                // Get the input field value
+                                var amount = $('#' + amountFieldId).val();
+
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_OUT, {
+                                    shop: shop.token,
+                                    amount: amount,
+                                    all: false
+                                });
+
+                                // Show a notification
+                                showNotification('Selling ' + NameConfig.out.name + '...');
+                            }
+                        },
+                        {
+                            text: 'Sell all',
+                            action: function() {
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_OUT, {
+                                    shop: shop.token,
+                                    amount: 0,
+                                    all: true
+                                });
+
+                                // Show a notification
+                                showNotification('Selling all ' + NameConfig.out.name + '...');
+                            }
+                        },
+                        {
+                            text: 'Goodbye'
+                        }
+                    ]
+                });
+            });
 
             // Slide out animation
             cardAnimationSlideIn(gameActionsList.find('.' + shopCardSelector + '[data-shop-token=\'' + shop.token + '\']'));
@@ -3771,7 +3905,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Cancel'
+                        text: 'Leave'
                     }
                 ]
             });
@@ -3829,7 +3963,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Cancel'
+                        text: 'Leave'
                     }
                 ]
             });
