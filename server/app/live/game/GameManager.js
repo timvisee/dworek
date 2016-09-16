@@ -31,6 +31,7 @@ var PacketType = require('../../realtime/PacketType');
 var Game = require('./Game');
 var GameModel = require('../../model/game/GameModel');
 var CallbackLatch = require('../../util/CallbackLatch');
+var gameConfig = require('../../../gameConfig');
 
 /**
  * GameManager class.
@@ -191,6 +192,14 @@ GameManager.prototype.load = function(callback) {
 
     // Determine whether we called back
     var calledBack = false;
+
+    // Start the game tick
+    setInterval(function() {
+        // Run a game tick
+        self.tick();
+
+    }, gameConfig.game.tickInterval);
+
 
     // Load all active games
     Core.model.gameModelManager.getGamesWithStage(1, function(err, games) {
@@ -581,7 +590,8 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
     // Create a data object to send back
     var gameData = {
         factories: [],
-        shops: []
+        shops: [],
+        strength: {}
     };
 
     // Store this instance
@@ -885,6 +895,53 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             latch.resolve();
         });
 
+        // Get the game user
+        latch.add();
+        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Make sure the game user is valid
+            if(gameUser == null) {
+                latch.resolve();
+                return;
+            }
+
+            // Get the game user strength
+            gameUser.getStrength(function(err, userStrength) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                gameData.strength.value = userStrength;
+
+                // Get the game config
+                game.getConfig(function(err, gameConfig) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Get the user strength upgrades
+                    gameData.strength.upgrades = gameConfig.player.getStrengthUpgrades(userStrength);
+
+                    latch.resolve();
+                });
+            });
+        });
+
         // Send the game data when we're done
         latch.then(function() {
             // Send the game data
@@ -958,6 +1015,33 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
             latch.then(() => callback(null));
         });
     });
+};
+
+/**
+ * Run a game tick.
+ */
+GameManager.prototype.tick = function(callback) {
+    var latch = new CallbackLatch();
+
+    // Loop through all the games, and tick the factories
+    this.games.forEach(function(liveGame) {
+        // Loop through the factories
+        liveGame.factoryManager.factories.forEach(function(liveFactory) {
+            latch.add();
+            // Tick the factory
+            liveFactory.tick(function(err) {
+                if(err !== null) {
+                    console.log('Error on tick');
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+    });
+
+    latch.then(() => callback(null));
 };
 
 // Export the class

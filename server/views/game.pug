@@ -116,7 +116,23 @@ block content
                     tr: td Ingredients
                         td.game-balance-in ?
                     tr: td Drugs
-                        td.game-balance-out ?
+                        td.game-balance-out
+
+        .nd2-card.wow.fadeInUp.card-player-strength
+            .card-title.has-supporting-text
+                h3.card-primary-title Upgrade strength
+
+            .card-supporting-text.has-action.has-title
+                p Upgrading your strength makes it easier to attack enemy labs.
+                table.table-list.ui-responsive
+                    tr: td Strength
+                        td <span class="game-player-strength">?</span>
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box.upgrade-button-list
+                    div(align="center")
+                        i No upgrades available...<br><br>
+
 
     div(data-role='nd2tab', data-tab='actions')
         .game-actions-list

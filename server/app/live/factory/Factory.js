@@ -1200,6 +1200,114 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
     });
 };
 
+Factory.prototype.tick = function(callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+    const self = this;
+
+    var productionIn, productionOut, valueIn, valueOut;
+
+    latch.add();
+    this.getProductionIn(function(err, result) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        productionIn = result;
+
+        latch.resolve();
+    });
+
+    latch.add();
+    this.getProductionOut(function(err, result) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        productionOut = result;
+
+        latch.resolve();
+    });
+
+    latch.add();
+    this.getFactoryModel().getIn(function(err, result) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        valueIn = result;
+
+        latch.resolve();
+    });
+
+    latch.add();
+    this.getFactoryModel().getOut(function(err, result) {
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        valueOut = result;
+
+        latch.resolve();
+    });
+
+    // Continue
+    latch.then(function() {
+        // Make sure we've enough in
+        if(valueIn < productionIn) {
+            callback(null);
+            return;
+        }
+
+        latch.identity();
+
+        // Update the in and out values
+        latch.add();
+        self.getFactoryModel().setIn(valueIn - productionIn, function(err) {
+            // Make sure we've enough in
+            if(valueIn < productionIn) {
+                callback(null);
+                return;
+            }
+
+            latch.resolve();
+        });
+
+        latch.add();
+        self.getFactoryModel().setOut(valueOut + productionOut, function(err) {
+            // Make sure we've enough in
+            if(valueIn < productionIn) {
+                callback(null);
+                return;
+            }
+
+            latch.resolve();
+        });
+
+        // Call back
+        latch.then(function() {
+            latch.identity();
+
+            self.broadcastData(function(err) {
+                callback(err);
+            });
+        });
+    });
+};
+
 // Export the class
 module.exports = Factory;
 

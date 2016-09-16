@@ -12,3 +12,4 @@ is_spectator : bool     True if this user is a game spectator, false if not.
 money : int             Amount of money this user has.
 in : int                Amount of in goods this user has.
 out : int               Amount of out goods this user has.
+strength : int          Strength value.

@@ -52,7 +52,8 @@ const PacketType = {
     FACTORY_DEPOSIT_IN: 22,
     FACTORY_WITHDRAW_OUT: 23,
     SHOP_SELL_IN: 24,
-    SHOP_BUY_OUT: 25
+    SHOP_BUY_OUT: 25,
+    PLAYER_STRENGTH_BUY: 26
 };
 
 /**
@@ -3570,6 +3571,70 @@ function updateGameDataVisuals() {
             activePage.find('.game-balance-in').html(data.balance.in);
         if(data.balance.hasOwnProperty('out'))
             activePage.find('.game-balance-out').html(data.balance.out);
+    }
+
+    if(data.hasOwnProperty('strength')) {
+        if(data.strength.hasOwnProperty('value'))
+            activePage.find('.game-player-strength').html(data.strength.value);
+
+
+        // Get the upgrade button list element, and clear it
+        const upgradeButtonlist = activePage.find('.card-player-strength').find('.upgrade-button-list');
+        upgradeButtonlist.empty();
+
+        // Check whether there are any defence upgrades
+        if(!data.strength.hasOwnProperty('upgrades')) {
+            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
+
+        } else {
+            // Loop through the list of upgrades
+            data.strength.upgrades.forEach(function(upgrade, i) {
+                // Get an unique button ID
+                var buttonId = generateUniqueId('button-upgrade-');
+
+                // Append a button
+                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                    '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')' +
+                    '</a>');
+
+                // Get the button
+                var button = upgradeButtonlist.find('#' + buttonId);
+
+                // Bind a click action
+                button.click(function() {
+                    showDialog({
+                        title: 'Strength upgrade',
+                        message: 'Are you sure you want to buy this upgrade for ' + upgrade.cost + ' ' + NameConfig.currency.name + '?<br><br>' +
+                        'This will improve your players defence.',
+                        actions: [
+                            {
+                                text: 'Buy upgrade',
+                                state: 'primary',
+                                action: function() {
+                                    // Send an upgrade packet
+                                    Dworek.realtime.packetProcessor.sendPacket(PacketType.PLAYER_STRENGTH_BUY, {
+                                        game: Dworek.utils.getGameId(),
+                                        index: i,
+                                        cost: upgrade.cost,
+                                        strength: upgrade.strength
+                                    });
+
+                                    // Show a notification
+                                    showNotification('Buying upgrade...');
+                                }
+                            },
+                            {
+                                text: 'Cancel'
+                            }
+                        ]
+                    })
+                });
+            });
+        }
+
+        // Trigger a create on the list
+        upgradeButtonlist.trigger('create');
     }
 
     // Check whether this is the active game

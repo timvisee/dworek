@@ -219,6 +219,12 @@ var GameUserModel = function(id) {
                     from: (raw) => parseInt(raw),
                     to: (value) => value.toString()
                 }
+            },
+            strength: {
+                redis: {
+                    from: (raw) => parseInt(raw),
+                    to: (value) => value.toString()
+                }
             }
         }
     });
@@ -572,6 +578,54 @@ GameUserModel.prototype.addOut = function(amount, callback) {
 
 GameUserModel.prototype.subtractOut = function(amount, callback) {
     this.addOut(-amount, callback);
+};
+
+/**
+ * Get the strength goods the user has.
+ *
+ * @param {GameUserModel~getGoodsCallback} callback Called with result or when an error occurred.
+ */
+GameUserModel.prototype.getStrength = function(callback) {
+    this.getField('strength', callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameModel~getGoodsCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Goods.
+ */
+
+/**
+ * Set the in goods.
+ *
+ * @param {Number} goods Goods.
+ * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
+ */
+GameUserModel.prototype.setStrength = function(goods, callback) {
+    this.setField('strength', goods, callback);
+};
+
+GameUserModel.prototype.addStrength = function(amount, callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the current goods value
+    this.getStrength(function(err, goods) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the goods
+        self.setStrength(goods + amount, callback);
+    });
+};
+
+GameUserModel.prototype.subtractStrength = function(amount, callback) {
+    this.addStrength(-amount, callback);
 };
 
 // Export the user class

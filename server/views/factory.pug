@@ -3,7 +3,7 @@ extends page
 block content
     .nd2-card.wow.fadeInUp.card-factory-info
         .card-title.has-supporting-text
-            h3.card-primary-title Factory information
+            h3.card-primary-title Lab summary
 
         .card-supporting-text.has-action.has-title
             table.table-list.ui-responsive
@@ -17,12 +17,12 @@ block content
                     td.factory-team= factory.teamName
                 tr: td Defence
                     td.factory-defence= factory.defence
-                tr: td.game-label-input In
+                tr: td.game-label-input Ingerients
                     td
                         span.factory-in= factory.in
                         | &nbsp;
                         span(style="color: gray;") − <span class="factory-production-in">?</span> / tick
-                tr: td.game-label-output Out
+                tr: td.game-label-output Drugs
                     td
                         span.factory-out= factory.out
                         | &nbsp;
