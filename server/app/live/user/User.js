@@ -555,8 +555,8 @@ User.prototype.isVisibleFor = function(other, callback) {
         return;
     }
 
-    // Make sure this user has a recent location
-    if(!this.hasRecentLocation()) {
+    // Make sure any location is known
+    if(!this.hasLocation()) {
         callback(null, false);
         return;
     }
@@ -569,7 +569,7 @@ User.prototype.isVisibleFor = function(other, callback) {
     const gameModel = liveGame.getGameModel();
 
     // Make sure the game model is valid
-    if(gameModel != null) {
+    if(gameModel == null) {
         callback(null, false);
         return;
     }
@@ -603,6 +603,18 @@ User.prototype.isVisibleFor = function(other, callback) {
             if(!calledBack)
                 callback(null, true);
             calledBack = true;
+            return;
+        }
+
+        // Check whether this user is a shop
+        if(self.getGame().shopManager.isShopUser(self)) {
+            callback(null, true);
+            return;
+        }
+
+        // Make sure this user has a recent location
+        if(!self.hasRecentLocation()) {
+            callback(null, false);
             return;
         }
 

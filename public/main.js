@@ -2837,7 +2837,7 @@ function updatePlayerMarkers(users) {
         if(marker == null) {
             // Create the marker
             marker = L.marker(pos, {
-                icon: L.spriteIcon('green')
+                icon: !user.isShop ? L.spriteIcon('green') : L.spriteIcon('yellow')
             });
 
             // Bind a popup

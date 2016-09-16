@@ -461,11 +461,15 @@ GameManager.prototype.broadcastData = function(callback) {
                                 return;
                             }
 
+                            // Determine whether the user is a shop
+                            var isShop = visible && game.shopManager.isShopUser(otherUser);
+
                             // Create a user object and add it to the list
                             users.push({
                                 user: otherUser.getIdHex(),
                                 userName: name,
-                                location
+                                location: otherUser.getLocation(),
+                                isShop
                             });
 
                             // Resolve the game latch
