@@ -234,24 +234,13 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                             factory: factoryModel.getIdHex()
                                         }, socket);
 
-                                        // Loop through all the live users in this game
-                                        liveGame.userManager.users.forEach(function(entryUser) {
-                                            // Make sure the user has any team
-                                            if(entryUser.getTeamModel() == null)
-                                                return;
-
-                                            // Make sure the user is in the same team
-                                            if(!entryUser.getTeamModel().getId().equals(entryUser.getTeamModel().getId()))
-                                                return;
-
-                                            // Send game data updates to this user
-                                            Core.gameController.sendGameData(game, user, undefined, function() {
-                                                // Handle errors
-                                                if(err !== null) {
-                                                    console.error('Failed to send game data updates!');
-                                                    console.error(err);
-                                                }
-                                            });
+                                        // Send new game data to everyone
+                                        Core.gameController.sendGameDataToAll(game, function(err) {
+                                            // Handle errors
+                                            if(err !== null) {
+                                                console.error('Failed to send game data updates, ignoring');
+                                                console.error(err);
+                                            }
                                         });
                                     });
                                 });
