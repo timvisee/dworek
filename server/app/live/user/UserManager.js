@@ -108,7 +108,7 @@ UserManager.prototype.getUser = function(userId, callback) {
             }
 
             // Create a user instance for this model
-            var newUser = new User(userId, this.game);
+            var newUser = new User(userId, self.game);
 
             // Add the user to the list of loaded users
             self.users.push(newUser);
