@@ -60,6 +60,14 @@ var Factory = function(factory, game) {
      */
     this._game = game;
 
+    /**
+     * Create an array that tracks the users this factory is visible for.
+     *
+     * @type {Array} Array of object IDs as string.
+     * @private
+     */
+    this._userVisibleMem = [];
+
     // Get and set the factory ID
     if(factory instanceof FactoryModel)
         this._id = factory.getId();
@@ -586,6 +594,61 @@ Factory.prototype.isVisibleFor = function(user, callback) {
             });
         });
     });
+};
+
+/**
+ * Update the visibility state for the given user.
+ *
+ * @param {User} liveUser User to update the visibility state for.
+ * @param {Factory~updateVisibilityMemoryCallback} callback Called with the result or when an error occurred.
+ */
+Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
+    // Store this instance
+    const self = this;
+
+    // Check whether the user is visible
+    this.isVisibleFor(liveUser, function(err, isVisible) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Get the memorized visibility state
+        const lastState = self.isInVisibilityMemory(liveUser);
+
+        // Return false if the state didn't change
+        if(lastState == isVisible) {
+            callback(null, false);
+            return;
+        }
+
+        // Update the visibility array
+        if(isVisible)
+            self._userVisibleMem.push(liveUser);
+        else
+            self._userVisibleMem.splice(self._userVisibleMem.indexOf(liveUser), 1);
+
+        // Call back the result
+        callback(null, true);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Factory~updateVisibilityMemoryCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {boolean=} True if the state changed, false if not.
+ */
+
+/**
+ * Check whether the given user is in the visibility memory.
+ *
+ * @param {User} liveUser User.
+ */
+Factory.prototype.isInVisibilityMemory = function(liveUser) {
+    return this._userVisibleMem.indexOf(liveUser) >= 0;
 };
 
 // Export the class
