@@ -52,9 +52,43 @@ var gameConfig = {
     shop: {
         /**
          * Operation range in meters.
-         * @param {Number}
+         * @type {Number}
          */
         range: 15,
+
+        /**
+         * Get the number of preferred shops in a team, based on the team size.
+         * @param {Number} playerCount Number of players in the team.
+         * @return {Number} Number of preferred shops.
+         */
+        getShopsInTeam: function(playerCount) {
+            // Return zero if there are no players in the team
+            if(playerCount == 0)
+                return 0;
+
+            // Determine the preferred number of shops
+            return Math.ceil(playerCount / 15)
+        },
+
+        /**
+         * The lifetime of a shop in milliseconds.
+         * Fetched once when a shop is created.
+         * @return {Number}
+         */
+        getShopLifetime: function() {
+            // Define the minimum and maximum shop lifetimes
+            const timeMin = 8 * 60 * 1000;
+            const timeMax = 12 * 60 * 1000;
+
+            // Randomize the shop lifetime
+            return Math.random() * (timeMax - timeMin) + timeMin;
+        },
+
+        /**
+         * The time in advance a user gets to know he'll become a shop. This is the time in milliseconds.
+         * @type {Number}
+         */
+        shopAlertTime: 45 * 1000,
 
         /**
          * Get the price per unit the in goods are sold for.
@@ -62,9 +96,11 @@ var gameConfig = {
          * @type {Number}
          */
         getInSellPrice: function() {
+            // Define the minimum and maximum price
             const priceMin = 5;
             const priceMax = 8;
 
+            // Randomize the price
             return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
         },
 
@@ -74,11 +110,13 @@ var gameConfig = {
          * @type {Number}
          */
         getOutBuyPrice: function() {
+            // Define the minimum and maximum price
             const priceMin = 10;
             const priceMax = 14;
 
+            // Randomize the price
             return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
-        }
+        },
     },
 
     /**
