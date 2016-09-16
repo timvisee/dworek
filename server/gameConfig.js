@@ -81,7 +81,7 @@ var gameConfig = {
          * @return {Number} Production input for each tick.
          */
         getProductionIn: function(level) {
-            return 10;
+            return 10 * level;
         },
 
         /**
@@ -90,7 +90,7 @@ var gameConfig = {
          * @return {Number} Production output for each tick.
          */
         getProductionOut: function(level) {
-            return 15;
+            return 15 * level;
         },
 
         /**
@@ -107,7 +107,7 @@ var gameConfig = {
          * @return {Number} Level cost.
          */
         getLevelCost: function(level) {
-            return 10;
+            return ((level * 0.5) * level) * 10;
         },
 
         /**
