@@ -223,7 +223,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Update the out amount for the user
-                                        factoryModel.setIn(userOut + withdrawAmount, function(err) {
+                                        gameUser.setOut(userOut + withdrawAmount, function(err) {
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
