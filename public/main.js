@@ -3189,7 +3189,7 @@ function updateGameDataVisuals() {
             const factoryId = $(this).data('factory-id');
 
             // Delete the card if it's not in the factory IDs array
-            if(jQuery.inArray(factoryId, factoryIds))
+            if(jQuery.inArray(factoryId, factoryIds) == -1)
                 $(this).remove();
         });
 

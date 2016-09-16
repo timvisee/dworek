@@ -734,6 +734,9 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
             if(calledBack)
                 return;
 
+            // TODO: Find all sockets for a user first, we might not have to update the game data for a user if there
+            // are no alive sockets. Updating game data is expensive.
+
             // Send the game data
             latch.add();
             self.sendGameData(game, liveUser.getUserModel(), undefined, function(err) {
