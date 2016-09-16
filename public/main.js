@@ -2970,7 +2970,7 @@ function buildFactory() {
     const fieldId = generateUniqueId('field-factory-name');
 
     // Build the dialog message
-    var dialogMessage = 'Enter a name for the ' + NameConfig.factory.name + ':<br><br>' +
+    // var dialogMessage = 'Enter a name for the ' + NameConfig.factory.name + ':<br><br>' +
         '<label for="' + fieldId + '">' + capitalizeFirst(NameConfig.factory.name) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
@@ -3163,7 +3163,7 @@ function updateGameDataVisuals() {
 
         // Create the factory build card if it isn't available
         if(showFactoryBuild && factoryBuildCardElement.length == 0) {
-            gameActionsList.prepend('<div class="nd2-card wow fadeInDown card-factory-build">' +
+            gameActionsList.prepend('<div class="nd2-card wow card-factory-build">' +
                 '    <div class="card-title has-supporting-text">' +
                 '        <h3 class="card-primary-title">Build a ' + capitalizeFirst(NameConfig.factory.name) + '</h3>' +
                 '    </div>' +
@@ -3188,9 +3188,10 @@ function updateGameDataVisuals() {
                 '</div>');
             bindFactoryBuildButton();
             changed = true;
+            cardAnimationSlideIn(gameActionsList.find('.card-factory-build'));
 
         } else if(!showFactoryBuild && factoryBuildCardElement.length > 0) {
-            cardAnimationSlideO(factoryBuildCardElement);
+            cardAnimationSlideOut(factoryBuildCardElement);
             changed = true;
         }
 
