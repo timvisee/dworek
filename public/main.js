@@ -3356,8 +3356,27 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
     // Set the factory data
     factoryData[factoryId] = data;
 
-    // Update the factory data visuals
-    updateFactoryDataVisuals();
+    // Check whether we're on this factory page
+    if(Dworek.utils.getFactoryId() == factoryId) {
+        // Redirect the user if the factory is hidden
+        if(!data.visible) {
+            showNotification({
+                title: 'Out of range',
+                message: 'You\'re outside of the ' + NameConfig.factory.name + ' range.<br><br>' +
+                'Please go back to the main game page.',
+                actions: [
+                    {
+                        text: 'Go to game page'
+                    }
+                ]
+            }, function() {
+                Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
+            });
+        }
+
+        // Update the factory data visuals
+        updateFactoryDataVisuals();
+    }
 });
 
 // Update the factory data visuals when initializing a page
@@ -3402,13 +3421,22 @@ function updateFactoryDataVisuals() {
     const factoryProductionOutLabel = activePage.find('.factory-production-out');
 
     // Update the elements
-    factoryNameLabel.html(data.name);
-    factoryLevelLabel.html(data.level);
-    factoryCreatorLabel.html(data.creatorName);
-    factoryTeamLabel.html(data.teamName);
-    factoryDefenceLabel.html(data.defence);
-    factoryInLabel.html(data.in);
-    factoryProductionInLabel.html(data.productionIn);
-    factoryOutLabel.html(data.out);
-    factoryProductionOutLabel.html(data.productionOut);
+    if(data.hasOwnProperty('name'))
+        factoryNameLabel.html(data.name);
+    if(data.hasOwnProperty('level'))
+        factoryLevelLabel.html(data.level);
+    if(data.hasOwnProperty('creatorName'))
+        factoryCreatorLabel.html(data.creatorName);
+    if(data.hasOwnProperty('teamName'))
+        factoryTeamLabel.html(data.teamName);
+    if(data.hasOwnProperty('defence'))
+        factoryDefenceLabel.html(data.defence);
+    if(data.hasOwnProperty('in'))
+        factoryInLabel.html(data.in);
+    if(data.hasOwnProperty('productionIn'))
+        factoryProductionInLabel.html(data.productionIn);
+    if(data.hasOwnProperty('out'))
+        factoryOutLabel.html(data.out);
+    if(data.hasOwnProperty('productionOut'))
+        factoryProductionOutLabel.html(data.productionOut);
 }
