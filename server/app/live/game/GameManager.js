@@ -704,5 +704,56 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
+/**
+ * Send the latest game data to all players in the given game.
+ *
+ * @param {GameModel} game Game to send the data for.
+ * @param {GameManager~sendGameDataCallback} callback Called on success or when an error occurred.
+ */
+GameManager.prototype.sendGameDataToAll = function(game, callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the live game
+    this.getGame(game, function(err, liveGame) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure we only call back once
+        var calledBack = false;
+
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Loop through all the users, and send their game data
+        liveGame.userManager.users.forEach(function(liveUser) {
+            // Cancel the loop if we called back
+            if(calledBack)
+                return;
+
+            // Send the game data
+            latch.add();
+            self.sendGameData(game, liveUser.getUserModel(), undefined, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Call back when we're done
+            latch.then(() => callback(null));
+        });
+    });
+};
+
 // Export the class
 module.exports = GameManager;
