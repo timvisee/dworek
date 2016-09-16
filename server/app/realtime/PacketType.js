@@ -264,7 +264,7 @@ module.exports = {
      *
      * TODO: Define data fields
      */
-    SHOP_BUY_IN: 24,
+    SHOP_SELL_IN: 24,
 
     /**
      * Send from a client to the server to sell out goods.

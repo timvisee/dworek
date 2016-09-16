@@ -221,6 +221,14 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                         console.error('Failed to broadcast factory data');
                                                     }
                                                 });
+
+                                                // Send a notification to the user
+                                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                                    error: false,
+                                                    message: 'Transaction succeed!',
+                                                    dialog: false,
+                                                    toast: true
+                                                }, socket);
                                             });
                                         });
                                     });

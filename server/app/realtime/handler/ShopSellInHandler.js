@@ -41,7 +41,7 @@ const HANDLER_PACKET_TYPE = PacketType.SHOP_SELL_IN;
  * @class
  * @constructor
  */
-var GameChangeStageHandler = function(init) {
+var ShopSellInHandler = function(init) {
     // Initialize
     if(init)
         this.init();
@@ -50,7 +50,7 @@ var GameChangeStageHandler = function(init) {
 /**
  * Initialize the handler.
  */
-GameChangeStageHandler.prototype.init = function() {
+ShopSellInHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
     if(Core.realTime == null)
         throw new Error('Real time server not initialized yet');
@@ -65,7 +65,7 @@ GameChangeStageHandler.prototype.init = function() {
  * @param {Object} packet Packet object.
  * @param socket SocketIO socket.
  */
-GameChangeStageHandler.prototype.handler = function(packet, socket) {
+ShopSellInHandler.prototype.handler = function(packet, socket) {
     // Make sure we only call back once
     var calledBack = false;
 
@@ -120,7 +120,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         // Loop through the shops
         liveGame.shopManager.shops.forEach(function(liveShop) {
             // Check whether this is the correct shop
-            if(!liveShop.getToken().equals(rawShop))
+            if(!liveShop.getToken() == rawShop)
                 return;
 
             // Set the found flag
@@ -150,7 +150,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     const price = liveShop.getInSellPrice();
 
                     // The the amount of money the user has
-                    liveUser.getUserModel().getMoney(function(err, userMoney) {
+                    gameUser.getMoney(function(err, userMoney) {
                         if(err !== null) {
                             callbackError();
                             return;
@@ -193,33 +193,41 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         }
 
                         // Set the money amount for the user
-                        user.setMoney(userMoney - buyAmount, function(err) {
+                        gameUser.setMoney(userMoney - buyAmount, function(err) {
                             if(err !== null) {
                                 callbackError();
                                 return;
                             }
 
                             // Get the in amount
-                            user.getIn(function(err, inAmount) {
+                            gameUser.getIn(function(err, inAmount) {
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
                                 // Set the in amount
-                                user.setIn(inAmount + Math.round(buyAmount * price), function(err) {
+                                gameUser.setIn(inAmount + Math.round(buyAmount * price), function(err) {
                                     if(err !== null) {
                                         callbackError();
                                         return;
                                     }
 
                                     // Send updated game data to the user
-                                    Core.gameController.sendGameData(game, user, undefined, function(err) {
+                                    Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
                                         if(err !== null) {
                                             console.error(err);
                                             console.error('Failed to send game data');
                                         }
                                     });
+
+                                    // Send a notification to the user
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: false,
+                                        message: 'Transaction succeed!',
+                                        dialog: false,
+                                        toast: true
+                                    }, socket);
                                 });
                             });
                         });
@@ -237,9 +245,8 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             message: 'Failed to buy goods, couldn\'t find shop. The shop you\'re trying to buy goods to might not be available anymore.',
             dialog: true
         }, socket);
-        return;
     }
 };
 
 // Export the module
-module.exports = GameChangeStageHandler;
+module.exports = ShopSellInHandler;

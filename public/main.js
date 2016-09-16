@@ -3383,11 +3383,11 @@ function updateGameDataVisuals() {
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' / 1 ' + NameConfig.in.name + ' unit</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' <span style="color: gray;">/ 1 ' + NameConfig.in.name + ' unit</span></td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' / 1 ' + NameConfig.out.name + ' unit</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' <span style="color: gray;">/ 1 ' + NameConfig.out.name + ' unit</span></td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
