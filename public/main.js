@@ -3368,14 +3368,23 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
         if(!data.visible) {
             showDialog({
                 title: 'Out of range',
-                message: 'You\'re outside of the ' + NameConfig.factory.name + ' range.<br><br>' +
+                message: 'You\'re outside the range of the ' + NameConfig.factory.name + ', or your GPS isn\'t working properly at the moment.<br><br>' +
                 'Please go back to the main game page.',
                 actions: [
                     {
-                        text: 'Go to game page'
+                        text: 'Go to game page',
+                        state: 'primary'
+                    },
+                    {
+                        text: 'Ignore',
+                        state: 'warning',
+                        value: false
                     }
                 ]
-            }, function() {
+            }, function(value) {
+                if(value === false)
+                    return;
+
                 Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
             });
         }
@@ -3475,7 +3484,7 @@ function updateFactoryDataVisuals(firstShow) {
                 // Append a button
                 upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + ' (' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')' +
                     '</a>');
 
                 // Get the button
