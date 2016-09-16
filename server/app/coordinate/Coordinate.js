@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var _ = require('lodash');
+var geolib = require('geolib');
 
 /**
  * Coordinate class.
@@ -83,6 +84,16 @@ Coordinate.prototype.serialize = function() {
 Coordinate.deserialize = function(serialized) {
     // Convert the serialize data into an object, and parse that as coordinate
     return Coordinate.parse(JSON.parse(serialized));
+};
+
+/**
+ * Get the distance to the other given location in meters.
+ *
+ * @param {Coordinate} other Other location.
+ * @return {Number} Distance in meters.
+ */
+Coordinate.prototype.getDistanceTo = function(other) {
+    return geolib.getDistance(this, other);
 };
 
 // Export the module
