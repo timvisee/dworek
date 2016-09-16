@@ -57,6 +57,12 @@ var gameConfig = {
         range: 15,
 
         /**
+         * Shop worker invocation interval.
+         * @type {Number}
+         */
+        workerInterval: 10 * 1000,
+
+        /**
          * Get the number of preferred shops in a team, based on the team size.
          * @param {Number} playerCount Number of players in the team.
          * @return {Number} Number of preferred shops.

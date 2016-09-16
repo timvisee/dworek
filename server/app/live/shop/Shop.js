@@ -26,20 +26,20 @@ var ObjectId = mongo.ObjectId;
 var config = require('../../../config');
 
 var Core = require('../../../Core');
-var UserModel = require('../../model/user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
 var TokenGenerator = require('../../token/TokenGenerator');
+var PacketType = require('../../realtime/PacketType');
 
 /**
  * Shop class.
  *
  * @param {User} user Live user this shop is attached to.
- * @param {Game} game Game instance.
+ * @param {ShopManager} shopManager Shop manager.
  *
  * @class
  * @constructor
  */
-var Shop = function(user, game) {
+var Shop = function(user, shopManager) {
     /**
      * Shop token.
      * @type {string}
@@ -55,11 +55,11 @@ var Shop = function(user, game) {
     this._user = user;
 
     /**
-     * Live game instance.
-     * @type {Game} Game.
+     * Shop manager for this shop.
+     * @type {ShopManager} Shop manager.
      * @private
      */
-    this._game = game;
+    this._shopManager = shopManager;
 
     /**
      * The price per unit in goods are sold for.
@@ -113,12 +113,21 @@ Shop.prototype.getUser = function() {
 };
 
 /**
+ * Get the shop manager this shop is in.
+ *
+ * @return {ShopManager} Shop manager.
+ */
+Shop.prototype.getShopManager = function() {
+    return this._shopManager;
+};
+
+/**
  * Get the game this shop is located in.
  *
  * @return {Game} Game.
  */
 Shop.prototype.getGame = function() {
-    return this._game;
+    return this.getShopManager().game;
 };
 
 /**
@@ -180,6 +189,50 @@ Shop.prototype.load = function(callback) {
 
         // Determine the effective range
         self._range = gameConfig.shop.range;
+
+        // Determine the lifetime and alert time of this shop
+        const lifeTime = gameConfig.shop.getShopLifetime();
+        const alertTime = gameConfig.shop.shopAlertTime;
+
+        // Set the lifetime timer
+        setTimeout(function() {
+            // Remove the shop from the list
+            self.getShopManager().shops.splice(self.getShopManager().shops.indexOf(self), 1);
+
+            // Send a notification to the current shop user
+            Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                message: 'Your shop has been transferred',
+                error: false,
+                toast: true,
+                dialog: false
+            }, self.getUser().getUserModel());
+        }, lifeTime);
+
+        // Set the alert timer
+        setTimeout(function() {
+            // Return if the team model is invalid
+            if(self.getUser().getTeamModel() == null)
+                return;
+
+            // Find a replacement user
+            var newUser = self.getShopManager().findNewShopUser(self.getUser().getTeamModel().getId().toString());
+
+            // Return if we don't have a new user
+            if(newser == null)
+                return;
+
+            // Schedule the new user
+            self.getShopManager().scheduleUser(newUser);
+
+            // Send a notification to the current shop user
+            Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                message: 'Your shop will be transferred to another player shortly',
+                error: false,
+                toast: true,
+                dialog: false
+            }, self.getUser().getUserModel());
+
+        }, lifeTime - alertTime);
 
         // Resolve the latch
         latch.resolve();

@@ -27,6 +27,7 @@ var Core = require('../../../Core');
 var GameModel = require('../../model/game/GameModel');
 var UserManager = require('../user/UserManager');
 var FactoryManager = require('../factory/FactoryManager');
+var ShopManager = require('../shop/ShopManager');
 var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
@@ -61,6 +62,12 @@ var Game = function(game) {
      * @type {FactoryManager} Factory manager instance.
      */
     this.factoryManager = new FactoryManager(this);
+
+    /**
+     * Shop manager instance.
+     * @type {ShopManager}
+     */
+    this.shopManager = new ShopManager(this);
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -187,6 +194,21 @@ Game.prototype.load = function(callback) {
     // Load the factory manager
     latch.add();
     this.factoryManager.load(function(err) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Load the shop manager
+    latch.add();
+    this.shopManager.load(function(err) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
