@@ -31,7 +31,7 @@ var CallbackLatch = require('../../util/CallbackLatch');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.FACTORY_DEPOSIT_IN;
+const HANDLER_PACKET_TYPE = PacketType.FACTORY_WITHDRAW_OUT;
 
 /**
  * Location update handler.
@@ -78,7 +78,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to deposit, a server error occurred.',
+            message: 'Failed to withdraw, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -103,7 +103,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to deposit, you\'re not authenticated.',
+            message: 'Failed to withdraw, you\'re not authenticated.',
             dialog: true
         }, socket);
         return;
@@ -158,72 +158,72 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
-                                    message: 'Failed to buy deposit, you aren\'t close enough or you don\'t have permission.',
+                                    message: 'Failed to buy withdraw, you aren\'t close enough or you don\'t have permission.',
                                     dialog: true
                                 }, socket);
                                 return;
                             }
 
                             // Get the amount of in the user has
-                            gameUser.getIn(function(err, userIn) {
+                            factoryModel.getOut(function(err, factoryOut) {
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Determine the amount to deposit
-                                var depositAmount = 0;
+                                // Determine the amount to withdraw
+                                var withdrawAmount = 0;
 
                                 // Check whether we should use the maximum amount
                                 if(rawAll === true)
-                                    depositAmount = userIn;
+                                    withdrawAmount = factoryOut;
                                 else {
                                     // Parse the raw amount
-                                    depositAmount = parseInt(rawAmount);
+                                    withdrawAmount = parseInt(rawAmount);
 
                                     // Make sure the amount isn't above the maximum
-                                    if(depositAmount > userIn) {
+                                    if(withdrawAmount > factoryOut) {
                                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                             error: true,
-                                            message: 'Failed to deposit, you don\'t have this much goods available.',
+                                            message: 'Failed to withdraw, you\'re trying to withdraw more than there\'s available.',
                                             dialog: true
                                         }, socket);
                                         return;
                                     }
 
                                     // Make sure the amount isn't below zero
-                                    if(depositAmount < 0) {
+                                    if(withdrawAmount < 0) {
                                         callbackError();
                                         return;
                                     }
 
                                     // Make the sure the amount isn't zero
-                                    if(depositAmount == 0) {
+                                    if(withdrawAmount == 0) {
                                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                             error: true,
-                                            message: '<i>You can\'t deposit no nothin\'.</i>',
+                                            message: '<i>You can\'t withdraw no nothin\'.</i>',
                                             dialog: true
                                         }, socket);
                                         return;
                                     }
                                 }
 
-                                // Decrease the in of the user
-                                gameUser.setIn(userIn - depositAmount, function(err) {
+                                // Decrease the in of the factory
+                                factoryModel.setOut(factoryOut - withdrawAmount, function(err) {
                                     if(err !== null) {
                                         callbackError();
                                         return;
                                     }
 
-                                    // Get the current in amount of the factory model
-                                    factoryModel.getIn(function(err, factoryIn) {
+                                    // Get the current out of the user
+                                    gameUser.getOut(function(err, userOut) {
                                         if(err !== null) {
                                             callbackError();
                                             return;
                                         }
 
-                                        // Update the in amount for the factory
-                                        factoryModel.setIn(factoryIn + depositAmount, function(err) {
+                                        // Update the out amount for the user
+                                        factoryModel.setIn(userOut + withdrawAmount, function(err) {
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
