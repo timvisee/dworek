@@ -132,7 +132,7 @@ var gameConfig = {
                     defence: 10
                 });
                 defences.push({
-                    name: 'Reinforcement',
+                    name: 'AK-47',
                     cost: Math.round(15 + defence * 2),
                     defence: defence * 2
                 });
