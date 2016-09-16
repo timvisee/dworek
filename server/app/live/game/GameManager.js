@@ -580,7 +580,8 @@ GameManager.prototype.broadcastData = function(callback) {
 GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
     // Create a data object to send back
     var gameData = {
-        factories: []
+        factories: [],
+        shops: []
     };
 
     // Store this instance
@@ -814,6 +815,48 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                         // Resolve the latch
                         latch.resolve();
+                    });
+                });
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Add the shop data when close by
+            latch.add();
+            liveGame.getUser(user, function(err, liveUser) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Stop if the live user is not found
+                if(liveUser === null) {
+                    latch.resolve();
+                    return;
+                }
+
+                // Get the shops
+                liveGame.shopManager.shops.forEach(function(liveShop) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Make sure the user is in range
+                    if(!liveShop.isUserInRange(liveUser))
+                        return;
+
+                    // Set the name in the factory object
+                    gameData.shops.push({
+                        id: liveShop.getIdHex(),
+                        name: 'SHOP NAME'
                     });
                 });
 

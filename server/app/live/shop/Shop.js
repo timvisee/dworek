@@ -289,7 +289,7 @@ Shop.prototype.isUserInRange = function(user) {
         return false;
 
     // Get the user location and check whether the user is in range
-    this.isLocactionInRange(user.getLocation());
+    return this.isLocactionInRange(user.getLocation());
 };
 
 // Export the class
