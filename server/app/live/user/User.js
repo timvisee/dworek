@@ -496,46 +496,6 @@ User.prototype.setIn = function(goods, callback) {
     });
 };
 
-User.prototype.addGoods = function(amount, callback) {
-    // Get the game user
-    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Make sure the game user is valid
-        if(gameUser == null) {
-            callback(null, null);
-            return;
-        }
-
-        // Get the goods
-        gameUser.addGoods(amount, callback);
-    });
-};
-
-User.prototype.subtractGoods = function(amount, callback) {
-    // Get the game user
-    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Make sure the game user is valid
-        if(gameUser == null) {
-            callback(null, null);
-            return;
-        }
-
-        // Get the goods
-        gameUser.subtractGoods(amount, callback);
-    });
-};
-
 /**
  * Check whether this user is visible for the given user.
  *
