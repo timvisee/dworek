@@ -31,7 +31,7 @@ var CallbackLatch = require('../../util/CallbackLatch');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.SHOP_SELL_OUT;
+const HANDLER_PACKET_TYPE = PacketType.SHOP_BUY_OUT;
 
 /**
  * Location update handler.
@@ -146,11 +146,11 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         return;
                     }
 
-                    // Get the selling price
-                    const sellPrice = liveShop.getInSellPrice();
+                    // Get the price
+                    const price = liveShop.getOutBuyPrice();
 
                     // The the amount of goods the user has
-                    liveUser.getOut(function(err, outAmount) {
+                    liveUser.getUserModel().getOut(function(err, outAmount) {
                         if(err !== null) {
                             callbackError();
                             return;
@@ -207,7 +207,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // Set the money
-                                user.setMoney(userMoney + Math.round(sellAmount * sellPrice), function(err) {
+                                user.setMoney(userMoney + Math.round(sellAmount * price), function(err) {
                                     if(err !== null) {
                                         callbackError();
                                         return;
