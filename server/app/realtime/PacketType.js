@@ -271,5 +271,5 @@ module.exports = {
      *
      * TODO: Define data fields
      */
-    SHOP_SELL_OUT: 25
+    SHOP_BUY_OUT: 25
 };

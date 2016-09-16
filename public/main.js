@@ -51,8 +51,8 @@ const PacketType = {
     FACTORY_LEVEL_BUY: 21,
     FACTORY_DEPOSIT_IN: 22,
     FACTORY_WITHDRAW_OUT: 23,
-    SHOP_BUY_IN: 24,
-    SHOP_SELL_OUT: 25
+    SHOP_SELL_IN: 24,
+    SHOP_BUY_OUT: 25
 };
 
 /**
@@ -3383,11 +3383,11 @@ function updateGameDataVisuals() {
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' per 1 ' + NameConfig.in.name + '</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' / 1 ' + NameConfig.in.name + ' unit</td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' for 1 ' + NameConfig.out.name + '</td>' +
+                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' / 1 ' + NameConfig.out.name + ' unit</td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
@@ -3441,7 +3441,7 @@ function updateGameDataVisuals() {
                                 var amount = $('#' + amountFieldId).val();
 
                                 // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_IN, {
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                                     shop: shop.token,
                                     amount: amount,
                                     all: false
@@ -3455,7 +3455,7 @@ function updateGameDataVisuals() {
                             text: 'Full buy',
                             action: function() {
                                 // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_IN, {
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                                     shop: shop.token,
                                     amount: 0,
                                     all: true
@@ -3499,7 +3499,7 @@ function updateGameDataVisuals() {
                                 var amount = $('#' + amountFieldId).val();
 
                                 // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_OUT, {
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
                                     shop: shop.token,
                                     amount: amount,
                                     all: false
@@ -3513,7 +3513,7 @@ function updateGameDataVisuals() {
                             text: 'Sell all',
                             action: function() {
                                 // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_OUT, {
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
                                     shop: shop.token,
                                     amount: 0,
                                     all: true
