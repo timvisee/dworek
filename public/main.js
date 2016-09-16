@@ -3133,8 +3133,11 @@ function updateGameDataVisuals() {
     const gameActionsList = activePage.find('.game-actions-list');
 
     // Define a card animation
-    const cardAnitmationSlideOut = function(element) {
-        element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(200).slideUp(function() {
+    const cardAnimationSlideIn = function(element) {
+        element.addClass('animated bounceInLeft').hide().slideDown();
+    };
+    const cardAnimationSlideOut = function(element) {
+        element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(500).slideUp(function() {
             $(this).remove();
         });
     };
@@ -3187,7 +3190,7 @@ function updateGameDataVisuals() {
             changed = true;
 
         } else if(!showFactoryBuild && factoryBuildCardElement.length > 0) {
-            cardAnitmationSlideOut(factoryBuildCardElement);
+            cardAnimationSlideO(factoryBuildCardElement);
             changed = true;
         }
 
@@ -3211,7 +3214,7 @@ function updateGameDataVisuals() {
                 return;
 
             // Create a new card for this factory
-            gameActionsList.prepend('<div class="nd2-card wow animated bounceInLeft ' + factoryCardSelector + '" data-factory-id="' + factory.id + '">' +
+            gameActionsList.prepend('<div class="nd2-card wow ' + factoryCardSelector + '" data-factory-id="' + factory.id + '">' +
                 '    <div class="card-title has-supporting-text">' +
                 '        <h3 class="card-primary-title">' + factory.name + '</h3>' +
                 '    </div>' +
@@ -3230,7 +3233,8 @@ function updateGameDataVisuals() {
                 '</div>');
             changed = true;
 
-            gameActionsList.find('.' + factoryCardSelector + '[data-factory-id=\'' + factory.id + '\']').hide().slideDown();
+            // Slide out animation
+            cardAnimationSlideIn(gameActionsList.find('.' + factoryCardSelector + '[data-factory-id=\'' + factory.id + '\']'));
         });
 
         // Find all factory cards, and loop through them
@@ -3241,7 +3245,7 @@ function updateGameDataVisuals() {
 
             // Delete the card if it's not in the factory IDs array
             if(jQuery.inArray(factoryId, factoryIds) == -1)
-                cardAnitmationSlideOut($(this));
+                cardAnimationSlideOut($(this));
         });
 
         // Show a label if no card is shown
