@@ -159,7 +159,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
-                                    message: 'Failed to buy defence, you aren\'t enough or you don\'t have permission.',
+                                    message: 'Failed to buy defence, you aren\'t close enough or you don\'t have permission.',
                                     dialog: true
                                 }, socket);
                                 return;
