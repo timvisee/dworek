@@ -4,8 +4,9 @@ block tabs
     ul(data-role='nd2tabs' data-swipe=true)
         - var fadeDelay = 0;
         li.wow.fadeInUp(data-tab='info', data-wow-delay=(fadeDelay += 0.1) + 's') Info
-        li.wow.fadeInUp(data-tab='map', data-wow-delay=(fadeDelay += 0.1) + 's') Map
+        li.wow.fadeInUp(data-tab='me', data-wow-delay=(fadeDelay += 0.1) + 's') Me
         li.wow.fadeInUp(data-tab='actions', data-wow-delay=(fadeDelay += 0.1) + 's') Actions
+        li.wow.fadeInUp(data-tab='map', data-wow-delay=(fadeDelay += 0.1) + 's') Map
 
 block content
     div(data-role='nd2tab', data-tab='info')
@@ -103,25 +104,24 @@ block content
                     a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/players', data-transition='slide') Players
                     a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/teams', data-transition='slide') Teams
 
-    div(data-role='nd2tab', data-tab='map')
-        #map-container
+    div(data-role='nd2tab', data-tab='me')
+        .nd2-card.wow.fadeInUp.card-factory-info
+            .card-title.has-supporting-text
+                h3.card-primary-title My balance
+
+            .card-supporting-text.has-action.has-title
+                table.table-list.ui-responjjjjsive
+                    tr: td Money
+                        td <span class="game-balance-money">?</span> <span style="color: gray;"> dollars</span>
+                    tr: td Ingredients
+                        td.game-balance-in ?
+                    tr: td Drugs
+                        td.game-balance-out ?
 
     div(data-role='nd2tab', data-tab='actions')
         .game-actions-list
             div(align='center')
                 p.game-data-load-label: i Loading...
 
-            //.nd2-card.wow.fadeInUp
-            //    .card-title.has-supporting-text
-            //        h3.card-primary-title Build a Lab
-            //
-            //    .card-supporting-text.has-action.has-title
-            //        p Build a lab at your current location and start producing more drugs.
-            //        table.table-list.ui-responsive
-            //            tr: td Cost
-            //                td: span.game-factory-cost ?
-            //
-            //    .card-action
-            //        .row.between-xs: .col-xs-12: .box
-            //            a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button.action-factory-build(href='#', data-transition='slide') Build lab
-
+    div(data-role='nd2tab', data-tab='map')
+        #map-container

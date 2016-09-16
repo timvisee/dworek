@@ -3563,6 +3563,15 @@ function updateGameDataVisuals() {
             $('.game-factory-cost').html(data.factory.cost);
     }
 
+    if(data.hasOwnProperty('balance')) {
+        if(data.balance.hasOwnProperty('money'))
+            activePage.find('.game-balance-money').html(data.balance.money);
+        if(data.balance.hasOwnProperty('in'))
+            activePage.find('.game-balance-in').html(data.balance.in);
+        if(data.balance.hasOwnProperty('out'))
+            activePage.find('.game-balance-out').html(data.balance.out);
+    }
+
     // Check whether this is the active game
     if(Dworek.state.activeGame == gameId)
         // Update the game stage
