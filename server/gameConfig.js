@@ -74,23 +74,23 @@ var gameConfig = {
          * @param {Number} level Factory level.
          * @return {Number} Production input for each tick.
          */
-        calculateProductionIn: function(level) {
+        getProductionIn: function(level) {
             return 10;
         },
 
         /**
-         * Calcualte the production output for each tick.
+         * Calculate the production output for each tick.
          * @param {Number} level Factory level.
          * @return {Number} Production output for each tick.
          */
-        calculateProductionOut: function(level) {
+        getProductionOut: function(level) {
             return 15;
         },
 
         /**
          * Function to calculate the factory cost.
          */
-        calculateCost: function() {
+        getCost: function() {
             return 100;
         }
     }

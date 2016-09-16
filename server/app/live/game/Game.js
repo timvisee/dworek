@@ -247,7 +247,7 @@ Game.prototype.calculateFactoryCost = function(team, callback) {
         }
 
         // Calculate the factory cost
-        callback(null, config.factory.calculateCost());
+        callback(null, config.factory.getCost());
     });
 };
 

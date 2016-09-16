@@ -693,7 +693,7 @@ Factory.prototype.isInVisibilityMemory = function(liveUser) {
  *
  * @param callback (err, productionValue)
  */
-Factory.prototype.calculateProductionIn = function(callback) {
+Factory.prototype.getProductionIn = function(callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
     var calledBack = false;
@@ -740,7 +740,7 @@ Factory.prototype.calculateProductionIn = function(callback) {
 
     // Calculate the production in
     latch.then(function() {
-        callback(null, gameConfig.factory.calculateProductionIn(level));
+        callback(null, gameConfig.factory.getProductionIn(level));
     });
 };
 
@@ -749,7 +749,7 @@ Factory.prototype.calculateProductionIn = function(callback) {
  *
  * @param callback (err, productionValue)
  */
-Factory.prototype.calculateProductionOut = function(callback) {
+Factory.prototype.getProductionOut = function(callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
     var calledBack = false;
@@ -796,7 +796,7 @@ Factory.prototype.calculateProductionOut = function(callback) {
 
     // Calculate the production in
     latch.then(function() {
-        callback(null, gameConfig.factory.calculateProductionOut(level));
+        callback(null, gameConfig.factory.getProductionOut(level));
     });
 };
 
