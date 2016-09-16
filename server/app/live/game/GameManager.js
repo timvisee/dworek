@@ -855,7 +855,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                     // Set the name in the factory object
                     gameData.shops.push({
-                        id: liveShop.getIdHex(),
+                        token: liveShop.getToken(),
                         name: 'SHOP NAME'
                     });
                 });

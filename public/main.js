@@ -3020,7 +3020,7 @@ function fitMap() {
         return;
 
     // Fly to the bounds
-    map.flyToBounds(L.featureGroup(fitters).getBounds());
+    map.fitBounds(L.featureGroup(fitters).getBounds());
 }
 
 // Build NativeDroid on page initialization
@@ -3346,6 +3346,68 @@ function updateGameDataVisuals() {
 
             // Delete the card if it's not in the factory IDs array
             if(jQuery.inArray(factoryId, factoryIds) == -1)
+                cardAnimationSlideOut($(this));
+        });
+
+        // Create an array with the shop tokens that are shown
+        var shopTokens = [];
+
+        // Define the shop card selector prefix
+        const shopCardSelector = 'card-shop';
+
+        // Loop through the list of shops
+        cardCount += data.shops.length;
+        console.log(data);
+        data.shops.forEach(function(shop) {
+            // Add the shop ID to the array
+            shopTokens.push(shop.token);
+
+            // Determine the card selector for this shop´s card and get the elements for it
+            var shopCardElement = gameActionsList.find('.' + shopCardSelector + '[data-shop-token=\'' + shop.token + '\']');
+
+            // Skip this run if it already exists
+            if(shopCardElement.length > 0)
+                return;
+
+            // Create a new card for this shop
+            gameActionsList.prepend('<div class="nd2-card wow ' + shopCardSelector + '" data-shop-token="' + shop.token + '">' +
+                '    <div class="card-title has-supporting-text">' +
+                '        <h3 class="card-primary-title">Your local dealer</h3>' +
+                '    </div>' +
+                '    <div class="card-supporting-text has-action has-title">' +
+                '        <p>' + shop.name + ' is currently selling goods around your location.</p>' +
+                '        <table class="table-list ui-responsive">' +
+                '            <tr>' +
+                '                <td>Cost</td>' +
+                '                <td><span class="game-factory-cost">?</span></td>' +
+                '            </tr>' +
+                '        </table>' +
+                '    </div>' +
+                '    <div class="card-action">' +
+                '        <div class="row between-xs">' +
+                '            <div class="col-xs-12">' +
+                '                <div class="box">' +
+                '                    <a href="#" class="ui-btn waves-effect waves-button">Buy ' + NameConfig.in.name + '</a>' +
+                '                    <a href="#" class="ui-btn waves-effect waves-button">Sell ' + NameConfig.out.name + '</a>' +
+                '                </div>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</div>');
+            changed = true;
+
+            // Slide out animation
+            cardAnimationSlideIn(gameActionsList.find('.' + shopCardSelector + '[data-shop-token=\'' + shop.token + '\']'));
+        });
+
+        // Find all shop cards, and loop through them
+        const shopCards = gameActionsList.find('.' + shopCardSelector);
+        shopCards.each(function() {
+            // Get the shop ID
+            const shopToken = $(this).data('shop-token');
+
+            // Delete the card if it's not in the shop tokens array
+            if(jQuery.inArray(shopToken, shopTokens) == -1)
                 cardAnimationSlideOut($(this));
         });
 
