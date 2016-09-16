@@ -31,7 +31,7 @@ var CallbackLatch = require('../../util/CallbackLatch');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.FACTORY_LEVEL_BUY;
+const HANDLER_PACKET_TYPE = PacketType.FACTORY_DEPOSIT_IN;
 
 /**
  * Location update handler.
@@ -78,7 +78,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to upgrade level, a server error occurred.',
+            message: 'Failed to deposit, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -87,7 +87,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
     };
 
     // Make sure a session is given
-    if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('cost')) {
+    if(!packet.hasOwnProperty('factory') || (!packet.hasOwnProperty('amount') && !packet.hasOwnProperty('all'))) {
         console.log('Received malformed packet');
         callbackError();
         return;
@@ -95,7 +95,8 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
     // Get the raw parameters
     const rawFactory = packet.factory;
-    const cost = packet.cost;
+    const rawAmount = packet.amount;
+    const rawAll = packet.all;
 
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid) {
@@ -157,70 +158,91 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
-                                    message: 'Failed to buy upgrade, you aren\'t close enough or you don\'t have permission.',
+                                    message: 'Failed to buy deposit, you aren\'t close enough or you don\'t have permission.',
                                     dialog: true
                                 }, socket);
                                 return;
                             }
 
-                            // Get the cost for a level upgrade
-                            liveFactory.getNextLevelCost(function(err, nextLevelCost) {
+                            // Get the amount of in the user has
+                            gameUser.getIn(function(err, userIn) {
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Compare the price and defence
-                                if(nextLevelCost != cost) {
-                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                        error: true,
-                                        message: 'Failed to buy upgrade, prices have changed.',
-                                        dialog: true
-                                    }, socket);
-                                    return;
-                                }
+                                // Determine the amount to deposit
+                                var depositAmount = 0;
 
-                                // Make sure the user has enough money
-                                gameUser.getMoney(function(err, money) {
-                                    if(err !== null) {
-                                        callbackError();
-                                        return;
-                                    }
+                                // Check whether we should use the maximum amount
+                                if(rawAll === true)
+                                    depositAmount = userIn;
+                                else {
+                                    // Parse the raw amount
+                                    depositAmount = parseInt(rawAmount);
 
-                                    if(money < nextLevelCost) {
+                                    // Make sure the amount isn't above the maximum
+                                    if(depositAmount > userIn) {
                                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                             error: true,
-                                            message: 'Failed to buy upgrade, you don\'t have enough money.',
+                                            message: 'Failed to deposit, you don\'t have this much goods available.',
                                             dialog: true
                                         }, socket);
                                         return;
                                     }
 
-                                    // Subtract the money
-                                    gameUser.subtractMoney(nextLevelCost, function(err) {
+                                    // Make sure the amount isn't below zero
+                                    if(depositAmount < 0) {
+                                        callbackError();
+                                        return;
+                                    }
+
+                                    // Make the sure the amount isn't zero
+                                    if(depositAmount == 0) {
+                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                            error: true,
+                                            message: '<i>You can\'t transfer no nothin\'.</i>',
+                                            dialog: true
+                                        }, socket);
+                                        return;
+                                    }
+                                }
+
+                                // Decrease the in of the user
+                                gameUser.setIn(userIn - depositAmount, function(err) {
+                                    if(err !== null) {
+                                        callbackError();
+                                        return;
+                                    }
+
+                                    // Get the current in amount of the factory model
+                                    factoryModel.getIn(function(err, factoryIn) {
                                         if(err !== null) {
                                             callbackError();
                                             return;
                                         }
 
-                                        factoryModel.getLevel(function(err, level) {
+                                        // Update the in amount for the factory
+                                        factoryModel.setIn(factoryIn + depositAmount, function(err) {
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
                                             }
 
-                                            factoryModel.setLevel(level + 1, function(err) {
+                                            // Send updated game data to the user
+                                            Core.gameController.sendGameData(game, user, undefined, function(err) {
                                                 if(err !== null) {
-                                                    callbackError();
-                                                    return;
+                                                    console.error(err);
+                                                    console.error('Failed to broadcast factory data');
                                                 }
+                                            });
 
-                                                liveFactory.broadcastData(function(err) {
-                                                    if(err !== null) {
-                                                        console.error(err);
-                                                        console.error('Failed to broadcast factory data');
-                                                    }
-                                                });
+                                            // Broadcast the factory data, since it's updated
+                                            liveFactory.broadcastData(function(err) {
+                                                if(err !== null) {
+                                                    console.error(err);
+                                                    console.error('Failed to broadcast factory data');
+                                                }
                                             });
                                         });
                                     });
