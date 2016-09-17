@@ -1041,7 +1041,10 @@ GameManager.prototype.tick = function(callback) {
         });
     });
 
-    latch.then(() => callback(null));
+    latch.then(function() {
+        if(callback != undefined)
+            callback();
+    });
 };
 
 // Export the class
