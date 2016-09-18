@@ -3209,7 +3209,7 @@ $(document).bind("pageshow", function() {
 });
 
 function cardAnimationSlideIn(element) {
-    element.addClass('animated bounceInLeft').hide().slideDown();
+    element.addClass('animated bounceInDown').hide().slideDown();
 }
 
 function cardAnimationSlideOut(element) {
