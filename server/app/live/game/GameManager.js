@@ -1025,6 +1025,7 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
 
 /**
  * Run a game tick.
+ * This invokes a game tick for games that are currently active.
  *
  * @param {GameManager~tickCallback} [callback] Called when the tick has been processed, or when an error occurred.
  */

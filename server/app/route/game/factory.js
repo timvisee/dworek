@@ -37,7 +37,22 @@ module.exports = {
         const self = module.exports;
 
         // Route the pages
+        router.get('/:game/factory', self.getRoot);
         router.get('/:game/factory/:factory', self.get);
+    },
+
+    /**
+     * Redirect the user back to the game if he's on the factory root directory (without a specified factory).
+     *
+     * @param req Express request object.
+     * @param res Express response object.
+     */
+    getRoot: (req, res) => {
+        // Get the game
+        const game = req.game;
+
+        // Redirect the user to the game's page
+        res.redirect('/game/' + game.getIdHex());
     },
 
     /**
