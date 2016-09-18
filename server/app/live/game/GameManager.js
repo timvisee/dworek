@@ -196,7 +196,13 @@ GameManager.prototype.load = function(callback) {
     // Start the game tick
     setInterval(function() {
         // Run a game tick
-        self.tick();
+        self.tick(function(err) {
+            // Report errors
+            if(err !== null) {
+                console.error(err);
+                console.error('An error occurred while invoking a game tick, ignoring.')
+            }
+        });
 
     }, gameConfig.game.tickInterval);
 
@@ -1019,19 +1025,31 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
 
 /**
  * Run a game tick.
+ *
+ * @param {GameManager~tickCallback} [callback] Called when the tick has been processed, or when an error occurred.
  */
 GameManager.prototype.tick = function(callback) {
+    // Create a new callback latch
     var latch = new CallbackLatch();
+
+    // We may only call back once
+    var calledBack = false;
 
     // Loop through all the games, and tick the factories
     this.games.forEach(function(liveGame) {
         // Loop through the factories
         liveGame.factoryManager.factories.forEach(function(liveFactory) {
+            // Add a latch for this factory
             latch.add();
+
             // Tick the factory
             liveFactory.tick(function(err) {
+                // Call back errors
                 if(err !== null) {
-                    console.log('Error on tick');
+                    if(!calledBack)
+                        if(_.isFunction(callback))
+                            callback(err);
+                    calledBack = true;
                     return;
                 }
 
@@ -1041,11 +1059,19 @@ GameManager.prototype.tick = function(callback) {
         });
     });
 
+    // Call back when we're done
     latch.then(function() {
-        if(callback != undefined)
-            callback();
+        if(_.isFunction(callback))
+            callback(null);
     });
 };
+
+/**
+ * Called when the tick is processed, or when an error occurred.
+ *
+ * @callback GameManager~tickCallback
+ * @param {Error|null} Error instance if an error occurred, or null on success.
+ */
 
 // Export the class
 module.exports = GameManager;
