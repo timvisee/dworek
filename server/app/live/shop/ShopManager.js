@@ -314,7 +314,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
 
         // Send a notification to the user
         Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-            message: 'You\'re getting increasingly interested in the salesman job for special goods.' +
+            message: 'You\'re getting increasingly interested in the salesman job for special goods.<br><br>' +
             'You might become a special kind of merchant soon...',
             error: false,
             toast: false,

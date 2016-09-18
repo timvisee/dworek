@@ -201,11 +201,13 @@ Shop.prototype.load = function(callback) {
 
             // Send a notification to the current shop user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message: 'Your shop has been transferred',
+                message: 'You\'re no longer a dealer',
                 error: false,
                 toast: true,
                 dialog: false
             }, self.getUser().getUserModel());
+
+            // TODO: Update the game data of the user, to remove the shop state!
         }, lifeTime);
 
         // Set the alert timer
@@ -214,23 +216,29 @@ Shop.prototype.load = function(callback) {
             if(self.getUser().getTeamModel() == null)
                 return;
 
+            // Get the current user
+            const currentLiveUser = self.getUser();
+            const currentUserModel = currentLiveUser.getUserModel();
+
             // Find a replacement user
-            var newUser = self.getShopManager().findNewShopUser(self.getUser().getTeamModel().getId().toString());
+            const newUser = self.getShopManager().findNewShopUser(currentLiveUser.getTeamModel().getId().toString());
 
-            // Return if we don't have a new user
-            if(newser == null)
-                return;
+            // Schedule for the new shop user if a user was found
+            if(newUser != null)
+                self.getShopManager().scheduleUser(newUser);
 
-            // Schedule the new user
-            self.getShopManager().scheduleUser(newUser);
+            // Determine what message to show to the current shop owner
+            var message = 'Your dealer ability will be given to another player soon...';
+            if(newUser == null)
+                message = 'You will lose your dealer ability soon...';
 
             // Send a notification to the current shop user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message: 'Your shop will be transferred to another player shortly',
+                message,
                 error: false,
                 toast: true,
                 dialog: false
-            }, self.getUser().getUserModel());
+            }, currentUserModel);
 
         }, lifeTime - alertTime);
 
