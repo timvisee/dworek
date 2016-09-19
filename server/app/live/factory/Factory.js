@@ -1196,7 +1196,7 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
 
         // Resolve the latch
         latch.resolve();
-    })
+    });
 
     // Get the factory location
     latch.add();
@@ -1217,7 +1217,7 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
     });
 
     // Call back when we're done
-    latch.then(() => callback(null, factoryLocation.getDistanceTo(liveUser.getLocation()) <= factoryRange));
+    latch.then(() => callback(null, factoryLocation.isInRange(liveUser.getLocation(), factoryRange)));
 };
 
 /**
@@ -1384,14 +1384,11 @@ Factory.prototype.getRange = function(callback) {
             return;
         }
 
-        // Get the range
-        const range = gameConfig.factory.range;
-
         // Store the range
-        self._range = range;
+        self._range = gameConfig.factory.range;
 
         // Call back the result
-        callback(null, range);
+        callback(null, self._range);
     });
 };
 
