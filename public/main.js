@@ -3074,10 +3074,19 @@ function updateFactoryMarkers(factories) {
             // Bind a popup
             marker.bindPopup(capitalizeFirst(NameConfig.factory.name) + ': ' + factory.name);
 
-            // Add the marker to the map
-            marker.addTo(map);
+            // Create a range circle
+            marker.rangeCircle = L.circle(pos, factory.range);
+            marker.rangeCircle.setStyle({
+                opacity: 0.4,
+                dashArray: '5,5',
+                color: 'red'
+            });
 
-            // Set the user section
+            // Add the marker and range circle to the map
+            marker.addTo(map);
+            marker.rangeCircle.addTo(map);
+
+            // Put the factory instance in the marker
             marker.factory = {
                 factory: factory.factory
             };
@@ -3085,9 +3094,12 @@ function updateFactoryMarkers(factories) {
             // Add the marker to the markers list
             factoryMarkers.push(marker);
 
-        } else
-            // Update the position
+        } else {
+            // Update the position and range
             marker.setLatLng(pos);
+            marker.rangeCircle.setLatLng(pos);
+            marker.rangeCircle.setRadius(factory.range);
+        }
     });
 
     // Create an array of marker indices to remove
@@ -3116,8 +3128,12 @@ function updateFactoryMarkers(factories) {
 
     // Remove the markers at the given indices
     for(var i = toRemove.length - 1; i >= 0; i--) {
-        // Remove the marker
-        map.removeLayer(factoryMarkers[toRemove[i]]);
+        // Get the marker to remove
+        const removeMarker = factoryMarkers[toRemove[i]];
+
+        // Remove the range circle and then the marker itself
+        map.removeLayer(removeMarker.rangeCircle);
+        map.removeLayer(removeMarker);
 
         // Remove the entry from the array
         factoryMarkers.splice(toRemove[i], 1);
