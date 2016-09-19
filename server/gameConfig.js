@@ -86,13 +86,13 @@ var gameConfig = {
          * Operation range in meters.
          * @type {Number}
          */
-        range: 30,
+        range: 15,
 
         /**
          * Shop worker invocation interval.
          * @type {Number}
          */
-        workerInterval: 10 * 1000,
+        workerInterval: 5 * 1000,
 
         /**
          * Get the number of preferred shops in a team, based on the team size.
@@ -171,7 +171,7 @@ var gameConfig = {
          * Operation range in meters.
          * @param {Number}
          */
-        range: 30,
+        range: 15,
 
         /**
          * Initial factory level, when the factory is created.
