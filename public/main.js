@@ -1661,17 +1661,6 @@ function vibrate(pattern) {
     window.navigator.vibrate(pattern);
 }
 
-/**
- * Called to show a toast to the user to tell a feature is not yet available.
- */
-function featureNotAvailable() {
-    showNotification('Feature not available yet', {
-        toast: true,
-        native: false,
-        vibrate: true
-    });
-}
-
 // TODO: Complete this feature
 function showNativeNotification() {
     // Let's check if the browser supports notifications
