@@ -2843,7 +2843,6 @@ function setGpsState(state) {
 
 var map = null;
 var playerMarker = null;
-var playerRange = null;
 var playersMarkers = [];
 var factoryMarkers = [];
 
@@ -2911,28 +2910,21 @@ function updatePlayerPosition(position) {
             // Bind a popup
             playerMarker.bindPopup('Hey! This is you!');
 
-            // Add the marker to the map
+            // Create a player range circle
+            playerMarker.rangeCircle = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
+
+            // Add the marker and circle to the map
             playerMarker.addTo(map);
+            playerMarker.rangeCircle.addTo(map);
 
             // Fit the map
             fitMap();
 
-        } else
-            // Update the position
-            playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
-
-        // Create a player range circle if we don't have one yet
-        if(playerRange == null) {
-            // Create the player range circle
-            playerRange = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
-
-            // Add the circle to the map
-            playerRange.addTo(map);
-
         } else {
-            // Update the circle
-            playerRange.setLatLng([position.coords.latitude, position.coords.longitude]);
-            playerRange.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
+            // Update the position and range
+            playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+            playerMarker.rangeCircle.setLatLng([position.coords.latitude, position.coords.longitude]);
+            playerMarker.rangeCircle.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
         }
     }
 }
@@ -3094,7 +3086,7 @@ function updateFactoryMarkers(factories) {
             factoryMarkers.push(marker);
 
         } else
-        // Update the position
+            // Update the position
             marker.setLatLng(pos);
     });
 
