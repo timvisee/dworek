@@ -3072,7 +3072,9 @@ function updateFactoryMarkers(factories) {
             });
 
             // Bind a popup
-            marker.bindPopup(capitalizeFirst(NameConfig.factory.name) + ': ' + factory.name);
+            marker.bindPopup('<b>' + capitalizeFirst(NameConfig.factory.name) + '</b><br>' +
+                factory.name + '<br><br>' +
+                '<a href="/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory + '" title="View ' + NameConfig.factory.name + '">View ' + NameConfig.factory.name + '</a>');
 
             // Create a range circle
             marker.rangeCircle = L.circle(pos, factory.range);
