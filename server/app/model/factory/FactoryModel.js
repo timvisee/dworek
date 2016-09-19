@@ -96,6 +96,44 @@ var FactoryModel = function(id) {
                     to: (game) => game.getIdHex()
                 }
             },
+            team: {
+                mongo: {
+                    field: 'team_id',
+
+                    /**
+                     * Convert an ID to a game team model.
+                     *
+                     * @param {ObjectId} id
+                     * @return {GameTeamModel} Team.
+                     */
+                    from: (id) => Core.model.gameTeamModelManager._instanceManager.create(id),
+
+                    /**
+                     * Convert an game team model to an ID.
+                     *
+                     * @param {GameTeamModel} gameTeam Game team.
+                     * @return {ObjectId} ID.
+                     */
+                    to: (gameTeam) => gameTeam.getId()
+                },
+                redis: {
+                    /**
+                     * Convert a hexadecimal ID to a game team model.
+                     *
+                     * @param {String} id
+                     * @return {GameTeamModel} Game team.
+                     */
+                    from: (id) => Core.model.gameTeamModelManager._instanceManager.create(id),
+
+                    /**
+                     * Convert an game team model to a hexadecimal ID.
+                     *
+                     * @param {GameTeamModel} gameTeam Game team.
+                     * @return {String} Hexadecimal ID.
+                     */
+                    to: (gameTeam) => gameTeam.getIdHex()
+                }
+            },
             user: {
                 mongo: {
                     field: 'user_id',
@@ -364,7 +402,7 @@ FactoryModel.prototype.setCreateDate = function(date, callback) {
 /**
  * Get the game for the factory.
  *
- * @param {FactoryModel~getGameCallback} callback Called with user or when an error occurred.
+ * @param {FactoryModel~getGameCallback} callback Called with game or when an error occurred.
  */
 FactoryModel.prototype.getGame = function(callback) {
     this.getField('game', callback);
@@ -386,6 +424,33 @@ FactoryModel.prototype.getGame = function(callback) {
  */
 FactoryModel.prototype.setGame = function(game, callback) {
     this.setField('game', game, callback);
+};
+
+/**
+ * Get the game team for the factory.
+ *
+ * @param {FactoryModel~getTeamCallback} callback Called with game team or when an error occurred.
+ */
+FactoryModel.prototype.getTeam = function(callback) {
+    this.getField('team', callback);
+};
+
+/**
+ * Called with the game team or when an error occurred.
+ *
+ * @callback FactoryModel~getTeamCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameTeamModel} Game team of the factory.
+ */
+
+/**
+ * Set the game team of the factory.
+ *
+ * @param {GameTeamModel} gameTeam Game team.
+ * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+FactoryModel.prototype.setGame = function(gameTeam, callback) {
+    this.setField('team', gameTeam, callback);
 };
 
 /**
@@ -614,67 +679,6 @@ FactoryModel.prototype.getLiveFactory = function(callback) {
                 callback(null, liveFactory);
             });
         })
-    });
-};
-
-/**
- * Get the team of the factory.
- *
- * @param callback
- */
-FactoryModel.prototype.getTeam = function(callback) {
-    // Create a callback latch
-    var latch = new CallbackLatch();
-
-    // Create a variable for the game and user
-    var game;
-    var user;
-
-    // Get the creator of the factory
-    latch.add();
-    this.getUser(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Set the user
-        user = result;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Get the game of the factory
-    latch.add();
-    this.getGame(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Set the game
-        game = result;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
-    // Continue
-    latch.then(function() {
-        // Get the game user
-        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
-            // Call back
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            // Get the game team
-            gameUser.getTeam(callback);
-        });
     });
 };
 

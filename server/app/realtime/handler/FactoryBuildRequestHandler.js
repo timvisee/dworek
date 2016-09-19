@@ -213,17 +213,17 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // Add the factory
-                                FactoryDatabase.addFactory(factoryName, game, user, factoryLocation, function(err, factoryModel) {
+                                FactoryDatabase.addFactory(factoryName, game, liveUser.getTeamModel(), user, factoryLocation, function (err, factoryModel) {
                                     // Call back errors
-                                    if(err !== null || liveUser == null) {
+                                    if (err !== null || liveUser == null) {
                                         callbackError();
                                         return;
                                     }
 
                                     // Load the factory in the live game
-                                    liveGame.factoryManager.getFactory(factoryModel, function(err, liveFactory) {
+                                    liveGame.factoryManager.getFactory(factoryModel, function (err, liveFactory) {
                                         // Call back errors
-                                        if(err !== null || liveUser == null) {
+                                        if (err !== null || liveUser == null) {
                                             callbackError();
                                             return;
                                         }
@@ -235,9 +235,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                         }, socket);
 
                                         // Send new game data to everyone
-                                        Core.gameController.sendGameDataToAll(game, function(err) {
+                                        Core.gameController.sendGameDataToAll(game, function (err) {
                                             // Handle errors
-                                            if(err !== null) {
+                                            if (err !== null) {
                                                 console.error('Failed to send game data updates, ignoring');
                                                 console.error(err);
                                             }

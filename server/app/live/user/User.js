@@ -61,7 +61,7 @@ var User = function(user, game) {
     /**
      * Team model of this user, if the user is in any team.
      *
-     * @type {TeamModel|null} Team model if the user is in a team, or null if the user isn't in a team.
+     * @type {GameTeamModel|null} Team model if the user is in a team, or null if the user isn't in a team.
      * @private
      */
     this._teamModel = null;
@@ -151,7 +151,7 @@ User.prototype.getUserModel = function() {
 /**
  * Get the team model for this user if the user is in any team.
  *
- * @return {TeamModel|null} Team model or null.
+ * @return {GameTeamModel|null} Team model or null.
  */
 User.prototype.getTeamModel = function() {
     return this._teamModel;

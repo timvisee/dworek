@@ -1157,14 +1157,23 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
         return;
     }
 
+    // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Store this instance
     const self = this;
+
+    // Call back only once
     var calledBack = false;
 
     // Get the users location
     if(this._range == null) {
+        // Add a latch
         latch.add();
+
+        // Get the game config
         this.getGame().getConfig(function(err, gameConfig) {
+            // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
@@ -1172,12 +1181,15 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
                 return;
             }
 
+            // Set the factory range
             self._range = gameConfig.factory.range;
 
+            // Resolve the latch
             latch.resolve();
         });
     }
 
+    // Store the factory location
     var factoryLocation;
 
     // Get the factory location

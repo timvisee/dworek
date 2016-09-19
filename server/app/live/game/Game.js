@@ -256,7 +256,7 @@ Game.prototype.getConfig = function(callback) {
 /**
  * Calculate the cost to build a new factory.
  *
- * @param {TeamModel} team Team model the user is in.
+ * @param {GameTeamModel} team Team model the user is in.
  * @param {Game~calculateFactoryCostCallback} callback
  */
 Game.prototype.calculateFactoryCost = function(team, callback) {

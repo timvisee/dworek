@@ -47,7 +47,7 @@ FactoryDatabase.DB_COLLECTION_NAME = 'factory';
  * @param {Coordinate} location Factory location.
  * @param {FactoryDatabase~addFactoryCallback} callback Called on success or on failure.
  */
-FactoryDatabase.addFactory = function(name, game, user, location, callback) {
+FactoryDatabase.addFactory = function (name, game, team, user, location, callback) {
     // Get the database instance
     var db = MongoUtil.getConnection();
 
@@ -59,8 +59,8 @@ FactoryDatabase.addFactory = function(name, game, user, location, callback) {
     }
 
     // Make sure the game and user are valid
-    if(game == null || user == null) {
-        callback(new Error('Unable to create factory, invalid game or user instance.'));
+    if(game == null || team == null || user == null) {
+        callback(new Error('Unable to create factory, invalid game, team or user instance.'));
         return;
     }
 
@@ -96,6 +96,7 @@ FactoryDatabase.addFactory = function(name, game, user, location, callback) {
             name,
             create_date: new Date(),
             user_id: user.getId(),
+            team_id: team.getId(),
             game_id: game.getId(),
             location,
             level: gameConfig.factory.initialLevel,
