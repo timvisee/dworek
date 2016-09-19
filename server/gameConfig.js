@@ -33,7 +33,7 @@ var gameConfig = {
          * Tick interval in milliseconds.
          * @type {Number}
          */
-        tickInterval: 5 * 1000
+        tickInterval: 10
     },
 
     /**
@@ -86,7 +86,7 @@ var gameConfig = {
          * Operation range in meters.
          * @type {Number}
          */
-        range: 15,
+        range: 30,
 
         /**
          * Shop worker invocation interval.
@@ -171,7 +171,7 @@ var gameConfig = {
          * Operation range in meters.
          * @param {Number}
          */
-        range: 8,
+        range: 30,
 
         /**
          * Initial factory level, when the factory is created.
