@@ -199,6 +199,9 @@ User.prototype.load = function(callback) {
     const userModel = this.getUserModel();
     const gameModel = this.getGame().getGameModel();
 
+    // Store this instance
+    const self = this;
+
     // Get the user state
     Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
         // Call back errors
@@ -216,7 +219,7 @@ User.prototype.load = function(callback) {
             }
 
             // Get the team
-            this._teamModel = result;
+            self._teamModel = result;
 
             // Call back
             callback(null);
