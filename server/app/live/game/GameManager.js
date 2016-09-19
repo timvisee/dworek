@@ -848,8 +848,17 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                 // Loop through the factories
                 factories.forEach(function(factory) {
-                    // Get the factory name
+                    // Create a factory latch
                     latch.add();
+                    var factoryLatch = new CallbackLatch();
+
+                    // Create a factory object
+                    var factoryObject = {
+                        id: factory.getIdHex()
+                    };
+
+                    // Get the factory name
+                    factoryLatch.add();
                     factory.getName(function(err, name) {
                         // Call back errors
                         if(err !== null) {
@@ -859,11 +868,35 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                             return;
                         }
 
-                        // Set the name in the factory object
-                        gameData.factories.push({
-                            id: factory.getIdHex(),
-                            name: name
-                        });
+                        // Set the factory name
+                        factoryObject.name = name;
+
+                        // Resolve the factory latch
+                        factoryLatch.resolve();
+                    });
+
+                    // Get the factory range
+                    factoryLatch.add();
+                    factory.getRange(function(err, range) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Set the factory range
+                        factoryObject.range = range;
+
+                        // Resolve the factory latch
+                        factoryLatch.resolve();
+                    });
+
+                    // Add the factory data when we're done and resolve the regular latch
+                    factoryLatch.then(function() {
+                        // Add the factory object
+                        gameData.factories.push(factoryObject);
 
                         // Resolve the latch
                         latch.resolve();
