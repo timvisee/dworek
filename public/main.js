@@ -268,48 +268,41 @@ var Dworek = {
             // Start the GEO location watcher if it needs to be started
             if(sendLocationUpdates && Dworek.state.geoWatcher == null) {
                 // Show a status message
-                console.log('Starting GPS wachter...');
+                console.log('Starting GPS watcher...');
 
                 // Start the position watcher
                 Dworek.state.geoWatcher = navigator.geolocation.watchPosition(function(position) {
-                    // Set the GPS status
-                    setGpsState(GeoStates.WORKING);
-
-                    // Make sure a game is active
-                    if(Dworek.state.activeGame === null)
-                        return;
-
-                    // Send a location update to the server
-                    Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
-                        game: Dworek.state.activeGame,
-                        location: {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            altitude: position.coords.altitude,
-                            accuracy: position.coords.accuracy,
-                            altitudeAccuracy: position.coords.altitudeAccuracy,
-                        }
-                    });
-
-                    // Update the player position
-                    updatePlayerPosition(position);
+                    // Process the success callback
+                    processLocationSuccess(position);
 
                 }, function(error) {
-                    // Handle error codes
-                    if(error.code == error.PERMISSION_DENIED)
-                        setGpsState(GeoStates.NO_PERMISSION);
-                    if(error.code == error.POSITION_UNAVAILABLE)
-                        setGpsState(GeoStates.UNKNOWN_POSITION);
-                    if(error.code == error.TIMEOUT)
-                        setGpsState(GeoStates.TIMEOUT);
-                    if(error.code == error.UNKNOWN_ERROR)
-                        setGpsState(GeoStates.NOT_WORKING);
+                    // Process the error callback
+                    processLocationError(error, false);
 
                 }, {
                     enableHighAccuracy: true,
                     timeout: 2 * 60 * 1000,
-                    maximumAge: 3 * 1000
+                    maximumAge: 5 * 1000
                 });
+
+                const customWatcherTest = function() {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        // Process the success callback
+                        processLocationSuccess(position);
+
+                    }, function(error) {
+                        // Process the error callback
+                        processLocationError(error, false);
+
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 2 * 60 * 1000,
+                        maximumAge: 5 * 1000
+                    })
+                };
+
+                // Start the custom watcher
+                Dworek.state.customWatcher = setInterval(customWatcherTest, 3000);
 
             } else if(!sendLocationUpdates && Dworek.state.geoWatcher != null) {
                 // Show a status message
@@ -318,6 +311,10 @@ var Dworek = {
                 // Clear the watch
                 navigator.geolocation.clearWatch(Dworek.state.geoWatcher);
                 Dworek.state.geoWatcher = null;
+
+                // Stop the custom watcher if here is any
+                if(Dworek.state.customWatcher !== undefined)
+                    clearInterval(Dworek.state.customWatcher);
             }
 
             // Update the status labels
@@ -2656,16 +2653,93 @@ function testGps() {
 
     // Get the current GPS location
     navigator.geolocation.getCurrentPosition(function(position) {
-        // Set the GPS state
-        setGpsState(GeoStates.WORKING);
+        // Process the location success callback, don't show an notification
+        processLocationSuccess(position, false);
 
-        // Show a notification
-        showNotification('Your GPS is working as expected');
-
-        // Update the player location
-        updatePlayerPosition(position);
+        // Show a notification regarding the GPS
+        showNotification('Your GPS is working');
 
     }, function(error) {
+        // Process the location error callback
+        processLocationError(error, true);
+
+    }, {
+        enableHighAccuracy: true
+    });
+}
+
+/**
+ * Process a location success callback.
+ *
+ * @param {*} position Position object.
+ * @param {boolean} [notification=true] True to show a notification if the GPS state has changed,
+ * false to show no notification.
+ * @return {boolean} True if a notification is shown, false if not.
+ */
+function processLocationSuccess(position, notification) {
+    // Process the showNotification parameter
+    if(notification == undefined)
+        notification = true;
+
+    // Set the GPS status
+    const gpsStateChanged = setGpsState(GeoStates.WORKING);
+
+    // Show a GPS success notification if it started working again
+    if(gpsStateChanged)
+        showNotification('Your location is available', {
+            vibrate: true
+        });
+
+    if(Dworek.state.activeGame !== null && Dworek.state.activeGameStage == 1 && Dworek.state.activeGameRoles.spectator) {
+        // Send a location update to the server if we've an active game
+        Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
+            game: Dworek.state.activeGame,
+            location: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                altitude: position.coords.altitude,
+                accuracy: position.coords.accuracy,
+                altitudeAccuracy: position.coords.altitudeAccuracy,
+            }
+        });
+    }
+
+    // Update the player position
+    updatePlayerPosition(position);
+
+    // Return true if the GPS state changed
+    return gpsStateChanged;
+}
+
+/**
+ * Process a location error callback.
+ *
+ * @param {*} error Error object.
+ * @param {boolean} showErrorDialog True to show an error dialog regarding the error, false to show a simple notification.
+ * @return {boolean} True if a notification is shown, false if not.
+ */
+function processLocationError(error, showErrorDialog) {
+    // Determine whether the GPS state changed, and create a GPS state variable
+    var gpsState = GeoStates.UNKNOWN;
+
+    // Set GPS states depending on the error
+    if(error.code == error.PERMISSION_DENIED)
+        gpsState = GeoStates.NO_PERMISSION;
+    else if(error.code == error.POSITION_UNAVAILABLE)
+        gpsState = GeoStates.UNKNOWN_POSITION;
+    else if(error.code == error.TIMEOUT)
+        gpsState = GeoStates.TIMEOUT;
+    else if(error.code == error.UNKNOWN_ERROR)
+        gpsState = GeoStates.NOT_WORKING;
+
+    // Set the GPS state
+    const gpsStateChanged = setGpsState(gpsState);
+
+    // Create a variable that contains the return value
+    var returnValue = false;
+
+    // Show an error if the showDialogError parameter is set to true
+    if(showErrorDialog) {
         // Define the message to show to the user
         var dialogMessage = 'We were unable to determine your location.<br><br>' +
             'Please make sure the location functionality and GPS is enabled on your device.<br><br>' +
@@ -2674,79 +2748,97 @@ function testGps() {
 
 
         // Handle the permission denied error
-        if(error.code == error.PERMISSION_DENIED) {
-            // Set the GPS state
-            setGpsState(GeoStates.NO_PERMISSION);
-
-            // Set the dialog message
+        if(error.code == error.PERMISSION_DENIED)
             dialogMessage = NameConfig.app.name + ' doesn\'t have permission to use your device\'s location.<br><br>' +
-            'Please allow this application to use your location and test your GPS again.';
-        }
+                'Please allow this application to use your location and test your GPS again.';
 
         // Handle the position unavailable error
-        if(error.code == error.POSITION_UNAVAILABLE) {
-            // Set the GPS state
-            setGpsState(GeoStates.UNKNOWN_POSITION);
-
-            // Set the dialog message
+        else if(error.code == error.POSITION_UNAVAILABLE)
             dialogMessage = 'The location of your device is currently unknown.<br><br>' +
                 'It might take a while for your device to determine your location.' +
                 'Please test your GPS again until your location is found.<br><br>' +
                 'Note: Your device\'s location service and GPS must be enabled.';
-        }
 
         // Handle the timeout error
-        if(error.code == error.TIMEOUT) {
-            // Set the GPS state
-            setGpsState(GeoStates.TIMEOUT);
-
-            // Set the dialog message
+        else if(error.code == error.TIMEOUT)
             dialogMessage = 'The location of your device couldn\'t be found in time.<br><br>' +
                 'You device might temporarily be having trouble determining your location using satellite,' +
                 'this problem usually resolves itself after a while.<br><br>' +
                 'Please keep testing your GPS until your location is found.<br><br>' +
                 'Note: Your device\'s location service and GPS must be enabled.';
-        }
 
-        // Handle other unspecified errors
-        if(error.code == error.UNKNOWN_ERROR)
-            setGpsState(GeoStates.NOT_WORKING);
-
-        // Show a dialog, the GPS test failed
+        // Show a dialog
         showDialog({
-            title: 'GPS test failed',
+            title: 'GPS error',
             message: dialogMessage,
             actions: [
                 {
-                    text: 'Test again',
+                    text: 'Test GPS again',
                     state: 'primary',
                     action: testGps
                 },
                 {
-                    text: 'Close'
+                    text: 'Ignore'
                 }
             ]
         });
-    }, {
-        enableHighAccuracy: true
-    });
+
+        // Set the return value
+        returnValue = true;
+
+    } else if(gpsStateChanged) {
+        // Define the notification message
+        var notificationMessage = 'Your location is unknown';
+
+        // Handle the permission denied error
+        if(error.code == error.PERMISSION_DENIED)
+            notificationMessage = 'No permission for your location';
+
+        // Handle the position unavailable error
+        else if(error.code == error.POSITION_UNAVAILABLE)
+            notificationMessage = 'Your location is unknown';
+
+        // Handle the timeout error
+        else if(error.code == error.TIMEOUT)
+            notificationMessage = 'Failed to determine your location in time';
+
+        // Show a notification
+        showNotification('Error: ' + notificationMessage, {
+            action: {
+                text: 'Test GPS',
+                action: testGps
+            },
+            vibrate: true,
+            ttl: 8000
+        });
+
+        // Set the return value
+        returnValue = true;
+    }
+
+    // Return the return value
+    return returnValue;
 }
 
 /**
  * Set the GPS state.
  *
  * @param state GPS state.
+ * @return {boolean} True if the GPS state has changed, false if not.
  */
 function setGpsState(state) {
     // Make sure the state changes
     if(Dworek.state.geoState == state)
-        return;
+        return false;
 
     // Set the state
     Dworek.state.geoState = state;
 
     // Update the status labels
     updateStatusLabels();
+
+    // Return true since we've changed the status
+    return true;
 }
 
 var map = null;
@@ -3397,7 +3489,6 @@ function updateGameDataVisuals() {
 
         // Loop through the list of shops
         cardCount += data.shops.length;
-        console.log(data);
         data.shops.forEach(function(shop) {
             // Add the shop ID to the array
             shopTokens.push(shop.token);
