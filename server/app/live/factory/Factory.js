@@ -820,44 +820,17 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
         else
             self._userVisibleMem.splice(self._userVisibleMem.indexOf(liveUser), 1);
 
-        // Create a callback latch
-        var latch = new CallbackLatch();
-
-        // Only call back once
-        var calledBack = false;
-
         // Send the factory data
-        latch.add();
         self.sendData(liveUser.getUserModel(), undefined, function(err) {
             // Call back errors
             if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
+                callback(err);
                 return;
             }
 
-            // Resolve the latch
-            latch.resolve();
+            // Call back
+            callback(null, true);
         });
-
-        // Update the game data for the user
-        latch.add();
-        Core.gameController.sendGameData(self.getGame().getGameModel(), liveUser.getUserModel(), undefined, function(err) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
-                return;
-            }
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Call back when we're done
-        latch.then(() => callback(null, true));
     });
 };
 
