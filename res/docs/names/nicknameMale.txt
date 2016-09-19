@@ -1,9 +1,9 @@
 007
 Action Jackson
 Ammo
+Angel
 Angel Eyes
 Angel Wings
-Angel
 Baby Face
 Bandana
 Beans
@@ -25,8 +25,8 @@ Cheater
 Coins
 Coughing
 Crackers
-Crazy Eyes
 Crazy
+Crazy Eyes
 Danger
 Daydream
 Deaf
@@ -45,13 +45,16 @@ Goliath
 Good Looking
 Greed
 Grinning
+Gus
 H4X0R
+Hector
 Horseface
 Hot Shot
 Iceman
-Iron Man
 Iron
+Iron Man
 Knuckles
+Krazy-8
 Legs
 Little Caesar
 Lucky
@@ -218,5 +221,6 @@ Two Tricks
 Two-Knife
 Venom
 Watchman
+Whalter White
 Wings
 Wonderboy

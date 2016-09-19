@@ -1,8 +1,7 @@
-Princess
 Ammo
+Angel
 Angel Eyes
 Angel Wings
-Angel
 Baby Face
 Bandana
 Beans
@@ -25,8 +24,8 @@ Cheater
 Coins
 Coughing
 Crackers
-Crazy Eyes
 Crazy
+Crazy Eyes
 Danger
 Daydream
 Deaf
@@ -49,9 +48,10 @@ H4X0R
 Horseface
 Hot Shot
 Iceman
-Iron Girl
 Iron
+Iron Girl
 Knuckles
+Krazy-8
 Legs
 Little Caesar
 Lucky
@@ -60,9 +60,10 @@ Machine Gun
 Mad Bomber
 Mad Dog
 Mad Eyed
-Mad Hatter
 Mad Girl
+Mad Hatter
 Meatball
+Medusa
 Merciless
 Moneybags
 Mumbler
@@ -74,7 +75,6 @@ Nine Lives
 No Man
 No Name
 Numbers
-The Queen
 Old Gal
 One Armed
 One Eye
@@ -86,7 +86,9 @@ Pink Panther
 Pitbull
 Poison
 Pretty Girl
+Princess
 Professional
+Queen Bee
 Razor
 Repo Girl
 Revolvers
@@ -99,6 +101,7 @@ Shades
 Shotgun
 Silence
 Silver Dollar
+Skyler White
 Sly
 Smiling
 Smokes
@@ -106,11 +109,10 @@ Squint
 Straight Jacket
 Sweet Cakes
 Tall Gal
-Queen Bee
-The Siren
 The Animal
 The Ant
 The Banker
+The Banshee
 The Barber
 The Bat
 The Bear
@@ -128,6 +130,7 @@ The Bystander
 The Calm
 The Cat
 The Chin
+The Cleaner
 The Clown
 The Cook
 The Dapper
@@ -144,7 +147,6 @@ The Fat
 The Fixer
 The Fox
 The Genius
-Medusa
 The Ghost
 The Golfer
 The Grim Reaper
@@ -175,11 +177,11 @@ The Peacemaker
 The Phantom
 The Plumber
 The Poet
+The Queen
 The Quiet
 The Rabbit
 The Rat
 The Reaper
-The Witch
 The Ring
 The Rock
 The Saint
@@ -187,13 +189,13 @@ The Scourge
 The Serpent
 The Shadow
 The Shark
+The Siren
 The Skinny
 The Smile
 The Snake
 The Snitch
 The Spider
 The Suit
-The Cleaner
 The Thin
 The Tiger
 The Tough
@@ -205,6 +207,7 @@ The Weasel
 The Whisper
 The Wig
 The Wild
+The Witch
 The Writer
 Three Fingers
 Three Toes
@@ -218,6 +221,5 @@ Two Toes
 Two Tricks
 Two-Knife
 Venom
-The Banshee
 Wings
 Wondergirl
