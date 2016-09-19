@@ -72,7 +72,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
         // Only call back once
         if(calledBack)
             return;
@@ -86,6 +86,12 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
         // Set the called back flag
         calledBack = true;
+
+        // Print the error to the console if anything is given
+        if(err != undefined) {
+            console.error('Failed to build factory on client request:');
+            console.error(err);
+        }
     };
 
     // Make sure a session is given
@@ -135,7 +141,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             console.error(err);
 
             // Call back an error
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -143,7 +149,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         game.getStage(function(err, stage) {
             // Call back errors
             if(err !== null || stage != 1) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -151,7 +157,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             Core.gameController.getGame(game, function(err, liveGame) {
                 // Call back errors
                 if(err !== null || liveGame == null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
@@ -159,7 +165,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
                     if(err !== null || liveUser == null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -168,7 +174,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         // Send a message response to the user
                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                             error: true,
-                            message: 'Failed to build factory, we don\'t know your position. Please make sure your GPS is enabled.',
+                            message: 'Failed to build factory, we don\'t know your position yet. Please make sure your location service and GPS is enabled.',
                             dialog: true
                         }, socket);
                         return;
@@ -181,7 +187,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     liveGame.calculateFactoryCost(liveUser.getTeamModel(), function(err, factoryCost) {
                         // Call back errors
                         if(err !== null) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -189,7 +195,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         liveUser.getMoney(function(err, money) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -208,7 +214,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             liveUser.subtractMoney(factoryCost, function(err, callback) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -216,7 +222,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 FactoryDatabase.addFactory(factoryName, game, liveUser.getTeamModel(), user, factoryLocation, function (err, factoryModel) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -224,7 +230,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                     liveGame.factoryManager.getFactory(factoryModel, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
