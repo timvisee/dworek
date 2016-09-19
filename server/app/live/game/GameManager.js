@@ -30,6 +30,8 @@ var Core = require('../../../Core');
 var PacketType = require('../../realtime/PacketType');
 var Game = require('./Game');
 var GameModel = require('../../model/game/GameModel');
+var User = require('../user/User');
+var UserModel = require('../../model/user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
 var gameConfig = require('../../../gameConfig');
 
@@ -49,7 +51,7 @@ var GameManager = function() {
 
     // Set up the location update interval
     setInterval(function() {
-        Core.gameController.broadcastData(function(err) {
+        Core.gameController.broadcastLocationData(undefined, undefined, function(err) {
             // Show errors in the console
             if(err !== null)
                 console.error('An error occurred while broadcasting location data to clients, ignoring (' + err + ')');
@@ -385,11 +387,35 @@ GameManager.prototype.unloadGame = function(gameId) {
 };
 
 /**
- * Broadcast the status of all loaded games to all real-time connected clients.
+ * Broadcast the location status of all loaded games to all real-time connected clients.
  *
+ * @param {GameModel|Game|ObjectId|string|undefined} [gameConstraint=undefined] Game instance or ID if the locations should only be
+ * broadcasted to the given game, undefined to broadcast to all games.
+ * @param {UserModel|User|ObjectId|string|undefined} [userConstraint=undefined] User instance or ID if the locations should only be
+ * broadcasted to the given user, undefined to broadcast to all users.
  * @param {GameManager~broadcastDataCallback} [callback] Called on success or when an error occurred.
  */
-GameManager.prototype.broadcastData = function(callback) {
+GameManager.prototype.broadcastLocationData = function(gameConstraint, userConstraint, callback) {
+    // Get the game ID if set
+    if((gameConstraint instanceof GameModel) || (gameConstraint instanceof Game))
+        gameConstraint = gameConstraint.getId();
+    else if(_.isString(gameConstraint) && ObjectId.isValid(gameConstraint))
+        gameConstraint = new ObjectId(gameConstraint);
+    else if(gameConstraint != undefined && !(gameConstraint instanceof ObjectId)) {
+        callback(new Error('Invalid game instance'));
+        return;
+    }
+
+    // Get the user ID if set
+    if((userConstraint instanceof UserModel) || (userConstraint instanceof User))
+        userConstraint = userConstraint.getId();
+    else if(_.isString(userConstraint) && ObjectId.isValid(userConstraint))
+        userConstraint = new ObjectId(userConstraint);
+    else if(userConstraint != undefined && !(userConstraint instanceof ObjectId)) {
+        callback(new Error('Invalid user instance'));
+        return;
+    }
+
     // Make sure we only call back once
     var calledBack = false;
 
@@ -397,9 +423,17 @@ GameManager.prototype.broadcastData = function(callback) {
     var latch = new CallbackLatch();
 
     // Loop through the games
-    this.games.forEach(function(game) {
+    this.games.forEach(function(liveGame) {
+        // Check whether a game constraint is set
+        if(gameConstraint != undefined && !liveGame.getId().equals(gameConstraint))
+            return;
+
         // Loop through the game users
-        game.userManager.users.forEach(function(liveUser) {
+        liveGame.userManager.users.forEach(function(liveUser) {
+            // Check whether a game constraint is set
+            if(userConstraint != undefined && !liveUser.getId().equals(userConstraint))
+                return;
+
             // Add a latch
             latch.add();
 
@@ -415,7 +449,7 @@ GameManager.prototype.broadcastData = function(callback) {
 
             // Get the user state
             gameLatch.add();
-            userModel.getGameState(game.getGameModel(), function(err, userState) {
+            userModel.getGameState(liveGame.getGameModel(), function(err, userState) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -443,7 +477,7 @@ GameManager.prototype.broadcastData = function(callback) {
                 var factories = [];
 
                 // Loop through the list user
-                game.userManager.users.forEach(function(otherUser) {
+                liveGame.userManager.users.forEach(function(otherUser) {
                     // Skip each user if we already called back
                     if(calledBack)
                         return;
@@ -478,7 +512,7 @@ GameManager.prototype.broadcastData = function(callback) {
                             }
 
                             // Determine whether the user is a shop
-                            var isShop = visible && game.shopManager.isShopUser(otherUser);
+                            var isShop = visible && liveGame.shopManager.isShopUser(otherUser);
 
                             // Create a user object and add it to the list
                             users.push({
@@ -495,7 +529,7 @@ GameManager.prototype.broadcastData = function(callback) {
                 });
 
                 // Loop through the list of factories
-                game.factoryManager.factories.forEach(function(liveFactory) {
+                liveGame.factoryManager.factories.forEach(function(liveFactory) {
                     // Skip each user if we already called back
                     if(calledBack)
                         return;
@@ -558,7 +592,7 @@ GameManager.prototype.broadcastData = function(callback) {
                 gameLatch.then(function() {
                     // Create a packet and send it to the correct user
                     Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
-                        game: game.getIdHex(),
+                        game: liveGame.getIdHex(),
                         users,
                         factories
                     }, liveUser);

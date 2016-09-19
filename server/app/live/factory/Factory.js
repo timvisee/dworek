@@ -585,7 +585,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
  *
  * @param callback (err)
  */
-Factory.prototype.broadcastData = function(callback) {
+Factory.prototype.broadcastLocationData = function(callback) {
     // Store the current instance
     const self = this;
 
@@ -1321,7 +1321,7 @@ Factory.prototype.tick = function(callback) {
         latch.then(function() {
             latch.identity();
 
-            self.broadcastData(function(err) {
+            self.broadcastLocationData(undefined, undefined, function(err) {
                 callback(err);
             });
         });
