@@ -2701,7 +2701,7 @@ function testGps() {
             setGpsState(GeoStates.TIMEOUT);
 
             // Set the dialog message
-            dialogMessage = 'The location of your device is outdated.<br><br>' +
+            dialogMessage = 'The location of your device couldn\'t be found in time.<br><br>' +
                 'You device might temporarily be having trouble determining your location using satellite,' +
                 'this problem usually resolves itself after a while.<br><br>' +
                 'Please keep testing your GPS until your location is found.<br><br>' +
