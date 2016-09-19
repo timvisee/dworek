@@ -304,6 +304,24 @@ Shop.prototype.isUserInRange = function(user) {
     return this.isLocactionInRange(user.getLocation());
 };
 
+/**
+ * Get the shop name.
+ *
+ * @param {Shop~getNameCallback} callback Called with the shop name or when an error occurred.
+ */
+Shop.prototype.getName = function(callback) {
+    // Get the name of the shop user and call it back
+    this.getUser().getName(callback);
+};
+
+/**
+ * Called with the shop name or when an error occurred.
+ *
+ * @callback Shop~getNameCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {string=} Name of the shop.
+ */
+
 // Export the class
 module.exports = Shop;
 

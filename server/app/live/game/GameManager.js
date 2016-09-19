@@ -869,9 +869,9 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     if(!liveShop.isUserInRange(liveUser))
                         return;
 
-                    // Get the name of the user
+                    // Get the name of the shop
                     latch.add();
-                    liveUser.getName(function(err, liveUserName) {
+                    liveShop.getName(function(err, liveShopName) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -883,7 +883,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         // Set the name in the factory object
                         gameData.shops.push({
                             token: liveShop.getToken(),
-                            name: liveUserName,
+                            name: liveShopName,
                             inSellPrice: liveShop.getInSellPrice(),
                             outBuyPrice: liveShop.getOutBuyPrice()
                         });
