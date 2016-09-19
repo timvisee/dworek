@@ -328,7 +328,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
     const liveGame = this.getGame();
 
     // Define whether to update the game data
-    var updateGameData = false;
+    var updateUser = false;
 
     // Make sure we only call back once
     var calledBack = false;
@@ -355,7 +355,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
 
             // Check whether we should update the game data
             if(changed)
-                updateGameData = true;
+                updateUser = true;
 
             // Resolve the latch
             latch.resolve();
@@ -364,18 +364,44 @@ User.prototype.updateLocation = function(location, socket, callback) {
 
     // Continue when we're done
     latch.then(function() {
-        // Update the game data
-        if(updateGameData)
+        // Reset the callback latch to it's identity
+        latch.identity();
+
+        // Check whether to update the user
+        if(updateUser) {
+            // Update the game data
+            latch.add();
             Core.gameController.sendGameData(liveGame.getGameModel(), self.getUserModel(), undefined, function(err) {
                 // Call back errors
                 if(err !== null) {
-                    callback(err);
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
                     return;
                 }
 
-                // Call back normally
-                callback(null);
+                // Resolve the latch
+                latch.resolve();
             });
+
+            // Update the user's location data
+            latch.add();
+            Core.gameController.broadcastLocationData(self.getGame(), self, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Call back when we're done
+            latch.then(() => callback(null));
+        }
     });
 };
 
