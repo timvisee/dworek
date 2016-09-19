@@ -93,7 +93,18 @@ Coordinate.deserialize = function(serialized) {
  * @return {Number} Distance in meters.
  */
 Coordinate.prototype.getDistanceTo = function(other) {
-    return geolib.getDistance(this, other);
+    return geolib.getDistance(this, other, 1, 2);
+};
+
+/**
+ * Check whether the coordinate is in the range of the other given coordinate.
+ *
+ * @param {Coordinate} other Other location.
+ * @param {Number} range Range in meters.
+ * @return {boolean} True if the other coordinate is in range, false is not.
+ */
+Coordinate.prototype.isInRange = function(other, range) {
+    return this.getDistanceTo(other) <= range;
 };
 
 // Export the module
