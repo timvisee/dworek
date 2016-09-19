@@ -1399,13 +1399,13 @@ var dialogQueue = [];
  * @param {Object} options Dialog box configuration.
  * @param {String} [options.title] Dialog box title.
  * @param {String} [options.message] Dialog box message.
- * @param {Array} [options.actions] Array of actions.
+ * @param {Array} [options.actions=[]] Array of actions.
  * @param {String} [options.actions.text] Action/button name.
- * @param {String} [options.actions.state=normal] Action/button visual state, can be normal, primary or warning.
+ * @param {String} [options.actions.state='normal'] Action/button visual state, can be normal, primary or warning.
  * @param {String} [options.actions.value=] Value returned through the callback when this action is invoked.
  * @param {String} [options.actions.icon=] Icon classes to show an icon.
  * @param {function} [options.actions.action=] Function to be called when the action is invoked.
- * @param {function} [callback] Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
+ * @param {showDialogCallback} [callback] Called when an action is invoked, or when the popup is closed. First argument will be the action value, or undefined.
  */
 function showDialog(options, callback) {
     // Queue the dialog if a dialog is already being shown
@@ -1550,6 +1550,18 @@ function showDialog(options, callback) {
     // Rebuild native droid
     nativeDroid.build(true);
 }
+
+/**
+ * Called when a dialog action is invoked, or when the dialog is closed.
+ * This call back is only called once per dialog.
+ * If the dialog is closed without implicitly invoking a specified action
+ * (for example, when the user closes it using the dedicated dialog close button)
+ * undefined is returned as value.
+ *
+ * @callback showDialogCallback
+ * @param {*} Value of the invoked action. The value will be undefined if no action was explicitly invoked,
+ * or if the action doesn't have a value assigned.
+ */
 
 /**
  * Determine whether there's any dialog shown on the page.
