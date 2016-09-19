@@ -2685,12 +2685,12 @@ function processLocationSuccess(position, notification) {
     const gpsStateChanged = setGpsState(GeoStates.WORKING);
 
     // Show a GPS success notification if it started working again
-    if(gpsStateChanged)
+    if(notification && gpsStateChanged)
         showNotification('Your location is available', {
             vibrate: true
         });
 
-    if(Dworek.state.activeGame !== null && Dworek.state.activeGameStage == 1 && Dworek.state.activeGameRoles.spectator) {
+    if(Dworek.state.activeGame !== null && Dworek.state.activeGameStage == 1 && Dworek.state.activeGameRoles.player) {
         // Send a location update to the server if we've an active game
         Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
             game: Dworek.state.activeGame,
