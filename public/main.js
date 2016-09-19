@@ -74,6 +74,9 @@ const GeoStates = {
  * @type {Object}
  */
 const NameConfig = {
+    app: {
+        name: 'Dworek'
+    },
     currency: {
         name: 'dollars',
         sign: '$'
@@ -2663,21 +2666,56 @@ function testGps() {
         updatePlayerPosition(position);
 
     }, function(error) {
-        // Handle error codes
-        if(error.code == error.PERMISSION_DENIED)
+        // Define the message to show to the user
+        var dialogMessage = 'We were unable to determine your location.<br><br>' +
+            'Please make sure the location functionality and GPS is enabled on your device.<br><br>' +
+            'It might take a while for your device to determine your location.' +
+            'Please keep testing your GPS until your location is found.';
+
+
+        // Handle the permission denied error
+        if(error.code == error.PERMISSION_DENIED) {
+            // Set the GPS state
             setGpsState(GeoStates.NO_PERMISSION);
-        if(error.code == error.POSITION_UNAVAILABLE)
+
+            // Set the dialog message
+            dialogMessage = NameConfig.app.name + ' doesn\'t have permission to use your device\'s location.<br><br>' +
+            'Please allow this application to use your location and test your GPS again.';
+        }
+
+        // Handle the position unavailable error
+        if(error.code == error.POSITION_UNAVAILABLE) {
+            // Set the GPS state
             setGpsState(GeoStates.UNKNOWN_POSITION);
-        if(error.code == error.TIMEOUT)
+
+            // Set the dialog message
+            dialogMessage = 'The location of your device is currently unknown.<br><br>' +
+                'It might take a while for your device to determine your location.' +
+                'Please test your GPS again until your location is found.<br><br>' +
+                'Note: Your device\'s location service and GPS must be enabled.';
+        }
+
+        // Handle the timeout error
+        if(error.code == error.TIMEOUT) {
+            // Set the GPS state
             setGpsState(GeoStates.TIMEOUT);
+
+            // Set the dialog message
+            dialogMessage = 'The location of your device is outdated.<br><br>' +
+                'You device might temporarily be having trouble determining your location using satellite,' +
+                'this problem usually resolves itself after a while.<br><br>' +
+                'Please keep testing your GPS until your location is found.<br><br>' +
+                'Note: Your device\'s location service and GPS must be enabled.';
+        }
+
+        // Handle other unspecified errors
         if(error.code == error.UNKNOWN_ERROR)
             setGpsState(GeoStates.NOT_WORKING);
 
         // Show a dialog, the GPS test failed
         showDialog({
             title: 'GPS test failed',
-            message: 'We were unable to determine your location using GPS.<br><br>' +
-            'Please make sure this application has permission to request your location, and that location services on your device are enabled.',
+            message: dialogMessage,
             actions: [
                 {
                     text: 'Test again',
