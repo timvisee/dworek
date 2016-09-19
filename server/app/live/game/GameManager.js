@@ -208,7 +208,6 @@ GameManager.prototype.load = function(callback) {
 
     }, gameConfig.game.tickInterval);
 
-
     // Load all active games
     Core.model.gameModelManager.getGamesWithStage(1, function(err, games) {
         // Call back errors

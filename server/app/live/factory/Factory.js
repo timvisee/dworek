@@ -1220,16 +1220,31 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
     latch.then(() => callback(null, factoryLocation.getDistanceTo(liveUser.getLocation()) <= factoryRange));
 };
 
+/**
+ * Invoke a tick for this factory.
+ *
+ * @param {Factory~tickCallback} callback Called on success or when an error occurred.
+ */
 Factory.prototype.tick = function(callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Only call back once
     var calledBack = false;
+
+    // Store this instance
     const self = this;
 
-    var productionIn, productionOut, valueIn, valueOut;
+    // Create a variable for the production and value in/out
+    var productionIn,
+        productionOut,
+        valueIn,
+        valueOut;
 
+    // Get the production in
     latch.add();
     this.getProductionIn(function(err, result) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1237,13 +1252,17 @@ Factory.prototype.tick = function(callback) {
             return;
         }
 
+        // Set the production in
         productionIn = result;
 
+        // Resolve the latch
         latch.resolve();
     });
 
+    // Get the production out
     latch.add();
     this.getProductionOut(function(err, result) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1251,13 +1270,17 @@ Factory.prototype.tick = function(callback) {
             return;
         }
 
+        // Set the production out
         productionOut = result;
 
+        // Resolve the latch
         latch.resolve();
     });
 
+    // Get the value in
     latch.add();
     this.getFactoryModel().getIn(function(err, result) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1265,13 +1288,17 @@ Factory.prototype.tick = function(callback) {
             return;
         }
 
+        // Set the value in
         valueIn = result;
 
+        // Resolve the latch
         latch.resolve();
     });
 
+    // Get the value out
     latch.add();
     this.getFactoryModel().getOut(function(err, result) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1279,8 +1306,10 @@ Factory.prototype.tick = function(callback) {
             return;
         }
 
+        // Set the value out
         valueOut = result;
 
+        // Resolve the latch
         latch.resolve();
     });
 
@@ -1292,6 +1321,7 @@ Factory.prototype.tick = function(callback) {
             return;
         }
 
+        // Reset the latch to it's identity
         latch.identity();
 
         // Update the in and out values
@@ -1303,6 +1333,7 @@ Factory.prototype.tick = function(callback) {
                 return;
             }
 
+            // Resolve the latch
             latch.resolve();
         });
 
@@ -1314,19 +1345,21 @@ Factory.prototype.tick = function(callback) {
                 return;
             }
 
+            // Resolve the latch
             latch.resolve();
         });
 
-        // Call back
-        latch.then(function() {
-            latch.identity();
-
-            self.broadcastLocationData(undefined, undefined, function(err) {
-                callback(err);
-            });
-        });
+        // Broadcast the location data when we're done, an call back
+        latch.then(self.broadcastLocationData(undefined, undefined, callback));
     });
 };
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback Factory~tickCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
 
 /**
  * Get the range of the factory.
