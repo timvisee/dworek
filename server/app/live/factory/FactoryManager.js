@@ -76,6 +76,34 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
         return;
     }
 
+    // Load the factory if it's valid for this game
+    this.loadFactory(factoryId, function(err, liveFactory) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back the live factory
+        callback(null, liveFactory);
+    });
+};
+
+/**
+ * Called back with the factory or when an error occurred.
+ *
+ * @callback FactoryController~getFactoryCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Factory|null=} Factory instance, null if the factory isn't active or if the factory is invalid.
+ */
+
+/**
+ * Load the factory with the given ID if this factory is valid for the current game.
+ *
+ * @param {ObjectId|string} factoryId ID of the factory to load.
+ * @param {FactoryManager~loadFactoryCallback} callback Called back with the loaded factory or when an error occurred.
+ */
+FactoryManager.prototype.loadFactory = function(factoryId, callback) {
     // Store this instance
     const self = this;
 
@@ -123,11 +151,11 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
 };
 
 /**
- * Called back with the factory or when an error occurred.
+ * Called back with the factory instance or when an error occurred.
  *
- * @callback FactoryController~getFactoryCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Factory|null=} Factory instance, null if the factory isn't active or if the factory is invalid.
+ * @callback FactoryManager~loadFactoryCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Factory|null=} The factory instance or null if the factory was invalid for this game.
  */
 
 /**

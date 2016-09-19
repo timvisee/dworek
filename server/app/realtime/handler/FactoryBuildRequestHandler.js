@@ -180,7 +180,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     // Calculate the factory cost
                     liveGame.calculateFactoryCost(liveUser.getTeamModel(), function(err, factoryCost) {
                         // Call back errors
-                        if(err !== null || liveUser == null) {
+                        if(err !== null) {
                             callbackError();
                             return;
                         }
@@ -188,7 +188,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                         // Make sure the user has enough money
                         liveUser.getMoney(function(err, money) {
                             // Call back errors
-                            if(err !== null || liveUser == null) {
+                            if(err !== null) {
                                 callbackError();
                                 return;
                             }
@@ -207,7 +207,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             // Subtract the money
                             liveUser.subtractMoney(factoryCost, function(err, callback) {
                                 // Call back errors
-                                if(err !== null || liveUser == null) {
+                                if(err !== null) {
                                     callbackError();
                                     return;
                                 }
@@ -215,15 +215,15 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 // Add the factory
                                 FactoryDatabase.addFactory(factoryName, game, liveUser.getTeamModel(), user, factoryLocation, function (err, factoryModel) {
                                     // Call back errors
-                                    if (err !== null || liveUser == null) {
+                                    if (err !== null) {
                                         callbackError();
                                         return;
                                     }
 
                                     // Load the factory in the live game
-                                    liveGame.factoryManager.getFactory(factoryModel, function (err, liveFactory) {
+                                    liveGame.factoryManager.getFactory(factoryModel, function(err) {
                                         // Call back errors
-                                        if (err !== null || liveUser == null) {
+                                        if(err !== null) {
                                             callbackError();
                                             return;
                                         }
