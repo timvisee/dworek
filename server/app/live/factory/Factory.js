@@ -69,6 +69,12 @@ var Factory = function(factory, game) {
      */
     this._userVisibleMem = [];
 
+    /**
+     * Range of the factory in meters.
+     * The value might be null if the range is unspecified.
+     * @type {Number|null}
+     * @private
+     */
     this._range = null;
 
     // Get and set the factory ID
@@ -1166,35 +1172,14 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
     // Call back only once
     var calledBack = false;
 
-    // Get the users location
-    if(this._range == null) {
-        // Add a latch
-        latch.add();
-
-        // Get the game config
-        this.getGame().getConfig(function(err, gameConfig) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
-                return;
-            }
-
-            // Set the factory range
-            self._range = gameConfig.factory.range;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-    }
-
-    // Store the factory location
+    // Store the factory range and location
+    var factoryRange;
     var factoryLocation;
 
-    // Get the factory location
+    // Get the range of the factory
     latch.add();
-    this.getFactoryModel().getLocation(function(err, location) {
+    this.getRange(function(err, range) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1202,14 +1187,33 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
             return;
         }
 
+        // Store the range
+        factoryRange = range;
+
+        // Resolve the latch
+        latch.resolve();
+    })
+
+    // Get the factory location
+    latch.add();
+    this.getFactoryModel().getLocation(function(err, location) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Store the factory location
         factoryLocation = location;
 
+        // Resolve the latch
         latch.resolve();
     });
 
-    latch.then(function() {
-        callback(null, geolib.getDistance(factoryLocation, liveUser.getLocation()) <= self._range);
-    });
+    // Call back when we're done
+    latch.then(() => callback(null, factoryLocation.getDistanceTo(liveUser.getLocation()) <= factoryRange));
 };
 
 Factory.prototype.tick = function(callback) {
@@ -1319,6 +1323,48 @@ Factory.prototype.tick = function(callback) {
         });
     });
 };
+
+/**
+ * Get the range of the factory.
+ *
+ * @param {Factory~getRangeCallback} callback Called back with the range or when an error occurred.
+ */
+Factory.prototype.getRange = function(callback) {
+    // Check whether we've cached the location
+    if(this._range != null) {
+        callback(null, this._range);
+        return;
+    }
+
+    // Store this instance
+    const self = this;
+
+    // Get the game config
+    this.getGame().getConfig(function(err, gameConfig) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Get the range
+        const range = gameConfig.factory.range;
+
+        // Store the range
+        self._range = range;
+
+        // Call back the result
+        callback(null, range);
+    });
+};
+
+/**
+ * Called back with the range or when an error occurred.
+ *
+ * @callback Factory~getRangeCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Number=} Factory range in meters.
+ */
 
 // Export the class
 module.exports = Factory;
