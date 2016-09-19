@@ -286,7 +286,7 @@ module.exports = {
                                 }
 
                                 // Get the team
-                                gameUser.getTeam(function(err, team) {
+                                factoryModel.getTeam(function(err, team) {
                                     // Call back errors
                                     if(err !== null) {
                                         if(!calledBack)

@@ -399,12 +399,12 @@ GameManager.prototype.broadcastData = function(callback) {
     // Loop through the games
     this.games.forEach(function(game) {
         // Loop through the game users
-        game.userManager.users.forEach(function(user) {
+        game.userManager.users.forEach(function(liveUser) {
             // Add a latch
             latch.add();
 
             // Get the user model
-            const userModel = user.getUserModel();
+            const userModel = liveUser.getUserModel();
 
             // Create a callback latch
             var gameLatch = new CallbackLatch();
@@ -450,7 +450,7 @@ GameManager.prototype.broadcastData = function(callback) {
 
                     // Check whether the other user is visible for the current user
                     gameLatch.add();
-                    otherUser.isVisibleFor(user, function(err, visible) {
+                    otherUser.isVisibleFor(liveUser, function(err, visible) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -502,7 +502,7 @@ GameManager.prototype.broadcastData = function(callback) {
 
                     // Check whether the other user is visible for the current user
                     gameLatch.add();
-                    liveFactory.isVisibleFor(user, function(err, visible) {
+                    liveFactory.isVisibleFor(liveUser, function(err, visible) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -561,7 +561,7 @@ GameManager.prototype.broadcastData = function(callback) {
                         game: game.getIdHex(),
                         users,
                         factories
-                    }, user);
+                    }, liveUser);
 
                     // Resolve the latch
                     latch.resolve();

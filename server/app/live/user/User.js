@@ -591,6 +591,15 @@ User.prototype.isVisibleFor = function(other, callback) {
     });
 };
 
+/**
+ * Get the user as a string.
+ *
+ * @return {String} String representation.
+ */
+User.prototype.toString = function() {
+    return '[User:' + this.getIdHex() + ']';
+};
+
 // Export the class
 module.exports = User;
 

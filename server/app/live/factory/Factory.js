@@ -255,6 +255,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             return;
         }
 
+        // Check whether this factory is visible for the given live user
         self.isVisibleFor(liveUser, function(err, visible) {
             // Call back errors
             if(err !== null) {
@@ -264,12 +265,15 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                 return;
             }
 
+            // Set the visibility status
             factoryData.visible = visible;
 
+            // Resolve the latch
             firstLatch.resolve();
         });
     });
 
+    // Check whether the user can modify the factory
     firstLatch.add();
     self.canModify(user, function(err, canModify) {
         // Call back errors
@@ -280,11 +284,14 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             return;
         }
 
+        // Set the modify permission status
         factoryData.canModify = canModify;
 
+        // Resolve the latch
         firstLatch.resolve();
     });
 
+    // Continue when we're done
     firstLatch.then(function() {
         // Send the data if no visible
         if(!factoryData.visible) {
@@ -456,7 +463,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                         }
 
                         // Get the team
-                        gameUser.getTeam(function(err, team) {
+                        factoryModel.getTeam(function(err, factoryTeam) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)
@@ -466,7 +473,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                             }
 
                             // Get the team name
-                            team.getName(function(err, teamName) {
+                            factoryTeam.getName(function(err, teamName) {
                                 // Call back errors
                                 if(err !== null) {
                                     if(!calledBack)
@@ -580,14 +587,21 @@ Factory.prototype.sendData = function(user, sockets, callback) {
  * @param callback (err)
  */
 Factory.prototype.broadcastData = function(callback) {
+    // Store the current instance
     const self = this;
+
+    // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Only call back once
     var calledBack = false;
 
-    this.getGame().userManager.users.forEach(function(user) {
+    // Loop through the list of live users for this factory
+    this.getGame().userManager.users.forEach(function(liveUser) {
         // Make sure the factory is visible for the user
         latch.add();
-        self.isVisibleFor(user, function(err, visible) {
+        self.isVisibleFor(liveUser, function(err, visible) {
+            // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
@@ -595,8 +609,11 @@ Factory.prototype.broadcastData = function(callback) {
                 return;
             }
 
+            // Send the game data if the factory is visible for the current live user
             if(visible)
-                self.sendData(user.getUserModel(), undefined, function(err) {
+                // Send the data
+                self.sendData(liveUser.getUserModel(), undefined, function(err) {
+                    // Call back errors
                     if(err !== null) {
                         if(!calledBack)
                             callback(err);
@@ -604,11 +621,17 @@ Factory.prototype.broadcastData = function(callback) {
                         return;
                     }
 
+                    // Resolve the latch
                     latch.resolve();
                 });
+
+            else
+                // Resolve the latch if the factory isn't visible
+                latch.resolve();
         });
     });
 
+    // Call back when we're done
     latch.then(() => callback(null));
 };
 
@@ -624,12 +647,12 @@ Factory.prototype.getTeam = function(callback) {
 /**
  * Check whether this factory is visible for the given user.
  *
- * @param {User} user Given user.
+ * @param {User} liveUser Given user.
  * @param {function} callback callback(err, isVisible)
  */
-Factory.prototype.isVisibleFor = function(user, callback) {
+Factory.prototype.isVisibleFor = function(liveUser, callback) {
     // Make sure a valid user is given
-    if(user == null) {
+    if(liveUser == null) {
         callback(null, false);
         return;
     }
@@ -641,56 +664,80 @@ Factory.prototype.isVisibleFor = function(user, callback) {
         return;
     }
 
-    // Get the game model
-    var game = this.getGame().getGameModel();
+    // Get the user and game model
+    const userModel = liveUser.getUserModel();
+    const gameModel = this.getGame().getGameModel();
 
     // Define the current instance
     const self = this;
 
-    // Get the factory creator
-    factoryModel.getUser(function(err, creator) {
+    // Get the user state
+    gameModel.getUserState(userModel, function(err, userState) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Call back true if the creator is the same as the user
-        if(creator.getId().equals(user.getId())) {
+        // Call back false if the user isn't a player or spectator
+        if(!userState.player && !userState.special) {
+            callback(null, false);
+            return;
+        }
+
+        // Call back true if the user is a spectator
+        if(userState.spectator) {
             callback(null, true);
             return;
         }
 
-        // Get the user state
-        game.getUserState(user, function(err, userState) {
+        // Create a callback latch
+        var latch = new CallbackLatch();
+
+        // Make sure we only call back once
+        var calledBack = false;
+
+        // Get the factory team
+        var factoryTeam;
+        latch.add();
+        self.getTeam(function(err, result) {
             // Call back errors
             if(err !== null) {
-                callback(err);
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
                 return;
             }
 
-            // Call back false if the user isn't a player or spectator
-            if(!userState.player && !userState.special) {
-                callback(null, false);
+            // Set the team
+            factoryTeam = result;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the game user and team
+        var userTeam;
+        latch.add();
+        Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
                 return;
             }
 
-            // Call back true if the user is a spectator
-            if(userState.spectator) {
-                callback(null, true);
+            // Make sure the game user is valid
+            if(gameUser == null) {
+                if(!calledBack)
+                    callback(null, false);
+                calledBack = true;
                 return;
             }
 
-            // Create a callback latch
-            var latch = new CallbackLatch();
-
-            // Make sure we only call back once
-            var calledBack = false;
-
-            // Get the factory team
-            var factoryTeam;
-            latch.add();
-            self.getTeam(function(err, result) {
+            // Get the team
+            gameUser.getTeam(function(err, result) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -699,85 +746,37 @@ Factory.prototype.isVisibleFor = function(user, callback) {
                     return;
                 }
 
-                // Set the team
-                factoryTeam = result;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-
-            // Get the game user and team
-            var userTeam;
-            latch.add();
-            Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Make sure the game user is valid
-                if(gameUser == null) {
+                // Call back if the team is null
+                if(result == null) {
                     if(!calledBack)
                         callback(null, false);
                     calledBack = true;
                     return;
                 }
 
-                // Get the user state
-                gameUser.getTeam(function(err, result) {
-                    // Call back errors
-                    if(err !== null) {
-                        if(!calledBack)
-                            callback(err);
-                        calledBack = true;
-                        return;
-                    }
+                // Set the user team
+                userTeam = result;
 
-                    // Call back if the team is null
-                    if(result == null) {
-                        if(!calledBack)
-                            callback(null, false);
-                        calledBack = true;
-                        return;
-                    }
-
-                    // Set the user team
-                    userTeam = result;
-
-                    // Resolve the latch
-                    latch.resolve();
-                });
+                // Resolve the latch
+                latch.resolve();
             });
+        });
 
-            // Continue if the teams are fetched
-            latch.then(function() {
-                // Call back if the teams are equal
-                if(factoryTeam.getId().equals(userTeam.getId())) {
-                    if(!calledBack)
-                        callback(null, true);
-                    calledBack = true;
-                    return;
-                }
+        // Continue if the teams are fetched
+        latch.then(function() {
+            // Call back if the teams are equal
+            if(factoryTeam.getId().equals(userTeam.getId())) {
+                if(!calledBack)
+                    callback(null, true);
+                calledBack = true;
+                return;
+            }
 
-                // Get the live user
-                self.getGame().getUser(user, function(err, liveUser) {
-                    // Call back if the teams are equal
-                    if(err !== null ) {
-                        if(!calledBack)
-                            callback(err);
-                        calledBack = true;
-                        return;
-                    }
-
-                    self.isUserInRange(liveUser, function(err, inRange) {
-                        // The factory probably isn't visible, call back false
-                        if(!calledBack)
-                            callback(null, inRange);
-                    });
-                });
+            // Check whether the given user is in range
+            self.isUserInRange(liveUser, function(err, inRange) {
+                // The factory probably isn't visible, call back false
+                if(!calledBack)
+                    callback(null, inRange);
             });
         });
     });
@@ -792,6 +791,12 @@ Factory.prototype.isVisibleFor = function(user, callback) {
 Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
     // Store this instance
     const self = this;
+
+    // Call back if the user is null
+    if(liveUser == null) {
+        callback(null);
+        return;
+    }
 
     // Check whether the user is visible
     this.isVisibleFor(liveUser, function(err, isVisible) {

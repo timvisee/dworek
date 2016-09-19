@@ -207,7 +207,7 @@ GameTeamModel.prototype.getName = function(callback) {
  *
  * @callback GameModel~getNameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {String} Team name.
+ * @param {string=} Team name.
  */
 
 /**

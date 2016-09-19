@@ -319,9 +319,9 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
         if(calledBack)
             return;
 
-        // Check whether the factory is visible
+        // Get the game for this factory
         latch.add();
-        factory.isVisibleFor(user, function(err, visible) {
+        factory.getGame().getUser(user, function(err, liveUser) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -330,12 +330,29 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
                 return;
             }
 
-            // Add the factory to the array if visible
-            if(visible)
-                factories.push(factory);
+            // Make sure a live user is found
+            if(liveUser == null) {
+                latch.resolve();
+                return;
+            }
 
-            // Resolve the latch
-            latch.resolve();
+            // Check whether the factory is visible
+            factory.isVisibleFor(liveUser, function(err, visible) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Add the factory to the array if visible
+                if(visible)
+                    factories.push(factory);
+
+                // Resolve the latch
+                latch.resolve();
+            });
         });
     });
 
