@@ -221,25 +221,31 @@ Shop.prototype.load = function(callback) {
             const currentUserModel = currentLiveUser.getUserModel();
 
             // Find a replacement user
-            const newUser = self.getShopManager().findNewShopUser(currentLiveUser.getTeamModel().getId().toString());
+            self.getShopManager().findNewShopUser(currentLiveUser.getTeamModel().getId().toString(), function(err, newUser) {
+                // Handle errors
+                if(err !== null) {
+                    console.error('Failed to find new shop user:');
+                    console.error(err);
+                    return;
+                }
 
-            // Schedule for the new shop user if a user was found
-            if(newUser != null)
-                self.getShopManager().scheduleUser(newUser);
+                // Schedule for the new shop user if a user was found
+                if(newUser != null)
+                    self.getShopManager().scheduleUser(newUser);
 
-            // Determine what message to show to the current shop owner
-            var message = 'Your dealer ability will be given to another player soon...';
-            if(newUser == null)
-                message = 'You will lose your dealer ability soon...';
+                // Determine what message to show to the current shop owner
+                var message = 'Your dealer ability will be given to another player soon...';
+                if(newUser == null)
+                    message = 'You will lose your dealer ability soon...';
 
-            // Send a notification to the current shop user
-            Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message,
-                error: false,
-                toast: true,
-                dialog: false
-            }, currentUserModel);
-
+                // Send a notification to the current shop user
+                Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                    message,
+                    error: false,
+                    toast: true,
+                    dialog: false
+                }, currentUserModel);
+            });
         }, lifeTime - alertTime);
 
         // Resolve the latch
