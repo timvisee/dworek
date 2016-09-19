@@ -622,6 +622,9 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
         else
             Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_DATA, packetObject, user);
+
+        // Call back
+        callback(null);
     };
 
     // Get the game stage
@@ -928,6 +931,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     return;
                 }
 
+                // Set the user strength
                 gameData.strength.value = userStrength;
 
                 // Get the game config
@@ -943,6 +947,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     // Get the user strength upgrades
                     gameData.strength.upgrades = gameConfig.player.getStrengthUpgrades(userStrength);
 
+                    // Resolve the latch
                     latch.resolve();
                 });
             });

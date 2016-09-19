@@ -227,6 +227,9 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
         else
             Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_DATA, packetObject, user);
+
+        // Call back
+        callback(null);
     };
 
     // Get the game
@@ -236,7 +239,8 @@ Factory.prototype.sendData = function(user, sockets, callback) {
     // Get the factory model
     const factoryModel = this.getFactoryModel();
 
-    var firstLatch = new CallbackLatch();
+    // Create a callback latch
+    var latch = new CallbackLatch();
 
     // Parse the sockets
     if(sockets == undefined)
@@ -245,7 +249,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
         sockets = [sockets];
 
     // Get the game user
-    firstLatch.add();
+    latch.add();
     this.getGame().getUser(user, function(err, liveUser) {
         // Call back errors
         if(err !== null) {
@@ -269,12 +273,12 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             factoryData.visible = visible;
 
             // Resolve the latch
-            firstLatch.resolve();
+            latch.resolve();
         });
     });
 
     // Check whether the user can modify the factory
-    firstLatch.add();
+    latch.add();
     self.canModify(user, function(err, canModify) {
         // Call back errors
         if(err !== null) {
@@ -288,11 +292,11 @@ Factory.prototype.sendData = function(user, sockets, callback) {
         factoryData.canModify = canModify;
 
         // Resolve the latch
-        firstLatch.resolve();
+        latch.resolve();
     });
 
     // Continue when we're done
-    firstLatch.then(function() {
+    latch.then(function() {
         // Send the data if no visible
         if(!factoryData.visible) {
             sendFactoryData();
@@ -329,8 +333,8 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
                 // TODO: Make sure the user has rights to view this factory!
 
-                // Create a callback latch
-                var latch = new CallbackLatch();
+                // Reset the latch
+                latch.identity();
 
                 // Get the factory name
                 latch.add();
@@ -529,11 +533,6 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
                     // Resolve the latch
                     latch.resolve();
-                });
-
-                // Send the factory data
-                latch.then(function() {
-                    sendFactoryData();
                 });
 
                 // Get the defence upgrades
