@@ -551,7 +551,16 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                             return;
                         }
 
+                        // Create a factory latch
+                        var factoryLatch = new CallbackLatch();
+
+                        // Create a factory object
+                        var factoryObject = {
+                            factory: liveFactory.getIdHex()
+                        };
+
                         // Get the name of the user
+                        factoryLatch.add();
                         liveFactory.getName(function(err, name) {
                             // Call back errors
                             if(err !== null) {
@@ -562,27 +571,58 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                                 return;
                             }
 
-                            // Get the factory location
-                            liveFactory.getFactoryModel().getLocation(function(err, location) {
-                                // Call back errors
-                                if(err !== null) {
-                                    if(!calledBack)
-                                        if(_.isFunction(callback))
-                                            callback(err);
-                                    calledBack = true;
-                                    return;
-                                }
+                            // Set the factory name
+                            factoryObject.name = name;
 
-                                // Create a user object and add it to the list
-                                factories.push({
-                                    factory: liveFactory.getIdHex(),
-                                    name: name,
-                                    location: location,
-                                });
+                            // Resolve the factory latch
+                            factoryLatch.resolve();
+                        });
 
-                                // Resolve the game latch
-                                gameLatch.resolve();
-                            });
+                        // Get the factory location
+                        factoryLatch.add();
+                        liveFactory.getFactoryModel().getLocation(function(err, location) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    if(_.isFunction(callback))
+                                        callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the location
+                            factoryObject.location = location;
+
+                            // Resolve the factory latch
+                            factoryLatch.resolve();
+                        });
+
+                        // Get the factory range
+                        factoryLatch.add();
+                        liveFactory.getRange(function(err, range) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    if(_.isFunction(callback))
+                                        callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the range
+                            factoryObject.range = range;
+
+                            // Resolve the factory latch
+                            factoryLatch.resolve();
+                        });
+
+                        // Add the factory object when we're done
+                        factoryLatch.then(function() {
+                            // Create a user object and add it to the list
+                            factories.push(factoryObject);
+
+                            // Resolve the game latch
+                            gameLatch.resolve();
                         });
                     });
                 });
@@ -870,24 +910,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                         // Set the factory name
                         factoryObject.name = name;
-
-                        // Resolve the factory latch
-                        factoryLatch.resolve();
-                    });
-
-                    // Get the factory range
-                    factoryLatch.add();
-                    factory.getRange(function(err, range) {
-                        // Call back errors
-                        if(err !== null) {
-                            if(!calledBack)
-                                callback(err);
-                            calledBack = true;
-                            return;
-                        }
-
-                        // Set the factory range
-                        factoryObject.range = range;
 
                         // Resolve the factory latch
                         factoryLatch.resolve();
