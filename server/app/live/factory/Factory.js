@@ -197,7 +197,7 @@ Factory.prototype.unload = function() {};
  * Send the factory data to the given user.
  *
  * @param {UserModel} user User to send the packet data to.
- * @param {Array|*|undefined} sockets A socket, or array of sockets to send the data to, or null.
+ * @param {Array|*|undefined} sockets A socket, or array of sockets to send the data to, or undefined.
  * @param callback
  */
 Factory.prototype.sendData = function(user, sockets, callback) {
@@ -822,7 +822,7 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
             self._userVisibleMem.splice(self._userVisibleMem.indexOf(liveUser), 1);
 
         // Send the factory data
-        self.sendData(liveUser.getUserModel(), null, function(err) {
+        self.sendData(liveUser.getUserModel(), undefined, function(err) {
             // Call back errors
             if(err !== null) {
                 callback(err);
