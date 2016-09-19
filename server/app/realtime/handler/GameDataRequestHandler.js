@@ -121,9 +121,6 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             return;
         }
 
-        // Create a callback latch
-        var latch = new CallbackLatch();
-
         // Send the game data to the user
         Core.gameController.sendGameData(game, user, socket, function(err) {
             // Call back errors
