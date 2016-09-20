@@ -113,6 +113,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
+        // Call back errors
         if(err !== null) {
             callbackError();
             return;
@@ -123,6 +124,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
         // Get the game
         factoryModel.getGame(function(err, game) {
+            // Call back errors
             if(err !== null) {
                 callbackError();
                 return;
@@ -130,18 +132,23 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
             // Get the game user
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+                // Call back errors
                 if(err !== null) {
                     callbackError();
                     return;
                 }
 
+                // Get the live game instance for the current game
                 Core.gameController.getGame(game, function(err, liveGame) {
+                    // Call back errors
                     if(err !== null || liveGame == null) {
                         callbackError();
                         return;
                     }
 
+                    // Get the live factory for the factory
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
+                        // Call back errors
                         if(err !== null || liveFactory == null) {
                             callbackError();
                             return;
@@ -149,11 +156,13 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                         // Make sure the user has right to modify this factory
                         liveFactory.canModify(user, function(err, canModify) {
+                            // Call back errors
                             if(err !== null) {
                                 callbackError();
                                 return;
                             }
 
+                            // Send an error to the user if the factory can't be modified
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
@@ -165,6 +174,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                             // Get the cost for a level upgrade
                             liveFactory.getNextLevelCost(function(err, nextLevelCost) {
+                                // Call back errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
@@ -182,11 +192,13 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                 // Make sure the user has enough money
                                 gameUser.getMoney(function(err, money) {
+                                    // Call back errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
                                     }
 
+                                    // Make sure the user has enough money
                                     if(money < nextLevelCost) {
                                         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                             error: true,
@@ -198,24 +210,31 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                     // Subtract the money
                                     gameUser.subtractMoney(nextLevelCost, function(err) {
+                                        // Call back errors
                                         if(err !== null) {
                                             callbackError();
                                             return;
                                         }
 
+                                        // Get the current factory level
                                         factoryModel.getLevel(function(err, level) {
+                                            // Call back errors
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
                                             }
 
+                                            // Set the new factory level, increase it by one
                                             factoryModel.setLevel(level + 1, function(err) {
+                                                // Call back errors
                                                 if(err !== null) {
                                                     callbackError();
                                                     return;
                                                 }
 
+                                                // Broadcast the factory data to the user
                                                 liveFactory.broadcastData(undefined, undefined, function(err) {
+                                                    // Call back errors
                                                     if(err !== null) {
                                                         console.error(err);
                                                         console.error('Failed to broadcast factory data');
