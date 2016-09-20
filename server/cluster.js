@@ -20,7 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var appInfo = require('../appInfo');
+var appInfo = require('./appInfo');
 
 // Define the cluster and count the number of CPU cores
 const cluster = require('cluster');
