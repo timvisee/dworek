@@ -157,6 +157,15 @@ module.exports = {
     GAME_LOCATIONS_UPDATE: 13,
 
     /**
+     * Request location updates for a specific game.
+     * This packet is send from a client to the server.
+     *
+     * Data:
+     * - game: ID of the game we're sending locations for
+     */
+    GAME_LOCATIONS_REQUEST: 27,
+
+    /**
      * Request a game data packet.
      * This packet is send form a client to the server.
      *

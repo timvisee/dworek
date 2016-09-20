@@ -31,17 +31,17 @@ var CallbackLatch = require('../../util/CallbackLatch');
  * Type of packets to handle by this handler.
  * @type {number} Packet type.
  */
-const HANDLER_PACKET_TYPE = PacketType.GAME_DATA_REQUEST;
+const HANDLER_PACKET_TYPE = PacketType.GAME_LOCATIONS_REQUEST;
 
 /**
- * Game data request handler.
+ * Game locations request handler.
  *
  * @param {boolean=false} init True to initialize after constructing.
  *
  * @class
  * @constructor
  */
-var GameDataRequestHandler = function(init) {
+var GameLocationsRequestHandler = function(init) {
     // Initialize
     if(init)
         this.init();
@@ -50,7 +50,7 @@ var GameDataRequestHandler = function(init) {
 /**
  * Initialize the handler.
  */
-GameDataRequestHandler.prototype.init = function() {
+GameLocationsRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
     if(Core.realTime == null)
         throw new Error('Real time server not initialized yet');
@@ -65,7 +65,7 @@ GameDataRequestHandler.prototype.init = function() {
  * @param {Object} packet Packet object.
  * @param socket SocketIO socket.
  */
-GameDataRequestHandler.prototype.handler = function(packet, socket) {
+GameLocationsRequestHandler.prototype.handler = function(packet, socket) {
     // Make sure we only call back once
     var calledBack = false;
 
@@ -78,7 +78,7 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to load game data, an error occurred.',
+            message: 'Failed to load location data, an error occurred.',
             dialog: true
         }, socket);
 
@@ -121,8 +121,8 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
             return;
         }
 
-        // Send the game data to the user
-        Core.gameController.sendGameData(game, user, socket, function(err) {
+        // Send the location data to the user
+        Core.gameController.broadcastLocationData(game, user, function(err) {
             // Call back errors
             if(err !== null)
                 callbackError();
@@ -131,4 +131,4 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
 };
 
 // Export the module
-module.exports = GameDataRequestHandler;
+module.exports = GameLocationsRequestHandler;

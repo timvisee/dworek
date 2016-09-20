@@ -41,6 +41,7 @@ const PacketType = {
     GAME_INFO: 11,
     GAME_INFO_REQUEST: 12,
     GAME_LOCATIONS_UPDATE: 13,
+    GAME_LOCATIONS_REQUEST: 27,
     GAME_DATA_REQUEST: 14,
     GAME_DATA: 15,
     FACTORY_BUILD_REQUEST: 16,
@@ -2967,15 +2968,6 @@ $(document).bind("tab-switch", function(event, data) {
                 attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>'
             }).addTo(map);
 
-            // Add a fit button
-            L.easyButton('<i class="zmdi zmdi-gps"></i>', function() {
-                // Disable player following
-                setFollowPlayer(false);
-
-                // Focus the whole map
-                focusEverything();
-            }).addTo(map);
-
             // Set the map follow player button
             mapFollowPlayerButton = L.easyButton({
                 states: [{
@@ -3039,6 +3031,13 @@ $(document).bind("tab-switch", function(event, data) {
             // Add the follow buttons to the map in a bar
             L.easyBar([mapFollowPlayerButton, mapFollowEverythingButton]).addTo(map);
 
+            // Add a refresh button
+            L.easyButton('<i class="zmdi zmdi-refresh"></i>', function() {
+                // Request map data
+                requestMapData();
+
+            }).addTo(map);
+
             // TODO: Request player positions from server
 
             // Force update the last player position if it's known
@@ -3050,6 +3049,33 @@ $(document).bind("tab-switch", function(event, data) {
         map.invalidateSize();
     }
 });
+
+/**
+ * Refresh the location data for the map.
+ *
+ * @param {string} game ID of the game to request the location data for, or null to use the current game.
+ */
+function requestMapData(game) {
+    // Parse the game parameter
+    if(game == undefined)
+        game = Dworek.state.activeGame;
+
+    // Don't request if we aren't authenticated yet
+    if(!Dworek.state.loggedIn)
+        return;
+
+    // Make sure the game isn't null
+    if(game == null)
+        return;
+
+    // Show a status message
+    console.log('Refreshing map...');
+
+    // Request the map data
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_LOCATIONS_REQUEST, {
+        game: game
+    });
+}
 
 /**
  * Update the last known player position.
