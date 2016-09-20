@@ -33,7 +33,7 @@ var gameConfig = {
          * Tick interval in milliseconds.
          * @type {Number}
          */
-        tickInterval: 10
+        tickInterval: 5 * 1000
     },
 
     /**
