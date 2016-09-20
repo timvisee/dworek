@@ -51,7 +51,7 @@ var GameManager = function() {
 
     // Set up the location update interval
     setInterval(function() {
-        Core.gameController.broadcastLocationData(undefined, undefined, function(err) {
+        Core.gameController.broadcastLocationData(undefined, undefined, undefined, function(err) {
             // Show errors in the console
             if(err !== null)
                 console.error('An error occurred while broadcasting location data to clients, ignoring (' + err + ')');
@@ -392,9 +392,10 @@ GameManager.prototype.unloadGame = function(gameId) {
  * broadcasted to the given game, undefined to broadcast to all games.
  * @param {UserModel|User|ObjectId|string|undefined} [userConstraint=undefined] User instance or ID if the locations should only be
  * broadcasted to the given user, undefined to broadcast to all users.
+ * @param {Array|*|undefined} sockets Array of sockets or a single socket to send the location data to. Undefined or an empty array to send to all sockets for the user.
  * @param {GameManager~broadcastDataCallback} [callback] Called on success or when an error occurred.
  */
-GameManager.prototype.broadcastLocationData = function(gameConstraint, userConstraint, callback) {
+GameManager.prototype.broadcastLocationData = function(gameConstraint, userConstraint, sockets, callback) {
     // Get the game ID if set
     if((gameConstraint instanceof GameModel) || (gameConstraint instanceof Game))
         gameConstraint = gameConstraint.getId();
@@ -414,6 +415,12 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
         callback(new Error('Invalid user instance'));
         return;
     }
+
+    // Parse the sockets
+    if(sockets === undefined)
+        sockets = [];
+    else if(!_.isArray(sockets))
+        sockets = [sockets];
 
     // Make sure we only call back once
     var calledBack = false;
@@ -629,12 +636,18 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                 // Send the data to the proper sockets when done
                 gameLatch.then(function() {
-                    // Create a packet and send it to the correct user
-                    Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, {
+                    // Create a packet object
+                    const packetObject = {
                         game: liveGame.getIdHex(),
                         users,
                         factories
-                    }, liveUser);
+                    };
+
+                    // Create a packet and send it to the correct user/sockets
+                    if(sockets.length == 0)
+                        Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, packetObject, liveUser);
+                    else
+                        Core.realTime.packetProcessor.sendPacket(PacketType.GAME_LOCATIONS_UPDATE, packetObject, sockets);
 
                     // Resolve the latch
                     latch.resolve();
