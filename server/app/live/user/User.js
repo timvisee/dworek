@@ -315,7 +315,7 @@ User.prototype.hasLocation = function() {
  *
  * @param {Coordinate} location New location.
  * @param socket Source socket.
- * @param {function} callback callback(err) Called on success or on error.
+ * @param {User~updateLocationCallback} callback Called on success or when an error occurred.
  */
 User.prototype.updateLocation = function(location, socket, callback) {
     // Store this instance
@@ -405,6 +405,18 @@ User.prototype.updateLocation = function(location, socket, callback) {
     });
 };
 
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~updateLocationCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Get the user's money.
+ *
+ * @param {User~getMoneyCallback} callback Called with the result or when an error occurred.
+ */
 User.prototype.getMoney = function(callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -425,6 +437,20 @@ User.prototype.getMoney = function(callback) {
     });
 };
 
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback User~getMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Amount of money.
+ */
+
+/**
+ * Set the user's money.
+ *
+ * @param {Number} money Money.
+ * @param {User~setMoneyCallback} callback Called on success or when an error occurred.
+ */
 User.prototype.setMoney = function(money, callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -445,6 +471,19 @@ User.prototype.setMoney = function(money, callback) {
     });
 };
 
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~setMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Add money to a user.
+ *
+ * @param {Number} amount Amount of money to add.
+ * @param {User~addMoneyCallback} callback Called on success or when an error occurred.
+ */
 User.prototype.addMoney = function(amount, callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -465,6 +504,19 @@ User.prototype.addMoney = function(amount, callback) {
     });
 };
 
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~addMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
+/**
+ * Subtract money from a user.
+ *
+ * @param {Number} amount Amount of money to subtract.
+ * @param {User~subtractMoney} callback Called on success or when an error occurred.
+ */
 User.prototype.subtractMoney = function(amount, callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -485,6 +537,18 @@ User.prototype.subtractMoney = function(amount, callback) {
     });
 };
 
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~subtractMoney
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
+/**
+ * Get the user's in.
+ *
+ * @param {User~getInCallback} callback Called with the result or when an error occurred.
+ */
 User.prototype.getIn = function(callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -505,6 +569,20 @@ User.prototype.getIn = function(callback) {
     });
 };
 
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback User~getInCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Amount of in.
+ */
+
+/**
+ * Set the user's in value.
+ *
+ * @param {Number} goods Number of in.
+ * @param {User~setInCallback} callback Called on success or when an error occurred.
+ */
 User.prototype.setIn = function(goods, callback) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
@@ -526,10 +604,17 @@ User.prototype.setIn = function(goods, callback) {
 };
 
 /**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~setInCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
+/**
  * Check whether this user is visible for the given user.
  *
  * @param {User} other Given user.
- * @param {function} callback callback(err, isVisible)
+ * @param {User~isVisibleFor} callback callback(err, isVisible)
  */
 User.prototype.isVisibleFor = function(other, callback) {
     // Make sure a valid user is given
@@ -616,6 +701,13 @@ User.prototype.isVisibleFor = function(other, callback) {
         calledBack = true;
     });
 };
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the user is visible, false if not.
+ */
 
 /**
  * Get the user as a string.
