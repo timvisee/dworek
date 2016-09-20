@@ -85,6 +85,9 @@ const NameConfig = {
     factory: {
         name: 'lab'
     },
+    shop: {
+        name: 'dealer'
+    },
     in: {
         name: 'ingredients'
     },
@@ -783,8 +786,10 @@ var Dworek = {
                 changeHash: changeHash !== undefined ? changeHash : true
             };
 
-            // Navigate to the page
-            $.mobile.changePage(page, options);
+            // Navigate to the page, wait a little to execute it after other page changing requests
+            setTimeout(function() {
+                $.mobile.changePage(page, options);
+            }, 1);
         },
 
         /**
@@ -1553,7 +1558,10 @@ function showDialog(options, callback) {
             button.addClass('clr-warning');
 
         // Bind the click event to the button
-        button.bind('click', function() {
+        button.bind('click', function(event) {
+            // Prevent the default action
+            event.preventDefault();
+
             // Close the popup
             popupElement.popup('close');
 
@@ -3205,8 +3213,26 @@ function updatePlayerPosition(position) {
                 icon: L.spriteIcon('blue')
             });
 
-            // Bind a popup
-            playerMarker.bindPopup('Hey! This is you!');
+            // Show a popup when the user clicks on the marker
+            playerMarker.on('click', function() {
+                showDialog({
+                    title: 'You',
+                    message: 'This marker shows your current location.<br><br>' +
+                    'The position of your marker is updated as soon as your device detects you\'ve moved.<br><br>' +
+                    'The blue circle around you shows how accurate your position is.',
+                    actions: [
+                        {
+                            text: 'Test GPS',
+                            action: function() {
+                                testGps();
+                            }
+                        },
+                        {
+                            text: 'Close'
+                        }
+                    ]
+                })
+            });
 
             // Create a player range circle
             playerMarker.rangeCircle = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
@@ -3272,8 +3298,29 @@ function updatePlayerMarkers(users) {
                 icon: !user.isShop ? L.spriteIcon('green') : L.spriteIcon('yellow')
             });
 
-            // Bind a popup
-            marker.bindPopup(user.userName);
+            // Show a popup when the user clicks on the marker
+            marker.on('click', function() {
+                // Create the dialog body
+                const dialogBody = '<div align="center" class="table-list">' +
+                    '<table>' +
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-account zmdi-hc-fw"></i> Player</td><td>' + user.userName + '</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.name) + '</td><td>' + (user.isShop ? 'Yes' : 'No') + '</td>' +
+                    '    </tr>' +
+                    '</table>' +
+                    '</div>';
+
+                // Show a dialog
+                showDialog({
+                    title: 'Other player',
+                    message: dialogBody,
+                    actions: [{
+                            text: 'Close'
+                    }]
+                })
+            });
 
             // Add the marker to the map
             marker.addTo(map);
@@ -3373,10 +3420,37 @@ function updateFactoryMarkers(factories) {
                 icon: L.spriteIcon('red')
             });
 
-            // Bind a popup
-            marker.bindPopup('<b>' + capitalizeFirst(NameConfig.factory.name) + '</b><br>' +
-                factory.name + '<br><br>' +
-                '<a href="/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory + '" title="View ' + NameConfig.factory.name + '">View ' + NameConfig.factory.name + '</a>');
+            // Show a popup when the user clicks on the marker
+            marker.on('click', function() {
+                // Create the dialog body
+                const dialogBody = '<div align="center" class="table-list">' +
+                    '<table>' +
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-tag-more zmdi-hc-fw"></i> Name</td><td>' + factory.name + '</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td style="color: gray;">Unknown</td>' +
+                    '    </tr>' +
+                    '</table>' +
+                    '</div>';
+
+                // Show a dialog
+                showDialog({
+                    title: capitalizeFirst(NameConfig.factory.name),
+                    message: dialogBody,
+                    actions: [
+                        {
+                            text: 'View ' + NameConfig.factory.name,
+                            state: 'primary',
+                            action: function() {
+                                Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'slide');
+                            }
+                        }, {
+                            text: 'Close'
+                        }
+                    ]
+                })
+            });
 
             // Create a range circle
             marker.rangeCircle = L.circle(pos, factory.range);
