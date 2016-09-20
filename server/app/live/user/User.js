@@ -614,7 +614,7 @@ User.prototype.setIn = function(goods, callback) {
  * Check whether this user is visible for the given user.
  *
  * @param {User} other Given user.
- * @param {User~isVisibleFor} callback callback(err, isVisible)
+ * @param {User~isVisibleForCallback} callback callback(err, isVisible)
  */
 User.prototype.isVisibleFor = function(other, callback) {
     // Make sure a valid user is given
@@ -705,6 +705,7 @@ User.prototype.isVisibleFor = function(other, callback) {
 /**
  * Called with the result or when an error occurred.
  *
+ * @callback User~isVisibleForCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {boolean=} True if the user is visible, false if not.
  */
