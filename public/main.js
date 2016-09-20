@@ -1153,6 +1153,15 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
     if(Dworek.state.activeGame != gameId || Dworek.state.activeGame == null)
         return;
 
+    // Determine the roles changed
+    var rolesChanged = Dworek.state.activeGameRoles == null;
+    if(!rolesChanged) {
+        rolesChanged = Dworek.state.activeGameRoles.player != roles.player ||
+            Dworek.state.activeGameRoles.spectator != roles.spectator ||
+            Dworek.state.activeGameRoles.special != roles.special ||
+            Dworek.state.activeGameRoles.requested != roles.requested;
+    }
+
     // Update the game stage and roles for the user
     Dworek.state.activeGameStage = stage;
     Dworek.state.activeGameRoles = {
@@ -1164,6 +1173,14 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
 
     // Update the game worker
     Dworek.gameWorker.update();
+
+    // Set the player/everyone following mode if the user roles changed and the user is a player/spectator
+    if(rolesChanged) {
+        if(roles.spectator)
+            setFollowEverything(true);
+        else if(roles.player)
+            setFollowPlayer(true);
+    }
 });
 
 // Game location updates
