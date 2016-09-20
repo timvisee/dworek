@@ -583,7 +583,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 /**
  * Broadcast the factory data to all relevant users.
  *
- * @param callback (err)
+ * @param {Factory~broadcastLocationDataCallback} [callback] Called on success or when an error occurred.
  */
 Factory.prototype.broadcastLocationData = function(callback) {
     // Store the current instance
@@ -603,7 +603,8 @@ Factory.prototype.broadcastLocationData = function(callback) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
-                    callback(err);
+                    if(_.isFunction(callback))
+                        callback(err);
                 calledBack = true;
                 return;
             }
@@ -615,7 +616,8 @@ Factory.prototype.broadcastLocationData = function(callback) {
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
-                            callback(err);
+                            if(_.isFunction(callback))
+                                callback(err);
                         calledBack = true;
                         return;
                     }
@@ -631,8 +633,18 @@ Factory.prototype.broadcastLocationData = function(callback) {
     });
 
     // Call back when we're done
-    latch.then(() => callback(null));
+    latch.then(() => {
+        if(_.isFunction(callback))
+            callback(null);
+    });
 };
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback Factory~broadcastLocationDataCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Get the team of the factory.
