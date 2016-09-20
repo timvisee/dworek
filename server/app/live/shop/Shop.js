@@ -207,7 +207,14 @@ Shop.prototype.load = function(callback) {
                 dialog: false
             }, self.getUser().getUserModel());
 
-            // TODO: Update the game data of the user, to remove the shop state!
+            // Send the game data to the user
+            Core.gameController.sendGameData(self.getGame().getGameModel(), self.getUser().getUserModel(), undefined, function(err) {
+                // Handle errors
+                if(err !== null) {
+                    console.error('Failed to send game data to user:');
+                    console.error(err);
+                }
+            });
         };
 
         // Function to prepare the shop transfer, if there's any applicable user to transfer to
