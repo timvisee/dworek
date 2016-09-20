@@ -36,7 +36,7 @@ if(cluster.isMaster) {
 
     // Show the master and a message that workers will be started
     console.log('Master ' + process.pid + ' online');
-    console.log('Staring ' + workerCount + ' workers, one on each CPU core...');
+    console.log('Staring ' + workerCount + ' worker' + (workerCount != 1 ? 's' : '') + '...');
 
     // Fork the workers
     for(var i = 0; i < workerCount; i++)
