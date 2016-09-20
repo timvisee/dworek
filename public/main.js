@@ -3084,7 +3084,7 @@ function requestMapData(game) {
         return;
 
     // Show a status message
-    console.log('Refreshing map...');
+    showNotification('Refreshing map...');
 
     // Request the map data
     Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_LOCATIONS_REQUEST, {
