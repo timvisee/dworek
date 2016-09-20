@@ -3417,7 +3417,7 @@ function updateFactoryMarkers(factories) {
         if(marker == null) {
             // Create the marker
             marker = L.marker(pos, {
-                icon: L.spriteIcon('red')
+                icon: L.spriteIcon('orange')
             });
 
             // Show a popup when the user clicks on the marker
@@ -3457,7 +3457,7 @@ function updateFactoryMarkers(factories) {
             marker.rangeCircle.setStyle({
                 opacity: 0.4,
                 dashArray: '5,5',
-                color: 'red'
+                color: 'DarkOrange'
             });
 
             // Add the marker and range circle to the map
