@@ -1185,6 +1185,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     // Update the factory locations
     if(hasFactories)
         updateFactoryMarkers(packet.factories);
+
+    // Focus on everything if enabled
+    if(getFollowEverything())
+        focusEverything();
 });
 
 // Update the active game and status labels when a new page is being shown
@@ -2846,6 +2850,101 @@ var playerMarker = null;
 var playersMarkers = [];
 var factoryMarkers = [];
 
+var mapFollowPlayerButton = null;
+var mapFollowEverythingButton = null;
+var followPlayer = false;
+var followEverything = false;
+
+/**
+ * Check whether to follow the player.
+ *
+ * @return {boolean} True to follow the player, false if not.
+ */
+function getFollowPlayer() {
+    return followPlayer;
+}
+
+/**
+ * Set whether to follow the player.
+ *
+ * @param {boolean} state True to follow the player, false if not.
+ */
+function setFollowPlayer(state) {
+    // Get the old state
+    const oldState = followPlayer;
+
+    // Set whether to follow players
+    followPlayer = state;
+
+    // Focus on the player if the following state is enabled and stop following everything
+    if(state) {
+        // Stop following everything
+        setFollowEverything(false);
+
+        // Focus the player
+        focusPlayer();
+    }
+
+    // Set the button state depending on the follow player state
+    if(mapFollowPlayerButton != null)
+        mapFollowPlayerButton.state(state ? 'follow-player' : 'no-follow-player');
+
+    // Show a notification if the state changed
+    if(state != oldState)
+        showNotification((state ? 'Started' : 'Stopped') + ' following you');
+}
+
+/**
+ * Check whether to follow everything.
+ *
+ * @return {boolean} True to follow everything, false if not.
+ */
+function getFollowEverything() {
+    return followEverything;
+}
+
+/**
+ * Set whether to follow everything.
+ *
+ * @param {boolean} state True to follow everything, false if not.
+ */
+function setFollowEverything(state) {
+    // Get the old state
+    const oldState = followEverything;
+
+    // Set whether to follow everything
+    followEverything = state;
+
+    // Focus on everything if the following state is enabled and stop following the player
+    if(state) {
+        // Stop following the player
+        setFollowPlayer(false);
+
+        // Focus the map
+        focusEverything();
+    }
+
+    // Set the button state depending on the follow everything state
+    if(mapFollowEverythingButton != null)
+        mapFollowEverythingButton.state(state ? 'follow-everything' : 'no-follow-everything');
+
+    // Show a notification if the state changed
+    if(state != oldState)
+        showNotification((state ? 'Started' : 'Stopped') + ' following everything');
+}
+
+/**
+ * Focus on the player (on the map) if the player location is known.
+ */
+function focusPlayer() {
+    // Make sure the map is created and the player marker is available
+    if(map == null || playerMarker == null)
+        return;
+
+    // Focus on the player marker
+    map.panTo(playerMarker.getLatLng());
+}
+
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
     if(data.to.find('#map-container').length > 0) {
@@ -2870,9 +2969,75 @@ $(document).bind("tab-switch", function(event, data) {
 
             // Add a fit button
             L.easyButton('<i class="zmdi zmdi-gps"></i>', function() {
-                // Fit the map
-                fitMap();
+                // Disable player following
+                setFollowPlayer(false);
+
+                // Focus the whole map
+                focusEverything();
             }).addTo(map);
+
+            // Set the map follow player button
+            mapFollowPlayerButton = L.easyButton({
+                states: [{
+                    stateName: 'no-follow-player',
+                    icon:      'zmdi zmdi-account-o',
+                    title:     'Start following yourself on the map',
+                    onClick: function(button, map) {
+                        // Set whether to follow the player
+                        setFollowPlayer(true);
+
+                        // Set the button state
+                        button.state('follow-player');
+                    }
+                }, {
+                    stateName: 'follow-player',
+                    icon:      'zmdi zmdi-account',
+                    title:     'Stop following yourself on the map',
+                    onClick: function(button, map) {
+                        // Set whether to follow the player
+                        setFollowPlayer(false);
+
+                        // Set the button state
+                        button.state('no-follow-player');
+                    }
+                }]
+            });
+
+            // Set the button state depending on the follow player state
+            mapFollowPlayerButton.state(getFollowPlayer() ? 'follow-player' : 'no-follow-player');
+
+            // Set the map follow everything button
+            mapFollowEverythingButton = L.easyButton({
+                states: [{
+                    stateName: 'no-follow-everything',
+                    icon:      'zmdi zmdi-accounts-outline',
+                    title:     'Start following everything',
+                    onClick: function(button, map) {
+                        // Set whether to follow everything
+                        setFollowEverything(true);
+
+                        // Set the button state
+                        button.state('follow-everything');
+                    }
+                }, {
+                    stateName: 'follow-everything',
+                    icon:      'zmdi zmdi-accounts',
+                    title:     'Stop following everything',
+                    onClick: function(button, map) {
+                        // Set whether to follow everything
+                        setFollowEverything(false);
+
+                        // Set the button state
+                        button.state('no-follow-everything');
+                    }
+                }]
+            });
+
+            // Set the button state depending on the follow everything state
+            mapFollowEverythingButton.state(getFollowEverything() ? 'follow-everything' : 'no-follow-everything');
+
+            // Add the follow buttons to the map in a bar
+            L.easyBar([mapFollowPlayerButton, mapFollowEverythingButton]).addTo(map);
 
             // TODO: Request player positions from server
 
@@ -2918,7 +3083,7 @@ function updatePlayerPosition(position) {
             playerMarker.rangeCircle.addTo(map);
 
             // Fit the map
-            fitMap();
+            focusEverything();
 
         } else {
             // Update the position and range
@@ -2927,6 +3092,10 @@ function updatePlayerPosition(position) {
             playerMarker.rangeCircle.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
         }
     }
+
+    // Focus on the player if player following is enabled
+    if(getFollowPlayer())
+        focusPlayer();
 }
 
 /**
@@ -3030,7 +3199,7 @@ function updatePlayerMarkers(users) {
 
     // Fit all users
     if(fitUsers)
-        fitMap();
+        focusEverything();
 }
 
 /**
@@ -3143,15 +3312,21 @@ function updateFactoryMarkers(factories) {
 }
 
 /**
- * Fit everything on the map.
+ * Focus on the map and fit all relevant things.
  */
-function fitMap() {
+function focusEverything() {
     // Make sure the map isn't null
     if(map == null)
         return;
 
     // Create an array of things to fit
     var fitters = playersMarkers.slice(0);
+
+    // Add the factory markers
+    if(factoryMarkers != null)
+        factoryMarkers.forEach(function(factoryMarker) {
+            fitters.push(factoryMarker.rangeCircle);
+        });
 
     // Add the player marker
     if(playerMarker != null)
