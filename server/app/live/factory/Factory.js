@@ -1362,7 +1362,7 @@ Factory.prototype.tick = function(callback) {
         });
 
         // Broadcast the location data when we're done, an call back
-        latch.then(self.broadcastData(undefined, undefined, callback));
+        latch.then(self.broadcastData(callback));
     });
 };
 

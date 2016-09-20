@@ -232,7 +232,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                     return;
                                                 }
 
-                                                liveFactory.broadcastData(undefined, undefined, function(err) {
+                                                liveFactory.broadcastData(function(err) {
                                                     if(err !== null) {
                                                         console.error(err);
                                                         console.error('Failed to broadcast factory data');

@@ -233,7 +233,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                 }
 
                                                 // Broadcast the factory data to the user
-                                                liveFactory.broadcastData(undefined, undefined, function(err) {
+                                                liveFactory.broadcastData(function(err) {
                                                     // Call back errors
                                                     if(err !== null) {
                                                         console.error(err);
