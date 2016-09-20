@@ -3013,8 +3013,8 @@ function focusPlayer(zoom) {
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
     if(data.to.find('#map-container').length > 0) {
-        // Update the map container size
-        $('#map-container').height($(document).height() - getActivePage().find('.ui-header').height());
+        // Update the map size
+        updateMapSize(true, true);
 
         // Use the last known player location when possible
         var latlng = [52.0705, 4.3007];
@@ -3114,10 +3114,40 @@ $(document).bind("tab-switch", function(event, data) {
     }
 });
 
+// Invalidate the map size each second
+setTimeout(function() {
+    updateMapSize(true, false);
+}, 1000);
+
+// Update the map size when the window is resized
+$(window).resize(function() {
+    updateMapSize(true, true);
+});
+
+/**
+ * Update the map size.
+ *
+ * @param {boolean} invalidateSize True to invalidate the map size inside it's container, false to skip this.
+ * @param {boolean} updateDiv True to update the map container size based on the page size, false to skip this.
+ */
+function updateMapSize(invalidateSize, updateDiv) {
+    // Update the map container size
+    if(updateDiv)
+        $('#map-container').height($(document).height() - getActivePage().find('.ui-header').height());
+
+    // Make sure we've a map we know about
+    if(map == null)
+        return;
+
+    // Invalidate the map size inside the container
+    if(invalidateSize)
+        map.invalidateSize(true);
+}
+
 /**
  * Refresh the location data for the map.
  *
- * @param {string} game ID of the game to request the location data for, or null to use the current game.
+ * @param {string} [game] ID of the game to request the location data for, or null to use the current game.
  */
 function requestMapData(game) {
     // Parse the game parameter
