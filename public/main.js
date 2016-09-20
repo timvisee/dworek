@@ -2951,14 +2951,11 @@ function focusPlayer(zoom) {
     // Get the player location
     const playerLocation = playerMarker.getLatLng();
 
-    // Focus on the player marker
-    map.panTo(playerLocation);
-
-    // Zoom to the player
+    // Focus on the player marker and/or zoom depending on the zoom parameter
     if(zoom)
-        setTimeout(function() {
-            map.setZoomAround(playerLocation, 18);
-        }, 500);
+        map.setView(playerLocation, 18);
+    else
+        map.panTo(playerLocation);
 }
 
 // Update the active game and status labels when a new page is being shown
