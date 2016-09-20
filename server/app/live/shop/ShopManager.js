@@ -450,8 +450,10 @@ ShopManager.prototype.findNewShopUser = function(teamId, callback) {
         }
 
         // Make sure we've any user
-        if(users.length === 0)
+        if(users.length === 0) {
             callback(null, null);
+            return;
+        }
 
         // Pick a random user, and call it back
         callback(null, users[Math.floor(Math.random() * users.length)]);
