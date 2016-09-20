@@ -3946,7 +3946,7 @@ function updateGameDataVisuals() {
             // Show the sell dialog for the shop when clicking the sell button
             sellButtonElement.click(function() {
                 // Show the sell dialog for the shop
-                shopShowSellDialog(shop.token);
+                showShopSellDialog(shop.token);
             });
 
             // Slide out animation
