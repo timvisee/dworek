@@ -370,9 +370,10 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
 /**
  * Get the shop count for the given team ID.
  * This includes scheduled shops, that aren't available on the map yet.
- * @param teamId Team ID
+ *
+ * @param {ObjectId} teamId Team ID
  */
-ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
+ShopManager.prototype.getTeamShopCount = function(teamId) {
     // Create a counter
     var count = 0;
 
