@@ -2883,7 +2883,7 @@ function setFollowPlayer(state) {
         setFollowEverything(false);
 
         // Focus the player
-        focusPlayer();
+        focusPlayer(true);
     }
 
     // Set the button state depending on the follow player state
@@ -2936,14 +2936,29 @@ function setFollowEverything(state) {
 
 /**
  * Focus on the player (on the map) if the player location is known.
+ *
+ * @param {boolean} [zoom=false] True to zoom in to the player, false to keep the current zoom level.
  */
-function focusPlayer() {
+function focusPlayer(zoom) {
+    // Parse the zoom parameter
+    if(zoom == undefined)
+        zoom = false;
+
     // Make sure the map is created and the player marker is available
     if(map == null || playerMarker == null)
         return;
 
+    // Get the player location
+    const playerLocation = playerMarker.getLatLng();
+
     // Focus on the player marker
-    map.panTo(playerMarker.getLatLng());
+    map.panTo(playerLocation);
+
+    // Zoom to the player
+    if(zoom)
+        setTimeout(function() {
+            map.setZoomAround(playerLocation, 18);
+        }, 500);
 }
 
 // Update the active game and status labels when a new page is being shown
@@ -3121,7 +3136,7 @@ function updatePlayerPosition(position) {
 
     // Focus on the player if player following is enabled
     if(getFollowPlayer())
-        focusPlayer();
+        focusPlayer(false);
 }
 
 /**
