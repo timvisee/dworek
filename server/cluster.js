@@ -31,11 +31,16 @@ if(cluster.isMaster) {
     // Starting cluster, show status message
     console.log('Starting ' + appInfo.APP_NAME + ' v' + appInfo.VERSION_NAME + ' (' + appInfo.VERSION_CODE + ') cluster...');
 
+    // Show the master and a message that workers will be started
+    console.log('Master ' + process.pid + ' online');
+
+    // Print the number of available CPUs for workers
+    console.log('Available CPUs for workers: ' + CPU_COUNT);
+
     // Determine the number of workers
     const workerCount = 1;
 
-    // Show the master and a message that workers will be started
-    console.log('Master ' + process.pid + ' online');
+    // Start the workers
     console.log('Staring ' + workerCount + ' worker' + (workerCount != 1 ? 's' : '') + '...');
 
     // Fork the workers
