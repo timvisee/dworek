@@ -192,10 +192,10 @@ Shop.prototype.load = function(callback) {
 
         // Determine the lifetime and alert time of this shop
         const lifeTime = gameConfig.shop.getShopLifetime();
-        const alertTime = gameConfig.shop.shopAlertTime;
+        const alertTime = Math.min(gameConfig.shop.shopAlertTime, lifeTime);
 
-        // Set the lifetime timer
-        setTimeout(function() {
+        // Function to actually transfer the shop
+        const functionTransfer = function() {
             // Remove the shop from the list
             self.getShopManager().shops.splice(self.getShopManager().shops.indexOf(self), 1);
 
@@ -208,10 +208,10 @@ Shop.prototype.load = function(callback) {
             }, self.getUser().getUserModel());
 
             // TODO: Update the game data of the user, to remove the shop state!
-        }, lifeTime);
+        };
 
-        // Set the alert timer
-        setTimeout(function() {
+        // Function to prepare the shop transfer, if there's any applicable user to transfer to
+        const functionPrepareTransfer = function() {
             // Return if the team model is invalid
             if(self.getUser().getTeamModel() == null)
                 return;
@@ -229,9 +229,15 @@ Shop.prototype.load = function(callback) {
                     return;
                 }
 
-                // Schedule for the new shop user if a user was found
-                if(newUser != null)
-                    self.getShopManager().scheduleUser(newUser);
+                // Reschedule the shop transfer if no new user was found
+                if(newUser == null) {
+                    setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
+                    return;
+                }
+
+                // Schedule the shop transfer (also for the new user)
+                self.getShopManager().scheduleUser(newUser);
+                setTimeout(functionTransfer, alertTime);
 
                 // Determine what message to show to the current shop owner
                 var message = 'Your dealer ability will be given to another player soon...';
@@ -246,7 +252,10 @@ Shop.prototype.load = function(callback) {
                     dialog: false
                 }, currentUserModel);
             });
-        }, lifeTime - alertTime);
+        };
+
+        // Set a timer to prepare the shop transfer
+        setTimeout(functionPrepareTransfer, lifeTime - alertTime);
 
         // Resolve the latch
         latch.resolve();
