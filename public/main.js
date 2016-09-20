@@ -1177,9 +1177,13 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
     // Set the player/everyone following mode if the user roles changed and the user is a player/spectator
     if(rolesChanged) {
         if(roles.spectator)
-            setFollowEverything(true);
+            setFollowEverything(true, {
+                showNotification: false
+            });
         else if(roles.player)
-            setFollowPlayer(true);
+            setFollowPlayer(true, {
+                showNotification: false
+            });
     }
 });
 
@@ -2886,8 +2890,22 @@ function getFollowPlayer() {
  * Set whether to follow the player.
  *
  * @param {boolean} state True to follow the player, false if not.
+ * @param {Object} [options] Options object.
+ * @param {boolean} [options.showNotification=true] True to show a notification, false if not.
  */
-function setFollowPlayer(state) {
+function setFollowPlayer(state, options) {
+    // Create a defaults object
+    const defaultOptions = {
+        showNotification: true
+    };
+
+    // Parse the options variable
+    if(options == undefined)
+        options = {};
+
+    // Merge the options object with the defaults
+    options = merge(defaultOptions, options, true);
+
     // Get the old state
     const oldState = followPlayer;
 
@@ -2897,7 +2915,9 @@ function setFollowPlayer(state) {
     // Focus on the player if the following state is enabled and stop following everything
     if(state) {
         // Stop following everything
-        setFollowEverything(false);
+        setFollowEverything(false, {
+            showNotification: false
+        });
 
         // Focus the player
         focusPlayer(true);
@@ -2908,7 +2928,7 @@ function setFollowPlayer(state) {
         mapFollowPlayerButton.state(state ? 'follow-player' : 'no-follow-player');
 
     // Show a notification if the state changed
-    if(state != oldState)
+    if(options.showNotification && state != oldState)
         showNotification((state ? 'Started' : 'Stopped') + ' following you');
 }
 
@@ -2925,8 +2945,21 @@ function getFollowEverything() {
  * Set whether to follow everything.
  *
  * @param {boolean} state True to follow everything, false if not.
+ * @param {Object} [options] Options object.
+ * @param {boolean} [options.showNotification=true] True to show a notification, false if not.
  */
-function setFollowEverything(state) {
+function setFollowEverything(state, options) {
+    // Create a defaults object
+    const defaultOptions = {
+        showNotification: true
+    };
+
+    // Parse the options variable
+    if(options == undefined)
+        options = {};
+
+    // Merge the options object with the defaults
+    options = merge(defaultOptions, options, true);
     // Get the old state
     const oldState = followEverything;
 
@@ -2936,7 +2969,9 @@ function setFollowEverything(state) {
     // Focus on everything if the following state is enabled and stop following the player
     if(state) {
         // Stop following the player
-        setFollowPlayer(false);
+        setFollowPlayer(false, {
+            showNotification: false
+        });
 
         // Focus the map
         focusEverything();
@@ -2947,7 +2982,7 @@ function setFollowEverything(state) {
         mapFollowEverythingButton.state(state ? 'follow-everything' : 'no-follow-everything');
 
     // Show a notification if the state changed
-    if(state != oldState)
+    if(options.showNotification && state != oldState)
         showNotification((state ? 'Started' : 'Stopped') + ' following everything');
 }
 
