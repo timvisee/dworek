@@ -173,8 +173,8 @@ ShopManager.prototype.unload = function() {
  * Will be called once in a while to manage the shops.
  */
 ShopManager.prototype.worker = function() {
-    // Create an object with the team counts
-    var counterObject = {};
+    // Create an object with the preferred shop delta count for each team
+    var prefShopCountDelta = {};
 
     // Store this
     const self = this;
@@ -190,7 +190,7 @@ ShopManager.prototype.worker = function() {
             // Handle errors
             if(err !== null) {
                 console.error(err);
-                console.error('Failed to get game configuration, ignoring');
+                console.error('Failed to get game user instance');
                 return;
             }
 
@@ -218,19 +218,27 @@ ShopManager.prototype.worker = function() {
                 // Get the user's team ID
                 const userTeamId = userTeam.getIdHex();
 
-                // Get the current count for this team
-                var userCount = 0;
-                if(counterObject.hasOwnProperty(userTeamId))
-                    userCount += counterObject[userTeamId];
+                // Continue if this team is already in the delta object
+                if(prefShopCountDelta.hasOwnProperty(userTeamId)) {
+                    latch.resolve();
+                    return;
+                }
 
-                // Increment the count
-                userCount++;
+                // Get the preferred shop count delta for this team
+                self.getTeamPreferredShopCountDelta(userTeamId, function(err, delta) {
+                    // Handle errors
+                    if(err !== null) {
+                        console.error(err);
+                        console.error('Failed to calculate preferred shop count delta for a team');
+                        return;
+                    }
 
-                // Set the value
-                counterObject[userTeamId] = userCount;
+                    // Add an entry to the object with the delta
+                    prefShopCountDelta[userTeamId] = delta;
 
-                // Resolve the latch
-                latch.resolve();
+                    // Resolve the latch
+                    latch.resolve();
+                });
             });
         });
     });
@@ -242,45 +250,40 @@ ShopManager.prototype.worker = function() {
             // Handle errors
             if(err !== null) {
                 console.error(err);
-                console.error('Failed to get game configuration, ignoring');
+                console.error('Failed to get game configuration');
                 return;
             }
 
             // Loop through the map
-            for(var teamId in counterObject) {
+            for(var teamId in prefShopCountDelta) {
                 // Make sure this team ID is part of the counter object
-                if(!counterObject.hasOwnProperty(teamId))
+                if(!prefShopCountDelta.hasOwnProperty(teamId))
                     continue;
 
-                // Get the user count
-                const userCount = counterObject[teamId];
+                // Get the delta count for the shops for ths team
+                const shopDeltaCount = prefShopCountDelta[teamId];
 
-                // Get the preferred shop count for this team
-                const preferredUserCount = gameConfig.shop.getShopsInTeam(userCount);
-
-                // Get the number of shops
-                const currentCount = self.getTeamShopCount(new ObjectId(teamId));
-
-                // Continue if we won't need any more shops
-                if(currentCount >= preferredUserCount)
+                // Continue if the delta count is zero or below
+                if(shopDeltaCount <= 0)
                     continue;
 
-                // Find a new shop user
-                self.findNewShopUser(teamId, function(err, newUser) {
-                    // Handle errors
-                    if(err !== null) {
-                        console.error(err);
-                        console.error('Failed to get game configuration, ignoring');
-                        return;
-                    }
+                // Find as much new shop users as we need
+                for(var i = 0; i < shopDeltaCount; i++)
+                    self.findNewShopUser(teamId, function(err, newUser) {
+                        // Handle errors
+                        if(err !== null) {
+                            console.error(err);
+                            console.error('Failed to find new shop user');
+                            return;
+                        }
 
-                    // Make sure a new user was found
-                    if(newUser == null)
-                        return;
+                        // Make sure a new user was found
+                        if(newUser == null)
+                            return;
 
-                    // Schedule the user
-                    self.scheduleUser(newUser);
-                });
+                        // Schedule the user
+                        self.scheduleUser(newUser);
+                    });
             }
         });
     });

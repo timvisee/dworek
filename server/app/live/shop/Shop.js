@@ -229,28 +229,39 @@ Shop.prototype.load = function(callback) {
                     return;
                 }
 
-                // Reschedule the shop transfer if no new user was found
-                if(newUser == null) {
-                    setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
-                    return;
-                }
+                // Get the preferred shop count delta
+                self.getShopManager().getTeamPreferredShopCountDelta(self.getUser().getTeamModel(), function(err, delta) {
+                    // Handle errors
+                    if(err !== null) {
+                        console.error('Failed to determine whether to find a new shop.');
+                        console.error(err);
+                        return;
+                    }
 
-                // Schedule the shop transfer (also for the new user)
-                self.getShopManager().scheduleUser(newUser);
-                setTimeout(functionTransfer, alertTime);
+                    // Reschedule the shop transfer if no new user was found and the delta is not below zero
+                    if(newUser == null && delta >= 0) {
+                        setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
+                        return;
+                    }
 
-                // Determine what message to show to the current shop owner
-                var message = 'Your dealer ability will be given to another player soon...';
-                if(newUser == null)
-                    message = 'You will lose your dealer ability soon...';
+                    // Schedule the shop transfer (also for the new user)
+                    if(newUser != null)
+                        self.getShopManager().scheduleUser(newUser);
+                    setTimeout(functionTransfer, alertTime);
 
-                // Send a notification to the current shop user
-                Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                    message,
-                    error: false,
-                    toast: true,
-                    dialog: false
-                }, currentUserModel);
+                    // Determine what message to show to the current shop owner
+                    var message = 'Your dealer ability will be given to another player soon...';
+                    if(newUser == null)
+                        message = 'You will lose your dealer ability soon...';
+
+                    // Send a notification to the current shop user
+                    Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                        message,
+                        error: false,
+                        toast: true,
+                        dialog: false
+                    }, currentUserModel);
+                });
             });
         };
 
