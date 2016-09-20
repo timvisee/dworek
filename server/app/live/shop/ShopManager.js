@@ -578,6 +578,10 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
 
     // Loop through the list of users
     this.game.userManager.users.forEach(function(liveUser) {
+        // Make sure the user has a recent location
+        if(!liveUser.hasRecentLocation())
+            return;
+
         // Get the game user
         latch.add();
         Core.model.gameUserModelManager.getGameUser(liveUser.getGame().getGameModel(), liveUser.getUserModel(), function(err, gameUser) {
@@ -602,7 +606,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
                 }
 
                 // Skip if the team is null or if the team doesn't equal the specified team
-                if(userTeam == null || userTeam.getId().equals(teamId)) {
+                if(userTeam == null || !userTeam.getId().equals(teamId)) {
                     latch.resolve();
                     return;
                 }
