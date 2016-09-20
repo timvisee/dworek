@@ -3937,120 +3937,16 @@ function updateGameDataVisuals() {
             const buyButtonElement = gameActionsList.find('#' + buyButtonId);
             const sellButtonElement = gameActionsList.find('#' + sellButtonId);
 
+            // Show the buy dialog for the shop when clicking the buy button
             buyButtonElement.click(function() {
-                // Determine how many in the user currently has
-                var current = 10000;
-                if(hasGameData()) {
-                    var gameData = getGameData();
-                    if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
-                        current = gameData.balance.money;
-                }
-
-                // Generate an unique field ID
-                var amountFieldId = generateUniqueId('amount-field');
-
-                // Show the dialog
-                showDialog({
-                    title: 'Buy ' + NameConfig.in.name,
-                    message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
-                    '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
-                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
-                    actions: [
-                        {
-                            text: 'Buy',
-                            state: 'primary',
-                            action: function() {
-                                // Get the input field value
-                                var amount = $('#' + amountFieldId).val();
-
-                                // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
-                                    shop: shop.token,
-                                    amount: amount,
-                                    all: false
-                                });
-
-                                // Show a notification
-                                showNotification('Buying ' + NameConfig.in.name + '...');
-                            }
-                        },
-                        {
-                            text: 'Full buy',
-                            action: function() {
-                                // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
-                                    shop: shop.token,
-                                    amount: 0,
-                                    all: true
-                                });
-
-                                // Show a notification
-                                showNotification('Full buying ' + NameConfig.in.name + '...');
-                            }
-                        },
-                        {
-                            text: 'Goodbye'
-                        }
-                    ]
-                });
+                // Show the buy dialog for the shop
+                showShopBuyDialog(shop.token);
             });
 
+            // Show the sell dialog for the shop when clicking the sell button
             sellButtonElement.click(function() {
-                // Determine how many out the user currently has
-                var current = 10000;
-                if(hasGameData()) {
-                    var gameData = getGameData();
-                    if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
-                        current = gameData.balance.out;
-                }
-
-                // Generate an unique field ID
-                var amountFieldId = generateUniqueId('amount-field');
-
-                // Show the dialog
-                showDialog({
-                    title: 'Sell ' + NameConfig.out.name,
-                    message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
-                    '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.out.name) + ':</label>' +
-                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
-                    actions: [
-                        {
-                            text: 'Sell',
-                            state: 'primary',
-                            action: function() {
-                                // Get the input field value
-                                var amount = $('#' + amountFieldId).val();
-
-                                // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
-                                    shop: shop.token,
-                                    amount: amount,
-                                    all: false
-                                });
-
-                                // Show a notification
-                                showNotification('Selling ' + NameConfig.out.name + '...');
-                            }
-                        },
-                        {
-                            text: 'Sell all',
-                            action: function() {
-                                // Send a packet to the server
-                                Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
-                                    shop: shop.token,
-                                    amount: 0,
-                                    all: true
-                                });
-
-                                // Show a notification
-                                showNotification('Selling all ' + NameConfig.out.name + '...');
-                            }
-                        },
-                        {
-                            text: 'Goodbye'
-                        }
-                    ]
-                });
+                // Show the sell dialog for the shop
+                shopShowSellDialog(shop.token);
             });
 
             // Slide out animation
@@ -4163,6 +4059,132 @@ function updateGameDataVisuals() {
     if(Dworek.state.activeGame == gameId)
         // Update the game stage
         Dworek.state.activeGameStage = data.stage;
+}
+
+/**
+ * Show the buying dialog for a shop with the given token.
+ *
+ * @param {string} shopToken Shop token.
+ */
+function showShopBuyDialog(shopToken) {
+    // Determine how many in the user currently has
+    var current = 10000;
+    if(hasGameData()) {
+        var gameData = getGameData();
+        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
+            current = gameData.balance.money;
+    }
+
+    // Generate an unique field ID
+    var amountFieldId = generateUniqueId('amount-field');
+
+    // Show the dialog
+    showDialog({
+        title: 'Buy ' + NameConfig.in.name,
+        message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
+        '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
+        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+        actions: [
+            {
+                text: 'Buy',
+                state: 'primary',
+                action: function() {
+                    // Get the input field value
+                    var amount = $('#' + amountFieldId).val();
+
+                    // Send a packet to the server
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
+                        shop: shop.token,
+                        amount: amount,
+                        all: false
+                    });
+
+                    // Show a notification
+                    showNotification('Buying ' + NameConfig.in.name + '...');
+                }
+            },
+            {
+                text: 'Full buy',
+                action: function() {
+                    // Send a packet to the server
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
+                        shop: shop.token,
+                        amount: 0,
+                        all: true
+                    });
+
+                    // Show a notification
+                    showNotification('Full buying ' + NameConfig.in.name + '...');
+                }
+            },
+            {
+                text: 'Goodbye'
+            }
+        ]
+    });
+}
+
+/**
+ * Show the sell dialog for the shop with the given token.
+ *
+ * @param {string} shopToken Token of the shop.
+ */
+function showShopSellDialog(shopToken) {
+    // Determine how many out the user currently has
+    var current = 10000;
+    if(hasGameData()) {
+        var gameData = getGameData();
+        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
+            current = gameData.balance.out;
+    }
+
+    // Generate an unique field ID
+    var amountFieldId = generateUniqueId('amount-field');
+
+    // Show the dialog
+    showDialog({
+        title: 'Sell ' + NameConfig.out.name,
+        message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
+        '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.out.name) + ':</label>' +
+        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+        actions: [
+            {
+                text: 'Sell',
+                state: 'primary',
+                action: function() {
+                    // Get the input field value
+                    var amount = $('#' + amountFieldId).val();
+
+                    // Send a packet to the server
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
+                        shop: shopToken,
+                        amount: amount,
+                        all: false
+                    });
+
+                    // Show a notification
+                    showNotification('Selling ' + NameConfig.out.name + '...');
+                }
+            },
+            {
+                text: 'Sell all',
+                action: function() {
+                    // Send a packet to the server
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
+                        shop: shopToken,
+                        amount: 0,
+                        all: true
+                    });
+
+                    // Show a notification
+                    showNotification('Selling all ' + NameConfig.out.name + '...');
+                }
+            },
+            {
+                text: 'Goodbye'
+            }
+        ]
+    });
 }
 
 /**
