@@ -3010,6 +3010,16 @@ function focusPlayer(zoom) {
         map.panTo(playerLocation);
 }
 
+// Update the map size when a page is shown
+$(document).bind('pageshow', function() {
+    // Make sure we're on a game page
+    if(!Dworek.utils.isGamePage())
+        return;
+
+    // Update the map size
+    updateMapSize(true, true);
+});
+
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
     if(data.to.find('#map-container').length > 0) {
@@ -3136,7 +3146,7 @@ $(window).resize(function() {
 function updateMapSize(invalidateSize, updateDiv) {
     // Update the map container size
     if(updateDiv)
-        $('#map-container').height($(document).height() - getActivePage().find('.ui-header').height());
+        $('#map-container').height($(window).height() - getActivePage().find('.ui-header').height());
 
     // Make sure we've a map we know about
     if(map == null)
