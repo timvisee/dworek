@@ -237,7 +237,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                             });
 
                                             // Broadcast the factory data, since it's updated
-                                            liveFactory.broadcastLocationData(undefined, undefined, function(err) {
+                                            liveFactory.broadcastData(undefined, undefined, function(err) {
                                                 if(err !== null) {
                                                     console.error(err);
                                                     console.error('Failed to broadcast factory data');

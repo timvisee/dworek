@@ -583,9 +583,9 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 /**
  * Broadcast the factory data to all relevant users.
  *
- * @param {Factory~broadcastLocationDataCallback} [callback] Called on success or when an error occurred.
+ * @param {Factory~broadcastDataCallback} [callback] Called on success or when an error occurred.
  */
-Factory.prototype.broadcastLocationData = function(callback) {
+Factory.prototype.broadcastData = function(callback) {
     // Store the current instance
     const self = this;
 
@@ -642,7 +642,7 @@ Factory.prototype.broadcastLocationData = function(callback) {
 /**
  * Called on success or when an error occurred.
  *
- * @callback Factory~broadcastLocationDataCallback
+ * @callback Factory~broadcastDataCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 
@@ -1362,7 +1362,7 @@ Factory.prototype.tick = function(callback) {
         });
 
         // Broadcast the location data when we're done, an call back
-        latch.then(self.broadcastLocationData(undefined, undefined, callback));
+        latch.then(self.broadcastData(undefined, undefined, callback));
     });
 };
 
