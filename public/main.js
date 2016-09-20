@@ -1203,7 +1203,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     const hasFactories = packet.hasOwnProperty('factories');
 
     // Show a notification
-    console.log('Received location data for ' + packet.users.length + ' users');
+    console.log('Received location data (users: ' + packet.users.length + ', factories: ' + packet.factories.length + ')');
 
     // Update the users locations
     if(hasUsers)
