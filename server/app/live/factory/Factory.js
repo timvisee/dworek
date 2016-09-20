@@ -1093,16 +1093,23 @@ Factory.prototype.getDefenceUpgrades = function(callback) {
  * @param callback callback(err, canModify)
  */
 Factory.prototype.canModify = function(user, callback) {
+    // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Store this instance
     const self = this;
 
+    // Only call back once
     var calledBack = false;
 
+    // Create a variable for the factory and user's team
     var factoryTeam = null;
     var userTeam = null;
 
+    // Get the factory team
     latch.add();
     this.getTeam(function(err, team) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1110,13 +1117,17 @@ Factory.prototype.canModify = function(user, callback) {
             return;
         }
 
+        // Set the factory team
         factoryTeam = team;
 
+        // Resolve the latch
         latch.resolve();
     });
 
+    // Get the game user instance for the given user
     latch.add();
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), user, function(err, gameUser) {
+        // Call back errors
         if(err !== null) {
             if(!calledBack)
                 callback(err);
@@ -1124,7 +1135,9 @@ Factory.prototype.canModify = function(user, callback) {
             return;
         }
 
+        // Get team of the user
         gameUser.getTeam(function(err, team) {
+            // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
@@ -1132,35 +1145,45 @@ Factory.prototype.canModify = function(user, callback) {
                 return;
             }
 
+            // Set the user's team
             userTeam = team;
 
+            // Resolve the latch
             latch.resolve();
         });
     });
 
+    // Continue when we're done fetching both teams
     latch.then(function() {
+        // Call back if any of the teams is null
         if(factoryTeam == null || userTeam == null) {
             callback(null, false);
             return;
         }
 
+        // Call back if both teams aren't matching
         if(!factoryTeam.getId().equals(userTeam.getId())) {
             callback(null, false);
             return;
         }
 
+        // Get the live user instance for the given user
         self.getGame().getUser(user, function(err, liveUser) {
+            // Call back errors
             if(err !== null) {
                 callback(err);
                 return;
             }
 
+            // Check whether the live user is in range
             self.isUserInRange(liveUser, function(err, inRange) {
+                // Call back errors
                 if(err !== null) {
                     callback(err);
                     return;
                 }
 
+                // Call back with the result
                 callback(null, inRange);
             });
         });
