@@ -3443,7 +3443,7 @@ function updateFactoryMarkers(factories) {
                             text: 'View ' + NameConfig.factory.name,
                             state: 'primary',
                             action: function() {
-                                Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'slide');
+                                Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'flip');
                             }
                         }, {
                             text: 'Close'
