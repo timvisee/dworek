@@ -25,8 +25,8 @@ var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 
 var Core = require('../../../Core');
-var User = require('./Shop');
 var UserModel = require('../../model/user/UserModel');
+var GameTeamModel = require('../../model/gameteam/GameTeamModel');
 var CallbackLatch = require('../../util/CallbackLatch');
 var Shop = require('./Shop');
 var PacketType = require('../../realtime/PacketType');
@@ -547,6 +547,104 @@ ShopManager.prototype.findNewShopUsers = function(teamId, callback) {
         callback(null, users);
     });
 };
+
+/**
+ * Get the preferred shop count delta for the given team.
+ * If it's preferred a team get's less shops for their current user count, a negative user count is returned.
+ *
+ * @param {GameTeamModel|ObjectId|string} teamId Team instance or ID to get the delta count for.
+ * @param {ShopManager~getTeamPreferredShopCountDeltaCallback} callback Called with the result or when an error occurred.
+ */
+ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback) {
+    // Get the object ID of the team
+    if(teamId instanceof GameTeamModel)
+        teamId = teamId.getId();
+    else if(_.isString(teamId) && ObjectId.isValid(teamId))
+        teamId = new ObjectId(teamId);
+    else if(!(teamId instanceof ObjectId)) {
+        // Call back with zero
+        callback(null, 0);
+        return;
+    }
+
+    // Count the number of users
+    var userCount = 0;
+
+    // Store this
+    const self = this;
+
+    // Callback latch
+    var latch = new CallbackLatch();
+
+    // Loop through the list of users
+    this.game.userManager.users.forEach(function(liveUser) {
+        // Get the game user
+        latch.add();
+        Core.model.gameUserModelManager.getGameUser(liveUser.getGame().getGameModel(), liveUser.getUserModel(), function(err, gameUser) {
+            // Handle errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Continue if we can't find a game user for this user
+            if(gameUser == null) {
+                latch.resolve();
+                return;
+            }
+
+            // Get the users team
+            gameUser.getTeam(function(err, userTeam) {
+                // Handle errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Skip if the team is null or if the team doesn't equal the specified team
+                if(userTeam == null || userTeam.getId().equals(teamId)) {
+                    latch.resolve();
+                    return;
+                }
+
+                // Increase the user count for the team
+                userCount++;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+    });
+
+    // Continue
+    latch.then(function() {
+        // Get the game configuration
+        self.game.getConfig(function(err, gameConfig) {
+            // Handle errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the preferred shop count for this team
+            const preferredShopCount = gameConfig.shop.getShopsInTeam(userCount);
+
+            // Get the number of shops
+            const currentCount = self.getTeamShopCount(teamId);
+
+            // Determine the shop count delta and call it back
+            callback(null, preferredShopCount - currentCount);
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback ShopManager~getTeamPreferredShopCountDeltaCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {Number=} Preferred shop count delta.
+ */
 
 // Export the class
 module.exports = ShopManager;
