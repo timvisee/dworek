@@ -72,18 +72,22 @@ PacketProcessor.prototype.receivePacked = function(rawPacket, socket) {
 };
 
 /**
- * Send a packet object to the given
+ * Send a packet object to the given sockets.
  *
  * @param {Number} packetType Packet type value.
  * @param {Object} packet Packet object to send.
- * @param socket SocketIO socket to send the packet over.
+ * @param {Array|*} sockets Array of SocketIO sockets or a single socket to send the packet over.
  */
-PacketProcessor.prototype.sendPacket = function(packetType, packet, socket) {
+PacketProcessor.prototype.sendPacket = function(packetType, packet, sockets) {
+    // Make sure the sockets parameter is an array
+    if(!_.isArray(sockets))
+        sockets = [sockets];
+
     // Put the packet type in the packet object
     packet.type = packetType;
 
-    // Send the packet over the socket
-    socket.emit(config.realtime.defaultRoom, packet);
+    // Send the packet over the sockets
+    sockets.forEach((socket) => socket.emit(config.realtime.defaultRoom, packet));
 };
 
 /**
