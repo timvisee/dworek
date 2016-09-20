@@ -3016,6 +3016,9 @@ $(document).bind("tab-switch", function(event, data) {
         // Update the map size
         updateMapSize(true, true);
 
+        // Request the map data
+        requestMapData();
+
         // Use the last known player location when possible
         var latlng = [52.0705, 4.3007];
         if(Dworek.state.geoLastPlayerPosition != null)
