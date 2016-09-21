@@ -3613,17 +3613,26 @@ function focusEverything() {
         return;
 
     // Create an array of things to fit
-    var fitters = playersMarkers.slice(0);
+    var fitters = [];
+
+    // Add the player marker
+    if(playerMarker != null)
+        fitters.push(playerMarker);
+
+    // Add the player marker
+    if(playersMarkers != null)
+        playersMarkers.forEach(function(marker) {
+            if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle != undefined)
+                fitters.push(marker.rangeCircle);
+            else
+                fitters.push(marker);
+        });
 
     // Add the factory markers
     if(factoryMarkers != null)
         factoryMarkers.forEach(function(factoryMarker) {
             fitters.push(factoryMarker.rangeCircle);
         });
-
-    // Add the player marker
-    if(playerMarker != null)
-        fitters.push(playerMarker);
 
     // Make sure we have any fitters
     if(fitters.length == 0)
@@ -3801,12 +3810,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_DATA, function(p
     if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('data'))
         return;
 
-    // Get the packet data
-    const gameId = packet.game;
-    const data = packet.data;
-
     // Set the game data
-    gameData[gameId] = data;
+    gameData[packet.game] = packet.data;
 
     // Update the game data visuals
     updateGameDataVisuals();
@@ -4353,7 +4358,6 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
 
     // Get the packet data
     const factoryId = packet.factory;
-    const gameId = packet.game;
     const data = packet.data;
 
     // Set the factory data
@@ -4465,12 +4469,12 @@ function updateFactoryDataVisuals(firstShow) {
     // Update the upgrade buttons
     if(canModify) {
         // Get the upgrade button list element, and clear it
-        const upgradeButtonlist = defenceCard.find('.upgrade-button-list');
-        upgradeButtonlist.empty();
+        const upgradeButtonList = defenceCard.find('.upgrade-button-list');
+        upgradeButtonList.empty();
 
         // Check whether there are any defence upgrades
         if(!data.hasOwnProperty('defenceUpgrades')) {
-            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br></i></div>');
+            upgradeButtonList.html('<div align="center"><i>No upgrades available...<br></i></div>');
 
         } else {
             // Loop through the list of upgrades
@@ -4479,13 +4483,13 @@ function updateFactoryDataVisuals(firstShow) {
                 var buttonId = generateUniqueId('button-upgrade-');
 
                 // Append a button
-                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
                     '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')' +
                     '</a>');
 
                 // Get the button
-                var button = upgradeButtonlist.find('#' + buttonId);
+                var button = upgradeButtonList.find('#' + buttonId);
 
                 // Bind a click action
                 button.click(function() {
@@ -4520,7 +4524,7 @@ function updateFactoryDataVisuals(firstShow) {
         }
 
         // Trigger a create on the list
-        upgradeButtonlist.trigger('create');
+        upgradeButtonList.trigger('create');
 
         if(data.hasOwnProperty('nextLevelCost')) {
             const levelUpgradeButton = levelCard.find('.action-factory-level-upgrade');
