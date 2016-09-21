@@ -23,7 +23,6 @@
 var mongo = require('mongodb');
 var ObjectId = mongo.ObjectId;
 var _ = require('lodash');
-var geolib = require('geolib');
 
 var config = require('../../../config');
 
