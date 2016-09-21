@@ -53,6 +53,7 @@ var User = function(user, game) {
 
     /**
      * Live game instance.
+     *
      * @type {Game} Game.
      * @private
      */
@@ -721,4 +722,3 @@ User.prototype.toString = function() {
 
 // Export the class
 module.exports = User;
-

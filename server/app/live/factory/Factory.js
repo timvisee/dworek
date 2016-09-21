@@ -1196,17 +1196,14 @@ Factory.prototype.canModify = function(user, callback) {
  * @param callback (err, inRange)
  */
 Factory.prototype.isUserInRange = function(liveUser, callback) {
-    // Make sure the user has a recent position
-    if(!liveUser.hasRecentLocation()) {
+    // Make sure a proper live user is given, and that he has a recent location
+    if(liveUser == null || !liveUser.hasRecentLocation()) {
         callback(null, false);
         return;
     }
 
     // Create a callback latch
     var latch = new CallbackLatch();
-
-    // Store this instance
-    const self = this;
 
     // Call back only once
     var calledBack = false;
@@ -1435,6 +1432,196 @@ Factory.prototype.getRange = function(callback) {
  * @param {Number=} Factory range in meters.
  */
 
+/**
+ * Check whether this factory is visible for the given user.
+ *
+ * @param {User} liveUser Given user.
+ * @param {Factory~getVisibilityDataCallback} callback Called with the result or when an error occurred.
+ */
+Factory.prototype.getVisibilityData = function(liveUser, callback) {
+    // Create a result object
+    var resultObject = {
+        ally: false,
+        visible: false,
+        inRange: false
+    };
+
+    // Make sure a valid user is given
+    if(liveUser == null) {
+        callback(null, resultObject);
+        return;
+    }
+
+    // Get the factory model and make sure it's valid
+    const factoryModel = this.getFactoryModel();
+    if(factoryModel == null) {
+        callback(null, resultObject);
+        return;
+    }
+
+    // Get the user and game model
+    const userModel = liveUser.getUserModel();
+    const gameModel = this.getGame().getGameModel();
+
+    // Define the current instance
+    const self = this;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create a callback latch for the ally check
+    var allyLatch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Create a variable for the factor and user team
+    var factoryTeam = null;
+    var userTeam = null;
+
+    // Get the factory's team
+    allyLatch.add();
+    this.getTeam(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Store the factory team
+        factoryTeam = result;
+
+        // Resolve the latch
+        allyLatch.resolve();
+    });
+
+    // Get the game user
+    latch.add();
+    allyLatch.add();
+    Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch if the game user is null
+        if(gameUser == null) {
+            latch.resolve();
+            allyLatch.resolve();
+            return;
+        }
+
+        // Get the user's team
+        gameUser.getTeam(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the user
+            userTeam = result;
+
+            // Resolve the ally latch
+            allyLatch.resolve();
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the user state
+    latch.add();
+    gameModel.getUserState(userModel, function(err, userState) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the visibility state if the user is a spectator
+        if(userState.spectator)
+            resultObject.visible = true;
+
+        // Determine whether the factory is ally when we fetched the team data
+        latch.add();
+        allyLatch.then(function() {
+            // Make sure the user is a player
+            if(!userState.player) {
+                latch.resolve();
+                return;
+            }
+
+            // Set the ally and visibility status if the teams equal and aren't null
+            if(factoryTeam != null && userTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
+                resultObject.ally = true;
+                resultObject.visible = true;
+            }
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // If the user is a player or special player, check whether he's in range
+        // Make sure the user has a recently known location
+        if((userState.player || userState.special) && liveUser.hasRecentLocation()) {
+            // Get the factory range
+            latch.add();
+            self.isUserInRange(liveUser, function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set whether the user is in range
+                resultObject.inRange = result;
+
+                // Set the visibility state if the factory is in range
+                if(result)
+                    resultObject.visible = true;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back the result object when we're done
+    latch.then(function() {
+        // Call back the results
+        callback(null, resultObject);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Factory~getVisibilityDataCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {VisibilityDataObject=} Object with the result.
+ */
+
+/**
+ * @typedef {Object} VisibilityDataObject
+ * @param {boolean} ally True if this factory is allied, false if not.
+ * @param {boolean} visible True if the factory is visible for the user, false if not.
+ * @param {boolean} inRange True if the factory is in the user's range, false if not.
+ */
+
 // Export the class
 module.exports = Factory;
-
