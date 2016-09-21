@@ -378,21 +378,48 @@ Shop.prototype.setInRangeMemory = function(liveUser, inRange) {
 /**
  * Check whether the given live user is in range of the shop.
  *
- * @param {User} user The live user to check for.
- * @return {boolean} True if the user is in range, false if not.
+ * @param {User} liveUser The live user to check for.
+ * @param {Shop~isUserInRangeCallback} callback Called with the result, or when an error occurred.
  */
-Shop.prototype.isUserInRange = function(user) {
+Shop.prototype.isUserInRange = function(liveUser, callback) {
+    // Make sure a valid user is given
+    if(liveUser == null) {
+        callback(null, false);
+        return;
+    }
+
     // Return true if the user is the same as the shop owner
-    if(this.getUser().getId().equals(user.getId()))
-        return true;
+    if(this.getUser().getId().equals(liveUser.getId())) {
+        callback(null, true);
+        return;
+    }
 
     // Make sure the user has a recent location
-    if(!user.hasRecentLocation())
-        return false;
+    if(!liveUser.hasRecentLocation()) {
+        callback(null, false);
+        return;
+    }
 
-    // Get the user location and check whether the user is in range
-    return this.getLocation().getDistanceTo(user.getLocation()) <= this.getRange(user);
+    // Get the shops range
+    this.getRange(liveUser, function(err, range) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Check whether the user is in range, call back the result
+        callback(null, self.getLocation().getDistanceTo(liveUser.getLocation()) <= range);
+    });
 };
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~isUserInRangeCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the user is in range, false if not.
+ */
 
 /**
  * Get the shop name.
