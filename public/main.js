@@ -3531,41 +3531,6 @@ function updateFactoryMarkers(factories) {
                 icon: L.spriteIcon(factory.ally ? 'orange' : 'red')
             });
 
-            // Show a popup when the user clicks on the marker
-            marker.on('click', function() {
-                // Create the dialog body
-                const dialogBody = '<div align="center" class="table-list">' +
-                    '<table>' +
-                    '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-tag-more zmdi-hc-fw"></i> Name</td><td>' + factory.name + '</td>' +
-                    '    </tr>' +
-                    '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (factory.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
-                    '    </tr>' +
-                    '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td>' + (factory.inRange ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
-                    '    </tr>' +
-                    '</table>' +
-                    '</div>';
-
-                // Show a dialog
-                showDialog({
-                    title: capitalizeFirst(NameConfig.factory.name),
-                    message: dialogBody,
-                    actions: [
-                        {
-                            text: 'View ' + NameConfig.factory.name,
-                            state: 'primary',
-                            action: function() {
-                                Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'flip');
-                            }
-                        }, {
-                            text: 'Close'
-                        }
-                    ]
-                })
-            });
-
             // Create a range circle
             marker.rangeCircle = L.circle(pos, factory.range);
             marker.rangeCircle.setStyle({
@@ -3597,6 +3562,42 @@ function updateFactoryMarkers(factories) {
                 dashArray: factory.inRange ? '' : '5,5'
             });
         }
+
+        // Rebind the popup to show when the user clicks on the marker
+        marker.off('click');
+        marker.on('click', function() {
+            // Create the dialog body
+            const dialogBody = '<div align="center" class="table-list">' +
+                '<table>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-tag-more zmdi-hc-fw"></i> Name</td><td>' + factory.name + '</td>' +
+                '    </tr>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (factory.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
+                '    </tr>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td>' + (factory.inRange ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
+                '    </tr>' +
+                '</table>' +
+                '</div>';
+
+            // Show a dialog
+            showDialog({
+                title: capitalizeFirst(NameConfig.factory.name),
+                message: dialogBody,
+                actions: [
+                    {
+                        text: 'View ' + NameConfig.factory.name,
+                        state: 'primary',
+                        action: function() {
+                            Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'flip');
+                        }
+                    }, {
+                        text: 'Close'
+                    }
+                ]
+            })
+        });
     });
 
     // Create an array of marker indices to remove

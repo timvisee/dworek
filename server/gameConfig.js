@@ -89,10 +89,17 @@ var gameConfig = {
         range: 15,
 
         /**
+         * Active operation range in meters.
+         * This range is effective when a user is inside the shops range.
+         * @type {Number}
+         */
+        activeRange: 20,
+
+        /**
          * Shop worker invocation interval.
          * @type {Number}
          */
-        workerInterval: 5 * 1000,
+        workerInterval: 1 * 1000,
 
         /**
          * Get the number of preferred shops in a team, based on the team size.
@@ -126,7 +133,7 @@ var gameConfig = {
          * The time in advance a user gets to know he'll become a shop. This is the time in milliseconds.
          * @type {Number}
          */
-        shopAlertTime: 45 * 1000,
+        shopAlertTime: 3 * 1000,
 
         /**
          * Get the price per unit the in goods are sold for.
