@@ -71,6 +71,19 @@ const GeoStates = {
 };
 
 /**
+ * Regular configuration for the game.
+ * @type {Object}
+ */
+const Config = {
+    location: {
+        /**
+         * Time in milliseconds for the location watcher fallback to kick in.
+         */
+        fallbackTime: 10 * 1000
+    }
+};
+
+/**
  * Name configuration for the game.
  * @type {Object}
  */
@@ -166,6 +179,12 @@ var Dworek = {
             geoWatcher: null,
 
             /**
+             * Geo watcher fallback interval handle.
+             * @type {Number|null}
+             */
+            geoWatcherFallback: null,
+
+            /**
              * Last known GEO location state.
              * Defined by GeoStates enum.
              * @type {Number}
@@ -173,9 +192,11 @@ var Dworek = {
             geoState: GeoStates.UNKNOWN,
 
             /**
-             * The last known player position.
+             * The processed player position.
+             * Or null if the position isn't valid anymore.
+             * @type {*|null}
              */
-            geoLastPlayerPosition: null,
+            geoPlayerPosition: null,
 
             /**
              * The time the client was last connected at.
@@ -274,10 +295,22 @@ var Dworek = {
                 // Show a status message
                 console.log('Starting GPS watcher...');
 
+                // Start the geo watcher fallback interval
+                Dworek.state.geoWatcherFallback = setInterval(doLocationFallback, Config.location.fallbackTime);
+
                 // Start the position watcher
                 Dworek.state.geoWatcher = navigator.geolocation.watchPosition(function(position) {
                     // Process the success callback
-                    processLocationSuccess(position);
+                    processLocationSuccess(position, true, true);
+
+                    // Clear the current geo watcher fallback
+                    if(Dworek.state.geoWatcherFallback != null) {
+                        clearInterval(Dworek.state.geoWatcherFallback);
+                        Dworek.state.geoWatcherFallback = null;
+                    }
+
+                    // Start the geo watcher fallback interval
+                    Dworek.state.geoWatcherFallback = setInterval(doLocationFallback, Config.location.fallbackTime);
 
                 }, function(error) {
                     // Process the error callback
@@ -289,28 +322,6 @@ var Dworek = {
                     maximumAge: 5 * 1000
                 });
 
-                const customWatcherTest = function() {
-                    if(Dworek.state.geoLastPlayerPosition != null)
-                        processLocationSuccess(Dworek.state.geoLastPlayerPosition);
-
-                    // navigator.geolocation.getCurrentPosition(function(position) {
-                    //     // Process the success callback
-                    //     processLocationSuccess(position);
-                    //
-                    // }, function(error) {
-                    //     // Process the error callback
-                    //     processLocationError(error, false);
-                    //
-                    // }, {
-                    //     enableHighAccuracy: false,
-                    //     timeout: 2 * 60 * 1000,
-                    //     maximumAge: 0
-                    // })
-                };
-
-                // Start the custom watcher
-                Dworek.state.customWatcher = setInterval(customWatcherTest, 3000);
-
             } else if(!sendLocationUpdates && Dworek.state.geoWatcher != null) {
                 // Show a status message
                 console.log('Stopping GPS watcher...');
@@ -319,9 +330,11 @@ var Dworek = {
                 navigator.geolocation.clearWatch(Dworek.state.geoWatcher);
                 Dworek.state.geoWatcher = null;
 
-                // Stop the custom watcher if here is any
-                if(Dworek.state.customWatcher !== undefined)
-                    clearInterval(Dworek.state.customWatcher);
+                // Clear the current geo watcher fallback
+                if(Dworek.state.geoWatcherFallback != null) {
+                    clearInterval(Dworek.state.geoWatcherFallback);
+                    Dworek.state.geoWatcherFallback = null;
+                }
             }
 
             // Update the status labels
@@ -2691,7 +2704,7 @@ function testGps() {
     // Get the current GPS location
     navigator.geolocation.getCurrentPosition(function(position) {
         // Process the location success callback, don't show an notification
-        processLocationSuccess(position, false);
+        processLocationSuccess(position, false, true);
 
         // Show a notification regarding the GPS
         showNotification('Your GPS is working');
@@ -2711,15 +2724,20 @@ function testGps() {
  * @param {*} position Position object.
  * @param {boolean} [notification=true] True to show a notification if the GPS state has changed,
  * false to show no notification.
+ * @param {boolean} [alsoUpdateLocal=true] True to update the location, but only send it to the server.
  * @return {boolean} True if a notification is shown, false if not.
  */
-function processLocationSuccess(position, notification) {
-    // Process the showNotification parameter
+function processLocationSuccess(position, notification, alsoUpdateLocal) {
+    // Process the showNotification and update parameter
     if(notification == undefined)
         notification = true;
+    if(alsoUpdateLocal == undefined)
+        alsoUpdateLocal = true;
 
     // Set the GPS status
-    const gpsStateChanged = setGpsState(GeoStates.WORKING);
+    const gpsStateChanged = false;
+    if(alsoUpdateLocal)
+        setGpsState(GeoStates.WORKING);
 
     // Show a GPS success notification if it started working again
     if(notification && gpsStateChanged)
@@ -2727,6 +2745,7 @@ function processLocationSuccess(position, notification) {
             vibrate: true
         });
 
+    // Update the location if a game is active and we have the proper roles
     if(Dworek.state.activeGame !== null && Dworek.state.activeGameStage == 1 && Dworek.state.activeGameRoles.player) {
         // Send a location update to the server if we've an active game
         Dworek.realtime.packetProcessor.sendPacket(PacketType.LOCATION_UPDATE, {
@@ -2742,7 +2761,8 @@ function processLocationSuccess(position, notification) {
     }
 
     // Update the player position
-    updatePlayerPosition(position);
+    if(alsoUpdateLocal)
+        updatePlayerPosition(position);
 
     // Return true if the GPS state changed
     return gpsStateChanged;
@@ -2853,8 +2873,27 @@ function processLocationError(error, showErrorDialog) {
         returnValue = true;
     }
 
+    // Reset the last location if the error isn't a timeout
+    if(error.code != error.TIMEOUT)
+        Dworek.state.geoPlayerPosition = null;
+
+    // Update the player marker
+    updatePlayerMarker();
+
     // Return the return value
     return returnValue;
+}
+
+/**
+ * Function to use as geo watcher fallback.
+ */
+function doLocationFallback() {
+    // Make sure we've any known last location
+    if(Dworek.state.geoPlayerPosition == null)
+        return;
+
+    // Process the last known location, don't update locally
+    processLocationSuccess(Dworek.state.geoPlayerPosition, false, false);
 }
 
 /**
@@ -3042,8 +3081,8 @@ $(document).bind("tab-switch", function(event, data) {
 
         // Use the last known player location when possible
         var latlng = [52.0705, 4.3007];
-        if(Dworek.state.geoLastPlayerPosition != null)
-            latlng = [Dworek.state.geoLastPlayerPosition.coords.latitude, Dworek.state.geoLastPlayerPosition.coords.longitude];
+        if(Dworek.state.geoPlayerPosition != null)
+            latlng = [Dworek.state.geoPlayerPosition.coords.latitude, Dworek.state.geoPlayerPosition.coords.longitude];
 
         // Create a map if none has been created yet
         // TODO: Make sure the map container still exists!?
@@ -3146,8 +3185,8 @@ $(document).bind("tab-switch", function(event, data) {
             // TODO: Request player positions from server
 
             // Force update the last player position if it's known
-            if(Dworek.state.geoLastPlayerPosition != null)
-                updatePlayerPosition(Dworek.state.geoLastPlayerPosition);
+            if(Dworek.state.geoPlayerPosition != null)
+                updatePlayerPosition(Dworek.state.geoPlayerPosition);
         }
 
         // Invalidate the map size, because the container size might be changed
@@ -3214,7 +3253,7 @@ function requestMapData(game) {
 
 /**
  * Update the last known player position.
- * @param position Player position.
+ * @param position Player position or undefined.
  */
 function updatePlayerPosition(position) {
     // Return if the user doesn't have the right roles
@@ -3222,12 +3261,31 @@ function updatePlayerPosition(position) {
         return;
 
     // Set the last known location
-    Dworek.state.geoLastPlayerPosition = position;
+    Dworek.state.geoPlayerPosition = position;
+
+    // Update the player marker
+    updatePlayerMarker();
+}
+
+/**
+ * Update the player marker.
+ */
+function updatePlayerMarker() {
+    // Return if the user doesn't have the right roles
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special))
+        return;
+
+    // Set the last known location
+    const position = Dworek.state.geoPlayerPosition;
 
     // Update the player markers if the map is created
     if(map != null) {
         // Create a player marker if we don't have one yet
         if(playerMarker == null) {
+            // Make sure a player position is known
+            if(position == null)
+                return;
+
             // Create the player marker
             playerMarker = L.marker([position.coords.latitude, position.coords.longitude], {
                 icon: L.spriteIcon('blue')
@@ -3268,10 +3326,19 @@ function updatePlayerPosition(position) {
             focusEverything();
 
         } else {
-            // Update the position and range
-            playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
-            playerMarker.rangeCircle.setLatLng([position.coords.latitude, position.coords.longitude]);
-            playerMarker.rangeCircle.setRadius(Dworek.state.geoLastPlayerPosition.coords.accuracy);
+            // Update the position if it's known
+            if(position != null) {
+                // Update the position and range
+                playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+                playerMarker.rangeCircle.setLatLng([position.coords.latitude, position.coords.longitude]);
+                playerMarker.rangeCircle.setRadius(Dworek.state.geoPlayerPosition.coords.accuracy);
+
+                // Set the marker opacity
+                playerMarker.setStyle(1);
+            } else {
+                // Set the marker opacity
+                playerMarker.setOpacity(0.3);
+            }
         }
     }
 
@@ -4479,7 +4546,6 @@ function updateFactoryDataVisuals(firstShow) {
     const canModify = visible && data.hasOwnProperty('inRange') && data.hasOwnProperty('ally') && data.inRange && data.ally;
 
     // Select the cards
-    var infoCard = activePage.find('.card-factory-info');
     var transferCard = activePage.find('.card-factory-transfer');
     var defenceCard = activePage.find('.card-factory-defence');
     var levelCard = activePage.find('.card-factory-level');
