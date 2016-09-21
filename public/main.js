@@ -3371,13 +3371,42 @@ function updatePlayerMarkers(users) {
                 '</table>' +
                 '</div>';
 
+            // Create a list of actions
+            var actions = [];
+
+            // Add a buy and sell action if user is a shop that's in range
+            if(user.shop.isShop && user.shop.inRange) {
+                // Buy button
+                actions.push({
+                    text: 'Buy ' + NameConfig.in.name,
+                    icon: 'zmdi zmdi-arrow-left',
+                    action: function() {
+                        // Show the buy dialog
+                        showShopBuyDialog(user.shop.token);
+                    }
+                });
+
+                // Sell button
+                actions.push({
+                    text: 'Sell ' + NameConfig.out.name,
+                    icon: 'zmdi zmdi-arrow-right',
+                    action: function() {
+                        // Show the sell dialog
+                        showShopSellDialog(user.shop.token);
+                    }
+                });
+            }
+
+            // Add the close button
+            actions.push({
+                text: 'Close'
+            });
+
             // Show a dialog
             showDialog({
                 title: 'Other player',
                 message: dialogBody,
-                actions: [{
-                    text: 'Close'
-                }]
+                actions: actions
             });
         });
     });
@@ -4151,7 +4180,7 @@ function showShopBuyDialog(shopToken) {
 
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
-                        shop: shop.token,
+                        shop: shopToken,
                         amount: amount,
                         all: false
                     });
@@ -4165,7 +4194,7 @@ function showShopBuyDialog(shopToken) {
                 action: function() {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
-                        shop: shop.token,
+                        shop: shopToken,
                         amount: 0,
                         all: true
                     });

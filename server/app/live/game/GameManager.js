@@ -537,6 +537,9 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                             // Fetch shop data if this user is a shop
                             if(isShop) {
+                                // Add the shop token
+                                userObject.shop.token = liveShop.getToken();
+
                                 // Get the shop visibility data
                                 shopLatch.add();
                                 liveShop.getVisibilityState(liveUser, function(err, visibilityState) {
