@@ -662,7 +662,7 @@ Factory.prototype.getTeam = function(callback) {
  */
 Factory.prototype.isVisibleFor = function(liveUser, callback) {
     // Get the visibility state for the user
-    self.getVisibilityState(liveUser, function(err, visibilityState) {
+    this.getVisibilityState(liveUser, function(err, visibilityState) {
         // Call back errors
         if(err !== null) {
             callback(err);

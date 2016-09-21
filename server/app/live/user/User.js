@@ -364,7 +364,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
     });
 
     // Loop through all the shops
-    liveGame.shopManager.factories.forEach(function(liveShop) {
+    liveGame.shopManager.shops.forEach(function(liveShop) {
         // Skip if we called back
         if(calledBack)
             return;

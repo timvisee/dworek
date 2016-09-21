@@ -483,14 +483,14 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                 var factories = [];
 
                 // Loop through the list user
-                liveGame.userManager.users.forEach(function(otherUser) {
+                liveGame.userManager.users.forEach(function(otherLiveUser) {
                     // Skip each user if we already called back
                     if(calledBack)
                         return;
 
                     // Check whether the other user is visible for the current user
                     gameLatch.add();
-                    otherUser.isVisibleFor(liveUser, function(err, visible) {
+                    otherLiveUser.isVisibleFor(liveUser, function(err, visible) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -507,7 +507,7 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                         }
 
                         // Get the name of the user
-                        otherUser.getName(function(err, name) {
+                        otherLiveUser.getName(function(err, name) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)
@@ -517,19 +517,74 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                                 return;
                             }
 
-                            // Determine whether the user is a shop
-                            var isShop = visible && liveGame.shopManager.isShopUser(otherUser);
+                            // Get the shop instance for this user if there is any, and determine whether the user is a shop
+                            const liveShop = visible && liveGame.shopManager.getShopByUser(otherLiveUser);
+                            const isShop = liveShop != null;
 
-                            // Create a user object and add it to the list
-                            users.push({
-                                user: otherUser.getIdHex(),
+                            // Create a data object for the user
+                            var userObject = {
+                                user: otherLiveUser.getIdHex(),
                                 userName: name,
-                                location: otherUser.getLocation(),
-                                isShop
-                            });
+                                location: otherLiveUser.getLocation(),
+                                ally: true,
+                                shop: {
+                                    isShop
+                                }
+                            };
 
-                            // Resolve the game latch
-                            gameLatch.resolve();
+                            // Create a callback latch for the shop
+                            var shopLatch = new CallbackLatch();
+
+                            // Fetch shop data if this user is a shop
+                            if(isShop) {
+                                // Get the shop visibility data
+                                shopLatch.add();
+                                liveShop.getVisibilityState(liveUser, function(err, visibilityState) {
+                                    // Call back errors
+                                    if(err !== null) {
+                                        if(!calledBack)
+                                            if(_.isFunction(callback))
+                                                callback(err);
+                                        calledBack = true;
+                                        return;
+                                    }
+
+                                    // Append the visibility state of the shop to the user
+                                    userObject.ally = visibilityState.ally;
+                                    userObject.shop.inRange = visibilityState.inRange;
+
+                                    // Resolve the shop latch
+                                    shopLatch.resolve();
+                                });
+
+                                // Get the shop range
+                                shopLatch.add();
+                                liveShop.getRange(liveUser, function(err, range) {
+                                    // Call back errors
+                                    if(err !== null) {
+                                        if(!calledBack)
+                                            if(_.isFunction(callback))
+                                                callback(err);
+                                        calledBack = true;
+                                        return;
+                                    }
+
+                                    // Set the range
+                                    userObject.shop.range = range;
+
+                                    // Resolve the shop latch
+                                    shopLatch.resolve();
+                                });
+                            }
+
+                            // Add the user object
+                            shopLatch.then(function() {
+                                // Create a user object and add it to the list
+                                users.push(userObject);
+
+                                // Resolve the game latch
+                                gameLatch.resolve();
+                            });
                         });
                     });
                 });

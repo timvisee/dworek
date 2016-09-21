@@ -3272,7 +3272,7 @@ function updatePlayerMarkers(users) {
         return;
 
     // Determine whether to fit all users in the map after updating
-    var fitUsers = playersMarkers.length == 0;
+    var focusMarkers = playersMarkers.length == 0;
 
     // Loop through the users
     users.forEach(function(user) {
@@ -3287,7 +3287,7 @@ function updatePlayerMarkers(users) {
                 return;
 
             // Check if this is the correct marker
-            if(entry.user.user == user.user)
+            if(entry.state.user == user.user)
                 marker = entry;
         });
 
@@ -3295,40 +3295,17 @@ function updatePlayerMarkers(users) {
         if(marker == null) {
             // Create the marker
             marker = L.marker(pos, {
-                icon: !user.isShop ? L.spriteIcon('green') : L.spriteIcon('purple')
+                icon: !user.shop.isShop ? L.spriteIcon('green') : L.spriteIcon('purple')
             });
 
-            // Show a popup when the user clicks on the marker
-            marker.on('click', function() {
-                // Create the dialog body
-                const dialogBody = '<div align="center" class="table-list">' +
-                    '<table>' +
-                    '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-account zmdi-hc-fw"></i> Player</td><td>' + user.userName + '</td>' +
-                    '    </tr>' +
-                    '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.name) + '</td><td>' + (user.isShop ? 'Yes' : 'No') + '</td>' +
-                    '    </tr>' +
-                    '</table>' +
-                    '</div>';
-
-                // Show a dialog
-                showDialog({
-                    title: 'Other player',
-                    message: dialogBody,
-                    actions: [{
-                            text: 'Close'
-                    }]
-                })
-            });
+            // Store the marker state
+            marker.state = {
+                user: user.user,
+                isShop: user.shop.isShop
+            };
 
             // Add the marker to the map
             marker.addTo(map);
-
-            // Set the user section
-            marker.user = {
-                user: user.user
-            };
 
             // Add the marker to the markers list
             playersMarkers.push(marker);
@@ -3336,6 +3313,73 @@ function updatePlayerMarkers(users) {
         } else
             // Update the position
             marker.setLatLng(pos);
+
+        // Add a range circle if the user is a shop
+        if(user.shop.isShop) {
+            // Create the range circle if the marker doesn't have one yet
+            if(!marker.hasOwnProperty('rangeCircle')) {
+                // Create a range circle
+                marker.rangeCircle = L.circle(pos, user.shop.range);
+                marker.rangeCircle.addTo(map);
+
+            } else {
+                // Update the position and radius of the range circle
+                marker.rangeCircle.setLatLng(pos);
+                marker.rangeCircle.setRadius(user.shop.range);
+            }
+
+            // Set the range circle style
+            marker.rangeCircle.setStyle({
+                opacity: user.shop.inRange ? 1 : 0.4,
+                dashArray: user.shop.inRange ? '' : '5,5',
+                color: 'purple'
+            });
+
+            // Update the icon
+            if(!marker.state.isShop) {
+                marker.setIcon(L.spriteIcon('purple'));
+                marker.state.isShop = true;
+            }
+
+        } else if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle != null) {
+            // Remove the map circle from the map, and remove it from the marker
+            map.removeLayer(marker.rangeCircle);
+            marker.rangeCircle = null;
+
+            // Update the icon
+            if(marker.state.isShop) {
+                marker.setIcon(L.spriteIcon('green'));
+                marker.state.isShop = false;
+            }
+        }
+
+        // Show a popup when the user clicks on the marker
+        marker.off('click');
+        marker.on('click', function() {
+            // Create the dialog body
+            const dialogBody = '<div align="center" class="table-list">' +
+                '<table>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-account zmdi-hc-fw"></i> Player</td><td>' + user.userName + '</td>' +
+                '    </tr>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? 'Yes' : 'No') + '</td>' +
+                '    </tr>' +
+                '    <tr>' +
+                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.name) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
+                '    </tr>' +
+                '</table>' +
+                '</div>';
+
+            // Show a dialog
+            showDialog({
+                title: 'Other player',
+                message: dialogBody,
+                actions: [{
+                    text: 'Close'
+                }]
+            });
+        });
     });
 
     // Create an array of marker indices to remove
@@ -3353,7 +3397,7 @@ function updatePlayerMarkers(users) {
                 return;
 
             // Check whether this is the user
-            if(user.user == entry.user.user)
+            if(user.user == entry.state.user)
                 exists = true;
         });
 
@@ -3364,6 +3408,13 @@ function updatePlayerMarkers(users) {
 
     // Remove the markers at the given indices
     for(var i = toRemove.length - 1; i >= 0; i--) {
+        // Get the marker to remove
+        const removeMarker = playersMarkers[toRemove[i]];
+
+        // Remove the range circle if it has any
+        if(removeMarker.hasOwnProperty('rangeCircle') && removeMarker.rangeCircle != null)
+            map.removeLayer(removeMarker.rangeCircle);
+
         // Remove the marker
         map.removeLayer(playersMarkers[toRemove[i]]);
 
@@ -3372,13 +3423,11 @@ function updatePlayerMarkers(users) {
     }
 
     // Make sure we still want to fit
-    if(fitUsers && playersMarkers.length == 0)
-        fitUsers = false;
-
-    // Create an array of markers to fit
+    if(focusMarkers && playersMarkers.length == 0)
+        focusMarkers = false;
 
     // Fit all users
-    if(fitUsers)
+    if(focusMarkers && !getFollowPlayer() && getFollowEverything())
         focusEverything();
 }
 
@@ -3417,7 +3466,7 @@ function updateFactoryMarkers(factories) {
         if(marker == null) {
             // Create the marker
             marker = L.marker(pos, {
-                icon: L.spriteIcon('orange')
+                icon: L.spriteIcon(factory.ally ? 'orange' : 'red')
             });
 
             // Show a popup when the user clicks on the marker
@@ -3429,7 +3478,10 @@ function updateFactoryMarkers(factories) {
                     '        <td class="left"><i class="zmdi zmdi-tag-more zmdi-hc-fw"></i> Name</td><td>' + factory.name + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td style="color: gray;">Unknown</td>' +
+                    '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (factory.ally ? 'Yes' : 'No') + '</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td>' + (factory.inRange ? 'Yes' : 'No') + '</td>' +
                     '    </tr>' +
                     '</table>' +
                     '</div>';
@@ -3455,9 +3507,9 @@ function updateFactoryMarkers(factories) {
             // Create a range circle
             marker.rangeCircle = L.circle(pos, factory.range);
             marker.rangeCircle.setStyle({
-                opacity: 0.4,
-                dashArray: '5,5',
-                color: 'DarkOrange'
+                opacity: factory.inRange ? 1 : 0.4,
+                dashArray: factory.inRange ? '' : '5,5',
+                color: factory.ally ? 'darkorange' : 'red'
             });
 
             // Add the marker and range circle to the map
@@ -3477,6 +3529,11 @@ function updateFactoryMarkers(factories) {
             marker.setLatLng(pos);
             marker.rangeCircle.setLatLng(pos);
             marker.rangeCircle.setRadius(factory.range);
+
+            marker.rangeCircle.setStyle({
+                opacity: factory.inRange ? 1 : 0.4,
+                dashArray: factory.inRange ? '' : '5,5'
+            });
         }
     });
 
@@ -3499,7 +3556,7 @@ function updateFactoryMarkers(factories) {
                 exists = true;
         });
 
-        // Add the index if the user doens't exist
+        // Add the index if the user doesn't exist
         if(!exists)
             toRemove.push(i);
     });

@@ -437,6 +437,9 @@ Shop.prototype.isUserInRange = function(liveUser, callback) {
         return;
     }
 
+    // Store this instance
+    const self = this;
+
     // Get the shops range
     this.getRange(liveUser, function(err, range) {
         // Call back errors
@@ -497,7 +500,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
     }
 
     // Get the shop's live user and user model
-    const shopLiveUser = self.getUser();
+    const shopLiveUser = this.getUser();
     const shopUserModel = shopLiveUser.getUserModel();
 
     // Make sure a user model is available
@@ -528,7 +531,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
 
     // Get the shop's team
     allyLatch.add();
-    this.getUser().getUserModel().getTeam(function(err, result) {
+    Core.model.gameUserModelManager.getGameUser(shopLiveUser.getGame().getGameModel(), shopUserModel, function(err, shopGameUser) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -537,11 +540,28 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
             return;
         }
 
-        // Store the shop team
-        shopTeam = result;
+        // Resolve the latch if the game user is null
+        if(shopGameUser == null) {
+            allyLatch.resolve();
+            return;
+        }
 
-        // Resolve the latch
-        allyLatch.resolve();
+        // Get the user's team
+        shopGameUser.getTeam(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Store the shop team
+            shopTeam = result;
+
+            // Resolve the latch
+            allyLatch.resolve();
+        });
     });
 
     // Get the game user
