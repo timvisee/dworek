@@ -608,7 +608,7 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                         // Get the factory range
                         factoryLatch.add();
-                        liveFactory.getRange(function(err, range) {
+                        liveFactory.getRange(liveUser, function(err, range) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)

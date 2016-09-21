@@ -174,6 +174,13 @@ var gameConfig = {
         range: 15,
 
         /**
+         * Active operation range in meters.
+         * This range is effective when a user is inside the factories range.
+         * @param {Number}
+         */
+        activeRange: 20,
+
+        /**
          * Initial factory level, when the factory is created.
          * @type {Number}
          */

@@ -77,14 +77,6 @@ var Factory = function(factory, game) {
      */
     this._userRangeMem = [];
 
-    /**
-     * Range of the factory in meters.
-     * The value might be null if the range is unspecified.
-     * @type {Number|null}
-     * @private
-     */
-    this._range = null;
-
     // Get and set the factory ID
     if(factory instanceof FactoryModel)
         this._id = factory.getId();
@@ -827,8 +819,8 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
 
         // Set the visibility and range state, remember whether any of these states changed
         const stateChanged =
-            self.setInVisibilityMemory(visibilityData.visible) ||
-            self.setInRangeMemory(visibilityData.inRange);
+            self.setInVisibilityMemory(liveUser, visibilityData.visible) ||
+            self.setInRangeMemory(liveUser, visibilityData.inRange);
 
         // Send the factory data if the state changed
         if(stateChanged)
@@ -873,7 +865,7 @@ Factory.prototype.isInVisibilityMemory = function(liveUser) {
  * @param {boolean} visible True to set the visibility state to true, false otherwise.
  * @return {boolean} True if the state changed, false if not.
  */
-Factory.prototype.setInVisibilityMemory = function(liveUser, visible, callback) {
+Factory.prototype.setInVisibilityMemory = function(liveUser, visible) {
     // Get the memorized visibility state
     const lastState = this.isInVisibilityMemory(liveUser);
 
@@ -1276,7 +1268,7 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
 
     // Get the range of the factory
     latch.add();
-    this.getRange(function(err, range) {
+    this.getRange(liveUser, function(err, range) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -1458,15 +1450,10 @@ Factory.prototype.tick = function(callback) {
 /**
  * Get the range of the factory.
  *
+ * @param {User|undefined} liveUser Live user instance to get the range for, or undefined to get the global factory range.
  * @param {Factory~getRangeCallback} callback Called back with the range or when an error occurred.
  */
-Factory.prototype.getRange = function(callback) {
-    // Check whether we've cached the location
-    if(this._range != null) {
-        callback(null, this._range);
-        return;
-    }
-
+Factory.prototype.getRange = function(liveUser, callback) {
     // Store this instance
     const self = this;
 
@@ -1478,11 +1465,11 @@ Factory.prototype.getRange = function(callback) {
             return;
         }
 
-        // Store the range
-        self._range = gameConfig.factory.range;
-
-        // Call back the result
-        callback(null, self._range);
+        // Check whether the active or global range should be used, call back the result
+        if(self.isInRangeMemory(liveUser))
+            callback(null, gameConfig.factory.activeRange);
+        else
+            callback(null, gameConfig.factory.range);
     });
 };
 
