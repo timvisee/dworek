@@ -439,6 +439,193 @@ Shop.prototype.getName = function(callback) {
  * @param {string=} Name of the shop.
  */
 
+/**
+ * Check whether this shop is visible for the given user.
+ *
+ * @param {User} liveUser Given user.
+ * @param {Shop~getVisibilityStateCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.getVisibilityState = function(liveUser, callback) {
+    // Create a result object
+    var resultObject = {
+        ally: false,
+        visible: false,
+        inRange: false
+    };
+
+    // Make sure a valid user is given
+    if(liveUser == null) {
+        callback(null, resultObject);
+        return;
+    }
+
+    // Get the shop's live user and user model
+    const shopLiveUser = self.getUser();
+    const shopUserModel = shopLiveUser.getUserModel();
+
+    // Make sure a user model is available
+    if(shopUserModel == null) {
+        callback(null, resultObject);
+        return;
+    }
+
+    // Get the user and game model
+    const userModel = liveUser.getUserModel();
+    const gameModel = this.getGame().getGameModel();
+
+    // Define the current instance
+    const self = this;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Create an ally latch
+    var allyLatch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Create a variable for the factor and user team
+    var shopTeam = null;
+    var userTeam = null;
+
+    // Get the shop's team
+    allyLatch.add();
+    this.getUser().getUserModel().getTeam(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Store the shop team
+        shopTeam = result;
+
+        // Resolve the latch
+        allyLatch.resolve();
+    });
+
+    // Get the game user
+    latch.add();
+    allyLatch.add();
+    Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch if the game user is null
+        if(gameUser == null) {
+            latch.resolve();
+            allyLatch.resolve();
+            return;
+        }
+
+        // Get the user's team
+        gameUser.getTeam(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the user
+            userTeam = result;
+
+            // Resolve the ally latch
+            allyLatch.resolve();
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the user state
+    latch.add();
+    gameModel.getUserState(userModel, function(err, userState) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the visibility state if the user is a player or spectator
+        if(userState.player || userState.spectator)
+            resultObject.visible = true;
+
+        // Determine whether the factory is ally when we fetched the team data
+        latch.add();
+        allyLatch.then(function() {
+            // Make sure the user is a player
+            if(!userState.player) {
+                latch.resolve();
+                return;
+            }
+
+            // Set the ally status if the teams equal and aren't null
+            if(shopTeam != null && userTeam != null && shopTeam.getId().equals(userTeam.getId()))
+                resultObject.ally = true;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // If the user is a player or special player, check whether he's in range
+        // Make sure the user has a recently known location
+        if((userState.player || userState.special) && liveUser.hasRecentLocation()) {
+            // Get the shop range
+            latch.add();
+            self.isUserInRange(liveUser, function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set whether the user is in range
+                resultObject.inRange = result;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back the result object when we're done
+    latch.then(function() {
+        // Call back the results
+        callback(null, resultObject);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~getVisibilityStateCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {VisibilityStateObject=} Object with the result.
+ */
+
+/**
+ * @typedef {Object} VisibilityStateObject
+ * @param {boolean} visible True if the shop is visible for the user, false if not.
+ * @param {boolean} inRange True if the shop is in the user's range, false if not.
+ */
+
 // Export the class
 module.exports = Shop;
 
