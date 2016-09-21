@@ -62,12 +62,20 @@ var Factory = function(factory, game) {
     this._game = game;
 
     /**
-     * Create an array that tracks the users this factory is visible for.
+     * Array containing live users this factory is currently visible for.
      *
-     * @type {Array} Array of object IDs as string.
+     * @type {Array} Array of live user objects.
      * @private
      */
     this._userVisibleMem = [];
+
+    /**
+     * Array containing live users this factory is in range for.
+     *
+     * @type {Array} Array of live user objects.
+     * @private
+     */
+    this._userRangeMem = [];
 
     /**
      * Range of the factory in meters.
@@ -809,40 +817,35 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
         return;
     }
 
-    // Check whether the user is visible
-    this.isVisibleFor(liveUser, function(err, isVisible) {
+    // Get the visibility data for the given user
+    this.getVisibilityData(liveUser, function(err, visibilityData) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Get the memorized visibility state
-        const lastState = self.isInVisibilityMemory(liveUser);
+        // Set the visibility and range state, remember whether any of these states changed
+        const stateChanged =
+            self.setInVisibilityMemory(visibilityData.visible) ||
+            self.setInRangeMemory(visibilityData.inRange);
 
-        // Return false if the state didn't change
-        if(lastState == isVisible) {
-            callback(null, false);
-            return;
-        }
+        // Send the factory data if the state changed
+        if(stateChanged)
+            self.sendData(liveUser.getUserModel(), undefined, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
 
-        // Update the visibility array
-        if(isVisible)
-            self._userVisibleMem.push(liveUser);
+                // Call back
+                callback(null, true);
+            });
+
         else
-            self._userVisibleMem.splice(self._userVisibleMem.indexOf(liveUser), 1);
-
-        // Send the factory data
-        self.sendData(liveUser.getUserModel(), undefined, function(err) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
             // Call back
-            callback(null, true);
-        });
+            callback(null, false);
     });
 };
 
@@ -861,6 +864,65 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
  */
 Factory.prototype.isInVisibilityMemory = function(liveUser) {
     return this._userVisibleMem.indexOf(liveUser) >= 0;
+};
+
+/**
+ * Set whether the given live user is in the visibility memory of the factory.
+ *
+ * @param {User} liveUser Live user instance to set the state for.
+ * @param {boolean} visible True to set the visibility state to true, false otherwise.
+ * @return {boolean} True if the state changed, false if not.
+ */
+Factory.prototype.setInVisibilityMemory = function(liveUser, visible, callback) {
+    // Get the memorized visibility state
+    const lastState = this.isInVisibilityMemory(liveUser);
+
+    // Return false if the state didn't change
+    if(lastState == visible)
+        return false;
+
+    // Update the visibility array
+    if(visible)
+        this._userVisibleMem.push(liveUser);
+    else
+        this._userVisibleMem.splice(this._userVisibleMem.indexOf(liveUser), 1);
+
+    // Return the result
+    return true;
+};
+
+/**
+ * Check whether the given user is in the range memory.
+ *
+ * @param {User} liveUser User.
+ */
+Factory.prototype.isInRangeMemory = function(liveUser) {
+    return this._userRangeMem.indexOf(liveUser) >= 0;
+};
+
+/**
+ * Set whether the given live user is in the range memory of the factory.
+ *
+ * @param {User} liveUser Live user instance to set the state for.
+ * @param {boolean} inRange True to set the in range state to true, false otherwise.
+ * @return {boolean} True if the state changed, false if not.
+ */
+Factory.prototype.setInRangeMemory = function(liveUser, inRange) {
+    // Get the memorized range state
+    const lastState = this.isInRangeMemory(liveUser);
+
+    // Return false if the state didn't change
+    if(lastState == inRange)
+        return false;
+
+    // Update the range array
+    if(inRange)
+        this._userRangeMem.push(liveUser);
+    else
+        this._userRangeMem.splice(this._userRangeMem.indexOf(liveUser), 1);
+
+    // Return the result
+    return true;
 };
 
 /**
