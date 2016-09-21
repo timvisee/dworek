@@ -3379,17 +3379,28 @@ function updatePlayerMarkers(users) {
         marker.off('click');
         marker.on('click', function() {
             // Create the dialog body
-            const dialogBody = '<div align="center" class="table-list">' +
+            var dialogBody = '<div align="center" class="table-list">' +
                 '<table>' +
                 '    <tr>' +
                 '        <td class="left"><i class="zmdi zmdi-account zmdi-hc-fw"></i> Player</td><td>' + user.userName + '</td>' +
                 '    </tr>' +
                 '    <tr>' +
-                '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? 'Yes' : 'No') + '</td>' +
+                '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
                 '    </tr>' +
                 '    <tr>' +
                 '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.name) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
-                '    </tr>' +
+                '    </tr>';
+
+            // Add a range part if the user is a shop
+            if(user.shop.isShop) {
+                dialogBody +=
+                    '    <tr>' +
+                    '        <td class="left"><i class="zmdi zmdi-dot-circle zmdi-hc-fw"></i> In range</td><td>' + (user.shop.inRange ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
+                    '    </tr>';
+            }
+
+            // Append the bottom
+            dialogBody +=
                 '</table>' +
                 '</div>';
 
