@@ -314,8 +314,8 @@ User.prototype.hasLocation = function() {
 /**
  * Update the location.
  *
- * @param {Coordinate} location New location.
- * @param socket Source socket.
+ * @param {Coordinate|undefined} [location] New location or undefined to not update his current location.
+ * @param [socket] Source socket or undefined.
  * @param {User~updateLocationCallback} callback Called on success or when an error occurred.
  */
 User.prototype.updateLocation = function(location, socket, callback) {
@@ -323,7 +323,8 @@ User.prototype.updateLocation = function(location, socket, callback) {
     const self = this;
 
     // Set the location
-    this.setLocation(location);
+    if(location != undefined)
+        this.setLocation(location);
 
     // Get the live game
     const liveGame = this.getGame();
