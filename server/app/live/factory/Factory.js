@@ -817,10 +817,14 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
             return;
         }
 
+        // Set whether the state changed
+        var stateChanged = false;
+
         // Set the visibility and range state, remember whether any of these states changed
-        const stateChanged =
-            self.setInVisibilityMemory(liveUser, visibilityData.visible) ||
-            self.setInRangeMemory(liveUser, visibilityData.inRange);
+        if(self.setInVisibilityMemory(liveUser, visibilityData.visible))
+            stateChanged = true;
+        if(self.setInRangeMemory(liveUser, visibilityData.inRange))
+            stateChanged = true;
 
         // Send the factory data if the state changed
         if(stateChanged)
