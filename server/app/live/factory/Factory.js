@@ -276,24 +276,6 @@ Factory.prototype.sendData = function(user, sockets, callback) {
         });
     });
 
-    // Check whether the user can modify the factory
-    latch.add();
-    self.canModify(user, function(err, canModify) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                callback(err);
-            calledBack = true;
-            return;
-        }
-
-        // Set the modify permission status
-        factoryData.canModify = canModify;
-
-        // Resolve the latch
-        latch.resolve();
-    });
-
     // Continue when we're done
     latch.then(function() {
         // Send the data if no visible
@@ -568,6 +550,36 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
                     // Resolve the latch
                     latch.resolve();
+                });
+
+                // Get the live user this data is send to
+                latch.add();
+                self.getGame().getUser(user, function(err, liveUser) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Get the visibility state for the user
+                    self.getVisibilityState(liveUser, function(err, visibilityState) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Set the visibility, range and ally states
+                        factoryData.inRange = visibilityState.inRange;
+                        factoryData.ally = visibilityState.ally;
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
                 });
 
                 // Send the factory data

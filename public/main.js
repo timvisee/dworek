@@ -4457,9 +4457,11 @@ function updateFactoryDataVisuals(firstShow) {
     // Get the active page
     const activePage = getActivePage();
 
-    // Check whether the user can modify
+    // Determine whether the lab is visible
     var visible = !data.hasOwnProperty('visible') || data.visible;
-    var canModify = data.hasOwnProperty('canModify') && data.canModify;
+
+    // Determine whether the user can modify this lab
+    const canModify = visible && data.hasOwnProperty('inRange') && data.hasOwnProperty('ally') && data.inRange && data.ally;
 
     // Select the cards
     var infoCard = activePage.find('.card-factory-info');
@@ -4467,16 +4469,7 @@ function updateFactoryDataVisuals(firstShow) {
     var defenceCard = activePage.find('.card-factory-defence');
     var levelCard = activePage.find('.card-factory-level');
 
-    if(visible)
-        infoCard.slideDown();
-    else {
-        if(firstShow)
-            infoCard.hide();
-        else
-            infoCard.slideUp();
-    }
-
-    // Show the modification cards
+    // Check whether the factory is in range
     if(canModify) {
         transferCard.slideDown();
         defenceCard.slideDown();
@@ -4712,31 +4705,72 @@ function updateFactoryDataVisuals(firstShow) {
     const factoryCreatorLabel = activePage.find('.factory-creator');
     const factoryTeamLabel = activePage.find('.factory-team');
     const factoryDefenceLabel = activePage.find('.factory-defence');
+    const factoryInRangeLabel = activePage.find('.factory-in-range');
     const factoryInLabel = activePage.find('.factory-in');
     const factoryProductionInLabel = activePage.find('.factory-production-in');
     const factoryOutLabel = activePage.find('.factory-out');
     const factoryProductionOutLabel = activePage.find('.factory-production-out');
     const factoryNextLevelCostLabel = activePage.find('.factory-next-level-cost');
 
-    // Update the elements
-    if(data.hasOwnProperty('name'))
+    // Create some label constants
+    const hiddenLabel = '<span style="color: gray;">Hidden</i>';
+    const yesLabel = '<span style="color: green;">Yes</span>';
+    const noLabel = '<span style="color: red;">No</span>';
+
+    // Set the name label
+    if(!visible || data.hasOwnProperty('name'))
         factoryNameLabel.html(data.name);
-    if(data.hasOwnProperty('level'))
-        factoryLevelLabel.html(data.level);
-    if(data.hasOwnProperty('creatorName'))
-        factoryCreatorLabel.html(data.creatorName);
-    if(data.hasOwnProperty('teamName'))
-        factoryTeamLabel.html(data.teamName);
-    if(data.hasOwnProperty('defence'))
-        factoryDefenceLabel.html(data.defence);
-    if(data.hasOwnProperty('in'))
-        factoryInLabel.html(data.in);
-    if(data.hasOwnProperty('productionIn'))
-        factoryProductionInLabel.html(data.productionIn);
-    if(data.hasOwnProperty('out'))
-        factoryOutLabel.html(data.out);
-    if(data.hasOwnProperty('productionOut'))
-        factoryProductionOutLabel.html(data.productionOut);
-    if(data.hasOwnProperty('nextLevelCost'))
-        factoryNextLevelCostLabel.html(data.nextLevelCost);
+
+    // Set the level label
+    if(!visible || data.hasOwnProperty('level'))
+        factoryLevelLabel.html(visible ? data.level : hiddenLabel);
+
+    // Set the creator label
+    if(!visible || data.hasOwnProperty('creatorName'))
+        factoryCreatorLabel.html(visible ? data.creatorName : hiddenLabel);
+
+    // Set the team name label
+    if(!visible || data.hasOwnProperty('teamName'))
+        // Make the label green/red if it's known whether this factory is from allies or enemies
+        if(data.hasOwnProperty('ally'))
+            factoryTeamLabel.html('<span style="color: ' + (data.ally ? 'green' : 'red' ) + ';">' + (visible ? data.teamName : 'Hidden') + '</span>');
+        else
+            factoryTeamLabel.html((visible ? data.teamName : hiddenLabel));
+
+    // Set the defence label
+    if(!visible || data.hasOwnProperty('defence'))
+        factoryDefenceLabel.html(visible ? data.defence : hiddenLabel);
+
+    // Set the range label
+    if(!visible || data.hasOwnProperty('inRange'))
+        factoryInRangeLabel.html(data.inRange ? yesLabel : noLabel);
+
+    // Set the in label
+    if(!visible || data.hasOwnProperty('in'))
+        if(data.hasOwnProperty('productionIn'))
+            factoryInLabel.html(visible ? ('<span style="color: ' + (data.in >= data.productionIn ? 'green' : 'red') + ';">' + data.in + '</span>') : hiddenLabel);
+        else
+            factoryInLabel.html(visible ? data.in : hiddenLabel);
+
+    // Set the production in label
+    if(visible && data.hasOwnProperty('productionIn')) {
+        factoryProductionInLabel.html('− ' + data.productionIn + ' / tick');
+        factoryProductionInLabel.show();
+    } else if(!visible)
+        factoryProductionInLabel.hide();
+
+    // Set the out label
+    if(!visible || data.hasOwnProperty('out'))
+        factoryOutLabel.html(visible ? data.out : hiddenLabel);
+
+    // Set the production out label
+    if(visible && data.hasOwnProperty('productionOut')) {
+        factoryProductionOutLabel.html('+ ' + data.productionOut + ' / tick');
+        factoryProductionOutLabel.show();
+    } else if(!visible)
+        factoryProductionOutLabel.hide();
+
+    // Set the next level cost label
+    if(!visible || data.hasOwnProperty('nextLevelCost'))
+        factoryNextLevelCostLabel.html(canModify ? data.nextLevelCost : '?');
 }

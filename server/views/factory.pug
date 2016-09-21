@@ -15,18 +15,20 @@ block content
                     td.factory-creator= factory.creatorName
                 tr: td Team
                     td.factory-team= factory.teamName
+                tr: td In range
+                    td.factory-in-range ?
                 tr: td Defence
                     td.factory-defence= factory.defence
-                tr: td.game-label-input Ingerients
+                tr: td.game-label-input Ingredients
                     td
                         span.factory-in= factory.in
                         | &nbsp;
-                        span(style="color: gray;") − <span class="factory-production-in">?</span> / tick
+                        span.factory-production-in(style="color: gray;") − ? / tick
                 tr: td.game-label-output Drugs
                     td
                         span.factory-out= factory.out
                         | &nbsp;
-                        span(style="color: gray;") + <span class="factory-production-out">?</span> / tick
+                        span.factory-production-out(style="color: gray;") + ? / tick
 
     .nd2-card.wow.fadeInUp.card-factory-transfer
         .card-title.has-supporting-text
