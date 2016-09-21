@@ -797,9 +797,9 @@ Factory.prototype.isVisibleFor = function(liveUser, callback) {
  * Update the visibility state for the given user.
  *
  * @param {User} liveUser User to update the visibility state for.
- * @param {Factory~updateVisibilityMemoryCallback} callback Called with the result or when an error occurred.
+ * @param {Factory~updateVisibilityStateCallback} callback Called with the result or when an error occurred.
  */
-Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
+Factory.prototype.updateVisibilityState = function(liveUser, callback) {
     // Store this instance
     const self = this;
 
@@ -848,7 +848,7 @@ Factory.prototype.updateVisibilityMemory = function(liveUser, callback) {
 /**
  * Called with the result or when an error occurred.
  *
- * @callback Factory~updateVisibilityMemoryCallback
+ * @callback Factory~updateVisibilityStateCallback
  * @param {Error|null} Error instance if an error occurred.
  * @param {boolean=} True if the state changed, false if not.
  */

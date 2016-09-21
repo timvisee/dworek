@@ -345,7 +345,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
 
         // Update the visibility state for the user
         latch.add();
-        liveFactory.updateVisibilityMemory(self, function(err, changed) {
+        liveFactory.updateVisibilityState(self, function(err, changed) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
