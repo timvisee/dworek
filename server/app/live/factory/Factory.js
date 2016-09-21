@@ -662,134 +662,16 @@ Factory.prototype.getTeam = function(callback) {
  * @param {function} callback callback(err, isVisible)
  */
 Factory.prototype.isVisibleFor = function(liveUser, callback) {
-    // Make sure a valid user is given
-    if(liveUser == null) {
-        callback(null, false);
-        return;
-    }
-
-    // Get the factory model and make sure it's valid
-    const factoryModel = this.getFactoryModel();
-    if(factoryModel == null) {
-        callback(null, false);
-        return;
-    }
-
-    // Get the user and game model
-    const userModel = liveUser.getUserModel();
-    const gameModel = this.getGame().getGameModel();
-
-    // Define the current instance
-    const self = this;
-
-    // Get the user state
-    gameModel.getUserState(userModel, function(err, userState) {
+    // Get the visibility state for the user
+    self.getVisibilityState(liveUser, function(err, visibilityState) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Call back false if the user isn't a player or spectator
-        if(!userState.player && !userState.special) {
-            callback(null, false);
-            return;
-        }
-
-        // Call back true if the user is a spectator
-        if(userState.spectator) {
-            callback(null, true);
-            return;
-        }
-
-        // Create a callback latch
-        var latch = new CallbackLatch();
-
-        // Make sure we only call back once
-        var calledBack = false;
-
-        // Get the factory team
-        var factoryTeam;
-        latch.add();
-        self.getTeam(function(err, result) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
-                return;
-            }
-
-            // Set the team
-            factoryTeam = result;
-
-            // Resolve the latch
-            latch.resolve();
-        });
-
-        // Get the game user and team
-        var userTeam;
-        latch.add();
-        Core.model.gameUserModelManager.getGameUser(gameModel, userModel, function(err, gameUser) {
-            // Call back errors
-            if(err !== null) {
-                if(!calledBack)
-                    callback(err);
-                calledBack = true;
-                return;
-            }
-
-            // Make sure the game user is valid
-            if(gameUser == null) {
-                if(!calledBack)
-                    callback(null, false);
-                calledBack = true;
-                return;
-            }
-
-            // Get the team
-            gameUser.getTeam(function(err, result) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Call back if the team is null
-                if(result == null) {
-                    if(!calledBack)
-                        callback(null, false);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set the user team
-                userTeam = result;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-        });
-
-        // Continue if the teams are fetched
-        latch.then(function() {
-            // Call back if the teams are equal
-            if(factoryTeam.getId().equals(userTeam.getId())) {
-                if(!calledBack)
-                    callback(null, true);
-                calledBack = true;
-                return;
-            }
-
-            // Check whether the given user is in range
-            self.isUserInRange(liveUser, function(err, inRange) {
-                // The factory probably isn't visible, call back false
-                if(!calledBack)
-                    callback(null, inRange);
-            });
-        });
+        // Call back with the result
+        callback(null, visibilityState.visible);
     });
 };
 
@@ -810,7 +692,7 @@ Factory.prototype.updateVisibilityState = function(liveUser, callback) {
     }
 
     // Get the visibility data for the given user
-    this.getVisibilityData(liveUser, function(err, visibilityData) {
+    this.getVisibilityState(liveUser, function(err, visibilityData) {
         // Call back errors
         if(err !== null) {
             callback(err);
@@ -1489,9 +1371,9 @@ Factory.prototype.getRange = function(liveUser, callback) {
  * Check whether this factory is visible for the given user.
  *
  * @param {User} liveUser Given user.
- * @param {Factory~getVisibilityDataCallback} callback Called with the result or when an error occurred.
+ * @param {Factory~getVisibilityStateCallback} callback Called with the result or when an error occurred.
  */
-Factory.prototype.getVisibilityData = function(liveUser, callback) {
+Factory.prototype.getVisibilityState = function(liveUser, callback) {
     // Create a result object
     var resultObject = {
         ally: false,
@@ -1664,13 +1546,13 @@ Factory.prototype.getVisibilityData = function(liveUser, callback) {
 /**
  * Called with the result or when an error occurred.
  *
- * @callback Factory~getVisibilityDataCallback
+ * @callback Factory~getVisibilityStateCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {VisibilityDataObject=} Object with the result.
+ * @param {VisibilityStateObject=} Object with the result.
  */
 
 /**
- * @typedef {Object} VisibilityDataObject
+ * @typedef {Object} VisibilityStateObject
  * @param {boolean} ally True if this factory is allied, false if not.
  * @param {boolean} visible True if the factory is visible for the user, false if not.
  * @param {boolean} inRange True if the factory is in the user's range, false if not.

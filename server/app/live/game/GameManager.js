@@ -542,7 +542,7 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                     // Check whether the other user is visible for the current user
                     gameLatch.add();
-                    liveFactory.getVisibilityData(liveUser, function(err, visibilityData) {
+                    liveFactory.getVisibilityState(liveUser, function(err, visibilityData) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
