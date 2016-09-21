@@ -72,7 +72,7 @@ var ShopManager = function(game) {
  * Get the shop for the given shop token.
  *
  * @param {string} token Token of the shop.
- * @param {ShopManager~getUserCallback} callback Called back with the user or when an error occurred.
+ * @param {ShopManager~getShopCallback} callback Called back with the user or when an error occurred.
  */
 ShopManager.prototype.getShop = function(token, callback) {
     // Keep track of the found shop
@@ -96,9 +96,46 @@ ShopManager.prototype.getShop = function(token, callback) {
 /**
  * Called back with the shop or when an error occurred.
  *
- * @callback UserController~getUserCallback
+ * @callback ShopController~getShopCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Shop|null=} Shop instance or null if no shop was found for this token.
+ */
+
+/**
+ * Get the shop by a user.
+ *
+ * @param {User} liveUser Live user.
+ * @param {ShopManager~getShopByUserCallback} callback Called back with the user or when an error occurred.
+ */
+ShopManager.prototype.getShopByUser = function(liveUser, callback) {
+    // Make sure a live user was given
+    if(liveUser == null)
+        return null;
+
+    // Keep track of the found shop
+    var result = null;
+
+    // Loop through the list of shops
+    this.shops.forEach(function(entry) {
+        // Skip if we already found a shop
+        if(result != null)
+            return;
+
+        // Check whether the token equals
+        if(entry.getUser().getId().equals(liveUser.getId()))
+            result = entry;
+    });
+
+    // Return the result
+    return result;
+};
+
+/**
+ * Called back with the shop or when an error occurred.
+ *
+ * @callback ShopController~getShopByUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Shop|null=} Shop instance or null if no shop was found for this user.
  */
 
 /**
