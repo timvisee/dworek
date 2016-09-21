@@ -81,6 +81,14 @@ var Shop = function(user, shopManager) {
      * @private
      */
     this._range = null;
+
+    /**
+     * Array containing live users this shop is in range for.
+     *
+     * @type {Array} Array of live user objects.
+     * @private
+     */
+    this._userRangeMem = [];
 };
 
 /**
@@ -300,22 +308,71 @@ Shop.prototype.getOutBuyPrice = function() {
 };
 
 /**
- * Get the effective range of this shop.
- * @return {Number} Effective range in meters.
+ * Get the range of the shop.
+ *
+ * @param {User|undefined} liveUser Live user instance to get the range for, or undefined to get the global shop range.
+ * @param {Shop~getRangeCallback} callback Called back with the range or when an error occurred.
  */
-Shop.prototype.getRange = function() {
-    return this._range;
+Shop.prototype.getRange = function(liveUser, callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the game config
+    this.getGame().getConfig(function(err, gameConfig) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Check whether the active or global range should be used, call back the result
+        if(self.isInRangeMemory(liveUser))
+            callback(null, gameConfig.shop.activeRange);
+        else
+            callback(null, gameConfig.shop.range);
+    });
 };
 
 /**
- * Check whether the given location is in the shop's range.
+ * Called back with the range or when an error occurred.
  *
- * @param {Coordinate} location Other location.
- * @return {boolean} True if the shop is in range, false if not.
+ * @callback Shop~getRangeCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {Number=} Shop range in meters.
  */
-Shop.prototype.isLocactionInRange = function(location) {
-    // Get the distance, compare it to the range and return the result
-    return this.getLocation().getDistanceTo(location) <= this.getRange();
+
+/**
+ * Check whether the given user is in the range memory.
+ *
+ * @param {User} liveUser User.
+ */
+Shop.prototype.isInRangeMemory = function(liveUser) {
+    return this._userRangeMem.indexOf(liveUser) >= 0;
+};
+
+/**
+ * Set whether the given live user is in the range memory of the shop.
+ *
+ * @param {User} liveUser Live user instance to set the state for.
+ * @param {boolean} inRange True to set the in range state to true, false otherwise.
+ * @return {boolean} True if the state changed, false if not.
+ */
+Shop.prototype.setInRangeMemory = function(liveUser, inRange) {
+    // Get the memorized range state
+    const lastState = this.isInRangeMemory(liveUser);
+
+    // Return false if the state didn't change
+    if(lastState == inRange)
+        return false;
+
+    // Update the range array
+    if(inRange)
+        this._userRangeMem.push(liveUser);
+    else
+        this._userRangeMem.splice(this._userRangeMem.indexOf(liveUser), 1);
+
+    // Return the result
+    return true;
 };
 
 /**
@@ -334,7 +391,7 @@ Shop.prototype.isUserInRange = function(user) {
         return false;
 
     // Get the user location and check whether the user is in range
-    return this.isLocactionInRange(user.getLocation());
+    return this.getLocation().getDistanceTo(user.getLocation()) <= this.getRange(user);
 };
 
 /**
