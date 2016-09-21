@@ -2894,6 +2894,21 @@ function doLocationFallback() {
 
     // Process the last known location, don't update locally
     processLocationSuccess(Dworek.state.geoPlayerPosition, false, false);
+
+    // Get the current position
+    navigator.geolocation.getCurrentPosition(function(position) {
+        // Process the success callback
+        processLocationSuccess(position, true, true);
+
+    }, function(error) {
+        // Process the error callback
+        processLocationError(error, false);
+
+    }, {
+        enableHighAccuracy: true,
+        timeout: 10 * 1000,
+        maximumAge: 5 * 1000
+    });
 }
 
 /**
@@ -3334,7 +3349,7 @@ function updatePlayerMarker() {
                 playerMarker.rangeCircle.setRadius(Dworek.state.geoPlayerPosition.coords.accuracy);
 
                 // Set the marker opacity
-                playerMarker.setStyle(1);
+                playerMarker.setOpacity(1);
             } else {
                 // Set the marker opacity
                 playerMarker.setOpacity(0.3);
