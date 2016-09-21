@@ -3258,6 +3258,8 @@ function updatePlayerPosition(position) {
     // Focus on the player if player following is enabled
     if(getFollowPlayer())
         focusPlayer(false);
+    if(getFollowEverything())
+        focusEverything();
 }
 
 /**
