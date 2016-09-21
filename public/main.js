@@ -4786,3 +4786,32 @@ function updateFactoryDataVisuals(firstShow) {
     if(!visible || data.hasOwnProperty('nextLevelCost'))
         factoryNextLevelCostLabel.html(canModify ? data.nextLevelCost : '?');
 }
+
+/**
+ * Toggle full screen mode for the app.
+ */
+function toggleFullScreen() {
+    if(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {  // current working methods
+        if(document.documentElement.requestFullscreen)
+            document.documentElement.requestFullscreen();
+        else if(document.documentElement.msRequestFullscreen)
+            document.documentElement.msRequestFullscreen();
+        else if(document.documentElement.mozRequestFullScreen)
+            document.documentElement.mozRequestFullScreen();
+        else if(document.documentElement.webkitRequestFullscreen)
+            document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        else
+            showNotification('Full screen is not supported on this device');
+    } else {
+        if(document.exitFullscreen)
+            document.exitFullscreen();
+        else if(document.msExitFullscreen)
+            document.msExitFullscreen();
+        else if(document.mozCancelFullScreen)
+            document.mozCancelFullScreen();
+        else if(document.webkitExitFullscreen)
+            document.webkitExitFullscreen();
+        else
+            showNotification('Full screen is not supported on this device');
+    }
+}

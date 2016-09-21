@@ -46,19 +46,9 @@ block page
         #optionspanel.ui-bottom-sheet-list(data-role="panel", data-animate="false", data-position='bottom', data-display="overlay")
             .row.around-xs
                 .col-xs-auto
-                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
-                        i.zmdi.zmdi-assignment.zmd-2x
-                        strong Button A
-
-                .col-xs-auto
-                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
-                        i.zmdi.zmdi-fire.zmd-2x
-                        strong Button B
-
-                .col-xs-auto
-                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='featureNotAvailable()', data-ajax='false')
-                        i.zmdi.zmdi-cloud-outline-alt.zmd-2x
-                        strong Button C
+                    a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href='#', onclick='toggleFullScreen()', data-ajax='false')
+                        i.zmdi.zmdi-fullscreen.zmd-2x
+                        strong Toggle fullscreen
 
                 .col-xs-auto
                     a.ui-bottom-sheet-link.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url, data-ajax='false')
