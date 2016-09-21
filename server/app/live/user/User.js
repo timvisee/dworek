@@ -363,6 +363,32 @@ User.prototype.updateLocation = function(location, socket, callback) {
         });
     });
 
+    // Loop through all the shops
+    liveGame.shopManager.factories.forEach(function(liveShop) {
+        // Skip if we called back
+        if(calledBack)
+            return;
+
+        // Update the visibility state for the user
+        latch.add();
+        liveShop.updateVisibilityState(self, function(err, changed) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Check whether we should update the game data
+            if(changed)
+                updateUser = true;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    });
+
     // Continue when we're done
     latch.then(function() {
         // Reset the callback latch to it's identity

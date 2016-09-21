@@ -365,29 +365,8 @@ Shop.prototype.updateVisibilityState = function(liveUser, callback) {
             return;
         }
 
-        // Set whether the state changed
-        var stateChanged = false;
-
-        // Set the range state, remember whether any of these states changed
-        if(self.setInRangeMemory(liveUser, visibilityData.inRange))
-            stateChanged = true;
-
-        // Send the game data if the state changed
-        if(stateChanged)
-            self.sendData(liveUser.getUserModel(), undefined, function(err) {
-                // Call back errors
-                if(err !== null) {
-                    callback(err);
-                    return;
-                }
-
-                // Call back
-                callback(null, true);
-            });
-
-        else
-            // Call back
-            callback(null, false);
+        // Update the range state, call back the result
+        callback(null, self.setInRangeMemory(liveUser, visibilityData.inRange));
     });
 };
 
