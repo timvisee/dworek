@@ -99,7 +99,7 @@ var gameConfig = {
          * Shop worker invocation interval.
          * @type {Number}
          */
-        workerInterval: 1 * 1000,
+        workerInterval: 10 * 1000,
 
         /**
          * Get the number of preferred shops in a team, based on the team size.
@@ -133,7 +133,7 @@ var gameConfig = {
          * The time in advance a user gets to know he'll become a shop. This is the time in milliseconds.
          * @type {Number}
          */
-        shopAlertTime: 3 * 1000,
+        shopAlertTime: 45 * 1000,
 
         /**
          * Get the price per unit the in goods are sold for.
