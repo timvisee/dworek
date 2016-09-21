@@ -542,7 +542,7 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                     // Check whether the other user is visible for the current user
                     gameLatch.add();
-                    liveFactory.isVisibleFor(liveUser, function(err, visible) {
+                    liveFactory.getVisibilityData(liveUser, function(err, visibilityData) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -552,8 +552,8 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                             return;
                         }
 
-                        // Make sure the user is visible
-                        if(!visible) {
+                        // Make sure the factory is visible
+                        if(!visibilityData.visible) {
                             gameLatch.resolve();
                             return;
                         }
@@ -563,10 +563,12 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
 
                         // Create a factory object
                         var factoryObject = {
-                            factory: liveFactory.getIdHex()
+                            factory: liveFactory.getIdHex(),
+                            ally: visibilityData.ally,
+                            inRange: visibilityData.inRange
                         };
 
-                        // Get the name of the user
+                        // Get the name of the factory
                         factoryLatch.add();
                         liveFactory.getName(function(err, name) {
                             // Call back errors
