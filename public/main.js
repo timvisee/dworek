@@ -285,24 +285,27 @@ var Dworek = {
 
                 }, {
                     enableHighAccuracy: true,
-                    timeout: 2 * 60 * 1000,
+                    timeout: 30 * 1000,
                     maximumAge: 5 * 1000
                 });
 
                 const customWatcherTest = function() {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        // Process the success callback
-                        processLocationSuccess(position);
+                    if(Dworek.state.geoLastPlayerPosition != null)
+                        processLocationSuccess(Dworek.state.geoLastPlayerPosition);
 
-                    }, function(error) {
-                        // Process the error callback
-                        processLocationError(error, false);
-
-                    }, {
-                        enableHighAccuracy: true,
-                        timeout: 2 * 60 * 1000,
-                        maximumAge: 5 * 1000
-                    })
+                    // navigator.geolocation.getCurrentPosition(function(position) {
+                    //     // Process the success callback
+                    //     processLocationSuccess(position);
+                    //
+                    // }, function(error) {
+                    //     // Process the error callback
+                    //     processLocationError(error, false);
+                    //
+                    // }, {
+                    //     enableHighAccuracy: false,
+                    //     timeout: 2 * 60 * 1000,
+                    //     maximumAge: 0
+                    // })
                 };
 
                 // Start the custom watcher
