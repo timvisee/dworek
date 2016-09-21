@@ -3053,6 +3053,23 @@ $(document).bind("tab-switch", function(event, data) {
                 attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>'
             }).addTo(map);
 
+            // Revert the view or stop following if the map is dragged by the user
+            map.on('dragend', function(e) {
+                // Revert the view if the user dragged the map less than 150 pixels, stop following otherwise
+                if(e.distance <= 150) {
+                    // Revert the view
+                    if(getFollowPlayer())
+                        focusPlayer(false);
+                    if(getFollowEverything())
+                        focusEverything();
+
+                } else {
+                    // Stop following
+                    setFollowPlayer(false);
+                    setFollowEverything(false);
+                }
+            });
+
             // Set the map follow player button
             mapFollowPlayerButton = L.easyButton({
                 states: [{
