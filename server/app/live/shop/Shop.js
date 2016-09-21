@@ -342,6 +342,64 @@ Shop.prototype.getRange = function(liveUser, callback) {
  */
 
 /**
+ * Update the visibility state for the given user.
+ *
+ * @param {User} liveUser User to update the visibility state for.
+ * @param {Shop~updateVisibilityStateCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.updateVisibilityState = function(liveUser, callback) {
+    // Store this instance
+    const self = this;
+
+    // Call back if the user is null
+    if(liveUser == null) {
+        callback(null);
+        return;
+    }
+
+    // Get the visibility data for the given user
+    this.getVisibilityState(liveUser, function(err, visibilityData) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set whether the state changed
+        var stateChanged = false;
+
+        // Set the range state, remember whether any of these states changed
+        if(self.setInRangeMemory(liveUser, visibilityData.inRange))
+            stateChanged = true;
+
+        // Send the game data if the state changed
+        if(stateChanged)
+            self.sendData(liveUser.getUserModel(), undefined, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Call back
+                callback(null, true);
+            });
+
+        else
+            // Call back
+            callback(null, false);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~updateVisibilityStateCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {boolean=} True if the state changed, false if not.
+ */
+
+/**
  * Check whether the given user is in the range memory.
  *
  * @param {User} liveUser User.
