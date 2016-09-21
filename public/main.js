@@ -3639,7 +3639,13 @@ function focusEverything() {
         return;
 
     // Fly to the bounds
-    map.fitBounds(L.featureGroup(fitters).getBounds());
+    map.fitBounds(
+        L.featureGroup(fitters).getBounds(),
+        {
+            paddingTopLeft: [5, 5],
+            paddingBottomRight: [35, 35]
+        }
+    );
 }
 
 // Build NativeDroid on page initialization
