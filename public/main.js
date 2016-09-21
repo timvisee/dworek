@@ -3236,6 +3236,9 @@ function updatePlayerPosition(position) {
 
             // Create a player range circle
             playerMarker.rangeCircle = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
+            playerMarker.rangeCircle.setStyle({
+                opacity: 0.4
+            });
 
             // Add the marker and circle to the map
             playerMarker.addTo(map);
