@@ -3081,12 +3081,23 @@ $(document).bind('pageshow', function() {
     if(!Dworek.utils.isGamePage())
         return;
 
+    // Make sure a map container is found on the page
+    if(getActivePage().find('#map-container').length <= 0)
+        return;
+
     // Update the map size
     updateMapSize(true, true);
+
+    // Focus on the player/everything
+    if(getFollowPlayer())
+        focusPlayer(true);
+    else if(getFollowEverything())
+        focusEverything();
 });
 
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
+    // Check whether there's a map container on the new page
     if(data.to.find('#map-container').length > 0) {
         // Update the map size
         updateMapSize(true, true);
@@ -4844,7 +4855,7 @@ function updateFactoryDataVisuals(firstShow) {
     // Set the in label
     if(!visible || data.hasOwnProperty('in'))
         if(data.hasOwnProperty('productionIn'))
-            factoryInLabel.html(visible ? ('<span style="color: ' + (data.in >= data.productionIn ? 'green' : 'red') + ';">' + data.in + '</span>') : hiddenLabel);
+            factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: ' + (data.in >= data.productionIn ? 'green' : 'red') + '; display: inline-block;">' + data.in + '</span>') : hiddenLabel);
         else
             factoryInLabel.html(visible ? data.in : hiddenLabel);
 
