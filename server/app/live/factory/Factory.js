@@ -725,7 +725,8 @@ Factory.prototype.updateVisibilityState = function(liveUser, callback) {
 
         // Send the factory data if the state changed
         if(stateChanged)
-            self.sendData(liveUser.getUserModel(), undefined, function(err) {
+            // Broadcast the factory data to all relevant user
+            self.broadcastData(function(err) {
                 // Call back errors
                 if(err !== null) {
                     callback(err);
