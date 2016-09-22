@@ -282,5 +282,13 @@ module.exports = {
      */
     SHOP_BUY_OUT: 25,
 
+    /**
+     * Buy a player strength upgrade.
+     *
+     * Data:
+     * - index: Index of the upgrade to buy
+     * - cost: Cost of the upgrade (check)
+     * - defence: Defence level of the upgrade (check)
+     */
     PLAYER_STRENGTH_BUY: 26
 };
