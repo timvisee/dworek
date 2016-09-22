@@ -2857,7 +2857,7 @@ function processLocationError(error, showErrorDialog) {
 
         // Handle the timeout error
         else if(error.code == error.TIMEOUT)
-            notificationMessage = 'Failed to determine your location in time';
+            notificationMessage = 'Your location timed out';
 
         // Show a notification
         showNotification('Error: ' + notificationMessage, {
@@ -2901,8 +2901,8 @@ function doLocationFallback() {
         processLocationSuccess(position, true, true);
 
     }, function(error) {
-        // Process the error callback
-        processLocationError(error, false);
+        // Show an error message
+        console.error('Failed to fetch position in location watcher fallback (ignoring): ' + error.message);
 
     }, {
         enableHighAccuracy: true,
@@ -3424,7 +3424,7 @@ function updatePlayerMarkers(users) {
         // Add a range circle if the user is a shop
         if(user.shop.isShop) {
             // Create the range circle if the marker doesn't have one yet
-            if(!marker.hasOwnProperty('rangeCircle')) {
+            if(!marker.hasOwnProperty('rangeCircle') || marker.rangeCircle == null) {
                 // Create a range circle
                 marker.rangeCircle = L.circle(pos, user.shop.range);
                 marker.rangeCircle.addTo(map);
