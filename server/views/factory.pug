@@ -50,10 +50,14 @@ block content
 
     .nd2-card.wow.fadeInUp.card-factory-defence
         .card-title.has-supporting-text
-            h3.card-primary-title Upgrade defence
+            h3.card-primary-title Defence
 
         .card-supporting-text.has-action.has-title
             p Upgrading the defence makes it harder for enemies to take things over.
+            div(align="center")
+                table.table-list.ui-responsive
+                    tr: td Defence
+                        td.factory-defence= factory.defence
 
         .card-action
             .row.between-xs: .col-xs-12: .box.upgrade-button-list
@@ -62,10 +66,14 @@ block content
 
     .nd2-card.wow.fadeInUp.card-factory-level
         .card-title.has-supporting-text
-            h3.card-primary-title Upgrade level
+            h3.card-primary-title Level
 
         .card-supporting-text.has-action.has-title
             p Upgrading the level speeds up production.
+            div(align="center")
+                table.table-list.ui-responsive
+                    tr: td Level
+                        td.factory-level= factory.level
 
         .card-action
             .row.between-xs: .col-xs-12: .box
