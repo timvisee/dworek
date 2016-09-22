@@ -655,5 +655,35 @@ FactoryModel.prototype.getLiveFactory = function(callback) {
     });
 };
 
+/**
+ * Delete the factory.
+ *
+ * @param {FactoryModel~deleteCallback} [callback] Called on success, or when an error occurred.
+ */
+FactoryModel.prototype.delete = function(callback) {
+    // Delete the session model
+    this._baseModel.flush(undefined, function(err) {
+        // Call back errors
+        if(err !== null) {
+            if(callback !== undefined)
+                callback(err);
+            return;
+        }
+
+        // Flush the model manager
+        Core.model.factoryModelManager.flushCache(function(err) {
+            if(callback !== undefined)
+                callback(err);
+        });
+    });
+};
+
+/**
+ * Called on success, or when an error occurred.
+ *
+ * @callback FactoryModel~deleteCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
 // Export the factory class
 module.exports = FactoryModel;
