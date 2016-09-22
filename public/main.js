@@ -4854,9 +4854,12 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Set the in label
     if(!visible || data.hasOwnProperty('in'))
-        if(data.hasOwnProperty('productionIn'))
-            factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: ' + (data.in >= data.productionIn ? 'green' : 'red') + '; display: inline-block;">' + data.in + '</span>') : hiddenLabel);
-        else
+        if(data.hasOwnProperty('productionIn')) {
+            if(data.in >= data.productionIn)
+                factoryInLabel.html(visible ? ('<span style="color: green;">' + data.in + '</span>') : hiddenLabel);
+            else
+                factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' + data.in + '</span>') : hiddenLabel);
+        } else
             factoryInLabel.html(visible ? data.in : hiddenLabel);
 
     // Set the production in label
