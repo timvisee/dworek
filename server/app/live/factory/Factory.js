@@ -968,6 +968,23 @@ Factory.prototype.getNextLevelCost = function(callback) {
 };
 
 /**
+ * Get the defence value for this factory.
+ *
+ * @param {Factory~getDefenceCallback} callback Called back with the defence value or when an error occurred.
+ */
+Factory.prototype.getDefence = function(callback) {
+    this.getFactoryModel().getDefence(callback);
+};
+
+/**
+ * Called back with the defence value or when an error occurred.
+ *
+ * @callback Factory~getDefenceCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Defence value for this factory.
+ */
+
+/**
  * Get the defence upgrades object.
  *
  * @param callback (err, upgradesObject)
@@ -1552,6 +1569,132 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
  * @param {boolean} ally True if this factory is allied, false if not.
  * @param {boolean} visible True if the factory is visible for the user, false if not.
  * @param {boolean} inRange True if the factory is in the user's range, false if not.
+ */
+
+/**
+ * Get the conquer value for this factory.
+ * If this value is above zero, the factory may be taken over by an other team.
+ *
+ * @param {Factory~getConquerCallback} callback Called with the conquer value or when an error occurred.
+ */
+Factory.prototype.getConquer = function(callback) {
+    // Create a variable to store the conquer value
+    var conquerValue = 0;
+
+    // Only call back once
+    var calledBack = false;
+
+    // Create a function to call back errors
+    const callbackError = function(err) {
+        if(!calledBack)
+            callback(err);
+        calledBack = true;
+    };
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Get the defence value of the lab
+    latch.add();
+    this.getDefence(function(err, defence) {
+        // Call back errors
+        if(err !== null) {
+            callbackError(err);
+            return;
+        }
+
+        // Subtract the defence value from the conquer value
+        conquerValue -= defence;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get factory team
+    latch.add();
+    this.getTeam(function(err, factoryTeam) {
+        // Call back errors
+        if(err !== null) {
+            callbackError(err);
+            return;
+        }
+
+        // Loop through the users that are in-range
+        this._userRangeMem.forEach(function(liveUser) {
+            // Make sure the user has a recently known location
+            if(!liveUser.hasRecentLocation())
+                return;
+
+            // Create a callback latch for this user
+            var userLatch = new CallbackLatch();
+
+            // Create a variable to define the user strength and whether the user is in the ally team
+            var ally = null;
+            var userStrength = null;
+
+            // Add a latch
+            latch.add();
+
+            // Check whether the user is ally
+            userLatch.add();
+            liveUser.isTeam(factoryTeam, function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    callbackError(err);
+                    return;
+                }
+
+                // Set the result
+                ally = result;
+
+                // Resolve the user latch
+                userLatch.resolve();
+            });
+
+            // Get the user's strength
+            userLatch.add();
+            liveUser.getStrength(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    callbackError(err);
+                    return;
+                }
+
+                // Set the team
+                userStrength = result;
+
+                // Resolve the user latch
+                userLatch.resolve();
+            });
+
+            // Process the user's team and strength when fetched
+            userLatch.then(function() {
+                // Process the strength if valid
+                if(userStrength != null)
+                    // Add or subtract the user strength from the conquer value, depending if the user is an ally or not
+                    conquerValue += ally ? -userStrength : userStrength;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        });
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back the conquer value when the latch is resolved
+    latch.then(function() {
+        callback(null, conquerValue);
+    });
+};
+
+/**
+ * Called with the conquer value or when an error occurred.
+ *
+ * @callback Factory~getConquerCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Current conquer value for this factory.
  */
 
 // Export the class
