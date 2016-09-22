@@ -222,6 +222,30 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                             dialog: false,
                                             toast: true
                                         }, socket);
+
+                                        // Get the live user
+                                        liveGame.getUser(user, function(err, liveUser) {
+                                            if(err !== null) {
+                                                callbackError();
+                                                return;
+                                            }
+
+                                            // Loop through all factories in this game
+                                            liveGame.factoryManager.factories.forEach(function(liveFactory) {
+                                                // Check whether this user is in range of the given factory
+                                                if(!liveFactory.isInRangeMemory(liveUser))
+                                                    return;
+
+                                                // Broadcast the updated state for this factory to everyone, as the conquer value has changed
+                                                liveFactory.broadcastData(function(err) {
+                                                    // Handle errors
+                                                    if(err !== null) {
+                                                        console.error('Failed to broadcast factory data to user, ignoring');
+                                                        console.error(err);
+                                                    }
+                                                });
+                                            });
+                                        });
                                     });
                                 });
                             });
