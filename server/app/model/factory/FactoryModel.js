@@ -562,33 +562,6 @@ FactoryModel.prototype.setDefence = function(defence, callback) {
 };
 
 /**
- * Get the defence value of the factory.
- *
- * @param {FactoryModel~getDefenceCallback} callback Called with defence value or when an error occurred.
- */
-FactoryModel.prototype.getDefence = function(callback) {
-    this.getField('defence', callback);
-};
-
-/**
- * Called with the defence value or when an error occurred.
- *
- * @callback FactoryModel~getDefenceCallback
- * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {Number} Defence value of the factory.
- */
-
-/**
- * Set the defence value of the factory.
- *
- * @param {Number} defence Defence value.
- * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
- */
-FactoryModel.prototype.setDefence = function(defence, callback) {
-    this.setField('defence', defence, callback);
-};
-
-/**
  * Get the in of the factory.
  *
  * @param {FactoryModel~getInCallback} callback Called with in or when an error occurred.
