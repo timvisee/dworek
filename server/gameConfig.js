@@ -276,6 +276,36 @@ var gameConfig = {
 
             // Return the defences
             return defences;
+        },
+
+        /**
+         * Get the new in value when a factory is attacked.
+         *
+         * @param {Number} oldIn Old in value.
+         * @return {Number} New in value.
+         */
+        attackNewIn: function(oldIn) {
+            return Math.round(oldIn * 0.5);
+        },
+
+        /**
+         * Get the new out value when a factory is attacked.
+         *
+         * @param {Number} oldOut Old out value.
+         * @return {Number} New out value.
+         */
+        attackNewOut: function(oldOut) {
+            return Math.round(oldOut * 0.5);
+        },
+
+        /**
+         * Get the new defence value when a factory is attacked.
+         *
+         * @param {Number} oldDefence Old defence value.
+         * @return {Number} New defence value.
+         */
+        attackNewDefence: function(oldDefence) {
+            return Math.floor(oldDefence * 0.66);
         }
     }
 };
