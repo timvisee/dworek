@@ -290,5 +290,13 @@ module.exports = {
      * - cost: Cost of the upgrade (check)
      * - defence: Defence level of the upgrade (check)
      */
-    PLAYER_STRENGTH_BUY: 26
+    PLAYER_STRENGTH_BUY: 26,
+
+    /**
+     * Attack a factory.
+     *
+     * Data:
+     * - factory: ID of the factory to attack.
+     */
+    FACTORY_ATTACK: 28
 };

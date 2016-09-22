@@ -54,7 +54,8 @@ const PacketType = {
     FACTORY_WITHDRAW_OUT: 23,
     SHOP_SELL_IN: 24,
     SHOP_BUY_OUT: 25,
-    PLAYER_STRENGTH_BUY: 26
+    PLAYER_STRENGTH_BUY: 26,
+    FACTORY_ATTACK: 28
 };
 
 /**
