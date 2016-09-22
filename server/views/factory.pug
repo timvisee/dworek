@@ -32,6 +32,23 @@ block content
                         | &nbsp;
                         span.factory-production-out(style="color: gray;") + ? / tick
 
+    .nd2-card.wow.fadeInUp.card-factory-attack
+        .card-title.has-supporting-text
+            h3.card-primary-title Attack
+
+        .card-supporting-text.has-action.has-title
+            p The lab isn't strong enough to withstand enemy attacks. Attack the lab to take it over.
+            div(align="center")
+                table.table-list.ui-responsive
+                    tr: td Conquer value
+                        td.factory-conquer-value= factory.conquerValue
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.action-factory-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-fire
+                    | &nbsp;&nbsp;Attack
+
     .nd2-card.wow.fadeInUp.card-factory-transfer
         .card-title.has-supporting-text
             h3.card-primary-title Deposit/Withdraw

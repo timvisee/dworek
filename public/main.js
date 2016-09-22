@@ -4572,6 +4572,7 @@ function updateFactoryDataVisuals(firstShow) {
     const canModify = visible && data.hasOwnProperty('inRange') && data.hasOwnProperty('ally') && data.inRange && data.ally;
 
     // Select the cards
+    var attackCard = activePage.find('.card-factory-attack');
     var transferCard = activePage.find('.card-factory-transfer');
     var defenceCard = activePage.find('.card-factory-defence');
     var levelCard = activePage.find('.card-factory-level');
@@ -4593,6 +4594,14 @@ function updateFactoryDataVisuals(firstShow) {
             levelCard.slideUp();
         }
     }
+
+    // Determine whether the attack card should be shown
+    if(data.hasOwnProperty('conquerValue') && data.conquerValue > 0 && data.hasOwnProperty('ally') && !data.ally)
+        attackCard.slideDown();
+    else if(!firstShow)
+        attackCard.slideUp();
+    else
+        attackCard.hide();
 
     // Update the upgrade buttons
     if(canModify) {
