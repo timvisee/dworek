@@ -4812,6 +4812,7 @@ function updateFactoryDataVisuals(firstShow) {
     const factoryCreatorLabel = activePage.find('.factory-creator');
     const factoryTeamLabel = activePage.find('.factory-team');
     const factoryDefenceLabel = activePage.find('.factory-defence');
+    const factoryConquerLabel = activePage.find('.factory-conquer-value');
     const factoryInRangeLabel = activePage.find('.factory-in-range');
     const factoryInLabel = activePage.find('.factory-in');
     const factoryProductionInLabel = activePage.find('.factory-production-in');
@@ -4847,6 +4848,26 @@ function updateFactoryDataVisuals(firstShow) {
     // Set the defence label
     if(!visible || data.hasOwnProperty('defence'))
         factoryDefenceLabel.html(visible ? data.defence : hiddenLabel);
+
+    // Set the conquer value label
+    if(!visible || data.hasOwnProperty('conquerValue')) {
+        if(!visible)
+            factoryConquerLabel.html(hiddenLabel);
+        else {
+            // Create a suffix label
+            var suffix = '';
+            if(data.hasOwnProperty('conquerUserCount'))
+                suffix = ' <span style="color: gray;">by ' + data.conquerUserCount + ' user' + (data.conquerUserCount != 1 ? 's' : '') + ' in range</span>';
+
+            // Set the label
+            if(data.conquerValue < -5)
+                factoryConquerLabel.html('<span style="color: green;">' +  data.conquerValue + '</span>' + suffix);
+            else if(data.conquerValue <= 0)
+                factoryConquerLabel.html('<span style="color: orangered;">' +  data.conquerValue + '</span>' + suffix);
+            else
+                factoryConquerLabel.html('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+        }
+    }
 
     // Set the range label
     if(!visible || data.hasOwnProperty('inRange'))

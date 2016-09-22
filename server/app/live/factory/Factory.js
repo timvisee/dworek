@@ -356,6 +356,25 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                     latch.resolve();
                 });
 
+                // Get the factory conquer value
+                latch.add();
+                liveFactory.getConquer(function(err, conquerValue, userCount) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set the conquer value and user count
+                    factoryData.conquerValue = conquerValue;
+                    factoryData.conquerUserCount = userCount;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+
                 // Get the input
                 latch.add();
                 factoryModel.getIn(function(err, input) {
@@ -1578,8 +1597,9 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
  * @param {Factory~getConquerCallback} callback Called with the conquer value or when an error occurred.
  */
 Factory.prototype.getConquer = function(callback) {
-    // Create a variable to store the conquer value
+    // Create a variable to store the conquer value and the user count
     var conquerValue = 0;
+    var userCount = 0;
 
     // Only call back once
     var calledBack = false;
@@ -1593,6 +1613,9 @@ Factory.prototype.getConquer = function(callback) {
 
     // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Store this instance
+    const self = this;
 
     // Get the defence value of the lab
     latch.add();
@@ -1620,7 +1643,7 @@ Factory.prototype.getConquer = function(callback) {
         }
 
         // Loop through the users that are in-range
-        this._userRangeMem.forEach(function(liveUser) {
+        self._userRangeMem.forEach(function(liveUser) {
             // Make sure the user has a recently known location
             if(!liveUser.hasRecentLocation())
                 return;
@@ -1670,9 +1693,13 @@ Factory.prototype.getConquer = function(callback) {
             // Process the user's team and strength when fetched
             userLatch.then(function() {
                 // Process the strength if valid
-                if(userStrength != null)
+                if(userStrength != null) {
                     // Add or subtract the user strength from the conquer value, depending if the user is an ally or not
                     conquerValue += ally ? -userStrength : userStrength;
+
+                    // Increase the user count
+                    userCount++;
+                }
 
                 // Resolve the latch
                 latch.resolve();
@@ -1685,7 +1712,7 @@ Factory.prototype.getConquer = function(callback) {
 
     // Call back the conquer value when the latch is resolved
     latch.then(function() {
-        callback(null, conquerValue);
+        callback(null, conquerValue, userCount);
     });
 };
 
@@ -1695,6 +1722,7 @@ Factory.prototype.getConquer = function(callback) {
  * @callback Factory~getConquerCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number=} Current conquer value for this factory.
+ * @param {Number=} Number of users that defined this conquer value.
  */
 
 // Export the class
