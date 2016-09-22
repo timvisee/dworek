@@ -48,12 +48,6 @@ var Factory = function(factory, game) {
     this._id = null;
 
     /**
-     * Factory model instance if available.
-     * @type {FactoryModel|null} Factory model instance or null if no instance is currently available.
-     */
-    this._model = null;
-
-    /**
      * Live game instance.
      * @type {Game} Game.
      * @private
@@ -85,10 +79,6 @@ var Factory = function(factory, game) {
         throw new Error('Invalid factory instance or ID');
     else
         this._id = factory;
-
-    // Store the factory model instance if any was given
-    if(factory instanceof FactoryModel)
-        this._model = factory;
 };
 
 /**
@@ -134,12 +124,7 @@ Factory.prototype.isFactory = function(factory) {
  * @return {FactoryModel} Factory model instance.
  */
 Factory.prototype.getFactoryModel = function() {
-    // Return the model if it isn't null
-    if(this._model !== null)
-        return this._model;
-
-    // Create a factory model for the known ID, store and return it
-    return this._model = Core.model.factoryModelManager._instanceManager.create(this._id);
+    Core.model.factoryModelManager._instanceManager.create(this._id);
 };
 
 /**

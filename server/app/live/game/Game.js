@@ -46,12 +46,6 @@ var Game = function(game) {
     this._id = null;
 
     /**
-     * Game model instance if available.
-     * @type {GameModel|null} Game model instance or null if no instance is currently available.
-     */
-    this._model = null;
-
-    /**
      * User manager instance.
      * @type {UserManager} User manager instance.
      */
@@ -78,10 +72,6 @@ var Game = function(game) {
         throw new Error('Invalid game instance or ID');
     else
         this._id = game;
-
-    // Store the game model instance if any was given
-    if(game instanceof GameModel)
-        this._model = game;
 };
 
 /**
@@ -129,12 +119,7 @@ Game.prototype.isGame = function(game) {
  * @return {GameModel} Game model instance.
  */
 Game.prototype.getGameModel = function() {
-    // Return the model if it isn't null
-    if(this._model !== null)
-        return this._model;
-
-    // Create a game model for the known ID, store and return it
-    return this._model = Core.model.gameModelManager._instanceManager.create(this._id);
+    return Core.model.gameModelManager._instanceManager.create(this._id);
 };
 
 /**

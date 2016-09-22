@@ -46,12 +46,6 @@ var User = function(user, game) {
     this._id = null;
 
     /**
-     * User model instance if available.
-     * @type {UserModel|null} User model instance or null if no instance is currently available.
-     */
-    this._model = null;
-
-    /**
      * Live game instance.
      *
      * @type {Game} Game.
@@ -92,10 +86,6 @@ var User = function(user, game) {
         throw new Error('Invalid user instance or ID');
     else
         this._id = user;
-
-    // Store the user model instance if any was given
-    if(user instanceof UserModel)
-        this._model = user;
 };
 
 /**
@@ -141,12 +131,7 @@ User.prototype.isUser = function(user) {
  * @return {UserModel} User model instance.
  */
 User.prototype.getUserModel = function() {
-    // Return the model if it isn't null
-    if(this._model !== null)
-        return this._model;
-
-    // Create a user model for the known ID, store and return it
-    return this._model = Core.model.userModelManager._instanceManager.create(this._id);
+    return Core.model.userModelManager._instanceManager.create(this._id);
 };
 
 /**
