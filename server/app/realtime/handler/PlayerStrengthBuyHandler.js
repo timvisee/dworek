@@ -115,6 +115,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
     // Get the game
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
+        // Call back errors
         if(err !== null) {
             callbackError();
             return;
@@ -122,18 +123,22 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
         // Get the game user
         Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+            // Call back errors
             if(err !== null) {
                 callbackError();
                 return;
             }
 
             Core.gameController.getGame(game, function(err, liveGame) {
+                // Call back errors
                 if(err !== null || liveGame == null) {
                     callbackError();
                     return;
                 }
 
+                //
                 gameUser.getStrength(function(err, userStrength) {
+                    // Call back errors
                     if(err !== null) {
                         callbackError();
                         return;
@@ -141,6 +146,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                     // Get the game configuration
                     game.getConfig(function(err, gameConfig) {
+                        // Call back errors
                         if(err !== null) {
                             callbackError();
                             return;
@@ -174,6 +180,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                         // Make sure the user has enough money
                         gameUser.getMoney(function(err, money) {
+                            // Call back errors
                             if(err !== null) {
                                 callbackError();
                                 return;
@@ -190,6 +197,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                             // Subtract the money
                             gameUser.subtractMoney(selectedStrength.cost, function(err) {
+                                // Call back errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
@@ -197,6 +205,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                 // Get the current strength
                                 gameUser.getStrength(function(err, strength) {
+                                    // Call back errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
@@ -204,6 +213,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                     // Set the new strength
                                     gameUser.setStrength(strength + selectedStrength.strength, function(err) {
+                                        // Call back errors
                                         if(err !== null) {
                                             callbackError();
                                             return;
@@ -225,6 +235,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                         // Get the live user
                                         liveGame.getUser(user, function(err, liveUser) {
+                                            // Call back errors
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
