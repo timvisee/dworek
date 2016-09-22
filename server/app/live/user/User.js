@@ -329,6 +329,39 @@ User.prototype.load = function(callback) {
 User.prototype.unload = function() {};
 
 /**
+ * Get the strength of the user.
+ *
+ * @param {User~getStrengthCallback} callback Called back with the strength or when an error occurred.
+ */
+User.prototype.getStrength = function(callback) {
+    // Get the game user
+    this.getGameUser(function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure a game user is known
+        if(gameUser == null) {
+            callback(null, 0);
+            return;
+        }
+
+        // Get the user's strength
+        gameUser.getStrength(callback);
+    });
+};
+
+/**
+ * Called back with the strength or when an error occurred.
+ *
+ * @callback User~getStrengthCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Strength value for this user.
+ */
+
+/**
  * Set the location.
  *
  * @param location New location.
