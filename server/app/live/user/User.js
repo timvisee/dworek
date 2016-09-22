@@ -215,6 +215,47 @@ User.prototype.hasTeam = function(callback) {
  */
 
 /**
+ * Check whether this player is in the given team.
+ * Null is also called back if the team of the current player is unknown and/or if the given team is null.
+ *
+ * @param {GameTeamModel} otherTeam Other team.
+ * @param {User~isTeamCallback} callback Called back with the result or when an error occurred.
+ */
+User.prototype.isTeam = function(otherTeam, callback) {
+    // Call back if the other team is null
+    if(otherTeam == null) {
+        callback(null, false);
+        return;
+    }
+
+    // Get the team of the current user
+    this.getTeam(function(err, team) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Call back false if the team is unknown
+        if(team == null) {
+            callback(null, false);
+            return;
+        }
+
+        // Compare the teams and return the result
+        callback(null, team.getId().equals(otherTeam.getId()));
+    });
+};
+
+/**
+ * Called back with the result or when an error occurred.
+ *
+ * @callback User~isTeamCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean=} True if the teams are the same, false if not.
+ */
+
+/**
  * Get the user name.
  *
  * @param {User~getNameCallback} callback Callback with the result.
