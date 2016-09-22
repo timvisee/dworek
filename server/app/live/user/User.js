@@ -135,22 +135,84 @@ User.prototype.getUserModel = function() {
 };
 
 /**
- * Get the team model for this user if the user is in any team.
+ * Get the game user model instance for this live user.
  *
- * @return {GameTeamModel|null} Team model or null.
+ * @param {User~getGameUserCallback} callback Called with the game user or when an error occurred.
  */
-User.prototype.getTeamModel = function() {
-    return this._teamModel;
+User.prototype.getGameUser = function(callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), callback);
 };
 
 /**
- * Check whether this user has a team.
+ * Called with the game user or when an error occurred.
  *
- * @return {boolean} True if the user has a team, false if not.
+ * @callback User~getGameUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameUserModel|null=} Game user model instance for this user, or null if it couldn't be found.
  */
-User.prototype.hasTeam = function() {
-    return this._teamModel != null;
+
+/**
+ * Get the user's team if the user has any.
+ *
+ * @param {User~getTeamCallback} callback Called with the team or when an error occurred.
+ */
+User.prototype.getTeam = function(callback) {
+    // Get the game user for this user
+    this.getGameUser(function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the user isn't null
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the user's team
+        gameUser.getTeam(callback);
+    });
 };
+
+/**
+ * Called with the team or when an error occurred.
+ *
+ * @callback User~getTeamCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameTeamModel|null=} User's team or null if the user doesn't have a team.
+ */
+
+/**
+ * Check whether the user has a team.
+ * The User#getTeam() function should be called instead if it's also preferred to use the team model instance for
+ * performance reasons.
+ *
+ * @param {User~hasTeamCallback} callback Called with the result or when an error occurred.
+ */
+User.prototype.hasTeam = function(callback) {
+    // Get the user's team
+    this.getTeam(function(err, team) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Check whether the user has a team, call back the result
+        callback(null, team != null);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback User~hasTeamCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {boolean=} True if this user has a team, false if not.
+ */
 
 /**
  * Get the user name.
@@ -705,13 +767,72 @@ User.prototype.isVisibleFor = function(other, callback) {
             return;
         }
 
-        // Check whether the users are in the same team
-        const sameTeam = self.hasTeam() && other.hasTeam() && self.getTeamModel().getId().equals(other.getTeamModel().getId());
+        // Create a team latch
+        var teamLatch = new CallbackLatch();
 
-        // Call back
-        if(!calledBack)
-            callback(null, sameTeam);
-        calledBack = true;
+        // Create two variables for the user and other user's team
+        var team = null;
+        var otherTeam = null;
+
+        // Get the user's team
+        teamLatch.add();
+        self.getTeam(function(err, result) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Call back if the team is null
+            if(result == null) {
+                if(!calledBack)
+                    callback(null, false);
+                calledBack = true;
+                return;
+            }
+
+            // Set the team
+            team = result;
+
+            // Resolve the team latch
+            teamLatch.resolve();
+        });
+
+        // Get the other user's team
+        teamLatch.add();
+        other.getTeam(function(err, team) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Call back if the team is null
+            if(result == null) {
+                if(!calledBack)
+                    callback(null, false);
+                calledBack = true;
+                return;
+            }
+
+            // Set the other team
+            otherTeam = result;
+
+            // Resolve the team latch
+            teamLatch.resolve();
+        });
+
+        // Check whether the user team's are the same when we fetched both teams
+        teamLatch.then(function() {
+            // Determine whether the teams are the same and call back
+            if(!calledBack)
+                callback(null, team.getId().equals(otherTeam.getId()));
+            calledBack = true;
+        });
     });
 };
 

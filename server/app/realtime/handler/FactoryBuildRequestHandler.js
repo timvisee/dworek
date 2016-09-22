@@ -183,16 +183,22 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                     // Get the users location
                     const factoryLocation = liveUser.getLocation();
 
-                    // Calculate the factory cost
-                    liveGame.calculateFactoryCost(liveUser.getTeamModel(), function(err, factoryCost) {
+                    // Get the user's team
+                    liveUser.getTeam(function(err, team) {
                         // Call back errors
                         if(err !== null) {
                             callbackError(err);
                             return;
                         }
 
-                        // Make sure the user has enough money
-                        liveUser.getMoney(function(err, money) {
+                        // Make sure the user has a team
+                        if(team == null) {
+                            callbackError();
+                            return;
+                        }
+
+                        // Calculate the factory cost
+                        liveGame.calculateFactoryCost(team, function(err, factoryCost) {
                             // Call back errors
                             if(err !== null) {
                                 callbackError(err);
@@ -200,53 +206,62 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                             }
 
                             // Make sure the user has enough money
-                            if(money < factoryCost) {
-                                // Send a message response to the user
-                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                    error: true,
-                                    message: 'You don\'t have enough money to build a factory.',
-                                    dialog: true
-                                }, socket);
-                                return;
-                            }
-
-                            // Subtract the money
-                            liveUser.subtractMoney(factoryCost, function(err, callback) {
+                            liveUser.getMoney(function(err, money) {
                                 // Call back errors
                                 if(err !== null) {
                                     callbackError(err);
                                     return;
                                 }
 
-                                // Add the factory
-                                FactoryDatabase.addFactory(factoryName, game, liveUser.getTeamModel(), user, factoryLocation, function (err, factoryModel) {
+                                // Make sure the user has enough money
+                                if(money < factoryCost) {
+                                    // Send a message response to the user
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'You don\'t have enough money to build a factory.',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
+
+                                // Subtract the money
+                                liveUser.subtractMoney(factoryCost, function(err, callback) {
                                     // Call back errors
-                                    if (err !== null) {
+                                    if(err !== null) {
                                         callbackError(err);
                                         return;
                                     }
 
-                                    // Load the factory in the live game
-                                    liveGame.factoryManager.getFactory(factoryModel, function(err) {
+                                    // Add the factory
+                                    FactoryDatabase.addFactory(factoryName, game, team, user, factoryLocation, function (err, factoryModel) {
                                         // Call back errors
-                                        if(err !== null) {
+                                        if (err !== null) {
                                             callbackError(err);
                                             return;
                                         }
 
-                                        // Send a response to the user
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_RESPONSE, {
-                                            game: rawGame,
-                                            factory: factoryModel.getIdHex()
-                                        }, socket);
-
-                                        // Send new game data to everyone
-                                        Core.gameController.sendGameDataToAll(game, function (err) {
-                                            // Handle errors
-                                            if (err !== null) {
-                                                console.error('Failed to send game data updates, ignoring');
-                                                console.error(err);
+                                        // Load the factory in the live game
+                                        liveGame.factoryManager.getFactory(factoryModel, function(err) {
+                                            // Call back errors
+                                            if(err !== null) {
+                                                callbackError(err);
+                                                return;
                                             }
+
+                                            // Send a response to the user
+                                            Core.realTime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_RESPONSE, {
+                                                game: rawGame,
+                                                factory: factoryModel.getIdHex()
+                                            }, socket);
+
+                                            // Send new game data to everyone
+                                            Core.gameController.sendGameDataToAll(game, function (err) {
+                                                // Handle errors
+                                                if (err !== null) {
+                                                    console.error('Failed to send game data updates, ignoring');
+                                                    console.error(err);
+                                                }
+                                            });
                                         });
                                     });
                                 });

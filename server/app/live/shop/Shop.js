@@ -227,58 +227,72 @@ Shop.prototype.load = function(callback) {
 
         // Function to prepare the shop transfer, if there's any applicable user to transfer to
         const functionPrepareTransfer = function() {
-            // Return if the team model is invalid
-            if(self.getUser().getTeamModel() == null)
-                return;
-
             // Get the current user
             const currentLiveUser = self.getUser();
             const currentUserModel = currentLiveUser.getUserModel();
 
-            // Find a replacement user
-            self.getShopManager().findNewShopUser(currentLiveUser.getTeamModel().getId().toString(), function(err, newUser) {
+            // Get the user's team
+            currentLiveUser.getTeam(function(err, team) {
                 // Handle errors
                 if(err !== null) {
-                    console.error('Failed to find new shop user:');
+                    console.error('Failed to find new shop user, failed to fetch user\'s team');
                     console.error(err);
                     return;
                 }
 
-                // Get the preferred shop count delta
-                self.getShopManager().getTeamPreferredShopCountDelta(self.getUser().getTeamModel(), function(err, delta) {
+                // Return if the team is null
+                if(team == null) {
+                    console.error('Failed to find new shop user, user\'s team is null');
+                    return;
+                }
+
+                // Find a replacement user
+                self.getShopManager().findNewShopUser(team.getId().toString(), function(err, newUser) {
                     // Handle errors
                     if(err !== null) {
-                        console.error('Failed to determine whether to find a new shop.');
+                        console.error('Failed to find new shop user');
                         console.error(err);
                         return;
                     }
 
-                    // Reschedule the shop transfer if no new user was found and the delta is not below zero
-                    if(newUser == null && delta >= 0) {
-                        setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
-                        return;
-                    }
+                    // Get the preferred shop count delta
+                    self.getShopManager().getTeamPreferredShopCountDelta(team, function(err, delta) {
+                        // Handle errors
+                        if(err !== null) {
+                            console.error('Failed to determine whether to find a new shop.');
+                            console.error(err);
+                            return;
+                        }
 
-                    // Schedule the shop transfer (also for the new user)
-                    if(newUser != null)
-                        self.getShopManager().scheduleUser(newUser);
-                    setTimeout(functionTransfer, alertTime);
+                        // Reschedule the shop transfer if no new user was found and the delta is not below zero
+                        if(newUser == null && delta >= 0) {
+                            setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
+                            return;
+                        }
 
-                    // Determine what message to show to the current shop owner
-                    var message = 'Your dealer ability will be given to another player soon...';
-                    if(newUser == null)
-                        message = 'You will lose your dealer ability soon...';
+                        // Schedule the shop transfer (also for the new user)
+                        if(newUser != null)
+                            self.getShopManager().scheduleUser(newUser);
+                        setTimeout(functionTransfer, alertTime);
 
-                    // Send a notification to the current shop user
-                    Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                        message,
-                        error: false,
-                        toast: true,
-                        dialog: false
-                    }, currentUserModel);
+                        // Determine what message to show to the current shop owner
+                        var message = 'Your dealer ability will be given to another player soon...';
+                        if(newUser == null)
+                            message = 'You will lose your dealer ability soon...';
+
+                        // Send a notification to the current shop user
+                        Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                            message,
+                            error: false,
+                            toast: true,
+                            dialog: false
+                        }, currentUserModel);
+                    });
                 });
             });
         };
+
+
 
         // Set a timer to prepare the shop transfer
         setTimeout(functionPrepareTransfer, lifeTime - alertTime);
@@ -290,6 +304,23 @@ Shop.prototype.load = function(callback) {
     // Call back when we're done
     latch.then(() => callback(null));
 };
+
+/**
+ * Get the team this shop is part of.
+ *
+ * @param {Shop~getTeamCallback} callback Called with the team or when an error occurred.
+ */
+Shop.prototype.getTeam = function(callback) {
+    this.getUser().getTeam(callback);
+};
+
+/**
+ * Called with the team or when an error occurred.
+ *
+ * @callback Shop~getTeamCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameTeamModel|null=} Game team model instance of the shop's user, or null.
+ */
 
 /**
  * Get the in goods sell price.

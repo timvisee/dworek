@@ -412,23 +412,42 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
  * This includes scheduled shops, that aren't available on the map yet.
  *
  * @param {ObjectId} teamId Team ID
+ * @param {ShopManager~getTeamShopCount} callback Called with the team's shop count or when an error occurred.
  */
-ShopManager.prototype.getTeamShopCount = function(teamId) {
+ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
     // Create a counter
     var count = 0;
 
+    // Only call back once
+    var calledBack = false;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
     // Create an array processing function
     const processingFunction = function(liveShop) {
-        // Check whether the shop is in this team
-        const shopTeam = liveShop.getUser().getTeamModel();
+        // Get the shop's team
+        latch.add();
+        liveShop.getTeam(function(err, team) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
 
-        // Continue if the team is null
-        if(shopTeam == null)
-            return;
+            // Continue if the team is null
+            if(team == null)
+                return;
 
-        // Check whether the teams equal
-        if(shopTeam.getId().equals(teamId))
-            count++;
+            // Check whether the teams equal
+            if(team.getId().equals(teamId))
+                count++;
+
+            // Resolve the latch
+            latch.resolve();
+        });
     };
 
     // Loop through the list of shops
@@ -437,9 +456,20 @@ ShopManager.prototype.getTeamShopCount = function(teamId) {
     // Loop through the list of scheduled shops
     this._scheduledShops.forEach(processingFunction);
 
-    // Return the count
-    return count;
+    // Call back the count when we're done with the latch
+    latch.then(function() {
+        // Call back
+        callback(null, count);
+    });
 };
+
+/**
+ * Called with the team's shop count or when an error occurred.
+ *
+ * @callback ShopManager~getTeamShopCount
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Number of shops for the given team.
+ */
 
 /**
  * Check whether the given user is a shop user, or is scheduled to become a shop.
@@ -674,10 +704,16 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
             const preferredShopCount = gameConfig.shop.getShopsInTeam(userCount);
 
             // Get the number of shops
-            const currentCount = self.getTeamShopCount(teamId);
+            self.getTeamShopCount(teamId, function(err, currentCount) {
+                // Handle errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
 
-            // Determine the shop count delta and call it back
-            callback(null, preferredShopCount - currentCount);
+                // Determine the shop count delta and call it back
+                callback(null, preferredShopCount - currentCount);
+            });
         });
     });
 };

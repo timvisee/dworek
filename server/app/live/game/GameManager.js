@@ -923,12 +923,9 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     return;
                 }
 
-                // Get the users team
-                const team = liveUser.getTeamModel();
-
-                // Get the factory cost
+                // Get the user's team
                 latch.add();
-                liveGame.calculateFactoryCost(team, function(err, cost) {
+                liveUser.getTeam(function(err, team) {
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
@@ -937,8 +934,30 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         return;
                     }
 
-                    // Set the cost
-                    _.set(gameData, 'factory.cost', cost);
+                    // Make sure the user has a team
+                    if(team == null) {
+                        // Resolve the latch and return
+                        latch.resolve();
+                        return;
+                    }
+
+                    // Get the factory cost
+                    latch.add();
+                    liveGame.calculateFactoryCost(team, function(err, cost) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Set the cost
+                        _.set(gameData, 'factory.cost', cost);
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
 
                     // Resolve the latch
                     latch.resolve();
