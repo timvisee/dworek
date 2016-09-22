@@ -802,7 +802,7 @@ User.prototype.isVisibleFor = function(other, callback) {
 
         // Get the other user's team
         teamLatch.add();
-        other.getTeam(function(err, team) {
+        other.getTeam(function(err, result) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)

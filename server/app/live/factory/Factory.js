@@ -124,7 +124,7 @@ Factory.prototype.isFactory = function(factory) {
  * @return {FactoryModel} Factory model instance.
  */
 Factory.prototype.getFactoryModel = function() {
-    Core.model.factoryModelManager._instanceManager.create(this._id);
+    return Core.model.factoryModelManager._instanceManager.create(this._id);
 };
 
 /**
