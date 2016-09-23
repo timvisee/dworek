@@ -1393,19 +1393,59 @@ Factory.prototype.getRange = function(liveUser, callback) {
     // Store this instance
     const self = this;
 
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Get the config and lab level
+    var gameConfig = null;
+    var level = null;
+
     // Get the game config
-    this.getGame().getConfig(function(err, gameConfig) {
+    latch.add();
+    this.getGame().getConfig(function(err, result) {
         // Call back errors
         if(err !== null) {
-            callback(err);
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
             return;
         }
 
+        // Set the config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the lab level
+    latch.add();
+    this.getLevel(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the lab level
+        level = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Determine and call back the range when we fetched the required data
+    latch.then(function() {
         // Check whether the active or global range should be used, call back the result
         if(self.isInRangeMemory(liveUser))
-            callback(null, gameConfig.factory.activeRange);
+            callback(null, gameConfig.factory.getActiveRange(level));
         else
-            callback(null, gameConfig.factory.range);
+            callback(null, gameConfig.factory.getRange(level));
     });
 };
 
