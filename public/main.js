@@ -1631,7 +1631,7 @@ function isDialogVisible() {
  * @param {boolean} [options.native=false] True to show a native notification if supported, false if not.
  * @param {boolean} [options.vibrate=false] True to vibrate the user's device if supported, false if not.
  * @param {Array} [options.vibrationPattern=[500, 250, 500]] Array with vibration pattern timings in milliseconds.
- * @param {Number} [options.ttl=4000] Notification time to live in milliseconds, if supported.
+ * @param {Number} [options.ttl=6000] Notification time to live in milliseconds, if supported.
  * @param {Array} [options.actions] Array of actions to show on the notification, if supported.
  * @param {String} [options.actions.text] Action name.
  * @param {function} [options.actions.action=] Action function.
@@ -1647,7 +1647,7 @@ function showNotification(message, options) {
         native: false,
         vibrate: false,
         vibrationPattern: [500, 250, 500],
-        ttl: 4000
+        ttl: 6000
     };
 
     // Set the default options parameter
