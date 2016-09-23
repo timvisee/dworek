@@ -203,8 +203,31 @@ var GameUserModel = function(id) {
                 }
             },
             money: {
+                mongo: {
+                    from: function(raw) {
+                        // Parse the value
+                        var value = parseInt(raw);
+
+                        // Return zero if the value is invalid
+                        if(value == 0 || isNaN(value))
+                            return 0;
+
+                        // Return the value
+                        return value;
+                    }
+                },
                 redis: {
-                    from: (raw) => parseInt(raw),
+                    from: function(raw) {
+                        // Parse the value
+                        var value = parseInt(raw);
+
+                        // Return zero if the value is invalid
+                        if(value == 0 || isNaN(value))
+                            return 0;
+
+                        // Return the value
+                        return value;
+                    },
                     to: (value) => value.toString()
                 }
             },

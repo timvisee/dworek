@@ -4287,7 +4287,7 @@ function updateGameDataVisuals() {
                 '                <div class="box">' +
                 '                    <a href="#" class="ui-btn waves-effect waves-button action-factory-build">' +
                 '                        <i class="zmdi zmdi-pin"></i>&nbsp;' +
-                '                        Build ' + NameConfig.factory.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + '<span class="game-factory-cost">?</span>)' +
+                '                        Build ' + NameConfig.factory.name + '&nbsp;&nbsp;(<span class="game-factory-cost">?</span>)' +
                 '                    </a>' +
                 '                </div>' +
                 '            </div>' +
@@ -4463,12 +4463,12 @@ function updateGameDataVisuals() {
     if(data.hasOwnProperty('factory')) {
         // Update the factory cost label
         if(data.factory.hasOwnProperty('cost'))
-            $('.game-factory-cost').html(data.factory.cost);
+            $('.game-factory-cost').html(data.factory.cost != 0 ? (NameConfig.currency.sign + data.factory.cost) : 'Free');
     }
 
     if(data.hasOwnProperty('balance')) {
         if(data.balance.hasOwnProperty('money'))
-            activePage.find('.game-balance-money').html(data.balance.money);
+            activePage.find('.game-balance-money').html(data.balance.money != 0 ? data.balance.money : 0);
         if(data.balance.hasOwnProperty('in'))
             activePage.find('.game-balance-in').html(data.balance.in);
         if(data.balance.hasOwnProperty('out'))
@@ -5223,7 +5223,6 @@ function toggleFullScreen() {
     }
 }
 
-// Flush all page cache when visiting login/register pages
 $(document).bind('pageshow', function() {
     // Make sure the user is on a login/register page
     if(document.location.pathname.trim().match(/^\/(login|register)/) == null)

@@ -953,7 +953,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Set the cost
-                        _.set(gameData, 'factory.cost', cost);
+                        _.set(gameData, 'factory.cost', cost != 0 ? cost : 0);
 
                         // Resolve the latch
                         latch.resolve();

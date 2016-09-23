@@ -316,8 +316,13 @@ Game.prototype.calculateFactoryCost = function(team, callback) {
         // Calculate the average enemy factory count
         const avgEnemyFactoryCount = enemyTeams > 0 ? (enemyFactories / enemyTeams) : 0;
 
+        // Calculate the cost
+        var cost = gameConfig.factory.getBuildCost(allyCount, avgEnemyFactoryCount);
+        if(cost == 0 || isNaN(cost))
+            cost = 0;
+
         // Calculate and call back the cost
-        callback(null, gameConfig.factory.getBuildCost(allyCount, avgEnemyFactoryCount));
+        callback(null, cost);
     });
 };
 
