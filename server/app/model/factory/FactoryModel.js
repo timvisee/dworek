@@ -449,7 +449,7 @@ FactoryModel.prototype.getTeam = function(callback) {
  * @param {GameTeamModel} gameTeam Game team.
  * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
-FactoryModel.prototype.setGame = function(gameTeam, callback) {
+FactoryModel.prototype.setTeam = function(gameTeam, callback) {
     this.setField('team', gameTeam, callback);
 };
 
