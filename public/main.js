@@ -772,7 +772,7 @@ var Dworek = {
             // Show an error dialog for Chrome users
             if(Dworek.utils.isChrome(true)) {
                 // Add the refresh meta to the page
-                getActivePage().append('<meta http-equiv="refresh" content="0; url=' + targetUrl + '">');
+                $(body).append('<meta http-equiv="refresh" content="0; url=' + targetUrl + '">');
 
                 // Show a dialog after half a second
                 setTimeout(function() {
@@ -784,7 +784,7 @@ var Dworek = {
                         '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
                         '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Google Chrome</a></div>'
                     });
-                }, 1500);
+                }, 2000);
             }
         },
 
@@ -809,7 +809,7 @@ var Dworek = {
             // Navigate to the page, wait a little to execute it after other page changing requests
             setTimeout(function() {
                 $.mobile.changePage(page, options);
-            }, 1);
+            }, Dworek.utils.isChrome(true) ? 500 : 10);
         },
 
         /**
@@ -1051,7 +1051,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_BUILD, functi
 
     // Create a function to navigate to the factory
     const navigateToFactory = function() {
-        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId)
+        Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId, false, true, 'flip');
     };
 
     // Show a message if it's the user itself
@@ -1098,7 +1098,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 
     // Create a function to navigate to the factory
     const navigateToFactory = function() {
-        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId)
+        Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId, false, true, 'flip');
     };
 
     // Show a message if it's the user itself
@@ -1207,7 +1207,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
     // Function to navigate to the game overview
     const navigateToGameOverview = function() {
-        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
+        Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId(), false, false);
     };
 
     // Show a message if it's the user itself
