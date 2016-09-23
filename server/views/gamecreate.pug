@@ -1,0 +1,25 @@
+extends page
+
+block content
+    unless created
+        p Please enter the name of the game you'd like to create.
+
+        br
+        form(method='POST', action=page.url + '/#')
+            label(for='field-game-name') Game name:
+            input(type='text', name='field-game-name', id='field-game-name', value='', data-clear-btn='true', data-randomize='true')
+
+            br
+            button.ui-btn.ui-btn-raised.clr-primary(type='submit') Create game
+
+    else
+        p The game has been created.
+
+        table.table-list.ui-responsive
+            tr: td Game name
+                td= game.name
+
+        p Click the button below to view the game.
+
+        br
+        a.ui-btn.ui-btn-raised.clr-primary(href='/game/' + game.id, title='View the game') View Game

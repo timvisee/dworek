@@ -105,7 +105,7 @@ FactoryDatabase.addFactory = function (name, game, team, user, location, callbac
             out: gameConfig.factory.initialOut
         };
 
-        // Insert the session into the database
+        // Insert the factory into the database
         db.collection(FactoryDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err, result) {
             // Handle errors and make sure the status is ok
             if(err !== null) {

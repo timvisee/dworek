@@ -253,5 +253,39 @@ Validator.isValidFactoryName = function(factoryName) {
     return (charCount >= config.validation.factoryNameMinLength && charCount <= config.validation.factoryNameMaxLength);
 };
 
+/**
+ * Format the the given game name.
+ *
+ * @param {string} gameName Game name.
+ *
+ * @return {string} The formatted game name.
+ */
+Validator.formatGameName = function(gameName) {
+    // Trim the game name, and return
+    return gameName.trim();
+};
+
+/**
+ * Check whether the given game name is valid.
+ *
+ * @param {string} gameName Game name.
+ *
+ * @return {boolean} True if the game name is valid, false if not.
+ */
+Validator.isValidGameName = function(gameName) {
+    // Make sure the game name isn't undefined or null
+    if(gameName === undefined || gameName === null)
+        return false;
+
+    // Trim the game name
+    gameName = gameName.trim();
+
+    // Count the number of characters
+    const charCount = gameName.length;
+
+    // Make sure the length is within bounds
+    return (charCount >= config.validation.gameNameMinLength && charCount <= config.validation.gameNameMaxLength);
+};
+
 // Export the class
 module.exports = Validator;

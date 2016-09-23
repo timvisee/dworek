@@ -324,6 +324,18 @@ config.validation.factoryNameMinLength = 1;
  */
 config.validation.factoryNameMaxLength = 64;
 
+/**
+ * Minimum number of game name characters.
+ * @type {int}
+ */
+config.validation.gameNameMinLength = 4;
+
+/**
+ * Maximum number of game name characters.
+ * @type {int}
+ */
+config.validation.gameNameMaxLength = 64;
+
 
 /******************************************************************************
  * Game configuration.                                                        *

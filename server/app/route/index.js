@@ -31,6 +31,7 @@ var games = require('./games')
 var game = require('./game');
 var about = require('./about');
 var status = require('./status');
+var create = require('./create');
 
 var appInfo = require('../../appInfo');
 var Core = require('../../Core');
@@ -111,6 +112,9 @@ router.use('/about', about);
 
 // Status page
 router.use('/status', status);
+
+// Game creation page
+router.use('/create', create);
 
 /**
  * Get the game list.
