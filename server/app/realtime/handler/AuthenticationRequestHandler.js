@@ -133,6 +133,12 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
         // TODO: Invalidate other sessions with this user!
 
+        // Don't authenticate if the user instance is null
+        if(user == null) {
+            console.error('Failed to authenticate real-time client, user is null');
+            return;
+        }
+
         // Show a status message
         console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');
 
