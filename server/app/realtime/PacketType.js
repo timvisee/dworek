@@ -296,6 +296,7 @@ module.exports = {
      * Attack a factory.
      *
      * Data:
+     * - game: ID of the current game.
      * - factory: ID of the factory to attack.
      */
     FACTORY_ATTACK: 28
