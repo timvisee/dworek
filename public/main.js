@@ -1041,6 +1041,115 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     }
 });
 
+// Handle factory capture packets
+Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, function(packet) {
+    // Get all properties
+    const factoryId = packet.factory;
+    const factoryName = packet.factoryName;
+    const isSelf = packet.self;
+    const userName = packet.userName;
+    const teamName = packet.teamName;
+    const isAlly = packet.ally;
+    const isEnemy = packet.enemy;
+
+    // Create a function to navigate to the factory
+    const navigateToFactory = function() {
+        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId)
+    };
+
+    // Show a message if it's the user itself
+    if(isSelf) {
+        // Show a dialog
+        showDialog({
+            title: capitalizeFirst(NameConfig.factory.name) + ' captured',
+            message: 'You\'ve successfully captured the <b>' + factoryName + '</b> ' + NameConfig.factory.name + '!',
+            actions: [
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+        return;
+    }
+
+    // Show a message to allies
+    if(isAlly) {
+        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+            // Show a dialog
+            showDialog({
+                title: capitalizeFirst(NameConfig.factory.name) + ' captured',
+                message: '<b>' + userName + '</b> successfully captured this ' + NameConfig.factory.name + ' and it is now owned by our team.',
+                actions: [
+                    {
+                        text: 'Close'
+                    }
+                ]
+            });
+
+        } else {
+            // Show a notification
+            showNotification('<b>' + userName + '</b> captured a lab from an enemy', {
+                action: {
+                    text: 'View',
+                    action: navigateToFactory
+                },
+                vibrate: true
+            });
+        }
+        return;
+    }
+
+    // Show a message to enemies
+    if(isEnemy) {
+        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+            // Show a dialog
+            showDialog({
+                title: capitalizeFirst(NameConfig.factory.name) + ' lost',
+                message: 'This ' + NameConfig.factory.name + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+                actions: [
+                    {
+                        text: 'Close'
+                    }
+                ]
+            });
+
+        } else {
+            // Show a notification
+            showNotification('<b>' + userName + '</b> took over one of our ' + NameConfig.factory.name + 's', {
+                action: {
+                    text: 'View',
+                    action: navigateToFactory
+                },
+                vibrate: true
+            });
+        }
+        return;
+    }
+
+    // Show a global message
+    if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+        // Show a dialog
+        showDialog({
+            title: capitalizeFirst(NameConfig.factory.name) + ' captured',
+            message: 'This ' + NameConfig.factory.name + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+            actions: [
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+
+    } else {
+        // Show a notification
+        showNotification('A lab has been captured by <b>' + userName + '</b>', {
+            action: {
+                text: 'View',
+                action: navigateToFactory
+            }
+        });
+    }
+});
+
 /**
  * Queue of broadcasts that need to be shown to the user.
  * @type {Array}

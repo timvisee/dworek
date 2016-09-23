@@ -323,6 +323,7 @@ module.exports = {
      * - self: True if the user this packet is send to captured the factory.
      * - userName: Name of the user that captured the factory.
      * - teamName: Name of the team of the user that captured this factory.
+     * - ally: True if the factory was captured from the user's current team.
      * - enemy: True if the factory was captured by an enemy, false if not.
      */
     FACTORY_CAPTURED: 30,
@@ -337,6 +338,7 @@ module.exports = {
      * - self: True if the user that this packet was send to destroyed the factory.
      * - userName: Name of the user that destroyed the factory.
      * - teamName: Name of the team of the user that destroyed this factory.
+     * - ally: True if the factory was captured from the user's current team.
      * - enemy: True if the factory was destroyed by an enemy, false if not.
      */
     FACTORY_DESTROYED: 31

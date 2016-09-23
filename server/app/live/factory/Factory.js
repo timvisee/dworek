@@ -2068,12 +2068,108 @@ Factory.prototype.attack = function(user, callback) {
 
                     // Continue when we're done
                     latch.then(function() {
-                        // Send a message to the user
-                        Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                            error: false,
-                            message: 'You successfully attacked! The shack has been taken over.',
-                            dialog: true
-                        }, user.getUserModel());
+                        // Reset the latch
+                        latch.identity();
+
+                        // Get the factory name, the name of the user and name of the team
+                        var factoryName = null;
+                        var userName = null;
+                        var userTeamName = null;
+
+                        // Get the factory name
+                        latch.add();
+                        self.getName(function(err, result) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the factory name
+                            factoryName = result;
+
+                            // Resolve the latch
+                            latch.resolve();
+                        });
+
+                        // Get the user name
+                        latch.add();
+                        user.getName(function(err, result) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the user name
+                            userName = result;
+
+                            // Resolve the latch
+                            latch.resolve();
+                        });
+
+                        // Get the team name
+                        latch.add();
+                        userTeam.getName(function(err, result) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    callback(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Set the team name
+                            userTeamName = result;
+
+                            // Resolve the latch
+                            latch.resolve();
+                        });
+
+                        // Send a broadcast to all relevant users when we fetched the data
+                        latch.then(function() {
+                            // Loop through the list of users
+                            self.getGame().userManager.users.forEach(function(otherUser) {
+                                // Get the user's team
+                                otherUser.getTeam(function(err, otherTeam) {
+                                    // Handle errors
+                                    if(err !== null) {
+                                        console.error('Failed to fetch user team, ignoring');
+                                        console.error(err);
+                                    }
+
+                                    // Make sure the user's team is known
+                                    if(otherTeam == null)
+                                        return;
+
+                                    // Check whether this is the user itself
+                                    const isSelf = user.getId().equals(otherUser.getId());
+
+                                    // Determine whether the user is ally/enemy
+                                    const isAlly = userTeam.getId().equals(otherTeam.getId());
+                                    const isEnemy = factoryTeam.getId().equals(otherTeam.getId());
+
+                                    // The user must be in range if he isn't ally/enemy
+                                    if(!isAlly && !isEnemy && !self.isInRangeMemory(otherUser))
+                                        return;
+
+                                    // Send a capture update
+                                    Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_CAPTURED, {
+                                        factory: self.getId(),
+                                        factoryName,
+                                        self: isSelf,
+                                        userName,
+                                        teamName: userTeamName,
+                                        ally: isAlly,
+                                        enemy: isEnemy
+                                    }, otherUser.getUserModel());
+                                });
+                            });
+                        });
 
                         // Broadcast the factory data
                         self.broadcastData(function(err) {
