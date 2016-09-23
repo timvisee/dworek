@@ -46,6 +46,21 @@ var gameConfig = {
         initialMoney: 500,
 
         /**
+         * Initial in.
+         */
+        initialIn: 0,
+
+        /**
+         * Initial out.
+         */
+        initialOut: 0,
+
+        /**
+         * Initial strength the user has.
+         */
+        initialStrength: 0,
+
+        /**
          * Get the upgrades and their cost.
          *
          * @param {Number} strength Current strength.

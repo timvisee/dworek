@@ -53,36 +53,48 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
     // Get the database instance
     const db = MongoUtil.getConnection();
 
-    // Create the object to insert
-    // TODO: Dynamically get the proper field names from the model configuration
-    const insertObject = {
-        game_id: game.getId(),
-        user_id: user.getId(),
-        team_id: team == null ? null : team.getId(),
-        is_special: isSpecial,
-        is_spectator: isSpectator
-    };
-
-    // Insert the game user into the database
-    db.collection(GameUserDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err) {
-        // Handle errors and make sure the status is ok
+    // Get the game configuration.
+    game.getConfig(function(err, gameConfig) {
+        // Call back errors
         if(err !== null) {
-            // Show a warning and call back with the error
-            console.warn('Unable to create new game user, failed to insert game user into database.');
             callback(err, null);
             return;
         }
 
-        // Flush the model manager cache
-        Core.model.gameUserModelManager.flushCache(function(err) {
-            // Call back errors
+        // Create the object to insert
+        // TODO: Dynamically get the proper field names from the model configuration
+        const insertObject = {
+            game_id: game.getId(),
+            user_id: user.getId(),
+            team_id: team == null ? null : team.getId(),
+            is_special: isSpecial,
+            is_spectator: isSpectator,
+            in: gameConfig.player.initialIn,
+            out: gameConfig.player.initialOut,
+            strength: gameConfig.player.initialStrength
+        };
+
+        // Insert the game user into the database
+        db.collection(GameUserDatabase.DB_COLLECTION_NAME).insertOne(insertObject, function(err) {
+            // Handle errors and make sure the status is ok
             if(err !== null) {
-                callback(err);
+                // Show a warning and call back with the error
+                console.warn('Unable to create new game user, failed to insert game user into database.');
+                callback(err, null);
                 return;
             }
 
-            // Call back with the inserted ID
-            callback(null, Core.model.gameUserModelManager._instanceManager.create(insertObject._id));
+            // Flush the model manager cache
+            Core.model.gameUserModelManager.flushCache(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Call back with the inserted ID
+                callback(null, Core.model.gameUserModelManager._instanceManager.create(insertObject._id));
+            });
         });
     });
 };
