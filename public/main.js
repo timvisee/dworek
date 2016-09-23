@@ -1207,7 +1207,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
     // Function to navigate to the game overview
     const navigateToGameOverview = function() {
-        Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId(), false, false);
+        Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId(), false, false, 'flip');
     };
 
     // Show a message if it's the user itself
