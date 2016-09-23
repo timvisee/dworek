@@ -5222,3 +5222,14 @@ function toggleFullScreen() {
             showNotification('Full screen is not supported on this device');
     }
 }
+
+// Flush all page cache when visiting login/register pages
+$(document).bind('pageshow', function() {
+    // Make sure the user is on a login/register page
+    if(document.location.pathname.trim().match(/^\/(login|register)/) == null)
+        return;
+
+    // Flush all pages
+    console.log('Flushing all!');
+    Dworek.utils.flushPages(undefined, false);
+});
