@@ -23,6 +23,8 @@
 var async = require('async');
 var express = require('express');
 var http = require('http');
+var https = require('https');
+var fs = require('fs');
 
 var config = require('./config');
 var debug = require('debug')(config.debug.name);
@@ -203,11 +205,49 @@ App.prototype._initExpressApp = function(callback) {
  */
 App.prototype._initWebServer = function() {
     // Set the web listening port
-    Core._webPort = PortUtils.normalizePort(config.web.port);
+    Core._webPort = PortUtils.normalizePort(config.web.sslUse ? config.web.sslPort : config.web.port);
     Core.expressApp.set('port', Core._webPort);
 
-    // Create the HTTP server
-    Core.server = http.createServer(Core.expressApp);
+    // Check whether to use SSL
+    if(config.web.sslUse) {
+        // Use SSL
+        // Show a status message
+        console.log('Loading SSL certificates for the SSL server...');
+
+        // Create the options object and load the SSL certificate files
+        var options = {
+            key: fs.readFileSync(config.web.sslKeyFile),
+            cert: fs.readFileSync(config.web.sslCertFile)
+        };
+
+        // Create the HTTPS server
+        Core.server = https.createServer(options, Core.expressApp);
+
+        // Get the redirect web port
+        const webRedirectPort = PortUtils.normalizePort(config.web.port);
+
+        // Create the HTTP redirect server
+        const redirectServer = http.createServer(function (req, res) {
+            // Show a log message
+            console.log('Redirecting HTTP user to HTTPS');
+
+            // Redirect the user to HTTPS
+            res.writeHead(301, {
+                Location: 'https://' + req.headers['host'] + req.url
+            });
+
+            // End the request
+            res.end();
+        });
+
+        // Listen
+        redirectServer.listen(webRedirectPort);
+
+    } else {
+        // Don't use SSL
+        // Create the HTTP server
+        Core.server = http.createServer(Core.expressApp);
+    }
 
     // Listen on provided port, on all network interfaces.
     Core.server.listen(Core._webPort);

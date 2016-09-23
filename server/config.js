@@ -147,7 +147,8 @@ config.cache.internal.flushInterval = 5 * 60 * 1000;
  ******************************************************************************/
 
 /**
- * Web server listening port.
+ * HTTP web server listening port.
+ * Requests to this port will be redirected to HTTPS if SSL is enabled.
  * @type {*|number}
  */
 config.web.port = process.env.WEB_PORT || 3000;
@@ -157,6 +158,30 @@ config.web.port = process.env.WEB_PORT || 3000;
  * @type {boolean}
  */
 config.web.fixUrl = true;
+
+/**
+ * Set whether to use an SSL certificate.
+ * @type {boolean} True to use SSL.
+ */
+config.web.sslUse = true;
+
+/**
+ * HTTPS SSL web server listening port.
+ * @type {*|number}
+ */
+config.web.sslPort = process.env.WEB_PORT_SSL || 443;
+
+/**
+ * SSL certificate private key file.
+ * @type {string} File path.
+ */
+config.web.sslKeyFile = '';
+
+/**
+ * SSL certificate file.
+ * @type {string} File path.
+ */
+config.web.sslCertFile = '';
 
 
 /******************************************************************************
