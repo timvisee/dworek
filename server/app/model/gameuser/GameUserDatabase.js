@@ -69,6 +69,7 @@ GameUserDatabase.addGameUser = function(game, user, team, isSpecial, isSpectator
             team_id: team == null ? null : team.getId(),
             is_special: isSpecial,
             is_spectator: isSpectator,
+            money: gameConfig.player.initialMoney,
             in: gameConfig.player.initialIn,
             out: gameConfig.player.initialOut,
             strength: gameConfig.player.initialStrength
