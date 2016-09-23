@@ -151,7 +151,7 @@ config.cache.internal.flushInterval = 5 * 60 * 1000;
  * Requests to this port will be redirected to HTTPS if SSL is enabled.
  * @type {*|number}
  */
-config.web.port = process.env.WEB_PORT || 3000;
+config.web.port = process.env.WEB_PORT || 80;
 
 /**
  * Define whether to automatically fix malformed URLs.
@@ -163,7 +163,7 @@ config.web.fixUrl = true;
  * Set whether to use an SSL certificate.
  * @type {boolean} True to use SSL.
  */
-config.web.sslUse = true;
+config.web.sslUse = false;
 
 /**
  * HTTPS SSL web server listening port.
