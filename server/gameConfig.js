@@ -341,7 +341,7 @@ var gameConfig = {
             // Add a second defence when the defence level is 6 or higher
             if(defence >= 6) {
                 defences.push({
-                    name: 'Mexicans',
+                    name: 'Alarm System',
                     cost: (basePrice * 2.1) * Math.pow(power, defence),
                     defence: 2
                 });
@@ -350,7 +350,7 @@ var gameConfig = {
             // Add a third defence when the defence level is 9 or higher
             if(defence >= 9) {
                 defences.push({
-                    name: 'Mexicans',
+                    name: 'Mines',
                     cost: (basePrice * 4.2) * Math.pow(power, defence),
                     defence: 4
                 });
@@ -359,7 +359,7 @@ var gameConfig = {
             // Add a fourth defence when the defence level is 13 or higher
             if(defence >= 13) {
                 defences.push({
-                    name: 'Mexicans',
+                    name: 'Private Army',
                     cost: (basePrice * 8.3) * Math.pow(power, defence),
                     defence: 8
                 });
