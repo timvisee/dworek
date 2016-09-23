@@ -245,16 +245,79 @@ Game.prototype.getConfig = function(callback) {
  * @param {Game~calculateFactoryCostCallback} callback
  */
 Game.prototype.calculateFactoryCost = function(team, callback) {
-    // Get the game configuration
-    this.getConfig(function(err, config) {
+    // Ally factory count and game configuration
+    var factoryTeamCounts = null;
+    var gameConfig = null;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Get the number of factories
+    latch.add();
+    this.getTeamFactoryCount(function(err, result) {
         // Call back errors
         if(err !== null) {
-            callback(err);
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
             return;
         }
 
-        // Calculate the factory cost
-        callback(null, config.factory.getCost());
+        // Set the count
+        factoryTeamCounts = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the game configuration
+    latch.add();
+    this.getConfig(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the config
+        gameConfig = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Calculate the factory cost when we fetched the required data
+    latch.then(function() {
+        // Get the ally count
+        const allyCount = factoryTeamCounts[team.getIdHex()];
+
+        // Count the number of enemy factories and teams
+        var enemyFactories = 0;
+        var enemyTeams = 0;
+        for(var teamId in factoryTeamCounts) {
+            // Make sure the key is valid
+            if(!factoryTeamCounts.hasOwnProperty(teamId))
+                continue;
+
+            // Make sure this is an enemy team
+            if(team.getId().equals(teamId))
+                continue;
+
+            // Increase the team count and enemy factory size
+            enemyFactories += factoryTeamCounts[teamId];
+            enemyTeams++;
+        }
+
+        // Calculate the average enemy factory count
+        const avgEnemyFactoryCount = enemyTeams > 0 ? (enemyFactories / enemyTeams) : 0;
+
+        // Calculate and call back the cost
+        callback(null, gameConfig.factory.getBuildCost(allyCount, avgEnemyFactoryCount));
     });
 };
 
@@ -262,6 +325,77 @@ Game.prototype.calculateFactoryCost = function(team, callback) {
  * @callback Game~calculateFactoryCostCallback
  * @param {Error|null} Error instance if an error occurred.
  * @param {Number} Cost.
+ */
+
+/**
+ * Get the number of factories a team has.
+ *
+ * @param {Game~getTeamFactoryCount} callback Called with the factory count or when an error occurred.
+ */
+Game.prototype.getTeamFactoryCount = function(callback) {
+    // Call back zero if the team is null
+    if(team == null) {
+        callback(null, 0);
+        return;
+    }
+
+    // Number of factories by team
+    var counts = {};
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Loop through all factories
+    this.factoryManager.factories.forEach(function(liveFactory) {
+        // Get the factory team
+        latch.add();
+        liveFactory.getTeam(function(err, factoryTeam) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Make sure the factory team isn't null
+            if(factoryTeam == null) {
+                latch.resolve();
+                return;
+            }
+
+            // Get the team ID
+            const rawTeamId = factoryTeam.getIdHex();
+
+            // Get the current count for this team
+            var count = 0;
+            if(counts.hasOwnProperty(rawTeamId))
+                count = counts[rawTeamId];
+
+            // Increase the count
+            count++;
+
+            // Set the count in the object
+            counts[rawTeamId] = count;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    });
+
+    // Call back the number of factories
+    latch.then(() => callback(null, counts));
+};
+
+/**
+ * Called with the factory count or when an error occurred.
+ *
+ * @callback Game~getTeamFactoryCount
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Object=} Object of factory counts.
  */
 
 // Export the class

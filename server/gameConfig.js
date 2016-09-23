@@ -252,8 +252,12 @@ var gameConfig = {
 
         /**
          * Function to calculate the factory cost.
+         *
+         * @param {Number} allyFactoryCount Number of factories the team owns.
+         * @param {Number} enemyFactoryCount Average number of factories each team owns.
+         * @return {Number} Cost of a new factory.
          */
-        getCost: function() {
+        getBuildCost: function(allyFactoryCount, enemyFactoryCount) {
             return 100;
         },
 
