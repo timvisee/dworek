@@ -90,7 +90,7 @@ var gameConfig = {
             // Add a third strength when the defence level is 3 or higher
             if(strength >= 3) {
                 strengths.push({
-                    name: 'Body Guard',
+                    name: 'S.W.A.T Gun',
                     cost: (basePrice * 2.1) * Math.pow(power, strength),
                     strength: 2
                 });
@@ -99,7 +99,7 @@ var gameConfig = {
             // Add a fourth strength when the defence level is 6 or higher
             if(strength >= 6) {
                 strengths.push({
-                    name: 'AK-47',
+                    name: 'Body Guard',
                     cost: (basePrice * 4.2) * Math.pow(power, strength),
                     strength: 4
                 });
@@ -108,9 +108,18 @@ var gameConfig = {
             // Add a fifth strength when the defence level is 8 or higher
             if(strength >= 8) {
                 strengths.push({
-                    name: 'Armoured Vehicle',
+                    name: 'RPG-V2',
                     cost: (basePrice * 8.3) * Math.pow(power, strength),
                     strength: 8
+                });
+            }
+
+            // Add a sixth strength when the defence level is 10 or higher
+            if(strength >= 10) {
+                strengths.push({
+                    name: 'Tank',
+                    cost: (basePrice * 18) * Math.pow(power, strength),
+                    strength: 16
                 });
             }
 
@@ -341,7 +350,7 @@ var gameConfig = {
             // Add a second defence when the defence level is 6 or higher
             if(defence >= 6) {
                 defences.push({
-                    name: 'Alarm System',
+                    name: 'Pitbull',
                     cost: (basePrice * 2.1) * Math.pow(power, defence),
                     defence: 2
                 });
@@ -350,7 +359,7 @@ var gameConfig = {
             // Add a third defence when the defence level is 9 or higher
             if(defence >= 9) {
                 defences.push({
-                    name: 'Mines',
+                    name: 'AK-47',
                     cost: (basePrice * 4.2) * Math.pow(power, defence),
                     defence: 4
                 });
@@ -359,9 +368,18 @@ var gameConfig = {
             // Add a fourth defence when the defence level is 13 or higher
             if(defence >= 13) {
                 defences.push({
-                    name: 'Private Army',
+                    name: 'Sniper',
                     cost: (basePrice * 8.3) * Math.pow(power, defence),
                     defence: 8
+                });
+            }
+
+            // Add a fifth defence when the defence level is 15 or higher
+            if(defence >= 15) {
+                defences.push({
+                    name: 'Private Army',
+                    cost: (basePrice * 18) * Math.pow(power, defence),
+                    defence: 16
                 });
             }
 
