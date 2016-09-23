@@ -299,5 +299,42 @@ module.exports = {
      * - game: ID of the current game.
      * - factory: ID of the factory to attack.
      */
-    FACTORY_ATTACK: 28
+    FACTORY_ATTACK: 28,
+
+    /**
+     * Update because a factory has been build.
+     * Send from the server to clients.
+     *
+     * Data:
+     * - factory: ID of the factory to attack.
+     * - factoryName: Name of the factory.
+     * - userName: Name of the user that captured the factory.
+     */
+    FACTORY_BUILD: 29,
+
+    /**
+     * Update because a factory has been captured.
+     * Send from the server to clients.
+     *
+     * Data:
+     * - factory: ID of the factory to attack.
+     * - factoryName: Name of the factory.
+     * - userName: Name of the user that captured the factory.
+     * - teamName: Name of the team of the user that captured this factory.
+     * - enemy: True if the factory was captured by an enemy, false if not.
+     */
+    FACTORY_CAPTURED: 30,
+
+    /**
+     * Update because a factory has been destroyed.
+     * Send from the server to clients.
+     *
+     * Data:
+     * - factory: ID of the factory to attack.
+     * - factoryName: Name of the factory.
+     * - userName: Name of the user that destroyed the factory.
+     * - teamName: Name of the team of the user that destroyed this factory.
+     * - enemy: True if the factory was destroyed by an enemy, false if not.
+     */
+    FACTORY_DESTROYED: 31
 };
