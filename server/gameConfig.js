@@ -43,7 +43,7 @@ var gameConfig = {
         /**
          * Initial money amount, when a user starts the game.
          */
-        initialMoney: 500,
+        initialMoney: 100,
 
         /**
          * Initial in.
@@ -58,7 +58,7 @@ var gameConfig = {
         /**
          * Initial strength the user has.
          */
-        initialStrength: 0,
+        initialStrength: 1,
 
         /**
          * Get the upgrades and their cost.
@@ -67,24 +67,50 @@ var gameConfig = {
          * @return {*[]}
          */
         getStrengthUpgrades: function(strength) {
+            // Base price
+            const basePrice = 35;
+            const power = 1.5;
+
             // Create an array of defences
             var strengths = [{
-                name: 'Energy',
-                cost: 1,
+                name: 'Pistol',
+                cost: basePrice * Math.pow(power, defence),
                 strength: 1
             }];
 
-            // Add other defences when the defence is greater than the initial value
-            if(strength > 5) {
+            // Add a second strength when the defence level is 3 or lower
+            if(strength <= 3) {
                 strengths.push({
-                    name: 'Pistol',
-                    cost: Math.round(5 + strength * 1.2),
-                    strength: 10
+                    name: 'P90 RUSH B',
+                    cost: (basePrice * 0.8) * Math.pow(power, defence),
+                    strength: 1
                 });
+            }
+
+            // Add a third strength when the defence level is 3 or higher
+            if(strength >= 3) {
                 strengths.push({
-                    name: 'Rush B',
-                    cost: Math.round(15 + strength * 2),
-                    strength: strength * 2
+                    name: 'Body Guard',
+                    cost: (basePrice * 2.1) * Math.pow(power, defence),
+                    strength: 2
+                });
+            }
+
+            // Add a fourth strength when the defence level is 6 or higher
+            if(strength >= 6) {
+                strengths.push({
+                    name: 'AK-47',
+                    cost: (basePrice * 4.2) * Math.pow(power, defence),
+                    strength: 4
+                });
+            }
+
+            // Add a fifth strength when the defence level is 8 or higher
+            if(strength >= 8) {
+                strengths.push({
+                    name: 'Armoured Vehicle',
+                    cost: (basePrice * 8.3) * Math.pow(power, defence),
+                    strength: 8
                 });
             }
 
@@ -195,7 +221,7 @@ var gameConfig = {
          * @return {Number} Range in meters.
          */
         getRange: function(level) {
-            return 15;
+            return 7 + Math.pow(level - 1, 0.3) * 4;
         },
 
         /**
@@ -218,7 +244,7 @@ var gameConfig = {
          * Initial factory defence value, when the factory is created.
          * @type {Number}
          */
-        initialDefence: 10,
+        initialDefence: 7,
 
         /**
          * Initial in value.
@@ -238,7 +264,11 @@ var gameConfig = {
          * @return {Number} Production input for each tick.
          */
         getProductionIn: function(level) {
-            return 3 * level;
+            // Constants
+            const ratioIn = 3;
+
+            // Calculate and return the production value
+            return Math.round(level * ratioIn);
         },
 
         /**
@@ -247,7 +277,11 @@ var gameConfig = {
          * @return {Number} Production output for each tick.
          */
         getProductionOut: function(level) {
-            return 2 * level;
+            // Constants
+            const ratioOut = 1;
+
+            // Calculate and return the production value
+            return Math.round(ratioOut + Math.pow(level, 1.3) - 1);
         },
 
         /**
@@ -258,7 +292,22 @@ var gameConfig = {
          * @return {Number} Cost of a new factory.
          */
         getBuildCost: function(allyFactoryCount, enemyFactoryCount) {
-            return 100;
+            // Factory base price
+            const basePrice = 400;
+
+            // The first factory costs nothing
+            if(allyFactoryCount <= 0)
+                return 0;
+
+            // The second factory costs the initial money value
+            if(allyFactoryCount == 1)
+                return gameConfig.player.initialMoney;
+
+            // Calculate the level offset due to the ally/enemy factory ratio
+            const ratioOffset = (allyFactoryCount - enemyFactoryCount) / 4;
+
+            // Calculate the factory cost and return it
+            return basePrice * Math.pow(1.45, allyFactoryCount + ratioOffset);
         },
 
         /**
@@ -268,7 +317,7 @@ var gameConfig = {
          * @return {Number} Level cost.
          */
         getLevelCost: function(level) {
-            return ((level * 0.5) * level) * 10;
+            return 250 + 500 * Math.pow(level - 1, 1.5);
         },
 
         /**
@@ -278,24 +327,41 @@ var gameConfig = {
          * @return {*[]}
          */
         getDefenceUpgrades: function(defence) {
+            // Base price
+            const basePrice = 100;
+            const power = 1.2;
+
             // Create an array of defences
             var defences = [{
                 name: 'Mexicans',
-                cost: 1,
+                cost: basePrice * Math.pow(power, defence),
                 defence: 1
             }];
 
-            // Add other defences when the defence is greater than the initial value
-            if(defence > this.initialDefence) {
+            // Add a second defence when the defence level is 6 or higher
+            if(defence >= 6) {
                 defences.push({
-                    name: 'Corrupt Agent',
-                    cost: Math.round(5 + defence * 1.2),
-                    defence: 10
+                    name: 'Mexicans',
+                    cost: (basePrice * 2.1) * Math.pow(power, defence),
+                    defence: 2
                 });
+            }
+
+            // Add a third defence when the defence level is 9 or higher
+            if(defence >= 9) {
                 defences.push({
-                    name: 'AK-47',
-                    cost: Math.round(15 + defence * 2),
-                    defence: defence * 2
+                    name: 'Mexicans',
+                    cost: (basePrice * 4.2) * Math.pow(power, defence),
+                    defence: 4
+                });
+            }
+
+            // Add a fourth defence when the defence level is 13 or higher
+            if(defence >= 13) {
+                defences.push({
+                    name: 'Mexicans',
+                    cost: (basePrice * 8.3) * Math.pow(power, defence),
+                    defence: 8
                 });
             }
 
