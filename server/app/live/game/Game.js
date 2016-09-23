@@ -333,12 +333,6 @@ Game.prototype.calculateFactoryCost = function(team, callback) {
  * @param {Game~getTeamFactoryCount} callback Called with the factory count or when an error occurred.
  */
 Game.prototype.getTeamFactoryCount = function(callback) {
-    // Call back zero if the team is null
-    if(team == null) {
-        callback(null, 0);
-        return;
-    }
-
     // Number of factories by team
     var counts = {};
 
