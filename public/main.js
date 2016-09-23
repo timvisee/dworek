@@ -4578,34 +4578,13 @@ function updateFactoryDataVisuals(firstShow) {
     var defenceCard = activePage.find('.card-factory-defence');
     var levelCard = activePage.find('.card-factory-level');
 
-    // Check whether the factory is in range
+    // Update the upgrade buttons
     if(canModify) {
+        // Slide down the cards
         transferCard.slideDown();
         defenceCard.slideDown();
         levelCard.slideDown();
 
-    } else {
-        if(firstShow) {
-            transferCard.hide();
-            defenceCard.hide();
-            levelCard.hide();
-        } else {
-            transferCard.slideUp();
-            defenceCard.slideUp();
-            levelCard.slideUp();
-        }
-    }
-
-    // Determine whether the attack card should be shown
-    if(data.hasOwnProperty('conquerValue') && data.conquerValue > 0 && data.hasOwnProperty('ally') && !data.ally)
-        attackCard.slideDown();
-    else if(!firstShow)
-        attackCard.slideUp();
-    else
-        attackCard.hide();
-
-    // Update the upgrade buttons
-    if(canModify) {
         // Get the upgrade button list element, and clear it
         const upgradeButtonList = defenceCard.find('.upgrade-button-list');
         upgradeButtonList.empty();
@@ -4709,7 +4688,7 @@ function updateFactoryDataVisuals(firstShow) {
             }
 
             // Generate an unique field ID
-            var amountFieldId = generateUniqueId('amount-field');
+            var amountFieldId = generateUniqueId('amount-field-');
 
             // Show the dialog
             showDialog({
@@ -4767,7 +4746,7 @@ function updateFactoryDataVisuals(firstShow) {
             }
 
             // Generate an unique field ID
-            var amountFieldId = generateUniqueId('amount-field');
+            var amountFieldId = generateUniqueId('amount-field-');
 
             // Show the dialog
             showDialog({
@@ -4814,7 +4793,75 @@ function updateFactoryDataVisuals(firstShow) {
                 ]
             });
         });
+
+    } else {
+        // Hide the cards
+        if(firstShow) {
+            transferCard.hide();
+            defenceCard.hide();
+            levelCard.hide();
+        } else {
+            transferCard.slideUp();
+            defenceCard.slideUp();
+            levelCard.slideUp();
+        }
     }
+
+    // Determine whether the attack card should be shown
+    if(data.hasOwnProperty('conquerValue') && data.conquerValue > 0 && data.hasOwnProperty('ally') && !data.ally) {
+        // Show the attack card
+        attackCard.slideDown();
+
+        // Determine whether the factory is going to be destroyed
+        const willDestroy = data.hasOwnProperty('level') && data.level <= 1;
+
+        // Get the attack button
+        var attackButton = attackCard.find('.action-factory-attack');
+        attackButton.unbind('click');
+
+        // Bind the attack button
+        attackButton.click(function() {
+            // Define the attack message
+            var dialogMessage = 'This ' + NameConfig.factory.name + ' will be taken over by your team when you attack it to use for your own production.<br><br>' +
+                    'Part of the current ' + NameConfig.in.name + ', ' + NameConfig.out.name + ' and defence in this ' + NameConfig.factory.name + ' will be lost because of this.<br><br>' +
+                'Are you sure you want to attack this ' + NameConfig.factory.name + '?';
+            if(willDestroy)
+                dialogMessage = 'This ' + NameConfig.factory.name + ' will be destroyed when you attack it because it\'s level is too low.<br><br>' +
+                    'The current amount of ' + NameConfig.in.name + ' and ' + NameConfig.out.name + ' in this ' + NameConfig.factory.name + ' will be lost.<br><br>' +
+                    'Are you sure you want to attack this ' + NameConfig.factory.name + '?';
+
+            // Show the dialog
+            showDialog({
+                title: 'Attack ' + NameConfig.factory.name,
+                message: dialogMessage,
+                actions: [
+                    {
+                        text: 'Attack & ' + (!willDestroy ? 'Take over' : 'Destroy'),
+                        icon: 'zmdi zmdi-fire',
+                        state: 'primary',
+                        action: function() {
+                            // Send a packet to the server
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_ATTACK, {
+                                game: Dworek.utils.getGameId(),
+                                factory: factoryId
+                            });
+
+                            // Show a notification
+                            showNotification('Attacking ' + NameConfig.in.name + '...');
+                        }
+                    },
+                    {
+                        text: 'Cancel'
+                    }
+                ]
+            });
+        });
+
+    } else if(!firstShow)
+        attackCard.slideUp();
+    else
+        attackCard.hide();
+
 
     // Get the elements
     const factoryNameLabel = activePage.find('.factory-name');

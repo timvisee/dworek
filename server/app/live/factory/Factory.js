@@ -1005,6 +1005,23 @@ Factory.prototype.getDefence = function(callback) {
  */
 
 /**
+ * Get the level for this factory.
+ *
+ * @param {Factory~getLevelCallback} callback Called back with the level value or when an error occurred.
+ */
+Factory.prototype.getLevel = function(callback) {
+    this.getFactoryModel().getLevel(callback);
+};
+
+/**
+ * Called back with the level value or when an error occurred.
+ *
+ * @callback Factory~getLevelCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Level value for this factory.
+ */
+
+/**
  * Get the defence upgrades object.
  *
  * @param callback (err, upgradesObject)
@@ -1765,6 +1782,366 @@ Factory.prototype.isTeam = function(otherTeam, callback) {
  * @callback Factory~isTeamCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {boolean=} True if the teams are the same, false if not.
+ */
+
+/**
+ * Attack the factory.
+ *
+ * @param {User} user User that is attacking this factory.
+ * @param {Factory~attackCallback} callback Called on success or when an error occurred.
+ */
+Factory.prototype.attack = function(user, callback) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Only call back once
+    var calledBack = false;
+
+    // Create a variable for the user's and factory's team
+    var factoryTeam = null;
+    var userTeam = null;
+    
+    // Store this instance
+    const self = this;
+
+    // Get the factory's team
+    latch.add();
+    self.getTeam(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the factory team
+        factoryTeam = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the user's team
+    latch.add();
+    user.getTeam(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Make sure the user's team isn't null
+        if(result == null) {
+            if(!calledBack)
+                callback(new Error('User doesn\'t have team'));
+            calledBack = true;
+            return;
+        }
+
+        // Set the user's team
+        userTeam = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Make sure the conquer value is above zero
+    latch.add();
+    this.getConquer(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Make sure the value is above zero
+        if(result <= 0) {
+            if(!calledBack)
+                callback(new Error('Conquer value must be above zero'));
+            calledBack = true;
+            return;
+        }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Continue when the latch is resolved
+    latch.then(function() {
+        // Reset the latch
+        latch.identity();
+        
+        // Make sure the user's team is different than the factories team
+        if(factoryTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
+            if(!calledBack)
+                callback(new Error('User can\'t take over ally factory'));
+            calledBack = true;
+            return;
+        }
+        
+        // Get the factory level
+        self.getLevel(function(err, factoryLevel) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Destroy the factory if the level is one
+            if(factoryLevel <= 1) {
+                // Destroy the factory
+                self.destroy(function() {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+                });
+                return;
+            }
+
+            // Get the factory model
+            const factoryModel = self.getFactoryModel();
+
+            // Get the factory level, input, output and defence
+            var factoryIn = 0;
+            var factoryOut = 0;
+            var factoryDefence = 0;
+
+            // Get the factory in
+            latch.add();
+            factoryModel.getIn(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the factory in
+                factoryIn = result;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the factory out
+            latch.add();
+            factoryModel.getOut(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the factory out
+                factoryOut = result;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the factory defence
+            latch.add();
+            factoryModel.getDefence(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Set the factory defence
+                factoryDefence = result;
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Continue when the latch is complete
+            latch.then(function() {
+                // Reset the latch
+                latch.identity();
+
+                // Get the game configuration
+                self.getGame().getConfig(function(err, gameConfig) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Process the factory in/out/defence values
+                    factoryIn = gameConfig.factory.attackNewIn(factoryIn);
+                    factoryOut = gameConfig.factory.attackNewOut(factoryOut);
+                    factoryDefence = gameConfig.factory.attackNewDefence(factoryDefence);
+
+                    // Set the factory team
+                    latch.add();
+                    factoryModel.setTeam(userTeam, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Set the factory level
+                    latch.add();
+                    factoryModel.setLevel(factoryLevel - 1, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Update the the in value
+                    latch.add();
+                    factoryModel.setIn(factoryIn, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Update the the out value
+                    latch.add();
+                    factoryModel.setOut(factoryOut, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Update the the defence value
+                    latch.add();
+                    factoryModel.setDefence(factoryDefence, function(err) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Continue when we're done
+                    latch.then(function() {
+                        // Send a message to the user
+                        Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                            error: false,
+                            message: 'You successfully attacked! The shack has been taken over.',
+                            dialog: true
+                        }, user.getUserModel());
+
+                        // Broadcast the factory data
+                        self.broadcastData(function(err) {
+                            // Handle errors
+                            if(err !== null) {
+                                console.error('Failed to broadcast factory data to users, ignoring');
+                                console.error(err);
+                            }
+                        });
+
+                        // Broadcast location data
+                        Core.gameController.broadcastLocationData(self.getGame(), undefined, undefined, function(err) {
+                            // Handle errors
+                            if(err !== null) {
+                                console.error('Failed to broadcast updated location data to users, ignoring');
+                                console.error(err);
+                            }
+                        });
+
+                        // Call back
+                        if(!calledBack)
+                            callback(null);
+                    });
+                });
+            });
+        });
+    });
+};
+
+/**
+ * Called when the factory has successfully been attacked or when an error occurred.
+ *
+ * @callback Factory~attackCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Destroy the factory.
+ *
+ * @param {Factory~destroyCallback} callback Called when the factory is destroyed, or when an error occurred.
+ */
+Factory.prototype.destroy = function(callback) {
+    // Store this instance
+    const self = this;
+
+    // Delete the factory model
+    this.getFactoryModel().delete(function(err) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Unload this factory and remove it from the manager
+        self.getGame().factoryManager.unloadFactory(self);
+
+        // TODO: Send an update to all clients because this factory has been destroyed. Clients should move from that page.
+
+        // We're done, call back
+        callback(null);
+    });
+};
+
+/**
+ * Called when the factory is destroyed or when an error occurred.
+ *
+ * @callback Factory~destroyCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
 // Export the class

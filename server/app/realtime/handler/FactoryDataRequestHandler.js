@@ -25,7 +25,6 @@ var _ = require('lodash');
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 var Coordinate = require('../../coordinate/Coordinate');
-var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.

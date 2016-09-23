@@ -287,6 +287,31 @@ FactoryManager.prototype.unload = function() {
         // Unload the factory
         factory.unload();
     });
+
+    // Clear the list of factories
+    this.factories = [];
+};
+
+/**
+ * Unload a specific factory.
+ *
+ * @param {Factory} factory Factory to unload.
+ * @return {boolean} True if any factory was unloaded, false if not.
+ */
+FactoryManager.prototype.unloadFactory = function(factory) {
+    // Find the factory
+    const index = this.factories.indexOf(factory);
+
+    // Make sure it was found
+    if(index < 0)
+        return false;
+
+    // Unload the factory
+    factory.unload();
+
+    // Remove the factory from the list and return
+    this.factories.splice(index, 1);
+    return true;
 };
 
 /**
