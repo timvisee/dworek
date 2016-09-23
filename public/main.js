@@ -4502,34 +4502,6 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DATA, functio
 
     // Check whether we're on this factory page
     if(Dworek.utils.getFactoryId() == factoryId) {
-        // Redirect the user if the factory is hidden
-        if(!data.visible) {
-            // Show a notification if the factory is out of range
-            showNotification('You are out of range');
-
-            // showDialog({
-            //     title: 'Out of range',
-            //     message: 'You\'re outside the range of the ' + NameConfig.factory.name + ', or your GPS isn\'t working properly at the moment.<br><br>' +
-            //     'Please go back to the main game page.',
-            //     actions: [
-            //         {
-            //             text: 'Go to game page',
-            //             state: 'primary'
-            //         },
-            //         {
-            //             text: 'Ignore',
-            //             state: 'warning',
-            //             value: false
-            //         }
-            //     ]
-            // }, function(value) {
-            //     if(value === false)
-            //         return;
-            //
-            //     Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
-            // });
-        }
-
         // Update the factory data visuals
         updateFactoryDataVisuals();
     }
