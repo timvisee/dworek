@@ -74,7 +74,7 @@ var gameConfig = {
             // Create an array of defences
             var strengths = [{
                 name: 'Pistol',
-                cost: basePrice * Math.pow(power, strength),
+                cost: Math.round(basePrice * Math.pow(power, strength)),
                 strength: 1
             }];
 
@@ -82,7 +82,7 @@ var gameConfig = {
             if(strength <= 3) {
                 strengths.push({
                     name: 'P90 RUSH B',
-                    cost: (basePrice * 0.8) * Math.pow(power, strength),
+                    cost: Math.round((basePrice * 0.8) * Math.pow(power, strength)),
                     strength: 1
                 });
             }
@@ -91,7 +91,7 @@ var gameConfig = {
             if(strength >= 3) {
                 strengths.push({
                     name: 'S.W.A.T Gun',
-                    cost: (basePrice * 2.1) * Math.pow(power, strength),
+                    cost: Math.round((basePrice * 2.1) * Math.pow(power, strength)),
                     strength: 2
                 });
             }
@@ -100,7 +100,7 @@ var gameConfig = {
             if(strength >= 6) {
                 strengths.push({
                     name: 'Body Guard',
-                    cost: (basePrice * 4.2) * Math.pow(power, strength),
+                    cost: Math.round((basePrice * 4.2) * Math.pow(power, strength)),
                     strength: 4
                 });
             }
@@ -109,7 +109,7 @@ var gameConfig = {
             if(strength >= 8) {
                 strengths.push({
                     name: 'RPG-V2',
-                    cost: (basePrice * 8.3) * Math.pow(power, strength),
+                    cost: Math.round((basePrice * 8.3) * Math.pow(power, strength)),
                     strength: 8
                 });
             }
@@ -118,7 +118,7 @@ var gameConfig = {
             if(strength >= 10) {
                 strengths.push({
                     name: 'Tank',
-                    cost: (basePrice * 18) * Math.pow(power, strength),
+                    cost: Math.round((basePrice * 18) * Math.pow(power, strength)),
                     strength: 16
                 });
             }
@@ -343,7 +343,7 @@ var gameConfig = {
             // Create an array of defences
             var defences = [{
                 name: 'Mexicans',
-                cost: basePrice * Math.pow(power, defence),
+                cost: Math.round(basePrice * Math.pow(power, defence)),
                 defence: 1
             }];
 
@@ -351,7 +351,7 @@ var gameConfig = {
             if(defence >= 6) {
                 defences.push({
                     name: 'Pitbull',
-                    cost: (basePrice * 2.1) * Math.pow(power, defence),
+                    cost: Math.round((basePrice * 2.1) * Math.pow(power, defence)),
                     defence: 2
                 });
             }
@@ -360,7 +360,7 @@ var gameConfig = {
             if(defence >= 9) {
                 defences.push({
                     name: 'AK-47',
-                    cost: (basePrice * 4.2) * Math.pow(power, defence),
+                    cost: Math.round((basePrice * 4.2) * Math.pow(power, defence)),
                     defence: 4
                 });
             }
@@ -369,7 +369,7 @@ var gameConfig = {
             if(defence >= 13) {
                 defences.push({
                     name: 'Sniper',
-                    cost: (basePrice * 8.3) * Math.pow(power, defence),
+                    cost: Math.round((basePrice * 8.3) * Math.pow(power, defence)),
                     defence: 8
                 });
             }
@@ -378,7 +378,7 @@ var gameConfig = {
             if(defence >= 15) {
                 defences.push({
                     name: 'Private Army',
-                    cost: (basePrice * 18) * Math.pow(power, defence),
+                    cost: Math.round((basePrice * 18) * Math.pow(power, defence)),
                     defence: 16
                 });
             }
