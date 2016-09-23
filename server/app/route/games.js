@@ -41,6 +41,9 @@ router.get('/', function(req, res, next) {
 
     // Create an object with layout options
     var options = {
+        page: {
+            leftButton: 'back'
+        },
         games: {
             category: null,
             openCount: 0,
