@@ -1041,6 +1041,50 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     }
 });
 
+// Handle factory build packets
+Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_BUILD, function(packet) {
+    // Get all properties
+    const factoryId = packet.factory;
+    const factoryName = packet.factoryName;
+    const isSelf = packet.self;
+    const userName = packet.userName;
+
+    // Create a function to navigate to the factory
+    const navigateToFactory = function() {
+        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId() + '/factory/' + factoryId)
+    };
+
+    // Show a message if it's the user itself
+    if(isSelf) {
+        // Show a dialog
+        showDialog({
+            title: capitalizeFirst(NameConfig.factory.name) + ' built',
+            message: 'The ' + NameConfig.factory.name + ' <b>' + factoryName + '</b> has successfully been built!',
+            actions: [
+                {
+                    text: 'View ' + NameConfig.factory.name,
+                    state: 'primary',
+                    action: navigateToFactory
+                },
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+        return;
+    }
+
+    // Show a notification
+    showNotification('<b>' + userName + '</b> built a factory', {
+        action: {
+            text: 'View',
+            action: navigateToFactory
+        },
+        vibrate: true
+    });
+    return;
+});
+
 // Handle factory capture packets
 Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, function(packet) {
     // Get all properties

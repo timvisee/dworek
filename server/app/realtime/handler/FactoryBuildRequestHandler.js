@@ -248,11 +248,101 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                 return;
                                             }
 
-                                            // Send a response to the user
-                                            Core.realTime.packetProcessor.sendPacket(PacketType.FACTORY_BUILD_RESPONSE, {
-                                                game: rawGame,
-                                                factory: factoryModel.getIdHex()
-                                            }, socket);
+                                            // Create a callback latch
+                                            var latch = new CallbackLatch();
+
+                                            // Get the factory name, the name of the user and name of the team
+                                            var factoryName = null;
+                                            var userName = null;
+                                            var userTeamName = null;
+
+                                            // Get the factory name
+                                            latch.add();
+                                            factoryModel.getName(function(err, result) {
+                                                // Call back errors
+                                                if(err !== null) {
+                                                    if(!calledBack)
+                                                        callback(err);
+                                                    calledBack = true;
+                                                    return;
+                                                }
+
+                                                // Set the factory name
+                                                factoryName = result;
+
+                                                // Resolve the latch
+                                                latch.resolve();
+                                            });
+
+                                            // Get the user name
+                                            latch.add();
+                                            user.getDisplayName(function(err, result) {
+                                                // Call back errors
+                                                if(err !== null) {
+                                                    if(!calledBack)
+                                                        callback(err);
+                                                    calledBack = true;
+                                                    return;
+                                                }
+
+                                                // Set the user name
+                                                userName = result;
+
+                                                // Resolve the latch
+                                                latch.resolve();
+                                            });
+
+                                            // Get the team name
+                                            latch.add();
+                                            team.getName(function(err, result) {
+                                                // Call back errors
+                                                if(err !== null) {
+                                                    if(!calledBack)
+                                                        callback(err);
+                                                    calledBack = true;
+                                                    return;
+                                                }
+
+                                                // Set the team name
+                                                userTeamName = result;
+
+                                                // Resolve the latch
+                                                latch.resolve();
+                                            });
+
+                                            // Send a broadcast to all relevant users when we fetched the data
+                                            latch.then(function() {
+                                                // Loop through the list of users
+                                                liveUser.getGame().userManager.users.forEach(function(otherUser) {
+                                                    // Get the user's team
+                                                    otherUser.getTeam(function(err, otherTeam) {
+                                                        // Handle errors
+                                                        if(err !== null) {
+                                                            console.error('Failed to fetch user team, ignoring');
+                                                            console.error(err);
+                                                        }
+
+                                                        // Make sure the user's team is known
+                                                        if(otherTeam == null)
+                                                            return;
+
+                                                        // Check whether this is the user itself
+                                                        const isSelf = user.getId().equals(otherUser.getId());
+
+                                                        // Make sure the user is in the builder's team
+                                                        if(!isSelf && !team.getId().equals(otherTeam.getId()))
+                                                            return;
+
+                                                        // Send a capture update
+                                                        Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_BUILD, {
+                                                            factory: factoryModel.getId(),
+                                                            factoryName,
+                                                            self: isSelf,
+                                                            userName
+                                                        }, otherUser.getUserModel());
+                                                    });
+                                                });
+                                            });
 
                                             // Send new game data to everyone
                                             Core.gameController.sendGameDataToAll(game, function (err) {
