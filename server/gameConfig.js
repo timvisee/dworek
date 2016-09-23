@@ -310,13 +310,13 @@ var gameConfig = {
 
             // The second factory costs the initial money value
             if(allyFactoryCount == 1)
-                return gameConfig.player.initialMoney;
+                return Math.round(gameConfig.player.initialMoney);
 
             // Calculate the level offset due to the ally/enemy factory ratio
             const ratioOffset = (allyFactoryCount - enemyFactoryCount) / 4;
 
             // Calculate the factory cost and return it
-            return basePrice * Math.pow(1.45, allyFactoryCount + ratioOffset);
+            return Math.round(basePrice * Math.pow(1.45, allyFactoryCount + ratioOffset));
         },
 
         /**
