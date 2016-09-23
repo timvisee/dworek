@@ -231,7 +231,7 @@ var gameConfig = {
          * @return {Number} Range in meters.
          */
         getActiveRange: function(level) {
-            return this.range(level) + 5;
+            return this.getRange(level) + 5;
         },
 
         /**
