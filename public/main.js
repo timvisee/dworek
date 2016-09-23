@@ -4539,6 +4539,30 @@ function updateGameDataVisuals() {
         upgradeButtonlist.trigger('create');
     }
 
+    if(data.hasOwnProperty('standings')) {
+        const list = activePage.find('.current-standings');
+
+        if(data.standings.length == 0) {
+            list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br><br>');
+            return;
+        }
+
+        // Build the HTML
+        var tableHtml = '';
+
+        data.standings.forEach(function(entry) {
+            tableHtml += '<tr>' +
+                '<td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
+                '<td>' + entry.money + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
+                '</tr>'
+        });
+
+        list.html(tableHtml);
+
+        // Trigger a create on the list
+        list.trigger('create');
+    }
+
     // Check whether this is the active game
     if(Dworek.state.activeGame == gameId)
         // Update the game stage

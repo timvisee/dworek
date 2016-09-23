@@ -133,6 +133,14 @@ block content
                     div(align="center")
                         i No upgrades available...<br><br>
 
+        .nd2-card.wow.fadeInUp.card-standings
+            .card-title.has-supporting-text
+                h3.card-primary-title Current standings
+
+            .card-supporting-text.has-action.has-title
+                p These are the current standings per team:
+                table.table-list.ui-responsive.current-standings
+                    tr: td: i(style='font-weight: normal; color: gray;') Unknown...
 
     div(data-role='nd2tab', data-tab='actions')
         .game-actions-list

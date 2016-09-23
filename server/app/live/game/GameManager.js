@@ -743,7 +743,8 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
     var gameData = {
         factories: [],
         shops: [],
-        strength: {}
+        strength: {},
+        standings: []
     };
 
     // Store this instance
@@ -1141,6 +1142,67 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     // Resolve the latch
                     latch.resolve();
                 });
+            });
+        });
+
+        // Get the game standings
+        latch.add();
+        Core.gameController.getGame(game, function(err, liveGame) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            if(liveGame == null) {
+                latch.resolve();
+                return;
+            }
+
+            liveGame.getTeamMoney(function(err, standings) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                gameData.standings = standings;
+
+                Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    if(gameUser == null) {
+                        latch.resolve();
+                        return;
+                    }
+
+                    gameUser.getTeam(function(err, team) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        for(var i = 0; i < gameData.standings.length; i++)
+                            gameData.standings[i].ally = (gameData.standings[i].id == team.getIdHex());
+
+                        latch.resolve();
+                    });
+                });
+
+                latch.resolve();
             });
         });
 

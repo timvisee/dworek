@@ -397,5 +397,112 @@ Game.prototype.getTeamFactoryCount = function(callback) {
  * @param {Object=} Object of factory counts.
  */
 
+Game.prototype.getTeamMoney = function(callback) {
+    // Create a team object
+    var teamObject = {};
+
+    var latch = new CallbackLatch();
+
+    // Loop through all users
+    this.userManager.users.forEach(function(liveUser) {
+        var userLatch = new CallbackLatch();
+        var calledBack = false;
+
+        var money;
+        var team;
+
+        latch.add();
+
+        userLatch.add();
+        liveUser.getTeam(function(err, result) {
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            if(result == null) {
+                latch.resolve();
+                return;
+            }
+
+            team = result;
+
+            userLatch.resolve();
+        });
+
+        userLatch.add();
+        liveUser.getMoney(function(err, result) {
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            money = result;
+
+            userLatch.resolve();
+        });
+
+        userLatch.then(function() {
+            const teamId = team.getIdHex();
+
+            var teamMoney = 0;
+            if(teamObject.hasOwnProperty(teamId))
+                teamMoney = teamObject[teamId];
+
+            teamMoney += money;
+
+            teamObject[teamId] = Math.round(teamMoney);
+
+            latch.resolve();
+        });
+    });
+
+    latch.then(function() {
+        latch.identity();
+
+        var teamObjects = [];
+
+        for(var teamId in teamObject) {
+            if(!teamObject.hasOwnProperty(teamId))
+                continue;
+
+            latch.add();
+            Core.model.gameTeamModelManager.getTeamById(teamId, function(err, team) {
+                if(err !== null) {
+                    if(!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                team.getName(function(err, name) {
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    teamObjects.push({
+                        id: team.getIdHex(),
+                        name,
+                        money: teamObject[team.getIdHex()]
+                    });
+
+                    latch.resolve();
+                });
+            });
+        }
+
+        latch.then(function() {
+           callback(null, teamObjects);
+        });
+    });
+};
+
 // Export the class
 module.exports = Game;
