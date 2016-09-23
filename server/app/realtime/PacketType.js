@@ -308,6 +308,7 @@ module.exports = {
      * Data:
      * - factory: ID of the factory to attack.
      * - factoryName: Name of the factory.
+     * - self: True if the user this packet is send to build the factory.
      * - userName: Name of the user that captured the factory.
      */
     FACTORY_BUILD: 29,
@@ -319,6 +320,7 @@ module.exports = {
      * Data:
      * - factory: ID of the factory to attack.
      * - factoryName: Name of the factory.
+     * - self: True if the user this packet is send to captured the factory.
      * - userName: Name of the user that captured the factory.
      * - teamName: Name of the team of the user that captured this factory.
      * - enemy: True if the factory was captured by an enemy, false if not.
@@ -332,6 +334,7 @@ module.exports = {
      * Data:
      * - factory: ID of the factory to attack.
      * - factoryName: Name of the factory.
+     * - self: True if the user that this packet was send to destroyed the factory.
      * - userName: Name of the user that destroyed the factory.
      * - teamName: Name of the team of the user that destroyed this factory.
      * - enemy: True if the factory was destroyed by an enemy, false if not.
