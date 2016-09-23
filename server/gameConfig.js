@@ -190,17 +190,23 @@ var gameConfig = {
         name: 'Lab',
 
         /**
-         * Operation range in meters.
-         * @param {Number}
+         * Get the operation range in meters.
+         * @param {Number} level Current factory level.
+         * @return {Number} Range in meters.
          */
-        range: 15,
+        getRange: function(level) {
+            return 15;
+        },
 
         /**
-         * Active operation range in meters.
-         * This range is effective when a user is inside the factories range.
-         * @param {Number}
+         * Get the active operation range in meters.
+         * This range is effective when a user is inside the shops range.
+         * @param {Number} level Current factory level.
+         * @return {Number} Range in meters.
          */
-        activeRange: 20,
+        getActiveRange: function(level) {
+            return this.range(level) + 5;
+        },
 
         /**
          * Initial factory level, when the factory is created.
