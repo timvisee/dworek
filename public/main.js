@@ -1078,7 +1078,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
             // Show a dialog
             showDialog({
                 title: capitalizeFirst(NameConfig.factory.name) + ' captured',
-                message: '<b>' + userName + '</b> successfully captured this ' + NameConfig.factory.name + ' and it is now owned by our team.',
+                message: '<b>' + userName + '</b> captured this ' + NameConfig.factory.name + ' and it is now owned by our team.',
                 actions: [
                     {
                         text: 'Close'
@@ -1088,7 +1088,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 
         } else {
             // Show a notification
-            showNotification('<b>' + userName + '</b> captured a lab from an enemy', {
+            showNotification('<b>' + userName + '</b> captured an enemy lab', {
                 action: {
                     text: 'View',
                     action: navigateToFactory
@@ -1104,7 +1104,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(NameConfig.factory.name) + ' lost',
+                title: capitalizeFirst(NameConfig.factory.name) + ' taken over',
                 message: 'This ' + NameConfig.factory.name + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
                 actions: [
                     {
@@ -1147,6 +1147,106 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
                 action: navigateToFactory
             }
         });
+    }
+});
+
+// Handle factory destroy packets
+Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, function(packet) {
+    // Get all properties
+    const factoryId = packet.factory;
+    const factoryName = packet.factoryName;
+    const isSelf = packet.self;
+    const userName = packet.userName;
+    const teamName = packet.teamName;
+    const isAlly = packet.ally;
+    const isEnemy = packet.enemy;
+
+    // Function to navigate to the game overview
+    const navigateToGameOverview = function() {
+        Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
+    };
+
+    // Show a message if it's the user itself
+    if(isSelf) {
+        // Show a dialog
+        showDialog({
+            title: capitalizeFirst(NameConfig.factory.name) + ' destroyed',
+            message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + NameConfig.factory.name + '!',
+            actions: [
+                {
+                    text: 'Game overview',
+                    state: 'primary'
+                }
+            ]
+        }, navigateToGameOverview);
+        return;
+    }
+
+    // Show a message to allies
+    if(isAlly) {
+        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+            // Show a dialog
+            showDialog({
+                title: capitalizeFirst(NameConfig.factory.name) + ' destroyed',
+                message: '<b>' + userName + '</b> destroyed this ' + NameConfig.factory.name + ' and it is now owned by our team.',
+                actions: [
+                    {
+                        text: 'Game overview',
+                        state: 'primary'
+                    }
+                ]
+            }, navigateToGameOverview);
+
+        } else {
+            // Show a notification
+            showNotification('<b>' + userName + '</b> destroyed an enemy lab', {
+                vibrate: true
+            });
+        }
+        return;
+    }
+
+    // Show a message to enemies
+    if(isEnemy) {
+        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+            // Show a dialog
+            showDialog({
+                title: capitalizeFirst(NameConfig.factory.name) + ' destroyed',
+                message: 'This ' + NameConfig.factory.name + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+                actions: [
+                    {
+                        text: 'Game overview',
+                        state: 'primary'
+                    }
+                ]
+            }, navigateToGameOverview);
+
+        } else {
+            // Show a notification
+            showNotification('<b>' + userName + '</b> destroyed one of our ' + NameConfig.factory.name + 's', {
+                vibrate: true
+            });
+        }
+        return;
+    }
+
+    // Show a global message
+    if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+        // Show a dialog
+        showDialog({
+            title: capitalizeFirst(NameConfig.factory.name) + ' destroyed',
+            message: 'This ' + NameConfig.factory.name + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+            actions: [
+                {
+                    text: 'Game overview',
+                    state: 'primary'
+                }
+            ]
+        }, navigateToGameOverview);
+
+    } else {
+        // Show a notification
+        showNotification('A lab has been destroyed by <b>' + userName + '</b>');
     }
 });
 
