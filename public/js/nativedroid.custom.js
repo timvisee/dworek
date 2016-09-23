@@ -766,9 +766,16 @@
             };
 
             _self.sidebarSwipeHandler = function(e) {
+                // Make sure no map is found on the current tab page
+                if($.mobile.activePage.find('.nd2Tab-active').find('#map-container').length > 0)
+                    return;
+
+                // Side bar swipe handler
                 if($(".ui-page-active").jqmData("panel") !== "open")
                     if(e.type === 'swiperight')
                         $.mobile.activePage.find('.ui-panel.ui-panel-position-left:first').panel('open');
+
+
             };
 
             _self.bindNavigationSwipe = function() {

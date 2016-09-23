@@ -223,7 +223,7 @@ ShopManager.prototype.worker = function() {
     this.game.userManager.users.forEach(function(liveUser) {
         // Get the game user
         latch.add();
-        Core.model.gameUserModelManager.getGameUser(liveUser.getGame().getGameModel(), liveUser.getUserModel(), function(err, gameUser) {
+        liveUser.getGameUser(function(err, gameUser) {
             // Handle errors
             if(err !== null) {
                 console.error(err);
