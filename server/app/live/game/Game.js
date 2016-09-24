@@ -548,5 +548,12 @@ Game.prototype.getTeamMoney = function(callback) {
  * @param {Array=} An array of TeamMoneyObject objects defining a team and it's money.
  */
 
+/**
+ * @typedef {Object} TeamMoneyObject
+ * @param {String} id ID of the team, as a string.
+ * @param {String} name Display name of the team.
+ * @param {Number} Amount of money the team has.
+ */
+
 // Export the class
 module.exports = Game;
