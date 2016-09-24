@@ -397,24 +397,37 @@ Game.prototype.getTeamFactoryCount = function(callback) {
  * @param {Object=} Object of factory counts.
  */
 
+/**
+ * Get the money amount for each team in an object.
+ *
+ * @param {Game~getTeamMoneyCallback} callback Called with the result array, or when an error occurred.
+ */
 Game.prototype.getTeamMoney = function(callback) {
     // Create a team object
     var teamObject = {};
 
+    // Create a callback latch
     var latch = new CallbackLatch();
+
+    // Make sure we only call back once
+    var calledBack = false;
 
     // Loop through all users
     this.userManager.users.forEach(function(liveUser) {
+        // Create a callback latch for the user data
         var userLatch = new CallbackLatch();
-        var calledBack = false;
 
+        // Create a variable for the amount of money in a team, and the team name
         var money;
         var team;
 
+        // Add a regular latch because we're going to fetch data for a user
         latch.add();
 
+        // Get the team of the user
         userLatch.add();
         liveUser.getTeam(function(err, result) {
+            // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
@@ -422,18 +435,24 @@ Game.prototype.getTeamMoney = function(callback) {
                 return;
             }
 
+            // Make sure the team isn't null
             if(result == null) {
+                // Resolve the regular latch, don't add this user's data
                 latch.resolve();
                 return;
             }
 
+            // Set the team instance
             team = result;
 
+            // Resolve the user latch
             userLatch.resolve();
         });
 
+        // Get the user's money
         userLatch.add();
         liveUser.getMoney(function(err, result) {
+            // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
@@ -441,37 +460,52 @@ Game.prototype.getTeamMoney = function(callback) {
                 return;
             }
 
+            // Set the amount of money the user has
             money = result;
 
+            // Resolve the user latch
             userLatch.resolve();
         });
 
+        // Process the fetched user data
         userLatch.then(function() {
+            // Get the ID of the team as a string
             const teamId = team.getIdHex();
 
+            // Get the current team's money if it's in the object
             var teamMoney = 0;
             if(teamObject.hasOwnProperty(teamId))
                 teamMoney = teamObject[teamId];
 
+            // Add the money
             teamMoney += money;
 
+            // Set the money for the team
             teamObject[teamId] = Math.round(teamMoney);
 
+            // Resolve the normal latch
             latch.resolve();
         });
     });
 
+    // Process the team money data when everything is fetched
     latch.then(function() {
+        // Reset the latch back to it's identity
         latch.identity();
 
+        // Create an array to put the team objects in
         var teamObjects = [];
 
+        // Loop through the team's in the object
         for(var teamId in teamObject) {
+            // Make sure the team ID is an actual property of the team object
             if(!teamObject.hasOwnProperty(teamId))
                 continue;
 
+            // Get the team that corresponds to the team ID
             latch.add();
             Core.model.gameTeamModelManager.getTeamById(teamId, function(err, team) {
+                // Call back errors
                 if(err !== null) {
                     if(!calledBack)
                         callback(err);
@@ -479,7 +513,9 @@ Game.prototype.getTeamMoney = function(callback) {
                     return;
                 }
 
+                // Get the name of the team
                 team.getName(function(err, name) {
+                    // Call back error
                     if(err !== null) {
                         if(!calledBack)
                             callback(err);
@@ -487,22 +523,30 @@ Game.prototype.getTeamMoney = function(callback) {
                         return;
                     }
 
+                    // Create a team object and push it into the array
                     teamObjects.push({
                         id: team.getIdHex(),
                         name,
                         money: teamObject[team.getIdHex()]
                     });
 
+                    // Resolve the latch
                     latch.resolve();
                 });
             });
         }
 
-        latch.then(function() {
-           callback(null, teamObjects);
-        });
+        // Call back the array of team objects.
+        latch.then(() => callback(null, teamObjects));
     });
 };
+
+/**
+ *
+ * @callback Game~getTeamMoneyCallback
+ * @param {Error|null} Error instance if an error occurred.
+ * @param {Array=} An array of TeamMoneyObject objects defining a team and it's money.
+ */
 
 // Export the class
 module.exports = Game;
