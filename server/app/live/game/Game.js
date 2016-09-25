@@ -502,10 +502,13 @@ Game.prototype.getTeamMoney = function(callback) {
             if(!teamObject.hasOwnProperty(teamId))
                 continue;
 
-            // Get the team that corresponds to the team ID
+            // Get a team instance by it's ID
+            const team = Core.model.gameTeamModelManager._instanceManager.create(teamId);
+
+            // Get the name of the team
             latch.add();
-            Core.model.gameTeamModelManager.getTeamById(teamId, function(err, team) {
-                // Call back errors
+            team.getName(function(err, name) {
+                // Call back error
                 if(err !== null) {
                     if(!calledBack)
                         callback(err);
@@ -513,26 +516,15 @@ Game.prototype.getTeamMoney = function(callback) {
                     return;
                 }
 
-                // Get the name of the team
-                team.getName(function(err, name) {
-                    // Call back error
-                    if(err !== null) {
-                        if(!calledBack)
-                            callback(err);
-                        calledBack = true;
-                        return;
-                    }
-
-                    // Create a team object and push it into the array
-                    teamObjects.push({
-                        id: team.getIdHex(),
-                        name,
-                        money: teamObject[team.getIdHex()]
-                    });
-
-                    // Resolve the latch
-                    latch.resolve();
+                // Create a team object and push it into the array
+                teamObjects.push({
+                    id: team.getIdHex(),
+                    name,
+                    money: teamObject[team.getIdHex()]
                 });
+
+                // Resolve the latch
+                latch.resolve();
             });
         }
 
