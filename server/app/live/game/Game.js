@@ -542,6 +542,7 @@ Game.prototype.getTeamMoney = function(callback) {
 };
 
 /**
+ * Called with an array of teams and their money, or when an error occurred.
  *
  * @callback Game~getTeamMoneyCallback
  * @param {Error|null} Error instance if an error occurred.
