@@ -516,11 +516,14 @@ Game.prototype.getTeamMoney = function(callback) {
                     return;
                 }
 
+                // Get the current team ID
+                const teamId = team.getIdHex();
+
                 // Create a team object and push it into the array
                 teamObjects.push({
-                    id: team.getIdHex(),
+                    id: teamId,
                     name,
-                    money: teamObject[team.getIdHex()]
+                    money: teamObject[teamId]
                 });
 
                 // Resolve the latch
