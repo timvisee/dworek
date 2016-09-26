@@ -326,7 +326,7 @@ var gameConfig = {
          * @return {Number} Level cost.
          */
         getLevelCost: function(level) {
-            return 250 + 500 * Math.pow(level - 1, 1.5);
+            return Math.round(250 + 500 * Math.pow(level - 1, 1.5));
         },
 
         /**
