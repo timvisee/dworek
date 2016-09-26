@@ -4970,6 +4970,20 @@ function updateFactoryDataVisuals(firstShow) {
                     current = gameData.balance.in;
             }
 
+            // Show a dialog if the user has nothing to deposit
+            if(current <= 0) {
+                showDialog({
+                    title: 'Nothing to deposit',
+                    message: 'You don\'t have any ' + NameConfig.in.name + ' you can deposit at this time.',
+                    actions: [
+                        {
+                            text: 'Close'
+                        }
+                    ]
+                });
+                return;
+            }
+
             // Generate an unique field ID
             var amountFieldId = generateUniqueId('amount-field-');
 
@@ -5026,6 +5040,20 @@ function updateFactoryDataVisuals(firstShow) {
                 var factoryData = getFactoryData();
                 if(factoryData != null && factoryData.hasOwnProperty('out'))
                     current = factoryData.out;
+            }
+
+            // Show a dialog if there's nothing to withdraw
+            if(current <= 0) {
+                showDialog({
+                    title: 'Nothing to withdraw',
+                    message: 'There are no ' + NameConfig.out.name + ' in this ' + NameConfig.factory.name + ' you can withdraw at this time.',
+                    actions: [
+                        {
+                            text: 'Close'
+                        }
+                    ]
+                });
+                return;
             }
 
             // Generate an unique field ID
