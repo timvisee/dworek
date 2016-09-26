@@ -115,16 +115,6 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     // Create a found flag
     var foundShop = false;
 
-    // Call back an error if the shop wasn't found
-    if(!foundShop) {
-        // Send a message response to the user
-        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-            error: true,
-            message: 'Failed to buy goods, couldn\'t find shop. The shop you\'re trying to buy goods to might not be available anymore.',
-            dialog: true
-        }, socket);
-    }
-
     // Loop through the games and shops to find the correct shop
     Core.gameController.games.forEach(function(liveGame) {
         // Loop through the shops
@@ -259,6 +249,16 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
             });
         });
     });
+
+    // Call back an error if the shop wasn't found
+    if(!foundShop) {
+        // Send a message response to the user
+        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+            error: true,
+            message: 'Failed to buy goods, couldn\'t find shop. The shop you\'re trying to buy goods to might not be available anymore.',
+            dialog: true
+        }, socket);
+    }
 };
 
 // Export the module
