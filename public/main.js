@@ -4583,6 +4583,20 @@ function showShopBuyDialog(shopToken) {
             current = gameData.balance.money;
     }
 
+    // Make sure the user has any money to buy anything, show a dialog if not
+    if(current <= 0) {
+        showDialog({
+            title: 'No money',
+            message: 'You don\'t have any money to buy ' + NameConfig.in.name + ' at this time.',
+            actions: [
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+        return;
+    }
+
     // Generate an unique field ID
     var amountFieldId = generateUniqueId('amount-field');
 
@@ -4644,6 +4658,20 @@ function showShopSellDialog(shopToken) {
         var gameData = getGameData();
         if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
             current = gameData.balance.out;
+    }
+
+    // Make sure the user has any out to sell, show a dialog if not
+    if(current <= 0) {
+        showDialog({
+            title: 'Nothing to sell',
+            message: 'You don\'t have any ' + NameConfig.out.name + ' to sell at this time.',
+            actions: [
+                {
+                    text: 'Close'
+                }
+            ]
+        });
+        return;
     }
 
     // Generate an unique field ID
