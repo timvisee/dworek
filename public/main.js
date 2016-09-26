@@ -4334,7 +4334,7 @@ function updateGameDataVisuals() {
                 '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-zoom-in"></i>&nbsp;' +
                 '                        View ' + NameConfig.factory.name + '' +
-            '                        </a>' +
+                '                    </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
@@ -4475,18 +4475,19 @@ function updateGameDataVisuals() {
             activePage.find('.game-balance-out').html(data.balance.out);
     }
 
+    // Update the user strength card
     if(data.hasOwnProperty('strength')) {
+        // Set the strength value on the page
         if(data.strength.hasOwnProperty('value'))
             activePage.find('.game-player-strength').html(data.strength.value);
 
-
         // Get the upgrade button list element, and clear it
-        const upgradeButtonlist = activePage.find('.card-player-strength').find('.upgrade-button-list');
-        upgradeButtonlist.empty();
+        const upgradeButtonList = activePage.find('.card-player-strength').find('.upgrade-button-list');
+        upgradeButtonList.empty();
 
         // Check whether there are any defence upgrades
         if(!data.strength.hasOwnProperty('upgrades')) {
-            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
+            upgradeButtonList.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
 
         } else {
             // Loop through the list of upgrades
@@ -4495,13 +4496,13 @@ function updateGameDataVisuals() {
                 var buttonId = generateUniqueId('button-upgrade-');
 
                 // Append a button
-                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
                     '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')' +
                     '</a>');
 
                 // Get the button
-                var button = upgradeButtonlist.find('#' + buttonId);
+                var button = upgradeButtonList.find('#' + buttonId);
 
                 // Bind a click action
                 button.click(function() {
@@ -4536,27 +4537,31 @@ function updateGameDataVisuals() {
         }
 
         // Trigger a create on the list
-        upgradeButtonlist.trigger('create');
+        upgradeButtonList.trigger('create');
     }
 
+    // Update the player standings card
     if(data.hasOwnProperty('standings')) {
+        // Get list view inside the card
         const list = activePage.find('.current-standings');
 
+        // Show unknown lable if no standings are known
         if(data.standings.length == 0) {
+            // Show unknown lable
             list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br><br>');
             return;
         }
 
-        // Build the HTML
+        // Build the HTML for each standing
         var tableHtml = '';
-
         data.standings.forEach(function(entry) {
             tableHtml += '<tr>' +
-                '<td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
-                '<td>' + entry.money + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
+                '    <td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
+                '    <td>' + entry.money + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
                 '</tr>'
         });
 
+        // Set the list HTML
         list.html(tableHtml);
 
         // Trigger a create on the list
