@@ -115,6 +115,17 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     // Create a found flag
     var foundShop = false;
 
+    // Call back an error if the shop wasn't found
+    if(!foundShop) {
+        // Send a message response to the user
+        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+            error: true,
+            message: 'Failed to sell goods, couldn\'t find shop. The shop you\'re trying to sell goods to might not be available anymore.',
+            dialog: true
+        }, socket);
+        return;
+    }
+
     // Loop through the games and shops to find the correct shop
     Core.gameController.games.forEach(function(liveGame) {
         // Loop through the shops
@@ -188,7 +199,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                             }
 
                             // Make the sure the amount isn't zero
-                            if(sellAmount == 0) {
+                            if(sellAmount === 0) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
                                     message: '<i>You can\'t sell no nothin\'.</i>',
@@ -199,6 +210,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                             // Set the out amount for the user
                             gameUser.setOut(outAmount - sellAmount, function(err) {
+                                // Call back errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
@@ -206,6 +218,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                                 // Get the current user balance
                                 gameUser.getMoney(function(err, userMoney) {
+                                    // Call back errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
@@ -213,6 +226,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                                     // Set the money
                                     gameUser.setMoney(userMoney + Math.round(sellAmount * price), function(err) {
+                                        // Call back errors
                                         if(err !== null) {
                                             callbackError();
                                             return;
@@ -220,10 +234,13 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                                         // Send updated game data to the user
                                         Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
-                                            if(err !== null) {
-                                                console.error(err);
-                                                console.error('Failed to send game data');
-                                            }
+                                            // Return of no error occurred
+                                            if(err === null)
+                                                return;
+
+                                            // Print errors in the console
+                                            console.error(err);
+                                            console.error('Failed to send game data');
                                         });
 
                                         // Send a notification to the user
@@ -242,17 +259,6 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
             });
         });
     });
-
-    // Call back an error if the shop wasn't found
-    if(!foundShop) {
-        // Send a message response to the user
-        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-            error: true,
-            message: 'Failed to sell goods, couldn\'t find shop. The shop you\'re trying to sell goods to might not be available anymore.',
-            dialog: true
-        }, socket);
-        return;
-    }
 };
 
 // Export the module
