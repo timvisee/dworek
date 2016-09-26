@@ -206,7 +206,7 @@ router.post('/', function(req, res, next) {
                     LayoutRenderer.render(req, res, next, 'register', 'Success', {
                         message: 'Welcome ' + firstName + '!\n\n' +
                         'You\'ve successfully been registered.\n\n' +
-                        'Please click the button below to continue to your dashboard.',
+                        'Please click the button below to login and continue to your dashboard.',
                         hideBackButton: true,
                         success: true
                     });
