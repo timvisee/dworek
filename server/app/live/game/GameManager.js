@@ -1202,9 +1202,13 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Loop through the list of teams, and define whether the team is ally for the user
-                        for(var i = 0; i < gameData.standings.length; i++)
-                            // TODO: team null NPE!
-                            gameData.standings[i].ally = (gameData.standings[i].id == team.getIdHex());
+                        for(var i = 0; i < gameData.standings.length; i++) {
+                            // The team is never an ally if the user's team is null
+                            if(team == null)
+                                gameData.standings[i].ally = false;
+                            else
+                                gameData.standings[i].ally = gameData.standings[i].id == team.getIdHex();
+                        }
 
                         // Resolve the latch
                         latch.resolve();
