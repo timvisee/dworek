@@ -107,7 +107,6 @@ App.prototype.init = function(callback) {
             }
 
             // Initialize the web server
-            //noinspection JSAccessibilityCheck
             self._initWebServer();
         }),
 
@@ -142,7 +141,7 @@ App.prototype.init = function(callback) {
             (completeCallback) => self._initRouter(completeCallback),
 
             // Initialize the real time server
-            (completeCallback) => self._initRealTime(initComplete)
+            (completeCallback) => self._initRealTime(completeCallback)
 
         ], function(err) {
             // Call back any errors, or throw it if no callback was defined
@@ -202,8 +201,6 @@ App.prototype._initExpressApp = function(callback) {
 
 /**
  * Initialize the web server.
- *
- * @private
  */
 App.prototype._initWebServer = function() {
     // Set the web listening port
@@ -384,7 +381,6 @@ App.prototype._initModelManagers = function(callback) {
  * Initialize the real time server.
  *
  * @param {App~_initRealTimeCallback} callback Called on success, or when an error occurred.
- * @private
  */
 App.prototype._initRealTime = function(callback) {
     // Initialize the real time server
