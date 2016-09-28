@@ -109,10 +109,6 @@ App.prototype.init = function(callback) {
             // Initialize the web server
             //noinspection JSAccessibilityCheck
             self._initWebServer();
-
-            // Initialize the real time server
-            //noinspection JSAccessibilityCheck
-            self._initRealTime(initComplete);
         }),
 
         // Initialize the database
@@ -140,9 +136,15 @@ App.prototype.init = function(callback) {
             return;
         }
 
-        // Initialize the router
-        //noinspection JSAccessibilityCheck
-        self._initRouter(function(err) {
+        // Initialize the router and real-time server
+        async.parallel([
+            // Initialize the router
+            (completeCallback) => self._initRouter(completeCallback),
+
+            // Initialize the real time server
+            (completeCallback) => self._initRealTime(initComplete)
+
+        ], function(err) {
             // Call back any errors, or throw it if no callback was defined
             if(err !== null) {
                 if(callback !== undefined)
