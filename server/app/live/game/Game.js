@@ -551,5 +551,14 @@ Game.prototype.getTeamMoney = function(callback) {
  * @param {Number} Amount of money the team has.
  */
 
+/**
+ * Get the game as a string.
+ *
+ * @return {String} String representation.
+ */
+Game.prototype.toString = function() {
+    return '[Game:' + this.getIdHex() + ']';
+};
+
 // Export the class
 module.exports = Game;

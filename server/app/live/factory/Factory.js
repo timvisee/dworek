@@ -2380,5 +2380,14 @@ Factory.prototype.destroy = function(callback) {
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
+/**
+ * Get the factory as a string.
+ *
+ * @return {String} String representation.
+ */
+Factory.prototype.toString = function() {
+    return '[Factory:' + this.getIdHex() + ']';
+};
+
 // Export the class
 module.exports = Factory;
