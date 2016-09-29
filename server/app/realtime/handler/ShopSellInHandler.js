@@ -78,7 +78,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to sell goods, a server error occurred.',
+            message: 'Transaction failed, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -183,7 +183,6 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
                             // Make sure the amount isn't below zero
                             if(buyAmount < 0) {
-                                // Call back errors
                                 callbackError();
                                 return;
                             }
@@ -210,7 +209,6 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getIn(function(err, inAmount) {
                                     // Call back errors
                                     if(err !== null) {
-                                        // Call back errors
                                         callbackError();
                                         return;
                                     }
@@ -225,13 +223,11 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
                                         // Send updated game data to the user
                                         Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
-                                            // Return if no error occurred
-                                            if(err !== null)
-                                                return;
-
-                                            // Print errors in the console
-                                            console.error(err);
-                                            console.error('Failed to send game data');
+                                            // Handle errors
+                                            if(err !== null) {
+                                                console.error(err);
+                                                console.error('Failed to send game data');
+                                            }
                                         });
 
                                         // Send a notification to the user
@@ -256,7 +252,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to buy goods, couldn\'t find shop. The shop you\'re trying to buy goods to might not be available anymore.',
+            message: 'The transaction failed, couldn\'t find shop. The shop you\'re trying to use might not be available anymore.',
             dialog: true
         }, socket);
     }

@@ -103,7 +103,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to deposit, you\'re not authenticated.',
+            message: 'Transaction failed, you\'re not authenticated.',
             dialog: true
         }, socket);
         return;
@@ -168,7 +168,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                             if(rawAll === true)
                                 sellAmount = outAmount;
                             else
-                            // Parse the raw amount
+                                // Parse the raw amount
                                 sellAmount = parseInt(rawAmount);
 
                             // Make sure the amount isn't above the maximum
@@ -188,7 +188,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                             }
 
                             // Make the sure the amount isn't zero
-                            if(sellAmount === 0) {
+                            if(sellAmount == 0) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
                                     message: '<i>You can\'t sell no nothin\'.</i>',
@@ -223,13 +223,11 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                                         // Send updated game data to the user
                                         Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
-                                            // Return of no error occurred
-                                            if(err === null)
-                                                return;
-
-                                            // Print errors in the console
-                                            console.error(err);
-                                            console.error('Failed to send game data');
+                                            // Handle errors
+                                            if(err !== null) {
+                                                console.error(err);
+                                                console.error('Failed to send game data');
+                                            }
                                         });
 
                                         // Send a notification to the user
@@ -254,7 +252,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to sell goods, couldn\'t find shop. The shop you\'re trying to sell goods to might not be available anymore.',
+            message: 'The transaction failed, couldn\'t find shop. The shop you\'re trying to use might not be available anymore.',
             dialog: true
         }, socket);
         return;
