@@ -208,6 +208,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
                                 // Get the in amount
                                 gameUser.getIn(function(err, inAmount) {
+                                    // Call back errors
                                     if(err !== null) {
                                         // Call back errors
                                         callbackError();
