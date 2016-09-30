@@ -176,7 +176,7 @@ var gameConfig = {
             const timeMax = 12 * 60 * 1000;
 
             // Randomize the shop lifetime
-            return Math.random() * (timeMax - timeMin) + timeMin;
+            return Math.round(Math.random() * (timeMax - timeMin) + timeMin);
         },
 
         /**
