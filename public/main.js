@@ -5276,7 +5276,7 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Set the next level cost label
     if(!visible || data.hasOwnProperty('nextLevelCost'))
-        factoryNextLevelCostLabel.html(canModify ? data.nextLevelCost : '?');
+        factoryNextLevelCostLabel.html(canModify ? NameConfig.currency.sign + data.nextLevelCost : '?');
 }
 
 /**
@@ -5308,12 +5308,12 @@ function toggleFullScreen() {
     }
 }
 
+// Flush all other pages when visiting the login/register page
 $(document).bind('pageshow', function() {
     // Make sure the user is on a login/register page
     if(document.location.pathname.trim().match(/^\/(login|register)/) == null)
         return;
 
     // Flush all pages
-    console.log('Flushing all!');
     Dworek.utils.flushPages(undefined, false);
 });
