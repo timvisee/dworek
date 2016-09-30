@@ -4498,7 +4498,7 @@ function updateGameDataVisuals() {
                 // Append a button
                 upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' <span style="color: gray;">/</span> +' + upgrade.strength + ')' +
                     '</a>');
 
                 // Get the button
