@@ -4498,7 +4498,7 @@ function updateGameDataVisuals() {
                 // Append a button
                 upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' <span style="color: gray;">/</span> +' + upgrade.strength + ')' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')</span>' +
                     '</a>');
 
                 // Get the button
@@ -4890,7 +4890,7 @@ function updateFactoryDataVisuals(firstShow) {
                 // Append a button
                 upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + '&nbsp;&nbsp;(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')</span>' +
                     '</a>');
 
                 // Get the button
