@@ -90,19 +90,19 @@ App.prototype.init = function(callback) {
     // Initialize various components in parallel
     async.parallel([
         // Print the library paths, and call back
-        (initComplete) => {
+        (completeCallback) => {
             PathLibrary.printPaths();
-            initComplete(null);
+            completeCallback(null);
         },
 
         // Instantiate the model managers
-        (initComplete) => self._initModelManagers(initComplete),
+        (completeCallback) => self._initModelManagers(completeCallback),
 
         // Initialize the express application
-        (initComplete) => self._initExpressApp(function(err) {
+        (completeCallback) => self._initExpressApp(function(err) {
             // Call back errors
             if(err !== null) {
-                initComplete(err);
+                completeCallback(err);
                 return;
             }
 
@@ -111,19 +111,28 @@ App.prototype.init = function(callback) {
         }),
 
         // Initialize the database
-        (initComplete) => self._initDatabase(function(err) {
+        (completeCallback) => self._initDatabase(function(err) {
             // Call back errors
             if(err !== null) {
-                initComplete(err);
+                completeCallback(err);
                 return;
             }
 
-            // Initialize the game controller
-            self._initGameController(initComplete);
+            // Initialize the real-time component
+            self._initRealTime(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    completeCallback(err);
+                    return;
+                }
+
+                // Initialize the game controller
+                self._initGameController(completeCallback);
+            });
         }),
 
         // Initialize Redis
-        (initComplete) => self._initRedis(initComplete)
+        (completeCallback) => self._initRedis(completeCallback)
 
     ], function(err) {
         // Make sure everything went right, callback or throw an error instead
@@ -136,14 +145,7 @@ App.prototype.init = function(callback) {
         }
 
         // Initialize the router and real-time server
-        async.parallel([
-            // Initialize the router
-            (completeCallback) => self._initRouter(completeCallback),
-
-            // Initialize the real time server
-            (completeCallback) => self._initRealTime(completeCallback)
-
-        ], function(err) {
+        self._initRouter(function(err) {
             // Call back any errors, or throw it if no callback was defined
             if(err !== null) {
                 if(callback !== undefined)
