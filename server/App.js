@@ -108,6 +108,7 @@ App.prototype.init = function(callback) {
 
             // Initialize the web server
             self._initWebServer();
+            completeCallback(null);
         }),
 
         // Initialize the database
