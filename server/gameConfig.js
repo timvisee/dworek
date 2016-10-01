@@ -90,7 +90,7 @@ var gameConfig = {
             // Add a third strength when the defence level is 3 or higher
             if(strength >= 3) {
                 strengths.push({
-                    name: 'S.W.A.T Gun',
+                    name: 'S.W.A.T. Gun',
                     cost: Math.round((basePrice * 2.1) * Math.pow(power, strength)),
                     strength: 2
                 });
