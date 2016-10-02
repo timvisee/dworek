@@ -4156,6 +4156,7 @@ function hasGameData(game) {
  * The ID of the active game will be used if no ID is given.
  *
  * @param {string} [game] ID of the game.
+ * @return {Object|null} Object with game data or null if no game data is available.
  */
 function getGameData(game) {
     // Parse the game parameter
@@ -4195,6 +4196,42 @@ function requestGameData(game) {
     Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_DATA_REQUEST, {
         game: game
     });
+}
+
+/**
+ * Get the data for the shop with the given token in a game.
+ * The ID of the active game will be used if no ID is given.
+ *
+ * @param {string|undefined} [game] ID of the game or undefined to use the current game.
+ * @param {string} shopToken Token of the shop to get the data for.
+ * @return {Object|null} Object with shop data, or null if not available.
+ */
+function getShopData(game, shopToken) {
+    // Get the game data for this shop and make sure it is available
+    const data = getGameData(game);
+    if(data == null)
+        return null;
+
+    // Define a variable to put the shop in
+    var foundShop = null;
+
+    // Loop through the list of shops
+    data.shops.forEach(function(shop) {
+        // Skip if we found the shop
+        if(foundShop != null)
+            return;
+
+        // Make sure the shop isn't undefined
+        if(shop == undefined)
+            return;
+
+        // Compare the shop token, mark it as found if they equal
+        if(shop.token == shopToken)
+            foundShop = shop;
+    });
+
+    // Return the found shop, if any is found
+    return foundShop;
 }
 
 // Update the game info
@@ -4334,7 +4371,7 @@ function updateGameDataVisuals() {
                 '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-zoom-in"></i>&nbsp;' +
                 '                        View ' + NameConfig.factory.name + '' +
-                '                    </a>' +
+            '                        </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
@@ -4475,19 +4512,18 @@ function updateGameDataVisuals() {
             activePage.find('.game-balance-out').html(data.balance.out);
     }
 
-    // Update the user strength card
     if(data.hasOwnProperty('strength')) {
-        // Set the strength value on the page
         if(data.strength.hasOwnProperty('value'))
             activePage.find('.game-player-strength').html(data.strength.value);
 
+
         // Get the upgrade button list element, and clear it
-        const upgradeButtonList = activePage.find('.card-player-strength').find('.upgrade-button-list');
-        upgradeButtonList.empty();
+        const upgradeButtonlist = activePage.find('.card-player-strength').find('.upgrade-button-list');
+        upgradeButtonlist.empty();
 
         // Check whether there are any defence upgrades
         if(!data.strength.hasOwnProperty('upgrades')) {
-            upgradeButtonList.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
+            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
 
         } else {
             // Loop through the list of upgrades
@@ -4496,13 +4532,13 @@ function updateGameDataVisuals() {
                 var buttonId = generateUniqueId('button-upgrade-');
 
                 // Append a button
-                upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
                     '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')</span>' +
                     '</a>');
 
                 // Get the button
-                var button = upgradeButtonList.find('#' + buttonId);
+                var button = upgradeButtonlist.find('#' + buttonId);
 
                 // Bind a click action
                 button.click(function() {
@@ -4537,31 +4573,27 @@ function updateGameDataVisuals() {
         }
 
         // Trigger a create on the list
-        upgradeButtonList.trigger('create');
+        upgradeButtonlist.trigger('create');
     }
 
-    // Update the player standings card
     if(data.hasOwnProperty('standings')) {
-        // Get list view inside the card
         const list = activePage.find('.current-standings');
 
-        // Show unknown lable if no standings are known
         if(data.standings.length == 0) {
-            // Show unknown lable
             list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br><br>');
             return;
         }
 
-        // Build the HTML for each standing
+        // Build the HTML
         var tableHtml = '';
+
         data.standings.forEach(function(entry) {
             tableHtml += '<tr>' +
-                '    <td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
-                '    <td>' + entry.money + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
+                '<td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
+                '<td>' + entry.money + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
                 '</tr>'
         });
 
-        // Set the list HTML
         list.html(tableHtml);
 
         // Trigger a create on the list
@@ -4575,42 +4607,70 @@ function updateGameDataVisuals() {
 }
 
 /**
+ * Show an error message to the user.
+ * This will show a dialog containing the specified error message.
+ *
+ * @param {string} message Error message.
+ */
+function showError(message) {
+    // Show the dialog
+    showDialog({
+        title: 'Error',
+        message: message
+    });
+}
+
+/**
  * Show the buying dialog for a shop with the given token.
  *
  * @param {string} shopToken Shop token.
  */
 function showShopBuyDialog(shopToken) {
-    // Determine how many in the user currently has
-    var current = 10000;
+    // Get the shop data
+    const shopData = getShopData(undefined, shopToken);
+
+    // Show an error message if the shop data is unavailable
+    if(shopData == null) {
+        showError('Shop data not available.<br><br>Please try to use this shop at a later time.');
+        return;
+    }
+
+    // Determine the amount fo money the user has
+    var moneyCurrent = 0;
     if(hasGameData()) {
         var gameData = getGameData();
         if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
-            current = gameData.balance.money;
+            moneyCurrent = gameData.balance.money;
     }
 
-    // Make sure the user has any money to buy anything, show a dialog if not
-    if(current <= 0) {
+    // Make sure the user has enough money, show a dialog of the user doesn't have enough money
+    if(moneyCurrent <= 0) {
         showDialog({
             title: 'No money',
-            message: 'You don\'t have any money to buy ' + NameConfig.in.name + ' at this time.',
-            actions: [
-                {
-                    text: 'Close'
-                }
-            ]
+            message: 'You don\'t have any money to spend on ' + NameConfig.in.name + '.<br><br>' +
+            'Please make some money by selling ' + NameConfig.out.name + ' first before comming back.'
         });
         return;
     }
 
+    // Calculate the minimum and maximum amount of in and money
+    var minIn = 1;
+    var maxIn = Math.floor(moneyCurrent / shopData.inSellPrice);
+    var minMoney = Math.round(shopData.inSellPrice);
+    var maxMoney = Math.floor(maxIn * shopData.inSellPrice);
+
     // Generate an unique field ID
-    var amountFieldId = generateUniqueId('amount-field');
+    const amountFieldId = generateUniqueId('amount-field');
+    const amountFieldId2 = generateUniqueId('amount-field');
 
     // Show the dialog
     showDialog({
         title: 'Buy ' + NameConfig.in.name,
         message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
         '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
-        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" step="' + shopData.inSellPrice + '" data-highlight="true">' +
+        '<label for="' + amountFieldId2 + '">' + capitalizeFirst(NameConfig.in.name) + ':</label>' +
+        '<input type="range" name="' + amountFieldId2 + '" id="' + amountFieldId2 + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">',
         actions: [
             {
                 text: 'Buy',
@@ -4649,6 +4709,40 @@ function showShopBuyDialog(shopToken) {
             }
         ]
     });
+
+    // Select the range sliders
+    const rangeMoney = $('#' + amountFieldId);
+    const rangeIn = $('#' + amountFieldId2);
+
+    // Update the range sliders on change
+    rangeMoney.on('slidestop', function() {
+        // Get the amount of money
+        var moneyAmount = $(this).val();
+
+        // Calculate the amount of in
+        var inAmount = Math.round(moneyAmount / shopData.inSellPrice);
+
+        // Recalculate the money amount to round it
+        moneyAmount = Math.round(inAmount * shopData.inSellPrice);
+
+        // Update the range sliders
+        rangeMoney.val(moneyAmount).slider('refresh');
+        rangeIn.val(inAmount).slider('refresh');
+    });
+    rangeIn.on('slidestop', function() {
+        // Get the amount of in
+        var inAmount = $(this).val();
+
+        // Calculate the amount of money
+        var moneyAmount = Math.round(inAmount * shopData.inSellPrice);
+
+        // Recalculate the in amount to round it
+        inAmount = Math.round(moneyAmount / shopData.inSellPrice);
+
+        // Update the range sliders
+        rangeIn.val(inAmount).slider('refresh');
+        rangeMoney.val(moneyAmount).slider('refresh');
+    });
 }
 
 /**
@@ -4663,20 +4757,6 @@ function showShopSellDialog(shopToken) {
         var gameData = getGameData();
         if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
             current = gameData.balance.out;
-    }
-
-    // Make sure the user has any out to sell, show a dialog if not
-    if(current <= 0) {
-        showDialog({
-            title: 'Nothing to sell',
-            message: 'You don\'t have any ' + NameConfig.out.name + ' to sell at this time.',
-            actions: [
-                {
-                    text: 'Close'
-                }
-            ]
-        });
-        return;
     }
 
     // Generate an unique field ID
@@ -4975,20 +5055,6 @@ function updateFactoryDataVisuals(firstShow) {
                     current = gameData.balance.in;
             }
 
-            // Show a dialog if the user has nothing to deposit
-            if(current <= 0) {
-                showDialog({
-                    title: 'Nothing to deposit',
-                    message: 'You don\'t have any ' + NameConfig.in.name + ' you can deposit at this time.',
-                    actions: [
-                        {
-                            text: 'Close'
-                        }
-                    ]
-                });
-                return;
-            }
-
             // Generate an unique field ID
             var amountFieldId = generateUniqueId('amount-field-');
 
@@ -5045,20 +5111,6 @@ function updateFactoryDataVisuals(firstShow) {
                 var factoryData = getFactoryData();
                 if(factoryData != null && factoryData.hasOwnProperty('out'))
                     current = factoryData.out;
-            }
-
-            // Show a dialog if there's nothing to withdraw
-            if(current <= 0) {
-                showDialog({
-                    title: 'Nothing to withdraw',
-                    message: 'There are no ' + NameConfig.out.name + ' in this ' + NameConfig.factory.name + ' you can withdraw at this time.',
-                    actions: [
-                        {
-                            text: 'Close'
-                        }
-                    ]
-                });
-                return;
             }
 
             // Generate an unique field ID
