@@ -4676,23 +4676,27 @@ function showShopBuyDialog(shopToken) {
     }
 
     // Calculate the minimum and maximum amount of in and money
-    var minIn = 1;
-    var maxIn = Math.floor(moneyCurrent / shopData.inSellPrice);
-    var minMoney = Math.round(shopData.inSellPrice);
-    var maxMoney = Math.round(maxIn * shopData.inSellPrice);
+    var inMin = 1;
+    var inMax = Math.floor(moneyCurrent / shopData.inSellPrice);
+    var moneyMin = Math.round(shopData.inSellPrice);
+    var moneyMax = Math.round(inMax * shopData.inSellPrice);
 
     // Generate an unique field ID
     const inFieldId = generateUniqueId('in-field');
     const moneyFieldId = generateUniqueId('money-field');
+
+    // Determine the default money and in value
+    var inDefault = Math.round(inMax / 2);
+    var moneyDefault = Math.round(inDefault * shopData.inSellPrice);
 
     // Show the dialog
     showDialog({
         title: 'Buy ' + NameConfig.in.name,
         message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to buy.<br><br>' +
         '<label for="' + inFieldId + '">Amount of ' + NameConfig.in.name + ':</label>' +
-        '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">' +
+        '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + inDefault + '" min="' + inMin + '" max="' + inMax + '" data-highlight="true">' +
         '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
-        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">',
+        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
                 text: 'Buy',
@@ -4748,8 +4752,8 @@ function showShopBuyDialog(shopToken) {
     });
 
     // Remember the last amount of money and in
-    var moneyLast = parseInt(rangeMoney.val());
-    var inLast = parseInt(rangeIn.val());
+    var moneyLast = moneyDefault;
+    var inLast = inDefault;
 
     // Update the range sliders on change
     rangeIn.on('change slidestop', function(event) {
