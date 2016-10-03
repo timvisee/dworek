@@ -214,7 +214,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                     }
 
                                     // Set the in amount
-                                    gameUser.setIn(inAmount + Math.round(buyAmount * price), function(err) {
+                                    gameUser.setIn(inAmount + Math.round(buyAmount / price), function(err) {
                                         // Call back errors
                                         if(err !== null) {
                                             callbackError();
