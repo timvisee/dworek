@@ -4679,7 +4679,7 @@ function showShopBuyDialog(shopToken) {
     var minIn = 1;
     var maxIn = Math.floor(moneyCurrent / shopData.inSellPrice);
     var minMoney = Math.round(shopData.inSellPrice);
-    var maxMoney = Math.floor(maxIn * shopData.inSellPrice);
+    var maxMoney = Math.round(maxIn * shopData.inSellPrice);
 
     // Generate an unique field ID
     const inFieldId = generateUniqueId('amount-field');
