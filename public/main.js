@@ -4665,8 +4665,14 @@ function showShopBuyDialog(shopToken) {
             moneyCurrent = gameData.balance.money;
     }
 
+    // Calculate the minimum and maximum amount of in and money
+    var inMin = 1;
+    var inMax = Math.floor(moneyCurrent / shopData.inSellPrice);
+    var moneyMin = Math.round(shopData.inSellPrice);
+    var moneyMax = Math.round(inMax * shopData.inSellPrice);
+
     // Make sure the user has enough money, show a dialog of the user doesn't have enough money
-    if(moneyCurrent <= 0) {
+    if(moneyMax <= 0) {
         showDialog({
             title: 'No money',
             message: 'You don\'t have any money to spend on ' + NameConfig.in.name + '.<br><br>' +
@@ -4674,12 +4680,6 @@ function showShopBuyDialog(shopToken) {
         });
         return;
     }
-
-    // Calculate the minimum and maximum amount of in and money
-    var inMin = 1;
-    var inMax = Math.floor(moneyCurrent / shopData.inSellPrice);
-    var moneyMin = Math.round(shopData.inSellPrice);
-    var moneyMax = Math.round(inMax * shopData.inSellPrice);
 
     // Generate an unique field ID
     const inFieldId = generateUniqueId('in-field');
