@@ -271,7 +271,10 @@ module.exports = {
     /**
      * Send from a client to the server to buy in goods.
      *
-     * TODO: Define data fields
+     * Data:
+     * - shop: ID of the shop
+     * - moneyAmount: Amount of money to spend on in.
+     * - [all]: True to buy as much as possible, false if not. Setting this to true will ignore the inAmount value.
      */
     SHOP_SELL_IN: 24,
 
