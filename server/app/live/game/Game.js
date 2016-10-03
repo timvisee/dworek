@@ -497,11 +497,7 @@ Game.prototype.getTeamMoney = function(callback) {
         var teamObjects = [];
 
         // Loop through the team's in the object
-        for(var teamId in teamObject) {
-            // Make sure the team ID is an actual property of the team object
-            if(!teamObject.hasOwnProperty(teamId))
-                continue;
-
+        Object.keys(teamObject).forEach(function(teamId) {
             // Get a team instance by it's ID
             const team = Core.model.gameTeamModelManager._instanceManager.create(teamId);
 
@@ -516,9 +512,6 @@ Game.prototype.getTeamMoney = function(callback) {
                     return;
                 }
 
-                // Get the current team ID
-                const teamId = team.getIdHex();
-
                 // Create a team object and push it into the array
                 teamObjects.push({
                     id: teamId,
@@ -529,7 +522,7 @@ Game.prototype.getTeamMoney = function(callback) {
                 // Resolve the latch
                 latch.resolve();
             });
-        }
+        });
 
         // Call back the array of team objects.
         latch.then(() => callback(null, teamObjects));
