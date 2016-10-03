@@ -1728,7 +1728,9 @@ function showDialog(options, callback) {
     const defaults = {
         title: 'Popup',
         message: '',
-        actions: []
+        actions: [{
+            text: 'Close'
+        }]
     };
 
     // Merge the options
