@@ -4704,7 +4704,7 @@ function showShopBuyDialog(shopToken) {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                         shop: shopToken,
-                        amount: amount,
+                        inAmount: amount,
                         all: false
                     });
 
@@ -4718,7 +4718,7 @@ function showShopBuyDialog(shopToken) {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                         shop: shopToken,
-                        amount: 0,
+                        inAmount: 0,
                         all: true
                     });
 
@@ -4736,34 +4736,103 @@ function showShopBuyDialog(shopToken) {
     const rangeMoney = $('#' + inFieldId);
     const rangeIn = $('#' + moneyFieldId);
 
-    // Update the range sliders on change
-    rangeMoney.on('change slidestop', function() {
-        // Get the amount of money
-        var moneyAmount = $(this).val();
+    // Define whether the user is dragging a slider
+    var dragging = false;
 
-        // Calculate the amount of in
-        var inAmount = Math.round(moneyAmount / shopData.inSellPrice);
-
-        // Recalculate the money amount to round it
-        moneyAmount = Math.round(inAmount * shopData.inSellPrice);
-
-        // Update the range sliders
-        rangeMoney.val(moneyAmount).slider('refresh');
-        rangeIn.val(inAmount).slider('refresh');
+    // Update the dragging state when interacting with a slider
+    rangeIn.on('slidestart slidestop', function(event) {
+        dragging = event.type == 'slidestart';
     });
-    rangeIn.on('change slidestop', function() {
-        // Get the amount of in
-        var inAmount = $(this).val();
+    rangeMoney.on('slidestart slidestop', function(event) {
+        dragging = event.type == 'slidestart';
+    });
+
+    // Remember the last amount of money and in
+    var moneyLast = parseInt(rangeMoney.val());
+    var inLast = parseInt(rangeIn.val());
+
+    // Update the range sliders on change
+    rangeIn.on('change slidestop', function(event) {
+        // Get the current amount of in
+        var inCurrent = $(this).val();
+
+        // Set whether to update the in slider
+        var update = event.type == 'slidestop';
+
+        // Determine whether to increase the range by one step
+        if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice < 1) {
+            // Calculate the in delta
+            var moneyDelta = parseInt(inCurrent - inLast);
+
+            // Get the current amount of money
+            var moneyCurrent = parseInt(rangeMoney.val());
+
+            // Calculate the new amount of in based on the current money with the delta
+            inCurrent = Math.round((moneyCurrent + moneyDelta) / shopData.inSellPrice);
+
+            // Force a slider update
+            update = true;
+        }
 
         // Calculate the amount of money
-        var moneyAmount = Math.round(inAmount * shopData.inSellPrice);
+        var moneyAmount = Math.round(inCurrent * shopData.inSellPrice);
 
-        // Recalculate the in amount to round it
-        inAmount = Math.round(moneyAmount / shopData.inSellPrice);
-
-        // Update the range sliders
-        rangeIn.val(inAmount).slider('refresh');
+        // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
+
+        // Update the last money and in value
+        inLast = inCurrent;
+        moneyLast = moneyAmount;
+
+        // Update the in slider if the event was called because we stopped dragging the slider
+        if(update) {
+            // Recalculate the in amount to round it
+            var inAmount = Math.round(moneyAmount / shopData.inSellPrice);
+
+            // Update the range sliders
+            rangeIn.val(inAmount).slider('refresh');
+        }
+    });
+    rangeMoney.on('change slidestop', function(event) {
+        // Get the current amount of money
+        var moneyCurrent = $(this).val();
+
+        // Set whether to update the money slider
+        var update = event.type == 'slidestop';
+
+        // Determine whether to increase the range by one step
+        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice > 1) {
+            // Calculate the in delta
+            var inDelta = parseInt(moneyCurrent - moneyLast);
+
+            // Get the current amount of in
+            var inCurrent = parseInt(rangeIn.val());
+
+            // Calculate the new amount of money based on the current in with the delta
+            moneyCurrent = Math.round((inCurrent + inDelta) * shopData.inSellPrice);
+
+            // Force a slider update
+            update = true;
+        }
+
+        // Calculate the amount of in
+        var inAmount = Math.round(moneyCurrent / shopData.inSellPrice);
+
+        // Update the in slider
+        rangeIn.val(inAmount).slider('refresh');
+
+        // Update the last money and in value
+        moneyLast = moneyCurrent;
+        inLast = inAmount;
+
+        // Update the money slider if the event was called because we stopped dragging the slider
+        if(update) {
+            // Recalculate the money amount to round it
+            var moneyAmount = Math.round(inAmount * shopData.inSellPrice);
+
+            // Update the range sliders
+            rangeMoney.val(moneyAmount).slider('refresh');
+        }
     });
 }
 
