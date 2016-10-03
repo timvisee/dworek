@@ -4511,7 +4511,7 @@ function updateGameDataVisuals() {
 
     if(data.hasOwnProperty('balance')) {
         if(data.balance.hasOwnProperty('money'))
-            activePage.find('.game-balance-money').html(data.balance.money != 0 ? data.balance.money : 0);
+            activePage.find('.game-balance-money').html(formatMoney(data.balance.money, false));
         if(data.balance.hasOwnProperty('in'))
             activePage.find('.game-balance-in').html(data.balance.in);
         if(data.balance.hasOwnProperty('out'))
