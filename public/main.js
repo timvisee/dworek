@@ -4689,9 +4689,9 @@ function showShopBuyDialog(shopToken) {
     showDialog({
         title: 'Buy ' + NameConfig.in.name,
         message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to buy.<br><br>' +
-        '<label for="' + moneyFieldId + '">' + capitalizeFirst(NameConfig.in.name) + ':</label>' +
+        '<label for="' + moneyFieldId + '">Amount of ' + NameConfig.in.name + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">' +
-        '<label for="' + inFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
+        '<label for="' + inFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
         '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">',
         actions: [
             {
@@ -4737,7 +4737,7 @@ function showShopBuyDialog(shopToken) {
     const rangeIn = $('#' + moneyFieldId);
 
     // Update the range sliders on change
-    rangeMoney.on('slidestop', function() {
+    rangeMoney.on('change slidestop', function() {
         // Get the amount of money
         var moneyAmount = $(this).val();
 
@@ -4751,7 +4751,7 @@ function showShopBuyDialog(shopToken) {
         rangeMoney.val(moneyAmount).slider('refresh');
         rangeIn.val(inAmount).slider('refresh');
     });
-    rangeIn.on('slidestop', function() {
+    rangeIn.on('change slidestop', function() {
         // Get the amount of in
         var inAmount = $(this).val();
 
