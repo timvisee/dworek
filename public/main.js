@@ -4676,9 +4676,9 @@ function showShopBuyDialog(shopToken) {
     // Make sure the user has enough money, show a dialog of the user doesn't have enough money
     if(moneyMax <= 0) {
         showDialog({
-            title: 'No money',
-            message: 'You don\'t have any money to spend on ' + NameConfig.in.name + '.<br><br>' +
-            'Please make some money by selling ' + NameConfig.out.name + ' first before comming back.'
+            title: 'Not enough money',
+            message: 'You don\'t have enough money to spend on ' + NameConfig.in.name + '.<br><br>' +
+            'Please make some money by selling ' + NameConfig.out.name + ' first before coming back.'
         });
         return;
     }
