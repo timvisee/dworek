@@ -4568,7 +4568,7 @@ function updateGameDataVisuals() {
                 button.click(function() {
                     showDialog({
                         title: 'Strength upgrade',
-                        message: 'Are you sure you want to buy this upgrade for ' + upgrade.cost + ' ' + NameConfig.currency.name + '?<br><br>' +
+                        message: 'Are you sure you want to buy this upgrade for <b>' + formatMoney(upgrade.cost, true) + '</b>?<br><br>' +
                         'This will improve your players defence.',
                         actions: [
                             {
@@ -5077,8 +5077,8 @@ function updateFactoryDataVisuals(firstShow) {
                 button.click(function() {
                     showDialog({
                         title: 'Defence upgrade',
-                        message: 'Are you sure you want to buy this upgrade for ' + upgrade.cost + ' ' + NameConfig.currency.name + '?<br><br>' +
-                        'This will improve the ' + NameConfig.factory.name + ' with ' + upgrade.defence + ' defence.',
+                        message: 'Are you sure you want to buy this upgrade for <b>' + formatMoney(upgrade.cost, true) + '</b>?<br><br>' +
+                        'This will improve the ' + NameConfig.factory.name + ' with <b>' + upgrade.defence + '</b> defence.',
                         actions: [
                             {
                                 text: 'Buy upgrade',
@@ -5114,7 +5114,7 @@ function updateFactoryDataVisuals(firstShow) {
             levelUpgradeButton.click(function() {
                 showDialog({
                     title: 'Level upgrade',
-                    message: 'Are you sure you want to upgrade one level for ' + data.nextLevelCost + ' ' + NameConfig.currency.name + '?',
+                    message: 'Are you sure you want to upgrade one level for <b>' + formatMoney(data.nextLevelCost, true) + '</b>?',
                     actions: [
                         {
                             text: 'Buy upgrade',
