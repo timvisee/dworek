@@ -192,8 +192,8 @@ var gameConfig = {
          */
         getInSellPrice: function() {
             // Define the minimum and maximum price
-            const priceMin = 5;
-            const priceMax = 8;
+            const priceMin = 8;
+            const priceMax = 12;
 
             // Randomize the price
             return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
@@ -206,8 +206,8 @@ var gameConfig = {
          */
         getOutBuyPrice: function() {
             // Define the minimum and maximum price
-            const priceMin = 10;
-            const priceMax = 14;
+            const priceMin = 35;
+            const priceMax = 45;
 
             // Randomize the price
             return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
