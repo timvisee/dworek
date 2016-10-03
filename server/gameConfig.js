@@ -79,13 +79,11 @@ var gameConfig = {
             }];
 
             // Add a second strength when the defence level is 3 or lower
-            if(strength < 3) {
-                strengths.push({
-                    name: 'P90 RUSH B',
-                    cost: Math.round((basePrice * 0.8) * Math.pow(power, strength)),
-                    strength: 1
-                });
-            }
+            strengths.push({
+                name: 'P90 RUSH B',
+                cost: Math.round((basePrice * 0.8) * Math.pow(power, strength)),
+                strength: 1
+            });
 
             // Add a third strength when the defence level is 3 or higher
             if(strength >= 3) {
