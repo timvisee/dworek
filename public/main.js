@@ -4690,7 +4690,7 @@ function showShopBuyDialog(shopToken) {
         title: 'Buy ' + NameConfig.in.name,
         message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
         '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
-        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" step="' + shopData.inSellPrice + '" data-highlight="true">' +
+        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">' +
         '<label for="' + amountFieldId2 + '">' + capitalizeFirst(NameConfig.in.name) + ':</label>' +
         '<input type="range" name="' + amountFieldId2 + '" id="' + amountFieldId2 + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">',
         actions: [
