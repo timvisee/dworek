@@ -3902,9 +3902,10 @@ function updateFactoryMarkers(factories) {
             marker.addTo(map);
             marker.rangeCircle.addTo(map);
 
-            // Put the factory instance in the marker
+            // Put the factory data in the marker
             marker.factory = {
-                factory: factory.factory
+                factory: factory.factory,
+                ally: factory.ally
             };
 
             // Add the marker to the markers list
@@ -3916,10 +3917,25 @@ function updateFactoryMarkers(factories) {
             marker.rangeCircle.setLatLng(pos);
             marker.rangeCircle.setRadius(factory.range);
 
+            // Set the factory style
             marker.rangeCircle.setStyle({
                 opacity: factory.inRange ? 1 : 0.4,
                 dashArray: factory.inRange ? '' : '5,5'
             });
+
+            // Update the factory sprite and color if the ally state changed
+            if(marker.factory.ally != factory.ally) {
+                // Update the marker sprite
+                marker.setIcon(L.spriteIcon(factory.ally ? 'orange' : 'red'));
+
+                // Update the range circle color
+                marker.rangeCircle.setStyle({
+                    color: factory.ally ? 'darkorange' : 'red'
+                });
+
+                // Update the factory ally state
+                marker.factory.ally = factory.ally;
+            }
         }
 
         // Rebind the popup to show when the user clicks on the marker
