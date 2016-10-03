@@ -95,7 +95,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
     // Get the raw parameters
     const rawShop = packet.shop;
-    const rawAmount = packet.amount;
+    const rawMoneyAmount = packet.moneyAmount;
     const rawAll = packet.all;
 
     // Make sure the user is authenticated
@@ -154,7 +154,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                         const price = liveShop.getInSellPrice();
 
                         // The the amount of money the user has
-                        gameUser.getMoney(function(err, userMoney) {
+                        gameUser.getMoney(function(err, moneyCurrent) {
                             // Call back errors
                             if(err !== null) {
                                 callbackError();
@@ -162,33 +162,37 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                             }
 
                             // Determine the amount to buy
-                            var buyAmount = 0;
+                            var moneyAmount = 0;
 
                             // Check whether we should use the maximum amount
                             if(rawAll === true)
-                                buyAmount = userMoney;
+                                moneyAmount = Math.round(Math.floor(moneyCurrent / price) * price);
                             else
                                 // Parse the raw amount
-                                buyAmount = parseInt(rawAmount);
+                                moneyAmount = parseInt(rawMoneyAmount);
+
+                            // Calculate the amount of ingredients to buy and revalidate the amount of money the user spends
+                            const inAmount = Math.round(moneyAmount / price);
+                            moneyAmount = Math.round(inAmount * price);
 
                             // Make sure the amount isn't above the maximum
-                            if(buyAmount > userMoney) {
+                            if(moneyAmount > moneyCurrent) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
-                                    message: 'Failed to buy, you don\'t have this much money available.',
+                                    message: 'Failed to buy, you don\'t have this much money.',
                                     dialog: true
                                 }, socket);
                                 return;
                             }
 
-                            // Make sure the amount isn't below zero
-                            if(buyAmount < 0) {
+                            // The amount of money may not be below zero
+                            if(moneyAmount < 0) {
                                 callbackError();
                                 return;
                             }
 
-                            // Make the sure the amount isn't zero
-                            if(buyAmount == 0) {
+                            // The user must buy something
+                            if(moneyAmount == 0 || inAmount == 0) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
                                     message: '<i>You can\'t buy no nothin\'.</i>',
@@ -197,47 +201,39 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                 return;
                             }
 
-                            // Set the money amount for the user
-                            gameUser.setMoney(userMoney - buyAmount, function(err) {
+                            // Subtract the money that is spend from the user
+                            gameUser.subtractMoney(moneyAmount, function(err) {
                                 // Call back errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Get the in amount
-                                gameUser.getIn(function(err, inAmount) {
+                                // Add the bought in amount to the user
+                                gameUser.addIn(inAmount, function(err) {
                                     // Call back errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
                                     }
 
-                                    // Set the in amount
-                                    gameUser.setIn(inAmount + Math.round(buyAmount / price), function(err) {
-                                        // Call back errors
+                                    // Send updated game data to the user
+                                    Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
+                                        // Handle errors
                                         if(err !== null) {
-                                            callbackError();
-                                            return;
+                                            console.error(err);
+                                            console.error('Failed to send game data');
                                         }
-
-                                        // Send updated game data to the user
-                                        Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
-                                            // Handle errors
-                                            if(err !== null) {
-                                                console.error(err);
-                                                console.error('Failed to send game data');
-                                            }
-                                        });
-
-                                        // Send a notification to the user
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: false,
-                                            message: 'Transaction succeed!',
-                                            dialog: false,
-                                            toast: true
-                                        }, socket);
                                     });
+
+                                    // Send a notification to the user
+                                    // TODO: Get the in and money name from the name configuration of the current game
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: false,
+                                        message: 'Bought ' + inAmount + ' ingredients for $' + moneyAmount,
+                                        dialog: false,
+                                        toast: true
+                                    }, socket);
                                 });
                             });
                         });
