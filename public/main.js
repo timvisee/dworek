@@ -1472,7 +1472,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
         return;
 
     // Make sure the map data is for the current game
-    if(Dworek.utils.getGameId() == packet.game) {
+    if(Dworek.utils.getGameId() != packet.game) {
         console.log('Received location data for inactive game, ignoring...');
         return;
     }
