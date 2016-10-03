@@ -479,19 +479,25 @@ GameUserModel.prototype.getMoney = function(callback) {
 /**
  * Set the money.
  *
- * @param {Number} money Money value.
+ * @param {Number} amount Money amount.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setMoney = function(money, callback) {
-    this.setField('money', money, callback);
+GameUserModel.prototype.setMoney = function(amount, callback) {
+    this.setField('money', amount, callback);
 };
 
+/**
+ * Add money to the user.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {GameUserModel~addMoneyCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.addMoney = function(amount, callback) {
     // Store this instance
     const self = this;
 
     // Get the current money value
-    this.getMoney(function(err, money) {
+    this.getMoney(function(err, current) {
         // Call back errors
         if(err !== null) {
             callback(err);
@@ -499,13 +505,33 @@ GameUserModel.prototype.addMoney = function(amount, callback) {
         }
 
         // Set the money
-        self.setMoney(money + amount, callback);
+        self.setMoney(current + amount, callback);
     });
 };
 
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~addMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract money from the user.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {GameUserModel~subtractMoneyCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.subtractMoney = function(amount, callback) {
     this.addMoney(-amount, callback);
 };
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~subtractMoneyCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Get the in goods the user has.
@@ -527,33 +553,59 @@ GameUserModel.prototype.getIn = function(callback) {
 /**
  * Set the in goods.
  *
- * @param {Number} goods Goods.
+ * @param {Number} amount Goods.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setIn = function(goods, callback) {
-    this.setField('in', goods, callback);
+GameUserModel.prototype.setIn = function(amount, callback) {
+    this.setField('in', amount, callback);
 };
 
+/**
+ * Add in to the user.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {GameUserModel~addInCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.addIn = function(amount, callback) {
     // Store this instance
     const self = this;
 
-    // Get the current goods value
-    this.getIn(function(err, goods) {
+    // Get the current in value
+    this.getIn(function(err, current) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Set the goods
-        self.setIn(goods + amount, callback);
+        // Set the in
+        self.setIn(current + amount, callback);
     });
 };
 
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~addInCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract in from the user.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {GameUserModel~subtractInCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.subtractIn = function(amount, callback) {
     this.addIn(-amount, callback);
 };
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~subtractInCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Get the out goods the user has.
@@ -582,26 +634,52 @@ GameUserModel.prototype.setOut = function(goods, callback) {
     this.setField('out', goods, callback);
 };
 
+/**
+ * Add out to the user.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {GameUserModel~addOutCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.addOut = function(amount, callback) {
     // Store this instance
     const self = this;
 
-    // Get the current goods value
-    this.getOut(function(err, goods) {
+    // Get the current out value
+    this.getOut(function(err, current) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Set the goods
-        self.setOut(goods + amount, callback);
+        // Set the out
+        self.setOut(current + amount, callback);
     });
 };
 
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~addOutCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract out from the user.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {GameUserModel~subtractOutCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.subtractOut = function(amount, callback) {
     this.addOut(-amount, callback);
 };
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~subtractOutCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Get the strength goods the user has.
@@ -630,12 +708,18 @@ GameUserModel.prototype.setStrength = function(goods, callback) {
     this.setField('strength', goods, callback);
 };
 
+/**
+ * Add strength to the user.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {GameUserModel~addStrengthCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.addStrength = function(amount, callback) {
     // Store this instance
     const self = this;
 
     // Get the current goods value
-    this.getStrength(function(err, goods) {
+    this.getStrength(function(err, current) {
         // Call back errors
         if(err !== null) {
             callback(err);
@@ -643,13 +727,33 @@ GameUserModel.prototype.addStrength = function(amount, callback) {
         }
 
         // Set the goods
-        self.setStrength(goods + amount, callback);
+        self.setStrength(current + amount, callback);
     });
 };
 
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~addStrengthCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract strength from the user.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {GameUserModel~subtractStrengthCallback} callback Called back on success or when an error occurred.
+ */
 GameUserModel.prototype.subtractStrength = function(amount, callback) {
     this.addStrength(-amount, callback);
 };
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~subtractStrengthCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 // Export the user class
 module.exports = GameUserModel;
