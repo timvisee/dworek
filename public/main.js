@@ -4682,29 +4682,29 @@ function showShopBuyDialog(shopToken) {
     var maxMoney = Math.round(maxIn * shopData.inSellPrice);
 
     // Generate an unique field ID
-    const inFieldId = generateUniqueId('amount-field');
-    const moneyFieldId = generateUniqueId('amount-field');
+    const inFieldId = generateUniqueId('in-field');
+    const moneyFieldId = generateUniqueId('money-field');
 
     // Show the dialog
     showDialog({
         title: 'Buy ' + NameConfig.in.name,
         message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to buy.<br><br>' +
-        '<label for="' + moneyFieldId + '">Amount of ' + NameConfig.in.name + ':</label>' +
-        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">' +
-        '<label for="' + inFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
-        '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">',
+        '<label for="' + inFieldId + '">Amount of ' + NameConfig.in.name + ':</label>' +
+        '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">' +
+        '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
+        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">',
         actions: [
             {
                 text: 'Buy',
                 state: 'primary',
                 action: function() {
                     // Get the input field value
-                    var amount = $('#' + inFieldId).val();
+                    var moneyAmount = parseInt($('#' + moneyFieldId).val());
 
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                         shop: shopToken,
-                        inAmount: amount,
+                        moneyAmount: moneyAmount,
                         all: false
                     });
 
@@ -4718,7 +4718,7 @@ function showShopBuyDialog(shopToken) {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
                         shop: shopToken,
-                        inAmount: 0,
+                        moneyAmount: 0,
                         all: true
                     });
 
@@ -4760,7 +4760,7 @@ function showShopBuyDialog(shopToken) {
         var update = event.type == 'slidestop';
 
         // Determine whether to increase the range by one step
-        if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice < 1) {
+        if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice > 1) {
             // Calculate the in delta
             var moneyDelta = parseInt(inCurrent - inLast);
 
@@ -4768,14 +4768,14 @@ function showShopBuyDialog(shopToken) {
             var moneyCurrent = parseInt(rangeMoney.val());
 
             // Calculate the new amount of in based on the current money with the delta
-            inCurrent = Math.round((moneyCurrent + moneyDelta) / shopData.inSellPrice);
+            inCurrent = Math.round((moneyCurrent + moneyDelta) * shopData.inSellPrice);
 
             // Force a slider update
             update = true;
         }
 
         // Calculate the amount of money
-        var moneyAmount = Math.round(inCurrent * shopData.inSellPrice);
+        var moneyAmount = Math.round(inCurrent / shopData.inSellPrice);
 
         // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
@@ -4787,7 +4787,7 @@ function showShopBuyDialog(shopToken) {
         // Update the in slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the in amount to round it
-            var inAmount = Math.round(moneyAmount / shopData.inSellPrice);
+            var inAmount = Math.round(moneyAmount * shopData.inSellPrice);
 
             // Update the range sliders
             rangeIn.val(inAmount).slider('refresh');
@@ -4801,7 +4801,7 @@ function showShopBuyDialog(shopToken) {
         var update = event.type == 'slidestop';
 
         // Determine whether to increase the range by one step
-        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice > 1) {
+        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice < 1) {
             // Calculate the in delta
             var inDelta = parseInt(moneyCurrent - moneyLast);
 
@@ -4809,14 +4809,14 @@ function showShopBuyDialog(shopToken) {
             var inCurrent = parseInt(rangeIn.val());
 
             // Calculate the new amount of money based on the current in with the delta
-            moneyCurrent = Math.round((inCurrent + inDelta) * shopData.inSellPrice);
+            moneyCurrent = Math.round((inCurrent + inDelta) / shopData.inSellPrice);
 
             // Force a slider update
             update = true;
         }
 
         // Calculate the amount of in
-        var inAmount = Math.round(moneyCurrent / shopData.inSellPrice);
+        var inAmount = Math.round(moneyCurrent * shopData.inSellPrice);
 
         // Update the in slider
         rangeIn.val(inAmount).slider('refresh');
@@ -4828,7 +4828,7 @@ function showShopBuyDialog(shopToken) {
         // Update the money slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the money amount to round it
-            var moneyAmount = Math.round(inAmount * shopData.inSellPrice);
+            var moneyAmount = Math.round(inAmount / shopData.inSellPrice);
 
             // Update the range sliders
             rangeMoney.val(moneyAmount).slider('refresh');
