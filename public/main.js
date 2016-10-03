@@ -5334,7 +5334,7 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Set the next level cost label
     if(!visible || data.hasOwnProperty('nextLevelCost'))
-        factoryNextLevelCostLabel.html(canModify ? NameConfig.currency.sign + data.nextLevelCost : '?');
+        factoryNextLevelCostLabel.html(canModify ? formatMoney(data.nextLevelCost, true) : '?');
 }
 
 /**
