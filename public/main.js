@@ -4433,11 +4433,11 @@ function updateGameDataVisuals() {
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.inSellPrice + ' <span style="color: gray;">/ 1 ' + NameConfig.in.name + ' unit</span></td>' +
+                '                <td>' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.in.name + ' unit</span></td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td>' + NameConfig.currency.sign + shop.outBuyPrice + ' <span style="color: gray;">/ 1 ' + NameConfig.out.name + ' unit</span></td>' +
+                '                <td>' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.out.name + ' unit</span></td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
@@ -4506,7 +4506,7 @@ function updateGameDataVisuals() {
     if(data.hasOwnProperty('factory')) {
         // Update the factory cost label
         if(data.factory.hasOwnProperty('cost'))
-            $('.game-factory-cost').html(data.factory.cost != 0 ? (NameConfig.currency.sign + data.factory.cost) : 'Free');
+            $('.game-factory-cost').html(data.factory.cost != 0 ? formatMoney(data.factory.cost, true) : 'Free');
     }
 
     if(data.hasOwnProperty('balance')) {
@@ -4540,7 +4540,7 @@ function updateGameDataVisuals() {
                 // Append a button
                 upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.strength + ')</span>' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + formatMoney(upgrade.cost, true) + ' / +' + upgrade.strength + ')</span>' +
                     '</a>');
 
                 // Get the button
@@ -4976,7 +4976,7 @@ function updateFactoryDataVisuals(firstShow) {
                 // Append a button
                 upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
-                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + NameConfig.currency.sign + upgrade.cost + ' / +' + upgrade.defence + ')</span>' +
+                    '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + formatMoney(upgrade.cost, true) + ' / +' + upgrade.defence + ')</span>' +
                     '</a>');
 
                 // Get the button
@@ -5410,4 +5410,14 @@ function formatMoney(amount, prefixSign) {
 
     // Return the number, prefix the money sign if specified
     return (prefixSign ? NameConfig.currency.sign : '') + amount;
+}
+
+/**
+ * Format the given amount of goods to make it better readable.
+ *
+ * @param {Number} amount Amount of goods.
+ * @returns {string} Formatted amount of goods.
+ */
+function formatGoods(amount) {
+    return formatBigNumber(amount);
 }
