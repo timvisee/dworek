@@ -4682,24 +4682,24 @@ function showShopBuyDialog(shopToken) {
     var maxMoney = Math.floor(maxIn * shopData.inSellPrice);
 
     // Generate an unique field ID
-    const amountFieldId = generateUniqueId('amount-field');
-    const amountFieldId2 = generateUniqueId('amount-field');
+    const inFieldId = generateUniqueId('amount-field');
+    const moneyFieldId = generateUniqueId('amount-field');
 
     // Show the dialog
     showDialog({
         title: 'Buy ' + NameConfig.in.name,
-        message: 'Enter the amount of ' + NameConfig.currency.name + ' you\'d like to buy ' + NameConfig.in.name + ' for.<br><br>' +
-        '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
-        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">' +
-        '<label for="' + amountFieldId2 + '">' + capitalizeFirst(NameConfig.in.name) + ':</label>' +
-        '<input type="range" name="' + amountFieldId2 + '" id="' + amountFieldId2 + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">',
+        message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to buy.<br><br>' +
+        '<label for="' + moneyFieldId + '">' + capitalizeFirst(NameConfig.in.name) + ':</label>' +
+        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + Math.round(moneyCurrent / 2 / shopData.inSellPrice) + '" min="' + minIn + '" max="' + maxIn + '" data-highlight="true">' +
+        '<label for="' + inFieldId + '">' + capitalizeFirst(NameConfig.currency.name) + ':</label>' +
+        '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + Math.round(moneyCurrent / 2) + '" min="' + minMoney + '" max="' + maxMoney + '" data-highlight="true">',
         actions: [
             {
                 text: 'Buy',
                 state: 'primary',
                 action: function() {
                     // Get the input field value
-                    var amount = $('#' + amountFieldId).val();
+                    var amount = $('#' + inFieldId).val();
 
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
@@ -4733,8 +4733,8 @@ function showShopBuyDialog(shopToken) {
     });
 
     // Select the range sliders
-    const rangeMoney = $('#' + amountFieldId);
-    const rangeIn = $('#' + amountFieldId2);
+    const rangeMoney = $('#' + inFieldId);
+    const rangeIn = $('#' + moneyFieldId);
 
     // Update the range sliders on change
     rangeMoney.on('slidestop', function() {
