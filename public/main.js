@@ -4513,9 +4513,9 @@ function updateGameDataVisuals() {
         if(data.balance.hasOwnProperty('money'))
             activePage.find('.game-balance-money').html(formatMoney(data.balance.money, false));
         if(data.balance.hasOwnProperty('in'))
-            activePage.find('.game-balance-in').html(data.balance.in);
+            activePage.find('.game-balance-in').html(formatGoods(data.balance.in));
         if(data.balance.hasOwnProperty('out'))
-            activePage.find('.game-balance-out').html(data.balance.out);
+            activePage.find('.game-balance-out').html(formatGoods(data.balance.out));
     }
 
     if(data.hasOwnProperty('strength')) {
@@ -5308,26 +5308,26 @@ function updateFactoryDataVisuals(firstShow) {
     if(!visible || data.hasOwnProperty('in'))
         if(data.hasOwnProperty('productionIn')) {
             if(data.in >= data.productionIn)
-                factoryInLabel.html(visible ? ('<span style="color: green;">' + data.in + '</span>') : hiddenLabel);
+                factoryInLabel.html(visible ? ('<span style="color: green;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
             else
-                factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' + data.in + '</span>') : hiddenLabel);
+                factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
         } else
-            factoryInLabel.html(visible ? data.in : hiddenLabel);
+            factoryInLabel.html(visible ? formatGoods(data.in) : hiddenLabel);
 
     // Set the production in label
     if(visible && data.hasOwnProperty('productionIn')) {
-        factoryProductionInLabel.html('− ' + data.productionIn + ' / tick');
+        factoryProductionInLabel.html('− ' + formatGoods(data.productionIn) + ' / tick');
         factoryProductionInLabel.show();
     } else if(!visible)
         factoryProductionInLabel.hide();
 
     // Set the out label
     if(!visible || data.hasOwnProperty('out'))
-        factoryOutLabel.html(visible ? data.out : hiddenLabel);
+        factoryOutLabel.html(visible ? formatGoods(data.out) : hiddenLabel);
 
     // Set the production out label
     if(visible && data.hasOwnProperty('productionOut')) {
-        factoryProductionOutLabel.html('+ ' + data.productionOut + ' / tick');
+        factoryProductionOutLabel.html('+ ' + formatGoods(data.productionOut) + ' / tick');
         factoryProductionOutLabel.show();
     } else if(!visible)
         factoryProductionOutLabel.hide();
