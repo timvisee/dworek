@@ -197,6 +197,7 @@ router.post('/', function(req, res, next) {
 
                 // Update the session validator
                 SessionValidator.route(req, res, function(err) {
+                    // Call back errors
                     if(err !== null && err !== undefined) {
                         next(err);
                         return;
