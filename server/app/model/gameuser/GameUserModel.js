@@ -483,6 +483,13 @@ GameUserModel.prototype.getMoney = function(callback) {
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
 GameUserModel.prototype.setMoney = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid money amount.'));
+        return;
+    }
+
+    // Set the field
     this.setField('money', amount, callback);
 };
 
@@ -493,6 +500,12 @@ GameUserModel.prototype.setMoney = function(amount, callback) {
  * @param {GameUserModel~addMoneyCallback} callback Called back on success or when an error occurred.
  */
 GameUserModel.prototype.addMoney = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid money amount.'));
+        return;
+    }
+
     // Store this instance
     const self = this;
 
@@ -557,6 +570,13 @@ GameUserModel.prototype.getIn = function(callback) {
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
 GameUserModel.prototype.setIn = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid in amount.'));
+        return;
+    }
+
+    // Set the field
     this.setField('in', amount, callback);
 };
 
@@ -567,6 +587,12 @@ GameUserModel.prototype.setIn = function(amount, callback) {
  * @param {GameUserModel~addInCallback} callback Called back on success or when an error occurred.
  */
 GameUserModel.prototype.addIn = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid in amount.'));
+        return;
+    }
+
     // Store this instance
     const self = this;
 
@@ -625,13 +651,20 @@ GameUserModel.prototype.getOut = function(callback) {
  */
 
 /**
- * Set the in goods.
+ * Set the out goods.
  *
- * @param {Number} goods Goods.
+ * @param {Number} amount Amount of out.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setOut = function(goods, callback) {
-    this.setField('out', goods, callback);
+GameUserModel.prototype.setOut = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid out amount.'));
+        return;
+    }
+
+    // Set the field
+    this.setField('out', amount, callback);
 };
 
 /**
@@ -641,6 +674,12 @@ GameUserModel.prototype.setOut = function(goods, callback) {
  * @param {GameUserModel~addOutCallback} callback Called back on success or when an error occurred.
  */
 GameUserModel.prototype.addOut = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid out amount.'));
+        return;
+    }
+
     // Store this instance
     const self = this;
 
@@ -699,13 +738,20 @@ GameUserModel.prototype.getStrength = function(callback) {
  */
 
 /**
- * Set the in goods.
+ * Set the strength.
  *
- * @param {Number} goods Goods.
+ * @param {Number} amount Amount of strength.
  * @param {GameUserModel~setFieldCallback} callback Called on success or when an error occurred.
  */
-GameUserModel.prototype.setStrength = function(goods, callback) {
-    this.setField('strength', goods, callback);
+GameUserModel.prototype.setStrength = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid strength amount.'));
+        return;
+    }
+
+    // Set the field
+    this.setField('strength', amount, callback);
 };
 
 /**
@@ -715,6 +761,12 @@ GameUserModel.prototype.setStrength = function(goods, callback) {
  * @param {GameUserModel~addStrengthCallback} callback Called back on success or when an error occurred.
  */
 GameUserModel.prototype.addStrength = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid strength amount.'));
+        return;
+    }
+
     // Store this instance
     const self = this;
 
