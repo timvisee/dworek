@@ -5375,3 +5375,39 @@ $(document).bind('pageshow', function() {
     // Flush all pages
     Dworek.utils.flushPages(undefined, false);
 });
+
+/**
+ * Format a big number to make it more readable.
+ *
+ * @param {Number} num Number to format.
+ * @returns {string} Formatted number.
+ */
+function formatBigNumber(num) {
+    // Split the number by a dot (for decimal numbers)
+    const parts = num.toString().split(".");
+
+    // Put comma's in it
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Join the decimal number and return
+    return parts.join(".");
+}
+
+/**
+ * Format money.
+ *
+ * @param {Number} amount Amount of money.
+ * @param {boolean} [prefixSign=true] True to prefix a money sign, false to not.
+ * @returns {string} Formatted money string.
+ */
+function formatMoney(amount, prefixSign) {
+    // Set the parameter defaults
+    if(prefixSign == undefined)
+        prefixSign = true;
+
+    // Format the amount of money
+    amount = formatBigNumber(amount);
+
+    // Return the number, prefix the money sign if specified
+    return (prefixSign ? NameConfig.currency.sign : '') + amount;
+}
