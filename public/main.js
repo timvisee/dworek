@@ -5387,7 +5387,7 @@ function formatBigNumber(num) {
     const parts = num.toString().split(".");
 
     // Put comma's in it
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
     // Join the decimal number and return
     return parts.join(".");
