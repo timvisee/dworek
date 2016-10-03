@@ -1471,6 +1471,12 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     if(!packet.hasOwnProperty('game'))
         return;
 
+    // Make sure the map data is for the current game
+    if(Dworek.utils.getGameId() == packet.game) {
+        console.log('Received location data for inactive game, ignoring...');
+        return;
+    }
+
     // Check whether this packet contains specific data
     const hasUsers = packet.hasOwnProperty('users');
     const hasFactories = packet.hasOwnProperty('factories');
