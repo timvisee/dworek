@@ -361,6 +361,12 @@ var Dworek = {
         _connected: false,
 
         /**
+         * Defines whether we're permanently disconnected.
+         * Possibly because we were disconnected for too long.
+         */
+        _disconnected: false,
+
+        /**
          * Define whether this is the users first connection.
          */
         _firstConnection: true,
@@ -560,6 +566,13 @@ var Dworek = {
              * @param socket SocketIO socket.
              */
             receivePacket: function(rawPacket, socket) {
+                // Do not process packets when disconnected
+                if(!Dworek.realtime._disconnected) {
+                    // Show a status message, and return
+                    console.log('Ignoring received packet because we we were disconnected for too long.');
+                    return;
+                }
+
                 // Make sure we received an object
                 if(!(typeof rawPacket === 'object')) {
                     console.log('Received malformed packet, packet data isn\'t an object, ignoring');
@@ -587,6 +600,13 @@ var Dworek = {
              * @param socket SocketIO socket to send the packet over.
              */
             sendPacket: function(packetType, packet, socket) {
+                // Do not send packets when disconnected
+                if(!Dworek.realtime._disconnected) {
+                    // Show a status message, and return
+                    console.log('Not sending packet because we we were disconnected for too long.');
+                    return;
+                }
+
                 // Make sure we're connected
                 if(!Dworek.realtime._connected) {
                     console.log('Unable to send packet to server, not connected');
@@ -1506,7 +1526,10 @@ $(document).bind("pageshow", function() {
 /**
  * Show a dialog that we're disconnected for too long.
  */
-function showDisconnectedTooLongDialog() {
+// function showDisconnectedTooLongDialog() {
+    // Set the disconnected flag
+    Dworek.realtime._disconnected = true;
+
     // Show the dialog
     showDialog({
         title: 'Disconnected',
