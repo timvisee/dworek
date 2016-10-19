@@ -363,6 +363,7 @@ var Dworek = {
         /**
          * Defines whether we're permanently disconnected.
          * Possibly because we were disconnected for too long.
+         * This flag shouldn't be set to true again unless the page is fully refreshed.
          */
         _disconnected: false,
 
