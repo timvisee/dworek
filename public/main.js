@@ -1527,11 +1527,12 @@ $(document).bind("pageshow", function() {
 /**
  * Show a dialog that we're disconnected for too long.
  */
-// function showDisconnectedTooLongDialog() {
+function showDisconnectedTooLongDialog() {
     // Set the disconnected flag
     Dworek.realtime._disconnected = true;
 
     // Show the dialog
+    //noinspection JSCheckFunctionSignatures
     showDialog({
         title: 'Disconnected',
         message: 'You ' + (Dworek.realtime._connected ? 'we\'re' : 'are') + ' disconnected for too long.<br><br>' +
