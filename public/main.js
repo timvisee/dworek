@@ -1543,15 +1543,13 @@ function showDisconnectedTooLongDialog() {
             icon: 'zmdi zmdi-refresh'
         }]
     }, function() {
-        // Determine the refresh path
-        var refreshPath = getActivePage().data('url');
-
         // Redirect a user to a game page if he's on a game related page
         if(Dworek.utils.isGamePage())
-            refreshPath = '/game/' + Dworek.utils.getGameId();
+            Dworek.utils.navigateToPath('/game/' + Dworek.utils.getGameId());
 
-        // Redirect the user
-        Dworek.utils.navigateToPath(refreshPath);
+        else
+            // Redirect the user
+            Dworek.utils.navigateToPath(getActivePage().data('url'));
     });
 }
 
