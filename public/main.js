@@ -1616,11 +1616,7 @@ function updateActiveGame() {
                     }
                 ]
 
-            }, function(value) {
-                // Return if the action is already handled
-                if(!!true)
-                    return;
-
+            }, function() {
                 // Show a notification to switch to the active game
                 showNotification('Switch to your active game', {
                     action: {
