@@ -253,7 +253,7 @@ module.exports = {
      *
      * Data:
      * - factory: ID of the factory
-     * - [amount]: amount
+     * - [amount]: Deposit amount.
      * - [all]: True to deposit all, false if not.
      */
     FACTORY_DEPOSIT_IN: 22,
@@ -262,8 +262,8 @@ module.exports = {
      * Send from a client to the server to withdraw goods.
      *
      * Data:
-     * - factory: ID of the factory
-     * - [amount]: amount
+     * - factory: ID of the factory.
+     * - [amount]: Withdrawal amount.
      * - [all]: True to withdraw all, false if not.
      */
     FACTORY_WITHDRAW_OUT: 23,
@@ -272,16 +272,19 @@ module.exports = {
      * Send from a client to the server to buy in goods.
      *
      * Data:
-     * - shop: ID of the shop
+     * - shop: ID of the shop.
      * - moneyAmount: Amount of money to spend on in.
-     * - [all]: True to buy as much as possible, false if not. Setting this to true will ignore the inAmount value.
+     * - [all]: True to buy as much as possible, false if not. Setting this to true will ignore the moneyAmount value.
      */
     SHOP_SELL_IN: 24,
 
     /**
      * Send from a client to the server to sell out goods.
      *
-     * TODO: Define data fields
+     * Data:
+     * - shop: ID of the shop.
+     * - outAmount: Amount of out to sell.
+     * - [all]: True to sell all out, false if not. Setting this to true will ignore the outAmount value.
      */
     SHOP_BUY_OUT: 25,
 
