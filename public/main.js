@@ -4867,35 +4867,67 @@ function showShopBuyDialog(shopToken) {
  * @param {string} shopToken Token of the shop.
  */
 function showShopSellDialog(shopToken) {
-    // Determine how many out the user currently has
-    var current = 10000;
-    if(hasGameData()) {
-        var gameData = getGameData();
-        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('out'))
-            current = gameData.balance.out;
+    // Get the shop data
+    const shopData = getShopData(undefined, shopToken);
+
+    // Show an error message if the shop data is unavailable
+    if(shopData == null) {
+        showError('Shop data not available.<br><br>Please try to use this shop at a later time.');
+        return;
     }
 
+    // Determine the amount of out the user has
+    var outCurrent = 0;
+    if(hasGameData()) {
+        var gameData = getGameData();
+        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
+            outCurrent = gameData.balance.out;
+    }
+
+    // Make sure the user has any out to sell
+    if(outCurrent <= 0) {
+        showDialog({
+            title: 'No ' + NameConfig.out.name,
+            message: 'You don\'t have any ' + NameConfig.out.name + ' to sell.<br><br>' +
+            'Please make some ' + NameConfig.out.name + ' using ' + NameConfig.factory.name + 's before coming back.'
+        });
+        return;
+    }
+
+    // Calculate the minimum and maximum amount of out and money
+    var outMin = 1;
+    var outMax = outCurrent;
+    var moneyMin = Math.round(shopData.outBuyPrice);
+    var moneyMax = Math.round(outMax * shopData.outBuyPrice);
+
     // Generate an unique field ID
-    var amountFieldId = generateUniqueId('amount-field');
+    const outFieldId = generateUniqueId('out-field');
+    const moneyFieldId = generateUniqueId('money-field');
+
+    // Determine the default in and money value
+    var outDefault = Math.round(outMax / 2);
+    var moneyDefault = Math.round(outDefault * shopData.outBuyPrice);
 
     // Show the dialog
     showDialog({
         title: 'Sell ' + NameConfig.out.name,
         message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
-        '<label for="' + amountFieldId + '">' + capitalizeFirst(NameConfig.out.name) + ':</label>' +
-        '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+        '<label for="' + outFieldId + '">Amount of ' + NameConfig.out.name + ':</label>' +
+        '<input type="range" name="' + outFieldId + '" id="' + outFieldId + '" value="' + outDefault + '" min="' + outMin + '" max="' + outMax + '" data-highlight="true">' +
+        '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
+        '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
                 text: 'Sell',
                 state: 'primary',
                 action: function() {
                     // Get the input field value
-                    var amount = $('#' + amountFieldId).val();
+                    const outAmount = parseInt($('#' + outFieldId).val());
 
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
                         shop: shopToken,
-                        amount: amount,
+                        outAmount: outAmount,
                         all: false
                     });
 
@@ -4909,7 +4941,7 @@ function showShopSellDialog(shopToken) {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_BUY_OUT, {
                         shop: shopToken,
-                        amount: 0,
+                        outAmount: 0,
                         all: true
                     });
 
@@ -4921,6 +4953,110 @@ function showShopSellDialog(shopToken) {
                 text: 'Goodbye'
             }
         ]
+    });
+
+    // Select the range sliders
+    const rangeOut = $('#' + outFieldId);
+    const rangeMoney = $('#' + moneyFieldId);
+
+    // Define whether the user is dragging a slider
+    var dragging = false;
+
+    // Update the dragging state when interacting with a slider
+    rangeOut.on('slidestart slidestop', function(event) {
+        dragging = event.type == 'slidestart';
+    });
+    rangeMoney.on('slidestart slidestop', function(event) {
+        dragging = event.type == 'slidestart';
+    });
+
+    // Remember the last amount of money and out
+    var moneyLast = moneyDefault;
+    var outLast = outDefault;
+
+    // Update the range sliders on change
+    rangeOut.on('change slidestop', function(event) {
+        // Get the current amount of out
+        var outCurrent = $(this).val();
+
+        // Set whether to update the in slider
+        var update = event.type == 'slidestop';
+
+        // Determine whether to increase the range by one step
+        if(!dragging && outLast != null && Math.abs(outCurrent - outLast) == 1 && shopData.outBuyPrice < 1) {
+            // Calculate the out delta
+            var outDelta = parseInt(outCurrent - outLast);
+
+            // Get the current amount of money
+            var moneyCurrent = parseInt(rangeMoney.val());
+
+            // Calculate the new amount of out based on the current money with the delta
+            outCurrent = Math.round((moneyCurrent + outDelta) / shopData.outBuyPrice);
+
+            // Force a slider update
+            update = true;
+        }
+
+        // Calculate the amount of money
+        var moneyAmount = Math.round(outCurrent / shopData.outBuyPrice);
+
+        // Update the money slider
+        rangeMoney.val(moneyAmount).slider('refresh');
+
+        // Update the last out and money value
+        outLast = outCurrent;
+        moneyLast = moneyAmount;
+
+        // Update the out slider if the event was called because we stopped dragging the slider
+        if(update) {
+            // Recalculate the out amount to round it
+            // TODO: Test whether we can use the 'outCurrent' variable value instead
+            var outAmount = Math.round(moneyAmount / shopData.outBuyPrice);
+
+            // Update the out slider
+            rangeOut.val(outAmount).slider('refresh');
+        }
+    });
+    rangeMoney.on('change slidestop', function(event) {
+        // Get the current amount of money
+        var moneyCurrent = $(this).val();
+
+        // Set whether to update the money slider
+        var update = event.type == 'slidestop';
+
+        // Determine whether to increase the range by one step
+        if(!dragging && moneyLast != null && Math.abs(outCurrent - outLast) == 1 && shopData.outBuyPrice > 1) {
+            // Calculate the money delta
+            var moneyDelta = parseInt(moneyCurrent - moneyLast);
+
+            // Get the current amount of out
+            var outCurrent = parseInt(rangeOut.val());
+
+            // Calculate the new amount of money based on the current in with the delta
+            moneyCurrent = Math.round((outCurrent + moneyDelta) * shopData.outBuyPrice);
+
+            // Force a slider update
+            update = true;
+        }
+
+        // Calculate the amount of out
+        var outAmount = Math.round(moneyCurrent / shopData.outBuyPrice);
+
+        // Update the out slider
+        rangeOut.val(outAmount).slider('refresh');
+
+        // Update the last out and money value
+        moneyLast = moneyCurrent;
+        outLast = outAmount;
+
+        // Update the money slider if the event was called because we stopped dragging the slider
+        if(update) {
+            // Recalculate the money amount to round it
+            var moneyAmount = Math.round(outAmount * shopData.outBuyPrice);
+
+            // Update the money slider
+            rangeMoney.val(moneyAmount).slider('refresh');
+        }
     });
 }
 
