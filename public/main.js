@@ -568,7 +568,7 @@ var Dworek = {
              */
             receivePacket: function(rawPacket, socket) {
                 // Do not process packets when disconnected
-                if(!Dworek.realtime._disconnected) {
+                if(Dworek.realtime._disconnected) {
                     // Show a status message, and return
                     console.log('Ignoring received packet because we we were disconnected for too long.');
                     return;
@@ -602,7 +602,7 @@ var Dworek = {
              */
             sendPacket: function(packetType, packet, socket) {
                 // Do not send packets when disconnected
-                if(!Dworek.realtime._disconnected) {
+                if(Dworek.realtime._disconnected) {
                     // Show a status message, and return
                     console.log('Not sending packet because we we were disconnected for too long.');
                     return;
