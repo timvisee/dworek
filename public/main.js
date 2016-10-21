@@ -4914,7 +4914,7 @@ function showShopSellDialog(shopToken) {
         message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
         '<label for="' + outFieldId + '">Amount of ' + NameConfig.out.name + ':</label>' +
         '<input type="range" name="' + outFieldId + '" id="' + outFieldId + '" value="' + outDefault + '" min="' + outMin + '" max="' + outMax + '" data-highlight="true">' +
-        '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
+        '<label for="' + moneyFieldId + '">Income in ' + NameConfig.currency.name + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
