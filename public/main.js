@@ -4909,6 +4909,7 @@ function showShopSellDialog(shopToken) {
     var moneyDefault = Math.round(outDefault * shopData.outBuyPrice);
 
     // Show the dialog
+    //noinspection JSCheckFunctionSignatures
     showDialog({
         title: 'Sell ' + NameConfig.out.name,
         message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
@@ -4998,7 +4999,7 @@ function showShopSellDialog(shopToken) {
         }
 
         // Calculate the amount of money
-        var moneyAmount = Math.round(outCurrent / shopData.outBuyPrice);
+        var moneyAmount = Math.round(outCurrent * shopData.outBuyPrice);
 
         // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
