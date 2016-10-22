@@ -4414,7 +4414,7 @@ function updateGameDataVisuals() {
                 '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-zoom-in"></i>&nbsp;' +
                 '                        View ' + NameConfig.factory.name + '' +
-            '                        </a>' +
+                '                    </a>' +
                 '                </div>' +
                 '            </div>' +
                 '        </div>' +
