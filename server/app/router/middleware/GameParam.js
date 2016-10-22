@@ -41,7 +41,7 @@ GameParam.attach = function(router) {
     // Game parameter parsing middleware
     router.param('game', function(req, res, next, game) {
         // Get the game ID
-        var gameId = req.param('game');
+        var gameId = req.params.game;
 
         // Validate the game ID
         Core.model.gameModelManager.getGameById(gameId, function(err, game) {
