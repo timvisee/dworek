@@ -5026,7 +5026,7 @@ function showShopSellDialog(shopToken) {
         var update = event.type == 'slidestop';
 
         // Determine whether to increase the range by one step
-        if(!dragging && moneyLast != null && Math.abs(outCurrent - outLast) == 1 && shopData.outBuyPrice > 1) {
+        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.outBuyPrice > 1) {
             // Calculate the money delta
             var moneyDelta = parseInt(moneyCurrent - moneyLast);
 
