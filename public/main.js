@@ -4681,16 +4681,16 @@ function showShopBuyDialog(shopToken) {
     // Determine the amount fo money the user has
     var moneyCurrent = 0;
     if(hasGameData()) {
-        var gameData = getGameData();
+        const gameData = getGameData();
         if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
             moneyCurrent = gameData.balance.money;
     }
 
     // Calculate the minimum and maximum amount of in and money
-    var inMin = 1;
-    var inMax = Math.floor(moneyCurrent / shopData.inSellPrice);
-    var moneyMin = Math.round(shopData.inSellPrice);
-    var moneyMax = Math.round(inMax * shopData.inSellPrice);
+    const inMin = 1;
+    const inMax = Math.floor(moneyCurrent / shopData.inSellPrice);
+    const moneyMin = Math.round(shopData.inSellPrice);
+    const moneyMax = Math.round(inMax * shopData.inSellPrice);
 
     // Make sure the user has enough money, show a dialog of the user doesn't have enough money
     if(moneyMax <= 0) {
@@ -4707,8 +4707,8 @@ function showShopBuyDialog(shopToken) {
     const moneyFieldId = generateUniqueId('money-field');
 
     // Determine the default money and in value
-    var inDefault = Math.round(inMax / 2);
-    var moneyDefault = Math.round(inDefault * shopData.inSellPrice);
+    const inDefault = Math.round(inMax / 2);
+    const moneyDefault = Math.round(inDefault * shopData.inSellPrice);
 
     // Show the dialog
     showDialog({
@@ -4724,7 +4724,7 @@ function showShopBuyDialog(shopToken) {
                 state: 'primary',
                 action: function() {
                     // Get the input field value
-                    var moneyAmount = parseInt($('#' + moneyFieldId).val());
+                    const moneyAmount = parseInt($('#' + moneyFieldId).val());
 
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
@@ -4787,10 +4787,10 @@ function showShopBuyDialog(shopToken) {
         // Determine whether to increase the range by one step
         if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice > 1) {
             // Calculate the in delta
-            var moneyDelta = parseInt(inCurrent - inLast);
+            const moneyDelta = parseInt(inCurrent - inLast);
 
             // Get the current amount of money
-            var moneyCurrent = parseInt(rangeMoney.val());
+            const moneyCurrent = parseInt(rangeMoney.val());
 
             // Calculate the new amount of in based on the current money with the delta
             inCurrent = Math.round((moneyCurrent + moneyDelta) * shopData.inSellPrice);
@@ -4800,7 +4800,7 @@ function showShopBuyDialog(shopToken) {
         }
 
         // Calculate the amount of money
-        var moneyAmount = Math.round(inCurrent / shopData.inSellPrice);
+        const moneyAmount = Math.round(inCurrent / shopData.inSellPrice);
 
         // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
@@ -4812,7 +4812,7 @@ function showShopBuyDialog(shopToken) {
         // Update the in slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the in amount to round it
-            var inAmount = Math.round(moneyAmount * shopData.inSellPrice);
+            const inAmount = Math.round(moneyAmount * shopData.inSellPrice);
 
             // Update the range sliders
             rangeIn.val(inAmount).slider('refresh');
@@ -4828,10 +4828,10 @@ function showShopBuyDialog(shopToken) {
         // Determine whether to increase the range by one step
         if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice < 1) {
             // Calculate the in delta
-            var inDelta = parseInt(moneyCurrent - moneyLast);
+            const inDelta = parseInt(moneyCurrent - moneyLast);
 
             // Get the current amount of in
-            var inCurrent = parseInt(rangeIn.val());
+            const inCurrent = parseInt(rangeIn.val());
 
             // Calculate the new amount of money based on the current in with the delta
             moneyCurrent = Math.round((inCurrent + inDelta) / shopData.inSellPrice);
@@ -4841,7 +4841,7 @@ function showShopBuyDialog(shopToken) {
         }
 
         // Calculate the amount of in
-        var inAmount = Math.round(moneyCurrent * shopData.inSellPrice);
+        const inAmount = Math.round(moneyCurrent * shopData.inSellPrice);
 
         // Update the in slider
         rangeIn.val(inAmount).slider('refresh');
@@ -4853,7 +4853,7 @@ function showShopBuyDialog(shopToken) {
         // Update the money slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the money amount to round it
-            var moneyAmount = Math.round(inAmount / shopData.inSellPrice);
+            const moneyAmount = Math.round(inAmount / shopData.inSellPrice);
 
             // Update the range sliders
             rangeMoney.val(moneyAmount).slider('refresh');
