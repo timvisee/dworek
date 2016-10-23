@@ -4879,7 +4879,7 @@ function showShopSellDialog(shopToken) {
     // Determine the amount of out the user has
     var outCurrent = 0;
     if(hasGameData()) {
-        var gameData = getGameData();
+        const gameData = getGameData();
         if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
             outCurrent = gameData.balance.out;
     }
@@ -4895,18 +4895,18 @@ function showShopSellDialog(shopToken) {
     }
 
     // Calculate the minimum and maximum amount of out and money
-    var outMin = 1;
-    var outMax = outCurrent;
-    var moneyMin = Math.round(shopData.outBuyPrice);
-    var moneyMax = Math.round(outMax * shopData.outBuyPrice);
+    const outMin = 1;
+    const outMax = outCurrent;
+    const moneyMin = Math.round(shopData.outBuyPrice);
+    const moneyMax = Math.round(outMax * shopData.outBuyPrice);
 
     // Generate an unique field ID
     const outFieldId = generateUniqueId('out-field');
     const moneyFieldId = generateUniqueId('money-field');
 
     // Determine the default in and money value
-    var outDefault = Math.round(outMax / 2);
-    var moneyDefault = Math.round(outDefault * shopData.outBuyPrice);
+    const outDefault = Math.round(outMax / 2);
+    const moneyDefault = Math.round(outDefault * shopData.outBuyPrice);
 
     // Show the dialog
     //noinspection JSCheckFunctionSignatures
@@ -4986,10 +4986,10 @@ function showShopSellDialog(shopToken) {
         // Determine whether to increase the range by one step
         if(!dragging && outLast != null && Math.abs(outCurrent - outLast) == 1 && shopData.outBuyPrice < 1) {
             // Calculate the out delta
-            var outDelta = parseInt(outCurrent - outLast);
+            const outDelta = parseInt(outCurrent - outLast);
 
             // Get the current amount of money
-            var moneyCurrent = parseInt(rangeMoney.val());
+            const moneyCurrent = parseInt(rangeMoney.val());
 
             // Calculate the new amount of out based on the current money with the delta
             outCurrent = Math.round((moneyCurrent + outDelta) / shopData.outBuyPrice);
@@ -4999,7 +4999,7 @@ function showShopSellDialog(shopToken) {
         }
 
         // Calculate the amount of money
-        var moneyAmount = Math.round(outCurrent * shopData.outBuyPrice);
+        const moneyAmount = Math.round(outCurrent * shopData.outBuyPrice);
 
         // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
@@ -5012,7 +5012,7 @@ function showShopSellDialog(shopToken) {
         if(update) {
             // Recalculate the out amount to round it
             // TODO: Test whether we can use the 'outCurrent' variable value instead
-            var outAmount = Math.round(moneyAmount / shopData.outBuyPrice);
+            const outAmount = Math.round(moneyAmount / shopData.outBuyPrice);
 
             // Update the out slider
             rangeOut.val(outAmount).slider('refresh');
@@ -5028,10 +5028,10 @@ function showShopSellDialog(shopToken) {
         // Determine whether to increase the range by one step
         if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.outBuyPrice > 1) {
             // Calculate the money delta
-            var moneyDelta = parseInt(moneyCurrent - moneyLast);
+            const moneyDelta = parseInt(moneyCurrent - moneyLast);
 
             // Get the current amount of out
-            var outCurrent = parseInt(rangeOut.val());
+            const outCurrent = parseInt(rangeOut.val());
 
             // Calculate the new amount of money based on the current in with the delta
             moneyCurrent = Math.round((outCurrent + moneyDelta) * shopData.outBuyPrice);
@@ -5041,7 +5041,7 @@ function showShopSellDialog(shopToken) {
         }
 
         // Calculate the amount of out
-        var outAmount = Math.round(moneyCurrent / shopData.outBuyPrice);
+        const outAmount = Math.round(moneyCurrent / shopData.outBuyPrice);
 
         // Update the out slider
         rangeOut.val(outAmount).slider('refresh');
@@ -5053,7 +5053,7 @@ function showShopSellDialog(shopToken) {
         // Update the money slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the money amount to round it
-            var moneyAmount = Math.round(outAmount * shopData.outBuyPrice);
+            const moneyAmount = Math.round(outAmount * shopData.outBuyPrice);
 
             // Update the money slider
             rangeMoney.val(moneyAmount).slider('refresh');
