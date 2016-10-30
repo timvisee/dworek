@@ -4738,7 +4738,7 @@ function showShopBuyDialog(shopToken) {
                 }
             },
             {
-                text: 'Full buy',
+                text: 'Buy all',
                 action: function() {
                     // Send a packet to the server
                     Dworek.realtime.packetProcessor.sendPacket(PacketType.SHOP_SELL_IN, {
