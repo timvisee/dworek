@@ -4748,7 +4748,7 @@ function showShopBuyDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Full buying ' + NameConfig.in.name + '...');
+                    showNotification('Buying all ' + NameConfig.in.name + '...');
                 }
             },
             {
