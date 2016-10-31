@@ -4757,9 +4757,9 @@ function showShopBuyDialog(shopToken) {
         ]
     });
 
-    // Select the range sliders
-    const rangeMoney = $('#' + inFieldId);
-    const rangeIn = $('#' + moneyFieldId);
+    // Get the range slider elements
+    const rangeMoney = $('#' + moneyFieldId);
+    const rangeIn = $('#' + inFieldId);
 
     // Define whether the user is dragging a slider
     var dragging = false;
@@ -4785,22 +4785,22 @@ function showShopBuyDialog(shopToken) {
         var update = event.type == 'slidestop';
 
         // Determine whether to increase the range by one step
-        if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice > 1) {
+        if(!dragging && inLast != null && Math.abs(inCurrent - inLast) == 1 && shopData.inSellPrice < 1) {
             // Calculate the in delta
-            const moneyDelta = parseInt(inCurrent - inLast);
+            const inDelta = parseInt(inCurrent - inLast);
 
             // Get the current amount of money
             const moneyCurrent = parseInt(rangeMoney.val());
 
             // Calculate the new amount of in based on the current money with the delta
-            inCurrent = Math.round((moneyCurrent + moneyDelta) * shopData.inSellPrice);
+            inCurrent = Math.round((moneyCurrent + inDelta) / shopData.inSellPrice);
 
             // Force a slider update
             update = true;
         }
 
         // Calculate the amount of money
-        const moneyAmount = Math.round(inCurrent / shopData.inSellPrice);
+        const moneyAmount = Math.round(inCurrent * shopData.inSellPrice);
 
         // Update the money slider
         rangeMoney.val(moneyAmount).slider('refresh');
@@ -4812,7 +4812,7 @@ function showShopBuyDialog(shopToken) {
         // Update the in slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the in amount to round it
-            const inAmount = Math.round(moneyAmount * shopData.inSellPrice);
+            const inAmount = Math.round(moneyAmount / shopData.inSellPrice);
 
             // Update the range sliders
             rangeIn.val(inAmount).slider('refresh');
@@ -4826,22 +4826,22 @@ function showShopBuyDialog(shopToken) {
         var update = event.type == 'slidestop';
 
         // Determine whether to increase the range by one step
-        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice < 1) {
+        if(!dragging && moneyLast != null && Math.abs(moneyCurrent - moneyLast) == 1 && shopData.inSellPrice > 1) {
             // Calculate the in delta
-            const inDelta = parseInt(moneyCurrent - moneyLast);
+            const moneyDelta = parseInt(moneyCurrent - moneyLast);
 
             // Get the current amount of in
             const inCurrent = parseInt(rangeIn.val());
 
             // Calculate the new amount of money based on the current in with the delta
-            moneyCurrent = Math.round((inCurrent + inDelta) / shopData.inSellPrice);
+            moneyCurrent = Math.round((inCurrent + moneyDelta) * shopData.inSellPrice);
 
             // Force a slider update
             update = true;
         }
 
         // Calculate the amount of in
-        const inAmount = Math.round(moneyCurrent * shopData.inSellPrice);
+        const inAmount = Math.round(moneyCurrent / shopData.inSellPrice);
 
         // Update the in slider
         rangeIn.val(inAmount).slider('refresh');
@@ -4853,7 +4853,7 @@ function showShopBuyDialog(shopToken) {
         // Update the money slider if the event was called because we stopped dragging the slider
         if(update) {
             // Recalculate the money amount to round it
-            const moneyAmount = Math.round(inAmount / shopData.inSellPrice);
+            const moneyAmount = Math.round(inAmount * shopData.inSellPrice);
 
             // Update the range sliders
             rangeMoney.val(moneyAmount).slider('refresh');
@@ -4956,7 +4956,7 @@ function showShopSellDialog(shopToken) {
         ]
     });
 
-    // Select the range sliders
+    // Get the range slider elements
     const rangeOut = $('#' + outFieldId);
     const rangeMoney = $('#' + moneyFieldId);
 
