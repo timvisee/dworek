@@ -4758,8 +4758,8 @@ function showShopBuyDialog(shopToken) {
     });
 
     // Get the range slider elements
-    const rangeMoney = $('#' + moneyFieldId);
     const rangeIn = $('#' + inFieldId);
+    const rangeMoney = $('#' + moneyFieldId);
 
     // Define whether the user is dragging a slider
     var dragging = false;
@@ -4773,8 +4773,8 @@ function showShopBuyDialog(shopToken) {
     });
 
     // Remember the last amount of money and in
-    var moneyLast = moneyDefault;
     var inLast = inDefault;
+    var moneyLast = moneyDefault;
 
     // Update the range sliders on change
     rangeIn.on('change slidestop', function(event) {
@@ -4972,8 +4972,8 @@ function showShopSellDialog(shopToken) {
     });
 
     // Remember the last amount of money and out
-    var moneyLast = moneyDefault;
     var outLast = outDefault;
+    var moneyLast = moneyDefault;
 
     // Update the range sliders on change
     rangeOut.on('change slidestop', function(event) {
