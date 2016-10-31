@@ -645,7 +645,7 @@ GameUserModel.prototype.getOut = function(callback) {
 /**
  * Called with the result or when an error occurred.
  *
- * @callback GameModel~getGoodsCallback
+ * @callback GameUserModel~getGoodsCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number} Goods.
  */
