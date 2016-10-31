@@ -229,7 +229,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                     // TODO: Get the out and money name from the name configuration of the current game
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: false,
-                                        message: 'Sold ' + outAmount + ' drugs for $' + moneyAmount,
+                                        message: 'Sold ' + outAmount + ' drug' + (outAmount == 1 ? '' : 's') + ' for $' + moneyAmount,
                                         dialog: false,
                                         toast: true
                                     }, socket);

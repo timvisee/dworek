@@ -230,7 +230,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                     // TODO: Get the in and money name from the name configuration of the current game
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: false,
-                                        message: 'Bought ' + inAmount + ' ingredients for $' + moneyAmount,
+                                        message: 'Bought ' + inAmount + ' ingredient' + (inAmount == 1 ? '' : 's') + ' for $' + moneyAmount,
                                         dialog: false,
                                         toast: true
                                     }, socket);
