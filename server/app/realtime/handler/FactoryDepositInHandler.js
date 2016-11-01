@@ -267,9 +267,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                 }
 
                                                 // Get the user's balance table
-                                                liveUser.getBalanceTable(function(err, balanceTable) {
+                                                liveUser.getBalanceTable(null, function (err, balanceTable) {
                                                     // Handle errors
-                                                    if(err !== null) {
+                                                    if (err !== null) {
                                                         console.error(err);
                                                         console.error('Failed to send transaction success');
                                                         return;

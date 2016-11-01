@@ -988,9 +988,17 @@ User.prototype.isVisibleFor = function(other, callback) {
  * Get the user's balance table as HTML.
  * This results in a table showing the user's current money, in and out balance.
  *
+ * @param {Object|null} options Object with options, or null to skip any options.
+ * @param {Number} [options.previousMoney] Previous amount of money to show in brackets.
+ * @param {Number} [options.previousIn] Previous amount of in to show in brackets.
+ * @param {Number} [options.previousOut] Previous amount of out to show in brackets.
  * @param {User~getBalanceTableCallback} callback
  */
-User.prototype.getBalanceTable = function(callback) {
+User.prototype.getBalanceTable = function (options, callback) {
+    // Parse the options
+    if(options === null || options === undefined)
+        options = {};
+
     // Create a callback latch
     const latch = new CallbackLatch();
 
@@ -1065,15 +1073,15 @@ User.prototype.getBalanceTable = function(callback) {
                     '<table>' +
                     '    <tr>' +
                     '        <td><i>Money:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userMoney + ' dollars</td>' +
+                    '        <td>' + userMoney + ' dollars' + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> (' + options.previousMoney + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userIn + ' units</td>' +
+                    '        <td>' + userIn + ' units' + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + options.previousIn + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userOut + ' units</td>' +
+                    '        <td>' + userOut + ' units' + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + options.previousOut + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '</table>'
             );

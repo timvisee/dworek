@@ -226,9 +226,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                     });
 
                                     // Get the user's balance table
-                                    liveUser.getBalanceTable(function(err, balanceTable) {
+                                    liveUser.getBalanceTable(null, function (err, balanceTable) {
                                         // Call back errors
-                                        if(err !== null)
+                                        if (err !== null)
                                             callbackError();
 
                                         // Send a notification to the user
