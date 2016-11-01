@@ -114,6 +114,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
+        // Callback errors
         if(err !== null) {
             callbackError();
             return;
@@ -124,6 +125,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
         // Get the game
         factoryModel.getGame(function(err, game) {
+            // Callback errors
             if(err !== null) {
                 callbackError();
                 return;
@@ -131,18 +133,21 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
             // Get the game user
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+                // Callback errors
                 if(err !== null) {
                     callbackError();
                     return;
                 }
 
                 Core.gameController.getGame(game, function(err, liveGame) {
+                    // Callback errors
                     if(err !== null || liveGame == null) {
                         callbackError();
                         return;
                     }
 
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
+                        // Callback errors
                         if(err !== null || liveFactory == null) {
                             callbackError();
                             return;
@@ -150,11 +155,13 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                         // Make sure the user has right to modify this factory
                         liveFactory.canModify(user, function(err, canModify) {
+                            // Callback errors
                             if(err !== null) {
                                 callbackError();
                                 return;
                             }
 
+                            // Make sure the user has rights to modify the factory
                             if(!canModify) {
                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                     error: true,
@@ -166,6 +173,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                             // Get the amount of in the user has
                             gameUser.getIn(function(err, userIn) {
+                                // Callback errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
@@ -209,6 +217,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                 // Decrease the in of the user
                                 gameUser.setIn(userIn - depositAmount, function(err) {
+                                    // Callback errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
@@ -216,6 +225,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                     // Get the current in amount of the factory model
                                     factoryModel.getIn(function(err, factoryIn) {
+                                        // Callback errors
                                         if(err !== null) {
                                             callbackError();
                                             return;
@@ -223,6 +233,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                         // Update the in amount for the factory
                                         factoryModel.setIn(factoryIn + depositAmount, function(err) {
+                                            // Callback errors
                                             if(err !== null) {
                                                 callbackError();
                                                 return;
@@ -230,6 +241,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                             // Send updated game data to the user
                                             Core.gameController.sendGameData(game, user, undefined, function(err) {
+                                                // Handle errors
                                                 if(err !== null) {
                                                     console.error(err);
                                                     console.error('Failed to broadcast factory data');
@@ -238,19 +250,42 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                                             // Broadcast the factory data, since it's updated
                                             liveFactory.broadcastData(function(err) {
+                                                // Handle errors
                                                 if(err !== null) {
                                                     console.error(err);
                                                     console.error('Failed to broadcast factory data');
                                                 }
                                             });
 
-                                            // Send a notification to the user
-                                            Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                                error: false,
-                                                message: 'Transaction succeed!',
-                                                dialog: false,
-                                                toast: true
-                                            }, socket);
+                                            // Get the live user instance
+                                            liveGame.getUser(user, function(err, liveUser) {
+                                                // Handle errors
+                                                if(err !== null) {
+                                                    console.error(err);
+                                                    console.error('Failed to send transaction success');
+                                                    return;
+                                                }
+
+                                                // Get the user's balance table
+                                                liveUser.getBalanceTable(function(err, balanceTable) {
+                                                    // Handle errors
+                                                    if(err !== null) {
+                                                        console.error(err);
+                                                        console.error('Failed to send transaction success');
+                                                        return;
+                                                    }
+
+                                                    // Send a notification to the user
+                                                    // TODO: Get the in name from the game's name configuration
+                                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                                        error: false,
+                                                        message: 'Deposited ' + depositAmount + ' ingredient' + (depositAmount == 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                        dialog: false,
+                                                        toast: true,
+                                                        ttl: 10 * 1000
+                                                    }, socket);
+                                                });
+                                            });
                                         });
                                     });
                                 });
