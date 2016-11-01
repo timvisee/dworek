@@ -985,6 +985,110 @@ User.prototype.isVisibleFor = function(other, callback) {
  */
 
 /**
+ * Get the user's balance table as HTML.
+ * This results in a table showing the user's current money, in and out balance.
+ *
+ * @param {User~getBalanceTableCallback} callback
+ */
+User.prototype.getBalanceTable = function(callback) {
+    // Create a callback latch
+    const latch = new CallbackLatch();
+
+    // Determine whether we called back
+    var calledBack = false;
+
+    // Create a variable for the user's money, in and out
+    var userMoney;
+    var userIn;
+    var userOut;
+
+    // Get the user's money
+    latch.add();
+    this.getMoney(function(err, money) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the user money
+        userMoney = money;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the user's in
+    latch.add();
+    this.getIn(function(err, result) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the user's in
+        userIn = result;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the user's out
+    latch.add();
+    this.getOut(function(err, out) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the user's out
+        userOut = out;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Call back the table when we fetched the required information
+    latch.then(function() {
+        // Build and call back the table
+        if(!calledBack)
+            // TODO: Get the money, in and out names from the game's game configuration
+            callback(null,
+                    '<table>' +
+                    '    <tr>' +
+                    '        <td><i>Money:</i>&nbsp;&nbsp;</td>' +
+                    '        <td>' + userMoney + ' dollars</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
+                    '        <td>' + userIn + ' units</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
+                    '        <td>' + userOut + ' units</td>' +
+                    '    </tr>' +
+                    '</table>'
+            );
+    });
+};
+
+/**
+ * Called with the user's balance table, or when an error occurred.
+ *
+ * @callback User~getBalanceTableCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {string=} String with the balance table as HTML.
+ */
+
+/**
  * Get the user as a string.
  *
  * @return {String} String representation.
