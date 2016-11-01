@@ -471,7 +471,7 @@ GameUserModel.prototype.getMoney = function(callback) {
 /**
  * Called with the result or when an error occurred.
  *
- * @callback GameModel~getMoneyCallback
+ * @callback GameUserModel~getMoneyCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number} Money.
  */

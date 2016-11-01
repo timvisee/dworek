@@ -225,14 +225,81 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                         }
                                     });
 
-                                    // Send a notification to the user
-                                    // TODO: Get the out and money name from the name configuration of the current game
-                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                        error: false,
-                                        message: 'Sold ' + outAmount + ' drug' + (outAmount == 1 ? '' : 's') + ' for $' + moneyAmount,
-                                        dialog: false,
-                                        toast: true
-                                    }, socket);
+                                    // Create a callback latch
+                                    const latch = new CallbackLatch();
+
+                                    // Create a variable for the user's money, in and out
+                                    var userMoney;
+                                    var userIn;
+                                    var userOut;
+
+                                    // Get the user's money
+                                    latch.add();
+                                    gameUser.getMoney(function(err, money) {
+                                        // Call back errors
+                                        if(err !== null)
+                                            callbackError();
+
+                                        // Set the user money
+                                        userMoney = money;
+
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
+
+                                    // Get the user's in
+                                    latch.add();
+                                    gameUser.getIn(function(err, result) {
+                                        // Call back errors
+                                        if(err !== null)
+                                            callbackError();
+
+                                        // Set the user's in
+                                        userIn = result;
+
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
+
+                                    // Get the user's out
+                                    latch.add();
+                                    gameUser.getOut(function(err, out) {
+                                        // Call back errors
+                                        if(err !== null)
+                                            callbackError();
+
+                                        // Set the user's out
+                                        userOut = out;
+
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
+
+                                    // Send a notification to the user if all required details are fetched
+                                    latch.then(function() {
+                                        // Send a notification to the user
+                                        // TODO: Get the in and money name from the name configuration of the current game
+                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                            error: false,
+                                            message: 'Sold ' + outAmount + ' drug' + (outAmount == 1 ? '' : 's') + ' for $' + moneyAmount + '.<br><br>' +
+                                            '<table>' +
+                                            '    <tr>' +
+                                            '        <td><i>Money:</i>&nbsp;&nbsp;</td>' +
+                                            '        <td>' + userMoney + ' dollars</td>' +
+                                            '    </tr>' +
+                                            '    <tr>' +
+                                            '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
+                                            '        <td>' + userIn + '</td>' +
+                                            '    </tr>' +
+                                            '    <tr>' +
+                                            '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
+                                            '        <td>' + userOut + '</td>' +
+                                            '    </tr>' +
+                                            '</table>',
+                                            dialog: false,
+                                            toast: true
+                                        }, socket);
+                                    });
                                 });
                             });
                         });
