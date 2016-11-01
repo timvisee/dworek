@@ -589,6 +589,59 @@ FactoryModel.prototype.setIn = function(value, callback) {
 };
 
 /**
+ * Add in to the factory.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {FactoryModel~addInCallback} callback Called back on success or when an error occurred.
+ */
+FactoryModel.prototype.addIn = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid in amount.'));
+        return;
+    }
+
+    // Store this instance
+    const self = this;
+
+    // Get the current in value
+    this.getIn(function(err, current) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the in
+        self.setIn(current + amount, callback);
+    });
+};
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback GameUserModel~addInCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract in from the factory.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {FactoryModel~subtractInCallback} callback Called back on success or when an error occurred.
+ */
+FactoryModel.prototype.subtractIn = function(amount, callback) {
+    this.addIn(-amount, callback);
+};
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback FactoryModel~subtractInCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
  * Get the out of the factory.
  *
  * @param {FactoryModel~getOutCallback} callback Called with in or when an error occurred.
@@ -614,6 +667,59 @@ FactoryModel.prototype.getOut = function(callback) {
 FactoryModel.prototype.setOut = function(value, callback) {
     this.setField('out', value, callback);
 };
+
+/**
+ * Add out to the factory.
+ *
+ * @param {Number} amount Amount to add.
+ * @param {FactoryModel~addOutCallback} callback Called back on success or when an error occurred.
+ */
+FactoryModel.prototype.addOut = function(amount, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(amount === null || isNaN(amount) || amount === Infinity) {
+        callback(new Error('Invalid out amount.'));
+        return;
+    }
+
+    // Store this instance
+    const self = this;
+
+    // Get the current out value
+    this.getOut(function(err, current) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Set the out
+        self.setOut(current + amount, callback);
+    });
+};
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback FactoryModel~addOutCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Subtract out from the factory.
+ *
+ * @param {Number} amount Amount to subtract.
+ * @param {FactoryModel~subtractOutCallback} callback Called back on success or when an error occurred.
+ */
+FactoryModel.prototype.subtractOut = function(amount, callback) {
+    this.addOut(-amount, callback);
+};
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback FactoryModel~subtractOutCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
 
 /**
  * Get the live factory instance for this factory.

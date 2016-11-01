@@ -216,7 +216,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // Decrease the in of the user
-                                gameUser.setIn(userIn - depositAmount, function(err) {
+                                gameUser.subtractIn(depositAmount, function(err) {
                                     // Callback errors
                                     if(err !== null) {
                                         callbackError();
@@ -231,8 +231,8 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                             return;
                                         }
 
-                                        // Update the in amount for the factory
-                                        factoryModel.setIn(factoryIn + depositAmount, function(err) {
+                                        // Deposit the in to the factory
+                                        factoryModel.addIn(depositAmount, function(err) {
                                             // Callback errors
                                             if(err !== null) {
                                                 callbackError();

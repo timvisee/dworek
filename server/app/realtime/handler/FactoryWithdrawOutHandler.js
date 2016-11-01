@@ -214,8 +214,8 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                     return;
                                 }
 
-                                // Decrease the in of the factory
-                                factoryModel.setOut(factoryOut - withdrawAmount, function(err) {
+                                // Withdraw the out from the factory
+                                factoryModel.subtractOut(withdrawAmount, function(err) {
                                     // Callback errors
                                     if(err !== null) {
                                         callbackError();
@@ -231,7 +231,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Update the out amount for the user
-                                        gameUser.setOut(userOut + withdrawAmount, function(err) {
+                                        gameUser.addOut(withdrawAmount, function(err) {
                                             // Callback errors
                                             if(err !== null) {
                                                 callbackError();
