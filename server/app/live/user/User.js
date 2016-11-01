@@ -760,6 +760,72 @@ User.prototype.setIn = function(goods, callback) {
  */
 
 /**
+ * Get the user's out.
+ *
+ * @param {User~getOutCallback} callback Called with the result or when an error occurred.
+ */
+User.prototype.getOut = function(callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.getOut(callback);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback User~getOutCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number} Amount of out.
+ */
+
+/**
+ * Set the user's out value.
+ *
+ * @param {Number} goods Number of out.
+ * @param {User~setOutCallback} callback Called on success or when an error occurred.
+ */
+User.prototype.setOut = function(goods, callback) {
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Make sure the game user is valid
+        if(gameUser == null) {
+            callback(null, null);
+            return;
+        }
+
+        // Get the goods
+        gameUser.setOut(goods, callback);
+    });
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback User~setOutCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ */
+
+/**
  * Check whether this user is visible for the given user.
  *
  * @param {User} other Given user.
