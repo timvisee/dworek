@@ -267,7 +267,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                 }
 
                                                 // Get the user's balance table
-                                                liveUser.getBalanceTable(null, function (err, balanceTable) {
+                                                liveUser.getBalanceTable({
+                                                    previousIn: userIn,
+                                                }, function (err, balanceTable) {
                                                     // Handle errors
                                                     if (err !== null) {
                                                         console.error(err);

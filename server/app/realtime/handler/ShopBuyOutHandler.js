@@ -153,7 +153,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                         // Get the price
                         const price = liveShop.getOutBuyPrice();
 
-                        // The the amount of out the user has
+                        // The the current amount of out the user has
                         gameUser.getOut(function(err, outCurrent) {
                             // Call back errors
                             if(err !== null) {
@@ -161,85 +161,97 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                 return;
                             }
 
-                            // Determine the amount of out to deposit
-                            var outAmount = 0;
-
-                            // Check whether we should use the maximum possible amount
-                            if(rawAll === true)
-                                outAmount = outCurrent;
-                            else
-                                // Parse the raw amount
-                                outAmount = parseInt(rawOutAmount);
-
-                            // Make sure the amount isn't above the maximum
-                            if(outAmount > outCurrent) {
-                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                    error: true,
-                                    message: 'Failed to sell, you don\'t have this much goods available.',
-                                    dialog: true
-                                }, socket);
-                                return;
-                            }
-
-                            // Make sure the amount isn't below zero
-                            if(outAmount < 0) {
-                                callbackError();
-                                return;
-                            }
-
-                            // Make the sure the amount isn't zero
-                            if(outAmount == 0) {
-                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                    error: true,
-                                    message: '<i>You can\'t sell no nothin\'.</i>',
-                                    dialog: true
-                                }, socket);
-                                return;
-                            }
-
-                            // Subtract the out from the user's out balance
-                            gameUser.subtractOut(outAmount, function(err) {
+                            // Get the current amount of money the user has
+                            gameUser.getMoney(function(err, moneyCurrent) {
                                 // Call back errors
                                 if(err !== null) {
                                     callbackError();
                                     return;
                                 }
 
-                                // Calculate the income
-                                const moneyAmount = Math.round(outAmount * price);
+                                // Determine the amount of out to deposit
+                                var outAmount = 0;
 
-                                // Add the income to the user's money balance
-                                gameUser.addMoney(moneyAmount, function(err) {
+                                // Check whether we should use the maximum possible amount
+                                if(rawAll === true)
+                                    outAmount = outCurrent;
+                                else
+                                // Parse the raw amount
+                                    outAmount = parseInt(rawOutAmount);
+
+                                // Make sure the amount isn't above the maximum
+                                if(outAmount > outCurrent) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Failed to sell, you don\'t have this much goods available.',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
+
+                                // Make sure the amount isn't below zero
+                                if(outAmount < 0) {
+                                    callbackError();
+                                    return;
+                                }
+
+                                // Make the sure the amount isn't zero
+                                if(outAmount == 0) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: '<i>You can\'t sell no nothin\'.</i>',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
+
+                                // Subtract the out from the user's out balance
+                                gameUser.subtractOut(outAmount, function(err) {
                                     // Call back errors
                                     if(err !== null) {
                                         callbackError();
                                         return;
                                     }
 
-                                    // Send updated game data to the user
-                                    Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
-                                        // Handle errors
-                                        if(err !== null) {
-                                            console.error(err);
-                                            console.error('Failed to send game data');
-                                        }
-                                    });
+                                    // Calculate the income
+                                    const moneyAmount = Math.round(outAmount * price);
 
-                                    // Get the user's balance table
-                                    liveUser.getBalanceTable(null, function (err, balanceTable) {
+                                    // Add the income to the user's money balance
+                                    gameUser.addMoney(moneyAmount, function(err) {
                                         // Call back errors
-                                        if (err !== null)
+                                        if(err !== null) {
                                             callbackError();
+                                            return;
+                                        }
 
-                                        // Send a notification to the user
-                                        // TODO: Get the in and money name from the name configuration of the current game
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: false,
-                                            message: 'Sold ' + outAmount + ' drug' + (outAmount == 1 ? '' : 's') + ' for $' + moneyAmount + '.<br><br>' + balanceTable,
-                                            dialog: false,
-                                            toast: true,
-                                            ttl: 10 * 1000
-                                        }, socket);
+                                        // Send updated game data to the user
+                                        Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
+                                            // Handle errors
+                                            if(err !== null) {
+                                                console.error(err);
+                                                console.error('Failed to send game data');
+                                            }
+                                        });
+
+                                        // Get the user's balance table
+                                        liveUser.getBalanceTable({
+                                            previousMoney: moneyCurrent,
+                                            previousOut: outCurrent,
+                                        }, function(err, balanceTable) {
+                                            // Call back errors
+                                            if (err !== null)
+                                                callbackError();
+
+                                            // Send a notification to the user
+                                            // TODO: Get the in and money name from the name configuration of the current game
+                                            Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                                error: false,
+                                                message: 'Sold ' + outAmount + ' drug' + (outAmount == 1 ? '' : 's') + ' for $' + moneyAmount + '.<br><br>' + balanceTable,
+                                                dialog: false,
+                                                toast: true,
+                                                ttl: 10 * 1000
+                                            }, socket);
+                                        });
                                     });
                                 });
                             });
