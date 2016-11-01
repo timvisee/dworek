@@ -298,7 +298,8 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             '    </tr>' +
                                             '</table>',
                                             dialog: false,
-                                            toast: true
+                                            toast: true,
+                                            ttl: 10 * 1000
                                         }, socket);
                                     });
                                 });

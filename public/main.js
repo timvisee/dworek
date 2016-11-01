@@ -1036,6 +1036,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     const error = packet.hasOwnProperty('error') ? !!packet.error : false;
     const dialog = packet.hasOwnProperty('dialog') && !!packet.dialog;
     const toast = packet.hasOwnProperty('toast') && !!packet.toast;
+    const ttl = packet.hasOwnProperty('ttl') ? parseInt(packet.ttl) : undefined;
 
     // Show a dialog
     if(dialog) {
@@ -1053,12 +1054,19 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
 
     // Show a toast notification
     if(toast || (!dialog && !toast)) {
-        // Show a toast notification
-        showNotification(message, {
+        // Create the notification object
+        var notificationObject = {
             action: {
                 text: 'Close'
             }
-        });
+        };
+
+        // Set the TTL
+        if(ttl !== undefined)
+            notificationObject.ttl = ttl;
+
+        // Show a toast notification
+        showNotification(message, notificationObject);
     }
 });
 

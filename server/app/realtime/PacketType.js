@@ -68,6 +68,7 @@ module.exports = {
      * - error: true if this is an error message, false if not
      * - [dialog]: true to show a dialog, false to not
      * - [toast]: true to show a toast notification, false to not
+     * - [ttl]: time to live of toast notification in milliseconds.
      */
     MESSAGE_RESPONSE: 4,
 
