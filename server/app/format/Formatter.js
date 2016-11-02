@@ -64,7 +64,8 @@ Formatter.formatMoney = function(amount, prefixSign) {
     amount = Formatter.formatBigNumber(amount);
 
     // Return the number, prefix the money sign if specified
-    return (prefixSign ? NameConfig.currency.sign : '') + amount;
+    // TODO: Get the money sign from the name configuration of the current game!
+    return (prefixSign ? '$' : '') + amount;
 };
 
 /**

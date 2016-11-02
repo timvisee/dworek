@@ -28,6 +28,7 @@ var config = require('../../../config');
 var Core = require('../../../Core');
 var UserModel = require('../../model/user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
+var Formatter = require('../../format/Formatter');
 
 /**
  * User class.
@@ -1073,15 +1074,15 @@ User.prototype.getBalanceTable = function (options, callback) {
                     '<table>' +
                     '    <tr>' +
                     '        <td><i>Money:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userMoney + ' dollars' + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> (' + options.previousMoney + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatMoney(userMoney) + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatMoney(options.previousMoney) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userIn + ' units' + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + options.previousIn + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatBigNumber(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatBigNumber(options.previousIn) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + userOut + ' units' + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + options.previousOut + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatBigNumber(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatBigNumber(options.previousOut) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '</table>'
             );
