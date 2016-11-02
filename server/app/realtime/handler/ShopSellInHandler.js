@@ -26,6 +26,7 @@ var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 var Coordinate = require('../../coordinate/Coordinate');
 var CallbackLatch = require('../../util/CallbackLatch');
+var Formatter = require("../../format/Formatter.js");
 
 /**
  * Type of packets to handle by this handler.
@@ -247,7 +248,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the in and money name from the name configuration of the current game
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Bought ' + inAmount + ' ingredient' + (inAmount == 1 ? '' : 's') + ' for $' + moneyAmount + '.<br><br>' + balanceTable,
+                                                message: 'Bought ' + Formatter.formatGoods(inAmount) + ' ingredient' + (inAmount == 1 ? '' : 's') + ' for ' + Formatter.formatGoods(moneyAmount) + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

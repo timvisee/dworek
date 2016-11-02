@@ -26,6 +26,7 @@ var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 var Coordinate = require('../../coordinate/Coordinate');
 var CallbackLatch = require('../../util/CallbackLatch');
+var Formatter = require('../../format/Formatter');
 
 /**
  * Type of packets to handle by this handler.
@@ -281,7 +282,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                                                     // TODO: Get the in name from the game's name configuration
                                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                         error: false,
-                                                        message: 'Deposited ' + depositAmount + ' ingredient' + (depositAmount == 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                        message: 'Deposited ' + Formatter.formatGoods(depositAmount) + ' ingredient' + (depositAmount == 1 ? '' : 's') + '.<br><br>' + balanceTable,
                                                         dialog: false,
                                                         toast: true,
                                                         ttl: 10 * 1000
