@@ -1078,11 +1078,11 @@ User.prototype.getBalanceTable = function (options, callback) {
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + Formatter.formatBigNumber(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatBigNumber(options.previousIn) + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatGoods(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousIn) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
                     '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + Formatter.formatBigNumber(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatBigNumber(options.previousOut) + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatGoods(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousOut) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '</table>'
             );
