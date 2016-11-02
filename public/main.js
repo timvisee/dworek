@@ -5661,6 +5661,7 @@ function formatMoney(amount, prefixSign) {
         prefixSign = true;
 
     // Format the amount of money
+    //noinspection JSValidateTypes
     amount = formatBigNumber(amount);
 
     // Return the number, prefix the money sign if specified
