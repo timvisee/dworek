@@ -75,7 +75,7 @@ Formatter.formatMoney = function(amount, prefixSign) {
  * @returns {string} Formatted amount of goods.
  */
 Formatter.formatGoods = function(amount) {
-    return formatBigNumber(amount);
+    return Formatter.formatBigNumber(amount);
 };
 
 // Export the class
