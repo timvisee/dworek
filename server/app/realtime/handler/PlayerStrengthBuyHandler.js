@@ -41,7 +41,7 @@ const HANDLER_PACKET_TYPE = PacketType.PLAYER_STRENGTH_BUY;
  * @class
  * @constructor
  */
-var GameChangeStageHandler = function(init) {
+var PlayerStrengthBuyHandler = function(init) {
     // Initialize
     if(init)
         this.init();
@@ -50,7 +50,7 @@ var GameChangeStageHandler = function(init) {
 /**
  * Initialize the handler.
  */
-GameChangeStageHandler.prototype.init = function() {
+PlayerStrengthBuyHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
     if(Core.realTime == null)
         throw new Error('Real time server not initialized yet');
@@ -65,7 +65,7 @@ GameChangeStageHandler.prototype.init = function() {
  * @param {Object} packet Packet object.
  * @param socket SocketIO socket.
  */
-GameChangeStageHandler.prototype.handler = function(packet, socket) {
+PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
     // Make sure we only call back once
     var calledBack = false;
 
@@ -269,4 +269,4 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 };
 
 // Export the module
-module.exports = GameChangeStageHandler;
+module.exports = PlayerStrengthBuyHandler;
