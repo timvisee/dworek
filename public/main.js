@@ -5320,6 +5320,16 @@ function updateFactoryDataVisuals(firstShow) {
                         current = gameData.balance[goodType];
                 }
 
+                // Make sure there's anything to deposit
+                if(current <= 0) {
+                    // Nothing to deposit, show a message dialog
+                    showDialog({
+                        title: 'Nothing to deposit',
+                        message: 'You currently don\'t have any ' + NameConfig[goodType].name + ' that you can deposit to this ' + NameConfig.factory.name + '.'
+                    });
+                    return;
+                }
+
                 // Generate an unique field ID
                 var amountFieldId = generateUniqueId('amount-field-');
 
@@ -5408,6 +5418,16 @@ function updateFactoryDataVisuals(firstShow) {
                     var factoryData = getFactoryData();
                     if(factoryData != null && factoryData.hasOwnProperty(goodType))
                         current = factoryData[goodType];
+                }
+
+                // Make sure there's anything to deposit
+                if(current <= 0) {
+                    // Nothing to deposit, show a message dialog
+                    showDialog({
+                        title: 'Nothing to withdraw',
+                        message: 'There currently isn\'t any ' + NameConfig[goodType].name + ' that you can withdraw from this ' + NameConfig.factory.name + '.'
+                    });
+                    return;
                 }
 
                 // Generate an unique field ID
