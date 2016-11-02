@@ -330,11 +330,11 @@ var gameConfig = {
             const levelCost = Math.round(250 + 500 * Math.pow(level - 1, 1.5));
 
             // Return the level cost if the level is 8 or below
-            if(level <= 8)
+            if(level <= 10)
                 return levelCost;
 
             // Increase the level cost rapidly for higher levels
-            return Math.round(levelCost * Math.pow(1.2, level - 8));
+            return Math.round(levelCost * Math.pow(1.2, level - 10));
         },
 
         /**
