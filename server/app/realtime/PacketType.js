@@ -264,10 +264,11 @@ module.exports = {
      *
      * Data:
      * - factory: ID of the factory.
+     * - goodType: Type of goods to withdraw, 'in' or 'out'.
      * - [amount]: Withdrawal amount.
      * - [all]: True to withdraw all, false if not.
      */
-    FACTORY_WITHDRAW_OUT: 23,
+    FACTORY_WITHDRAW: 23,
 
     /**
      * Send from a client to the server to buy in goods.

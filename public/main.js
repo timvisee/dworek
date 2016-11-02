@@ -51,7 +51,7 @@ const PacketType = {
     FACTORY_DEFENCE_BUY: 20,
     FACTORY_LEVEL_BUY: 21,
     FACTORY_DEPOSIT_IN: 22,
-    FACTORY_WITHDRAW_OUT: 23,
+    FACTORY_WITHDRAW: 23,
     SHOP_SELL_IN: 24,
     SHOP_BUY_OUT: 25,
     PLAYER_STRENGTH_BUY: 26,
@@ -5302,11 +5302,13 @@ function updateFactoryDataVisuals(firstShow) {
             });
         }
 
-        var depositButton = transferCard.find('.action-factory-deposit');
-        var withdrawButton = transferCard.find('.action-factory-withdraw');
+        // Find all deposit and withdraw buttons, and unbind their current click events
+        const depositButton = transferCard.find('.action-factory-deposit');
+        const withdrawButton = transferCard.find('.action-factory-withdraw');
         depositButton.unbind('click');
         withdrawButton.unbind('click');
 
+        // Bind the deposit dialog to the deposit button
         depositButton.click(function() {
             // Determine how many in the user currently has
             var current = 10000;
@@ -5359,65 +5361,96 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Leave'
+                        text: 'Cancel'
                     }
                 ]
             });
         });
 
+        // Bind the withdraw dialog to the withdraw button
         withdrawButton.click(function() {
-            // Determine how many in the user currently has
-            var current = 10000;
-            if(hasFactoryData()) {
-                var factoryData = getFactoryData();
-                if(factoryData != null && factoryData.hasOwnProperty('out'))
-                    current = factoryData.out;
-            }
-
-            // Generate an unique field ID
-            var amountFieldId = generateUniqueId('amount-field-');
-
             // Show the dialog
+            const withdrawDialog = function(goodType) {
+                // Determine how many in the user currently has
+                var current = 10000;
+                if(hasFactoryData()) {
+                    var factoryData = getFactoryData();
+                    if(factoryData != null && factoryData.hasOwnProperty(goodType))
+                        current = factoryData[goodType];
+                }
+
+                // Generate an unique field ID
+                var amountFieldId = generateUniqueId('amount-field-');
+
+                showDialog({
+                    title: 'Withdraw ' + NameConfig[goodType].name,
+                    message: 'Enter the amount of ' + NameConfig[goodType].name + ' you\'d like to withdraw, or withdraw all available.<br><br>' +
+                    '<label for="' + amountFieldId + '">Withdraw amount:</label>' +
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    actions: [
+                        {
+                            text: 'Withdraw',
+                            state: 'primary',
+                            action: function() {
+                                // Get the input field value
+                                var amount = $('#' + amountFieldId).val();
+
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW, {
+                                    factory: factoryId,
+                                    goodType: goodType,
+                                    amount: amount,
+                                    all: false
+                                });
+
+                                // Show a notification
+                                showNotification('Withdrawing ' + NameConfig[goodType].name + '...');
+                            }
+                        },
+                        {
+                            text: 'Withdraw all',
+                            action: function() {
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW, {
+                                    factory: factoryId,
+                                    goodType: goodType,
+                                    amount: 0,
+                                    all: true
+                                });
+
+                                // Show a notification
+                                showNotification('Withdrawing all ' + NameConfig[goodType].name + '...');
+                            }
+                        },
+                        {
+                            text: 'Cancel'
+                        }
+                    ]
+                });
+            };
+
+            // Show the dialog to choose the type of goods to deposit
             showDialog({
-                title: 'Withdraw ' + NameConfig.out.name,
-                message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to withdraw, or withdraw all available.<br><br>' +
-                '<label for="' + amountFieldId + '">Withdraw amount:</label>' +
-                '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                title: 'Withdraw goods',
+                message: 'Choose the type of goods to withdraw.',
                 actions: [
                     {
-                        text: 'Withdraw',
+                        text: 'Withdraw ' + NameConfig.out.name,
                         state: 'primary',
                         action: function() {
-                            // Get the input field value
-                            var amount = $('#' + amountFieldId).val();
-
-                            // Send a packet to the server
-                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW_OUT, {
-                                factory: factoryId,
-                                amount: amount,
-                                all: false
-                            });
-
-                            // Show a notification
-                            showNotification('Withdrawing ' + NameConfig.out.name + '...');
+                            // Show the withdraw dialog
+                            withdrawDialog('out');
                         }
                     },
                     {
-                        text: 'Withdraw all',
+                        text: 'Withdraw ' + NameConfig.in.name,
                         action: function() {
-                            // Send a packet to the server
-                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_WITHDRAW_OUT, {
-                                factory: factoryId,
-                                amount: 0,
-                                all: true
-                            });
-
-                            // Show a notification
-                            showNotification('Withdrawing all ' + NameConfig.out.name + '...');
+                            // Show the withdraw dialog
+                            withdrawDialog('in');
                         }
                     },
                     {
-                        text: 'Leave'
+                        text: 'Cancel'
                     }
                 ]
             });
