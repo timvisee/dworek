@@ -5338,7 +5338,7 @@ function updateFactoryDataVisuals(firstShow) {
                     title: 'Deposit ' + NameConfig[goodType].name,
                     message: 'Enter the amount of ' + NameConfig[goodType].name + ' you\'d like to deposit, or deposit all available to you.<br><br>' +
                     '<label for="' + amountFieldId + '">Deposit amount:</label>' +
-                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="1" max="' + current + '" data-highlight="true">',
                     actions: [
                         {
                             text: 'Deposit',
@@ -5438,7 +5438,7 @@ function updateFactoryDataVisuals(firstShow) {
                     title: 'Withdraw ' + NameConfig[goodType].name,
                     message: 'Enter the amount of ' + NameConfig[goodType].name + ' you\'d like to withdraw, or withdraw all available.<br><br>' +
                     '<label for="' + amountFieldId + '">Withdraw amount:</label>' +
-                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="1" max="' + current + '" data-highlight="true">',
                     actions: [
                         {
                             text: 'Withdraw',
