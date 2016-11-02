@@ -50,7 +50,7 @@ const PacketType = {
     FACTORY_DATA: 19,
     FACTORY_DEFENCE_BUY: 20,
     FACTORY_LEVEL_BUY: 21,
-    FACTORY_DEPOSIT_IN: 22,
+    FACTORY_DEPOSIT: 22,
     FACTORY_WITHDRAW: 23,
     SHOP_SELL_IN: 24,
     SHOP_BUY_OUT: 25,
@@ -5310,54 +5310,85 @@ function updateFactoryDataVisuals(firstShow) {
 
         // Bind the deposit dialog to the deposit button
         depositButton.click(function() {
-            // Determine how many in the user currently has
-            var current = 10000;
-            if(hasGameData()) {
-                var gameData = getGameData();
-                if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('in'))
-                    current = gameData.balance.in;
-            }
+            // Function to show the dialog
+            const depositDialog = function(goodType) {
+                // Determine how many in the user currently has
+                var current = 100;
+                if(hasGameData()) {
+                    var gameData = getGameData();
+                    if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty(goodType))
+                        current = gameData.balance[goodType];
+                }
 
-            // Generate an unique field ID
-            var amountFieldId = generateUniqueId('amount-field-');
+                // Generate an unique field ID
+                var amountFieldId = generateUniqueId('amount-field-');
 
-            // Show the dialog
+                // Show the dialog
+                showDialog({
+                    title: 'Deposit ' + NameConfig[goodType].name,
+                    message: 'Enter the amount of ' + NameConfig[goodType].name + ' you\'d like to deposit, or deposit all available to you.<br><br>' +
+                    '<label for="' + amountFieldId + '">Deposit amount:</label>' +
+                    '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                    actions: [
+                        {
+                            text: 'Deposit',
+                            state: 'primary',
+                            action: function() {
+                                // Get the input field value
+                                var amount = $('#' + amountFieldId).val();
+
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT, {
+                                    factory: factoryId,
+                                    goodType: goodType,
+                                    amount: amount,
+                                    all: false
+                                });
+
+                                // Show a notification
+                                showNotification('Depositing ' + NameConfig[goodType].name + '...');
+                            }
+                        },
+                        {
+                            text: 'Deposit all',
+                            action: function() {
+                                // Send a packet to the server
+                                Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT, {
+                                    factory: factoryId,
+                                    goodType: goodType,
+                                    amount: 0,
+                                    all: true
+                                });
+
+                                // Show a notification
+                                showNotification('Depositing all ' + NameConfig[goodType].name + '...');
+                            }
+                        },
+                        {
+                            text: 'Cancel'
+                        }
+                    ]
+                });
+            };
+
+            // Show the dialog to choose the type of goods to deposit
             showDialog({
-                title: 'Deposit ' + NameConfig.in.name,
-                message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to deposit, or deposit all available to you.<br><br>' +
-                '<label for="' + amountFieldId + '">Deposit amount:</label>' +
-                '<input type="range" name="' + amountFieldId + '" id="' + amountFieldId + '" value="' + Math.round(current / 2) + '" min="0" max="' + current + '" data-highlight="true">',
+                title: 'Deposit goods',
+                message: 'Choose the type of goods to deposit.',
                 actions: [
                     {
-                        text: 'Deposit',
+                        text: 'Deposit ' + NameConfig.in.name,
                         state: 'primary',
                         action: function() {
-                            // Get the input field value
-                            var amount = $('#' + amountFieldId).val();
-
-                            // Send a packet to the server
-                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT_IN, {
-                                factory: factoryId,
-                                amount: amount,
-                                all: false
-                            });
-
-                            // Show a notification
-                            showNotification('Depositing ' + NameConfig.in.name + '...');
+                            // Show the deposit dialog
+                            depositDialog('in');
                         }
                     },
                     {
-                        text: 'Deposit all',
+                        text: 'Deposit ' + NameConfig.out.name,
                         action: function() {
-                            // Send a packet to the server
-                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DEPOSIT_IN, {
-                                factory: factoryId,
-                                amount: 0,
-                                all: true
-                            });
-
-                            // Show a notification
-                            showNotification('Depositing all ' + NameConfig.in.name + '...');
+                            // Show the deposit dialog
+                            depositDialog('out');
                         }
                     },
                     {
@@ -5369,10 +5400,10 @@ function updateFactoryDataVisuals(firstShow) {
 
         // Bind the withdraw dialog to the withdraw button
         withdrawButton.click(function() {
-            // Show the dialog
+            // Function to show the dialog
             const withdrawDialog = function(goodType) {
                 // Determine how many in the user currently has
-                var current = 10000;
+                var current = 100;
                 if(hasFactoryData()) {
                     var factoryData = getFactoryData();
                     if(factoryData != null && factoryData.hasOwnProperty(goodType))
@@ -5382,6 +5413,7 @@ function updateFactoryDataVisuals(firstShow) {
                 // Generate an unique field ID
                 var amountFieldId = generateUniqueId('amount-field-');
 
+                // Show the good withdrawal dialog
                 showDialog({
                     title: 'Withdraw ' + NameConfig[goodType].name,
                     message: 'Enter the amount of ' + NameConfig[goodType].name + ' you\'d like to withdraw, or withdraw all available.<br><br>' +
@@ -5429,7 +5461,7 @@ function updateFactoryDataVisuals(firstShow) {
                 });
             };
 
-            // Show the dialog to choose the type of goods to deposit
+            // Show the dialog to choose the type of goods to withdraw
             showDialog({
                 title: 'Withdraw goods',
                 message: 'Choose the type of goods to withdraw.',

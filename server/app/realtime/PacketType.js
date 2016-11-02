@@ -254,10 +254,11 @@ module.exports = {
      *
      * Data:
      * - factory: ID of the factory
+     * - goodType: Type of goods to deposit, 'in' or 'out'.
      * - [amount]: Deposit amount.
      * - [all]: True to deposit all, false if not.
      */
-    FACTORY_DEPOSIT_IN: 22,
+    FACTORY_DEPOSIT: 22,
 
     /**
      * Send from a client to the server to withdraw goods.

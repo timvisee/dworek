@@ -94,7 +94,7 @@ module.exports = {
             }
 
             // Get the factory ID
-            var factoryId = req.param('factory');
+            var factoryId = req.params.factory;
 
             // Make sure the factory ID is valid
             Core.model.factoryModelManager.isValidFactoryId(factoryId, function(err, valid) {
