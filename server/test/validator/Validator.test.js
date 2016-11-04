@@ -29,6 +29,26 @@ const Validator = require('../../app/validator/Validator');
 
 // Validator module
 describe('validator.Validator', function() {
+    // formatMail function
+    describe('formatMail', function() {
+        // Valid mail
+        it('Valid mail', function () {
+            assert.equal(Validator.formatMail('a@b.com'), 'a@b.com');
+        });
+
+        // Surrounding spaces
+        it('Surrounding spaces', function () {
+            assert.equal(Validator.formatMail(' a@b.com '), 'a@b.com', 'Leading and trailing spaces');
+            assert.equal(Validator.formatMail(' a@b.com'), 'a@b.com', 'Leading spaces');
+            assert.equal(Validator.formatMail('a@b.com '), 'a@b.com', 'Trailing spaces');
+        });
+
+        // Uppercase mail
+        it('Uppercase mail', function () {
+            assert.equal(Validator.formatMail('A@B.com'), 'a@b.com');
+        });
+    });
+
     // isValidMail function
     describe('isValidMail', function() {
         // Valid mail
@@ -58,8 +78,8 @@ describe('validator.Validator', function() {
 
         // No domain extension
         it('No domain extension', function() {
-            assert.isFalse(Validator.isValidMail('a@b'));
-            assert.isFalse(Validator.isValidMail('a@b.'));
+            assert.isFalse(Validator.isValidMail('a@b'), 'With extension dot');
+            assert.isFalse(Validator.isValidMail('a@b.'), 'Without extension dot');
         });
 
         // No @
