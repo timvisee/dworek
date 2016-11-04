@@ -1,5 +1,5 @@
-[![Build status on CircleCI](https://circleci.com/gh/timvisee/Dworek.svg?style=svg)](https://circleci.com/gh/timvisee/Dworek)
-[![Build Status on TravisCI](https://travis-ci.org/timvisee/Dworek.svg?branch=master)](https://travis-ci.org/timvisee/Dworek)
+[![CircleCI](https://img.shields.io/circleci/project/github/timvisee/Dworek.svg)](https://circleci.com/gh/timvisee/Dworek)
+[![Travis](https://img.shields.io/travis/timvisee/Dworek.svg)](https://travis-ci.org/timvisee/Dworek)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
 
