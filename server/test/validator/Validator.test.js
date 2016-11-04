@@ -20,8 +20,56 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var mocha = require('mocha');
-var it = mocha.it;
+const mocha = require('mocha');
+const it = mocha.it;
+const describe = mocha.describe;
+const assert = require('chai').assert;
 
-// Dummy test, to successfully pass CI builds
-it('Dummy test.', (done) => done());
+const Validator = require('../../app/validator/Validator');
+
+// Validator module
+describe('validator.Validator', function() {
+    // isValidMail function
+    describe('isValidMail', function() {
+        // Valid mail
+        it('Valid mail', function() {
+            assert.isTrue(Validator.isValidMail('a@b.com'));
+        });
+
+        // No recipient
+        it('No recipient', function() {
+            assert.isFalse(Validator.isValidMail('@a.com'));
+        });
+
+        // Invalid recipient
+        it('Invalid recipient', function() {
+            assert.isFalse(Validator.isValidMail('a/\\?b@c.com'));
+        });
+
+        // No domain
+        it('No domain', function() {
+            assert.isFalse(Validator.isValidMail('a@'));
+        });
+
+        // Invalid domain
+        it('Invalid domain', function() {
+            assert.isFalse(Validator.isValidMail('a@b/\\?c.com'));
+        });
+
+        // No domain extension
+        it('No domain extension', function() {
+            assert.isFalse(Validator.isValidMail('a@b'));
+            assert.isFalse(Validator.isValidMail('a@b.'));
+        });
+
+        // No @
+        it('No @', function() {
+            assert.isFalse(Validator.isValidMail('ab.com'));
+        });
+
+        // Multiple @
+        it('Multiple @', function() {
+            assert.isFalse(Validator.isValidMail('a@b@c.com'));
+        });
+    });
+});
