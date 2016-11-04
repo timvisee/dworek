@@ -1,6 +1,6 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/timvisee/Dworek.svg)](https://circleci.com/gh/timvisee/Dworek)
 [![Travis](https://img.shields.io/travis/timvisee/Dworek.svg)](https://travis-ci.org/timvisee/Dworek)
-![Libraries.io for GitHub](https://img.shields.io/librariesio/github/timvisee/Dworek.svg)
+[![Libraries.io for GitHub](https://img.shields.io/librariesio/github/timvisee/Dworek.svg)](https://libraries.io/github/timvisee/DungeonMaze)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
 
