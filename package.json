@@ -5,7 +5,7 @@
   "author": "Tim Visée <timvisee@gmail.com>",
   "scripts": {
     "start": "node ./bin/cluster",
-    "test": "mocha ./server/test"
+    "test": "mocha ./server/test --recursive"
   },
   "homepage": "https://github.com/timvisee/Dworek",
   "repository": {
