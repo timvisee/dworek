@@ -39,7 +39,7 @@ router.post('/', function(req, res, next) {
     const user = req.session.user;
 
     // Make sure a data object is given
-    if(!req.body.hasOwnProperty('data')) {
+    if(!req.hasOwnProperty('body') || !req.body.hasOwnProperty('data')) {
         next(new Error('Missing data'));
         return;
     }
