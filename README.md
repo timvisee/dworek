@@ -1,6 +1,6 @@
+[![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)
 [![CircleCI](https://img.shields.io/circleci/project/github/timvisee/Dworek.svg)](https://circleci.com/gh/timvisee/Dworek)
 [![Travis](https://img.shields.io/travis/timvisee/Dworek.svg)](https://travis-ci.org/timvisee/Dworek)
-![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)
 [![Libraries.io for GitHub](https://img.shields.io/librariesio/github/timvisee/Dworek.svg)](https://libraries.io/github/timvisee/Dworek)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
