@@ -35,5 +35,7 @@
     "socket.io": "1.5.1",
     "validator": "6.1.0"
   },
-  "engine": "node >= 4.5.0"
+  "engines": {
+    "node": "4.5.0"
+  }
 }
