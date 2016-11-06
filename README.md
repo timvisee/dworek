@@ -9,7 +9,7 @@ Conquer labs owned by other cartels to become the drug production MVP.
 
 ## Builds
 |CI|Status| |
-|--|--|--|
+|---:|:---|:---|
 |Codeship|[![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)||
 |CircleCI|[![CircleCI](https://img.shields.io/circleci/project/github/timvisee/Dworek.svg)](https://circleci.com/gh/timvisee/Dworek)|[View Status](https://circleci.com/gh/timvisee/Dworek/)|
 |Travis|[![Travis](https://img.shields.io/travis/timvisee/Dworek.svg)](https://travis-ci.org/timvisee/Dworek)|[View Status](https://travis-ci.org/timvisee/Dworek)|
