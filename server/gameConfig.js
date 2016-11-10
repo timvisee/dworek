@@ -468,6 +468,7 @@ var gameConfig = {
             // Create and return an array of pings
             return [
                 {
+                    id: 1,
                     name: "Radar",
                     price: Math.round(Math.max(teamMoney * RADAR_PRICE_FACTOR, RADAR_PRICE_MIN)),
                     range: 40,
@@ -475,6 +476,7 @@ var gameConfig = {
                     max: 1
                 },
                 {
+                    id: 2,
                     name: "Spy satellite",
                     price: Math.round(Math.max(teamMoney * SATELLITE_PRICE_FACTOR, SATELLITE_PRICE_MIN)),
                     range: -1,
