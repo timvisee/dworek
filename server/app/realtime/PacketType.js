@@ -350,5 +350,15 @@ module.exports = {
      * - ally: True if the factory was captured from the user's current team.
      * - enemy: True if the factory was destroyed by an enemy, false if not.
      */
-    FACTORY_DESTROYED: 31
+    FACTORY_DESTROYED: 31,
+
+    /**
+     * Buy and execute a ping.
+     *
+     * Data:
+     * - game: ID of the current game.
+     * - pingId: ID of the ping to buy
+     * - cost: Cost of the ping (check)
+     */
+    PING_BUY: 32
 };
