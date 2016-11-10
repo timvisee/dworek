@@ -1230,8 +1230,10 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                             gameData.pings.push({
                                 id: ping.id,
                                 name: ping.name,
-                                price: ping.price,
-                                range: ping.range
+                                cost: ping.price,
+                                range: ping.range,
+                                duration: ping.range,
+                                max: ping.max
                             });
                         });
 
