@@ -424,6 +424,51 @@ var gameConfig = {
         attackNewDefence: function(oldDefence) {
             return Math.floor(oldDefence * 0.66);
         }
+    },
+
+    ping: {
+        /**
+         * Object defining the configuration of a ping, including it's effect strength and price.
+         *
+         * @typedef {Object} PingConfig
+         * @param {String} name Name of the ping.
+         * @param {Number} price Price to use the ping.
+         * @param {Number} range Range of the ping in meters, -1 for an infinite range.
+         * @param {Number} duration Duration of the ping's effect in seconds.
+         * @param {Number} max Maximum number of labs this ping can find, -1 for infinite labs.
+         */
+
+        /**
+         * Get the pings a user can buy/use.
+         *
+         * @param teamMoney Money the user's team currently has.
+         * @return {[PingConfig]} Array of PingConfig objects, an empty array if the user can't use pings.
+         */
+        getPings: function(teamMoney) {
+            // Minimum possible prices and price factors for the pings
+            const RADAR_PRICE_FACTOR = 0.05;
+            const RADAR_PRICE_MIN = 1000;
+            const SATELLITE_PRICE_FACTOR = 0.1;
+            const SATELLITE_PRICE_MIN = 2000;
+
+            // Create and return an array of pings
+            return [
+                {
+                    name: "Radar",
+                    price: Math.round(Math.max(teamMoney * RADAR_PRICE_FACTOR, RADAR_PRICE_MIN)),
+                    range: 40,
+                    duration: 45 * 1000,
+                    max: 1
+                },
+                {
+                    name: "Spy satellite",
+                    price: Math.round(Math.max(teamMoney * SATELLITE_PRICE_FACTOR, SATELLITE_PRICE_MIN)),
+                    range: -1,
+                    duration: 45 * 1000,
+                    max: 1
+                }
+            ];
+        }
     }
 };
 
