@@ -22,6 +22,8 @@
 
 var _ = require('lodash');
 
+var config = require('../../../config');
+
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
 var Coordinate = require('../../coordinate/Coordinate');
@@ -224,133 +226,179 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                     return;
                                 }
 
-                                // Subtract the money
-                                liveUser.subtractMoney(factoryCost, function(err, callback) {
-                                    // Call back errors
-                                    if(err !== null) {
-                                        callbackError(err);
-                                        return;
-                                    }
+                                // Create an interspace latch
+                                var interspaceLatch = new CallbackLatch();
 
-                                    // Add the factory
-                                    FactoryDatabase.addFactory(factoryName, game, team, user, factoryLocation, function (err, factoryModel) {
+                                // Create a flag, to define whether any factory is too close
+                                var isTooClose = false;
+
+                                liveGame.factoryManager.factories.forEach(function(factory) {
+                                    // Return if we we're too close, because we should stop the loop
+                                    if(isTooClose)
+                                        return;
+
+                                    // Get the location of the entry factory
+                                    interspaceLatch.add();
+                                    factory.getFactoryModel().getLocation(function(entryLocation, err) {
                                         // Call back errors
-                                        if (err !== null) {
+                                        if(err !== null) {
                                             callbackError(err);
                                             return;
                                         }
 
-                                        // Load the factory in the live game
-                                        liveGame.factoryManager.getFactory(factoryModel, function(err) {
+                                        // Get the distance between the new factory and the entry
+                                        if(factoryLocation.getDistanceTo(entryLocation) < config.factory.interspaceMin) {
+                                            // Send a notification to the user if this is the first factory that is too close
+                                            if(!isTooClose) {
+                                                // Send a message response to the user
+                                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                                    error: true,
+                                                    // TODO: Dynamically get factory name from game name configuration!
+                                                    message: 'It looks like there another lab close by!<br><br>' +
+                                                            'Your new lab must be at least ' + config.factory.interspaceMin + ' meters away from any other lab.',
+                                                    dialog: true
+                                                }, socket);
+                                            }
+
+                                            // Set the flag
+                                            isTooClose = true;
+
+                                        } else
+                                            // Resolve a latch
+                                            interspaceLatch.resolve();
+                                    });
+                                });
+
+                                // Continue when the latch is complete
+                                interspaceLatch.then(function() {
+                                    // Subtract the money
+                                    liveUser.subtractMoney(factoryCost, function(err, callback) {
+                                        // Call back errors
+                                        if(err !== null) {
+                                            callbackError(err);
+                                            return;
+                                        }
+
+                                        // Add the factory
+                                        FactoryDatabase.addFactory(factoryName, game, team, user, factoryLocation, function (err, factoryModel) {
                                             // Call back errors
-                                            if(err !== null) {
+                                            if (err !== null) {
                                                 callbackError(err);
                                                 return;
                                             }
 
-                                            // Create a callback latch
-                                            var latch = new CallbackLatch();
-
-                                            // Get the factory name, the name of the user and name of the team
-                                            var factoryName = null;
-                                            var userName = null;
-                                            var userTeamName = null;
-
-                                            // Get the factory name
-                                            latch.add();
-                                            factoryModel.getName(function(err, result) {
+                                            // Load the factory in the live game
+                                            liveGame.factoryManager.getFactory(factoryModel, function(err) {
                                                 // Call back errors
                                                 if(err !== null) {
-                                                    if(!calledBack)
-                                                        callback(err);
-                                                    calledBack = true;
+                                                    callbackError(err);
                                                     return;
                                                 }
 
-                                                // Set the factory name
-                                                factoryName = result;
+                                                // Create a callback latch
+                                                var latch = new CallbackLatch();
 
-                                                // Resolve the latch
-                                                latch.resolve();
-                                            });
+                                                // Get the factory name, the name of the user and name of the team
+                                                var factoryName = null;
+                                                var userName = null;
+                                                var userTeamName = null;
 
-                                            // Get the user name
-                                            latch.add();
-                                            user.getDisplayName(function(err, result) {
-                                                // Call back errors
-                                                if(err !== null) {
-                                                    if(!calledBack)
-                                                        callback(err);
-                                                    calledBack = true;
-                                                    return;
-                                                }
+                                                // Get the factory name
+                                                latch.add();
+                                                factoryModel.getName(function(err, result) {
+                                                    // Call back errors
+                                                    if(err !== null) {
+                                                        if(!calledBack)
+                                                            callback(err);
+                                                        calledBack = true;
+                                                        return;
+                                                    }
 
-                                                // Set the user name
-                                                userName = result;
+                                                    // Set the factory name
+                                                    factoryName = result;
 
-                                                // Resolve the latch
-                                                latch.resolve();
-                                            });
+                                                    // Resolve the latch
+                                                    latch.resolve();
+                                                });
 
-                                            // Get the team name
-                                            latch.add();
-                                            team.getName(function(err, result) {
-                                                // Call back errors
-                                                if(err !== null) {
-                                                    if(!calledBack)
-                                                        callback(err);
-                                                    calledBack = true;
-                                                    return;
-                                                }
+                                                // Get the user name
+                                                latch.add();
+                                                user.getDisplayName(function(err, result) {
+                                                    // Call back errors
+                                                    if(err !== null) {
+                                                        if(!calledBack)
+                                                            callback(err);
+                                                        calledBack = true;
+                                                        return;
+                                                    }
 
-                                                // Set the team name
-                                                userTeamName = result;
+                                                    // Set the user name
+                                                    userName = result;
 
-                                                // Resolve the latch
-                                                latch.resolve();
-                                            });
+                                                    // Resolve the latch
+                                                    latch.resolve();
+                                                });
 
-                                            // Send a broadcast to all relevant users when we fetched the data
-                                            latch.then(function() {
-                                                // Loop through the list of users
-                                                liveUser.getGame().userManager.users.forEach(function(otherUser) {
-                                                    // Get the user's team
-                                                    otherUser.getTeam(function(err, otherTeam) {
-                                                        // Handle errors
-                                                        if(err !== null) {
-                                                            console.error('Failed to fetch user team, ignoring');
-                                                            console.error(err);
-                                                        }
+                                                // Get the team name
+                                                latch.add();
+                                                team.getName(function(err, result) {
+                                                    // Call back errors
+                                                    if(err !== null) {
+                                                        if(!calledBack)
+                                                            callback(err);
+                                                        calledBack = true;
+                                                        return;
+                                                    }
 
-                                                        // Make sure the user's team is known
-                                                        if(otherTeam == null)
-                                                            return;
+                                                    // Set the team name
+                                                    userTeamName = result;
 
-                                                        // Check whether this is the user itself
-                                                        const isSelf = user.getId().equals(otherUser.getId());
+                                                    // Resolve the latch
+                                                    latch.resolve();
+                                                });
 
-                                                        // Make sure the user is in the builder's team
-                                                        if(!isSelf && !team.getId().equals(otherTeam.getId()))
-                                                            return;
+                                                // Send a broadcast to all relevant users when we fetched the data
+                                                latch.then(function() {
+                                                    // Loop through the list of users
+                                                    liveUser.getGame().userManager.users.forEach(function(otherUser) {
+                                                        // Get the user's team
+                                                        otherUser.getTeam(function(err, otherTeam) {
+                                                            // Handle errors
+                                                            if(err !== null) {
+                                                                console.error('Failed to fetch user team, ignoring');
+                                                                console.error(err);
+                                                            }
 
-                                                        // Send a capture update
-                                                        Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_BUILD, {
-                                                            factory: factoryModel.getId(),
-                                                            factoryName,
-                                                            self: isSelf,
-                                                            userName
-                                                        }, otherUser.getUserModel());
+                                                            // Make sure the user's team is known
+                                                            if(otherTeam == null)
+                                                                return;
+
+                                                            // Check whether this is the user itself
+                                                            const isSelf = user.getId().equals(otherUser.getId());
+
+                                                            // Make sure the user is in the builder's team
+                                                            if(!isSelf && !team.getId().equals(otherTeam.getId()))
+                                                                return;
+
+                                                            // Send a capture update
+                                                            Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_BUILD, {
+                                                                factory: factoryModel.getId(),
+                                                                factoryName,
+                                                                self: isSelf,
+                                                                userName
+                                                            }, otherUser.getUserModel());
+                                                        });
                                                     });
                                                 });
-                                            });
 
-                                            // Send new game data to everyone
-                                            Core.gameController.sendGameDataToAll(game, function (err) {
-                                                // Handle errors
-                                                if (err !== null) {
-                                                    console.error('Failed to send game data updates, ignoring');
-                                                    console.error(err);
-                                                }
+                                                // Send new game data to everyone
+                                                Core.gameController.sendGameDataToAll(game, function (err) {
+                                                    // Handle errors
+                                                    if (err !== null) {
+                                                        console.error('Failed to send game data updates, ignoring');
+                                                        console.error(err);
+                                                    }
+                                                });
                                             });
                                         });
                                     });
