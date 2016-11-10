@@ -36,6 +36,10 @@ router.get('/', function(req, res, next) {
     // Layout options object
     var options = {
         status: {
+            server: {
+                arch: os.arch(),
+                cpus: os.cpus()
+            },
             web: {
                 online: true,
                 uptime: Math.round(os.uptime())

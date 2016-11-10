@@ -27,6 +27,23 @@ block content
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
+            h3.card-primary-title Server Status
+
+        .card-supporting-text.has-action.has-title
+            p Status of the actual machine #{app.name} is running on.
+            table.table-list.ui-responsive
+                tr: td CPUs
+                    td: span.cpus= status.server.cpus.length
+                        span(style="gray")  cores
+                tr: td Cores
+                    td: span.cpus: ul
+                        each cpu in status.server.cpus
+                            li= cpu.model
+                tr: td Architecture
+                    td: span.arch= status.server.arch
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
             h3.card-primary-title Game Logic
 
         .card-supporting-text.has-action.has-title
@@ -39,7 +56,8 @@ block content
                         else
                             span Idle
                 tr: td Active games
-                    td= status.live.gameCount
+                    td: span.activeGameCount= status.live.gameCount
+                        span(style="color: gray;")  (Loaded in RAM)
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
