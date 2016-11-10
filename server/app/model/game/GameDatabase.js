@@ -151,7 +151,7 @@ GameDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback) {
 
     // Limit the results
     //noinspection JSValidateTypes
-    if(options.hasOwnProperty('limit') && options.limit !== undefined)
+    if(options.hasOwnProperty('limit') && _.isNumber(options.limit) && options.limit > 0)
         findQuery = findQuery.limit(options.limit);
 
     // Convert the results into an array and call back

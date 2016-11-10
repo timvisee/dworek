@@ -230,7 +230,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         options = {};
 
     // Merge the options
-    options = MergeUtils.merge(options, defaultOptions);
+    options = MergeUtils.merge(defaultOptions, options);
 
     // Make sure the game stage value is valid, call back if not
     if(!this.isValidStage(stage)) {
