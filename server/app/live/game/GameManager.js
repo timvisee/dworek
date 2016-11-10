@@ -123,7 +123,7 @@ GameManager.prototype.getGame = function(gameId, callback) {
 /**
  * Called back with the game or when an error occurred.
  *
- * @callback GameController~getGameCallback
+ * @callback GameManager~getGameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Game|null=} Game instance, null if the game isn't active or if the game is invalid.
  */
