@@ -59,6 +59,8 @@ block content
                     td: span.loadavg15= status.server.loadavg[2]
                         span(style="color: gray;")  avg last 15 minutes
                 tr: td Latency
+                    td: span(style="color: gray;") Recent response times:
+                tr: td
                     td: span.latency-max= status.server.latency[0]
                         span(style="color: gray;")  max
                 tr: td
