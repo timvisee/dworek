@@ -1232,7 +1232,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                                 name: ping.name,
                                 cost: ping.price,
                                 range: ping.range,
-                                duration: ping.range,
+                                duration: ping.duration,
                                 max: ping.max
                             });
                         });
