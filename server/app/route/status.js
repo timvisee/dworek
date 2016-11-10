@@ -30,6 +30,7 @@ var Core = require('../../Core');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 var RedisUtils = require('../redis/RedisUtils');
 var CallbackLatch = require('../util/CallbackLatch');
+var Formatter = require('../format/Formatter');
 
 // Status index
 router.get('/', function(req, res, next) {
@@ -38,7 +39,13 @@ router.get('/', function(req, res, next) {
         status: {
             server: {
                 arch: os.arch(),
-                cpus: os.cpus()
+                loadavg: os.loadavg(),
+                cpus: os.cpus(),
+                memory: {
+                    total: Formatter.formatBytes(os.totalmem()),
+                    used: Formatter.formatBytes(os.totalmem() - os.freemem()),
+                    free: Formatter.formatBytes(os.freemem())
+                }
             },
             web: {
                 online: true,
