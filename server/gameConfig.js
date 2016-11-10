@@ -234,6 +234,12 @@ var gameConfig = {
         },
 
         /**
+         * Minimum amount of space between the centers of two factories in meters.
+         * @type {Number}
+         */
+        interspaceMin: 12.5,
+
+        /**
          * Get the active operation range in meters.
          * This range is effective when a user is inside the shops range.
          * @param {Number} level Current factory level.
