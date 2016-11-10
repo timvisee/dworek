@@ -101,7 +101,7 @@ router.get('/open', function(req, res, next) {
     }
 
     // Render the page
-    renderGameList(req, res, next, 0, undefined, 'Open', 'Open games');
+    renderGameList(req, res, next, 0, -1, 'Open', 'Open games');
 });
 
 router.get('/active', function(req, res, next) {
@@ -112,7 +112,7 @@ router.get('/active', function(req, res, next) {
     }
 
     // Render the page
-    renderGameList(req, res, next, 1, undefined, 'Active', 'Active games');
+    renderGameList(req, res, next, 1, -1, 'Active', 'Active games');
 });
 
 router.get('/finished', function(req, res, next) {
@@ -123,7 +123,7 @@ router.get('/finished', function(req, res, next) {
     }
 
     // Render the page
-    renderGameList(req, res, next, 2, undefined, 'Finished', 'Finished games');
+    renderGameList(req, res, next, 2, -1, 'Finished', 'Finished games');
 });
 
 /**
@@ -133,7 +133,7 @@ router.get('/finished', function(req, res, next) {
  * @param res Express response.
  * @param next Express next callback.
  * @param {Number} stage Game stage.
- * @param {Number|undefined} limit Limit of games to fetch, undefined to fetch all.
+ * @param {Number} limit Limit of games to fetch, -1 to fetch all.
  * @param {string} category Game category name.
  * @param {string} pageTitle Page title.
  */
@@ -163,7 +163,7 @@ function renderGameList(req, res, next, stage, limit, category, pageTitle) {
  * Get the game list.
  *
  * @param {Number} stage Game stage.
- * @param {Number|undefined} limit Limit of games to fetch, undefined to fetch all.
+ * @param {Number|undefined} limit Limit of games to fetch, -1 to fetch all.
  * @param {function} callback Callback(err, games)
  */
 function getGameList(stage, limit, callback) {
@@ -179,7 +179,7 @@ function getGameList(stage, limit, callback) {
     // Get the list of active games
     latch.add();
     Core.model.gameModelManager.getGamesWithStage(stage, {
-        limit
+        limit: limit
     }, function(err, games) {
         // Call back errors
         if(err !== null) {

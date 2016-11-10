@@ -208,7 +208,7 @@ GameModelManager.prototype.getGameById = function(id, callback) {
  *
  * @param {Number} stage Game stage value.
  * @param {Object} [options] Options object for additional configurations.
- * @param {Number|undefined} [options.limit=3] Number of results to limit on, undefined to disable result limitation.
+ * @param {Number|undefined} [options.limit=3] Number of results to limit on, -1 to disable result limitation.
  * @param {GameModelManager~getGamesWithStageCallback} callback Called with the result or when an error occurred.
  */
 GameModelManager.prototype.getGamesWithStage = function(stage, options, callback) {
@@ -245,7 +245,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
     const self = this;
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = REDIS_KEY_ROOT + ':gamesWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+    const redisCacheKey = REDIS_KEY_ROOT + ':gamesWithStage:' + stage.toString() + (_.isNumber(options.limit) && options.limit > 0 ? ':limit' + options.limit : '');
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -311,7 +311,7 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
         };
 
         // Set the results limit
-        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
+        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null && options.limit > 0)
             fetchFieldOptions.limit = options.limit;
 
         // Create the projection object for MongoDB
@@ -386,13 +386,13 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
  *
  * @param {Number} stage Game stage value.
  * @param {Object} [options] Options object for additional configurations.
- * @param {Number|undefined} [options.limit=] Number of results to limit on, undefined to disable result limitation.
+ * @param {Number|undefined} [options.limit=] Number of results to limit on, -1 to disable result limitation.
  * @param {GameModelManager~getGamesCountWithStageCallback} callback Called with the result or when an error occurred.
  */
 GameModelManager.prototype.getGamesCountWithStage = function(stage, options, callback) {
     // Create an object with the default options
     const defaultOptions = {
-        limit: undefined
+        limit: -1
     };
 
     // Make sure the game stage value is valid, call back if not
@@ -420,7 +420,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key for this function
-    const redisCacheKey = REDIS_KEY_ROOT + ':gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) ? ':limit' + options.limit : '');
+    const redisCacheKey = REDIS_KEY_ROOT + ':gamesCountWithStage:' + stage.toString() + (_.isNumber(options.limit) && options.limit > 0 ? ':limit' + options.limit : '');
 
     // Check whether the game is valid through Redis if ready
     if(RedisUtils.isReady()) {
@@ -457,7 +457,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
         var fetchFieldOptions = {};
 
         // Set the results limit
-        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null)
+        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null ** options.limit > 0)
             fetchFieldOptions.limit = options.limit;
 
         // Query the database and check whether the game is valid
