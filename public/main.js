@@ -58,7 +58,8 @@ const PacketType = {
     FACTORY_ATTACK: 28,
     FACTORY_BUILD: 29,
     FACTORY_CAPTURED: 30,
-    FACTORY_DESTROYED: 31
+    FACTORY_DESTROYED: 31,
+    PING_BUY: 32
 };
 
 /**
@@ -100,7 +101,8 @@ const NameConfig = {
         sign: '$'
     },
     factory: {
-        name: 'lab'
+        name: 'lab',
+        names: 'labs'
     },
     shop: {
         name: 'dealer'
@@ -4563,18 +4565,19 @@ function updateGameDataVisuals() {
             activePage.find('.game-balance-out').html(formatGoods(data.balance.out));
     }
 
+    // Check whether strength data is being sent
     if(data.hasOwnProperty('strength')) {
+        // Make sure the current strength value is included
         if(data.strength.hasOwnProperty('value'))
             activePage.find('.game-player-strength').html(data.strength.value);
 
-
         // Get the upgrade button list element, and clear it
-        const upgradeButtonlist = activePage.find('.card-player-strength').find('.upgrade-button-list');
-        upgradeButtonlist.empty();
+        const upgradeButtonList = activePage.find('.card-player-strength').find('.upgrade-button-list');
+        upgradeButtonList.empty();
 
-        // Check whether there are any defence upgrades
+        // Check whether there are any strength upgrades
         if(!data.strength.hasOwnProperty('upgrades')) {
-            upgradeButtonlist.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
+            upgradeButtonList.html('<div align="center"><i>No upgrades available...<br><br></i></div>');
 
         } else {
             // Loop through the list of upgrades
@@ -4583,13 +4586,13 @@ function updateGameDataVisuals() {
                 var buttonId = generateUniqueId('button-upgrade-');
 
                 // Append a button
-                upgradeButtonlist.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                upgradeButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
                     '    <i class="zmdi zmdi-plus"></i>&nbsp;' +
                     '    ' + upgrade.name + '&nbsp;&nbsp;<span style="color: gray;">(' + formatMoney(upgrade.cost, true) + ' / +' + upgrade.strength + ')</span>' +
                     '</a>');
 
                 // Get the button
-                var button = upgradeButtonlist.find('#' + buttonId);
+                var button = upgradeButtonList.find('#' + buttonId);
 
                 // Bind a click action
                 button.click(function() {
@@ -4624,7 +4627,71 @@ function updateGameDataVisuals() {
         }
 
         // Trigger a create on the list
-        upgradeButtonlist.trigger('create');
+        upgradeButtonList.trigger('create');
+    }
+
+    // Check whether ping data is being sent
+    if(data.hasOwnProperty('pings')) {
+        // Get the pings button list element, and clear it
+        const pingsButtonList = activePage.find('.card-pings').find('.ping-button-list');
+        pingsButtonList.empty();
+
+        // Make sure there are any pings
+        if(data.pings.length <= 0) {
+            pingsButtonList.html('<div align="center"><i>No pings available...<br><br></i></div>');
+
+        } else {
+            // Loop through the list of pings
+            data.pings.forEach(function(ping, i) {
+                // Get an unique button ID
+                var buttonId = generateUniqueId('button-ping-');
+
+                // Append a button
+                pingsButtonList.append('<a id="' + buttonId + '" class="ui-btn waves-effect waves-button" href="#" data-transition="slide" data-rel="popup">' +
+                    '    <i class="zmdi zmdi-portable-wifi-changes"></i>&nbsp;' +
+                    '    ' + ping.name + '&nbsp;&nbsp;<span style="color: gray;">(' + formatMoney(ping.cost, true) + ' / ' + (ping.range >= 0 ? ping.range : '&#8734;') + ' m)</span>' +
+                    '</a>');
+
+                // Get the button
+                var button = pingsButtonList.find('#' + buttonId);
+
+                // Bind a click action
+                button.click(function() {
+                    showDialog({
+                        title: ping.name,
+                        message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
+                        (ping.range >= 0 ? 'This ping has a maximum range of ' + ping.range + ' meters,' : 'This ping has an infinite range,') + ' ' +
+                        (ping.max > 0 ? ('and finds a maximum of ' + ping.max + ' enemy ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) + ' closest to you.') : 'and finds all enemy labs if there are any.') + ' ' +
+                        'If there aren\'t any enemy ' + NameConfig.factory.names + ' to be found, the ping might be wasted.<br><br>' +
+                        capitalizeFirst(NameConfig.factory.names) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
+                        'The ping will be consumed immediately after executing.',
+                        actions: [
+                            {
+                                text: 'Execute ping',
+                                state: 'primary',
+                                action: function() {
+                                    // Send an ping packet
+                                    Dworek.realtime.packetProcessor.sendPacket(PacketType.PING_BUY, {
+                                        game: Dworek.utils.getGameId(),
+                                        pingId: ping.id,
+                                        cost: ping.cost
+                                    });
+
+                                    // Show a notification
+                                    showNotification('Executing ping...');
+                                }
+                            },
+                            {
+                                text: 'Cancel'
+                            }
+                        ]
+                    })
+                });
+            });
+        }
+
+        // Trigger a create on the list
+        pingsButtonList.trigger('create');
     }
 
     if(data.hasOwnProperty('standings')) {
