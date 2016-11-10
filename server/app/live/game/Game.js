@@ -400,9 +400,10 @@ Game.prototype.getTeamFactoryCount = function(callback) {
 /**
  * Get the money amount for each team in an object.
  *
+ * @param {GameTeamModel|undefined} teamFilter Team filter, or undefined to get all teams.
  * @param {Game~getTeamMoneyCallback} callback Called with the result array, or when an error occurred.
  */
-Game.prototype.getTeamMoney = function(callback) {
+Game.prototype.getTeamMoney = function(teamFilter, callback) {
     // Create a team object
     var teamObject = {};
 
@@ -438,6 +439,12 @@ Game.prototype.getTeamMoney = function(callback) {
             // Make sure the team isn't null
             if(result == null) {
                 // Resolve the regular latch, don't add this user's data
+                latch.resolve();
+                return;
+            }
+
+            // Skip if this team is filtered
+            if(teamFilter !== undefined && teamFilter.getId().equals(result)) {
                 latch.resolve();
                 return;
             }
@@ -488,6 +495,9 @@ Game.prototype.getTeamMoney = function(callback) {
         });
     });
 
+    // Determine whether the filtered team is in the object
+    var hasFilteredTeam = false;
+
     // Process the team money data when everything is fetched
     latch.then(function() {
         // Reset the latch back to it's identity
@@ -500,6 +510,10 @@ Game.prototype.getTeamMoney = function(callback) {
         Object.keys(teamObject).forEach(function(teamId) {
             // Get a team instance by it's ID
             const team = Core.model.gameTeamModelManager._instanceManager.create(teamId);
+
+            // Check whether this is the filtered team, set the hasFilteredTeam to true in that case
+            if(teamFilter !== undefined && teamFilter.getId().equals(teamId))
+                hasFilteredTeam = true;
 
             // Get the name of the team
             latch.add();
@@ -525,7 +539,16 @@ Game.prototype.getTeamMoney = function(callback) {
         });
 
         // Call back the array of team objects.
-        latch.then(() => callback(null, teamObjects));
+        latch.then(() => {
+            // Make sure the filtered team is in the object
+            if(teamFilter !== undefined)
+                // Set the team's money to zero if it isn't currently in the object
+                if(!hasFilteredTeam)
+                    teamObjects[teamFilter.getIdHex()] = 0;
+
+            // Call back the list of team objects
+            callback(null, teamObjects)
+        });
     });
 };
 
