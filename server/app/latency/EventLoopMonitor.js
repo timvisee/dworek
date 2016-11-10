@@ -29,8 +29,8 @@
 
 const EE = require('events').EventEmitter;
 
-const LATENCY_COUNT_RESET = 50;
-const LATENCY_COUNT_THRESHOLD = 100;
+const LATENCY_COUNT_RESET = 100;
+const LATENCY_COUNT_THRESHOLD = 250;
 
 class EventLoopMonitor extends EE {
     /**
