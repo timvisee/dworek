@@ -30,11 +30,14 @@ block content
             h3.card-primary-title Server Status
 
         .card-supporting-text.has-action.has-title
-            p Status of all available resources for #{app.name} on the machine it's running on.
+            p Status of the resources available to #{app.name} on the machine the server is running on.
             table.table-list.ui-responsive
+                tr: td OS
+                    td: span.cpus= status.server.os
+                        span(style="color: gray;")  (#{status.server.platform}/#{status.server.arch})
                 tr: td CPUs
                     td: span.cpus= status.server.cpus.length
-                        span(style="color: gray;")  cores (#{status.server.arch})
+                        span(style="color: gray;")  cores
                 tr: td Model
                     td: small.cpus= status.server.cpus[0].model
                 tr: td RAM
@@ -55,6 +58,9 @@ block content
                 tr: td
                     td: span.loadavg15= status.server.loadavg[2]
                         span(style="color: gray;")  avg last 15 minutes
+                tr: td Latency
+                    td: span.cpus= status.server.latency
+                        span(style="color: gray;")  (events)
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text

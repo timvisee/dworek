@@ -104,5 +104,36 @@ Formatter.formatBytes = function(bytes, decimals) {
     return parseFloat((bytes / Math.pow(BASE, factor)).toFixed(decimalPlaces)) + ' ' + SIZE_NOTATIONS[factor];
 };
 
+/**
+ * Format the given number of nanoseconds into a human readable string.
+ *
+ * @param {Number} nano Number of nanoseconds.
+ * @param {Number} [decimals=0] Number of decimals to show.
+ * @return {String} Readable string.
+ */
+Formatter.formatNano = function(nano, decimals) {
+    // Constants
+    const BASE = 1000;
+    const SIZE_NOTATIONS = ['nanosecond', 'microsecond', 'millisecond', 'second'];
+
+    // Handle zero cases
+    if(nano == 0)
+        return '0 Bytes';
+
+    // Determine the number of decimal places to show
+    const decimalPlaces = decimals || 0;
+
+    // Determine the factor
+    const factor = Math.floor(Math.log(nano) / Math.log(BASE));
+
+    // Create and return the readable string
+    var value = parseFloat((nano / Math.pow(BASE, factor)).toFixed(decimalPlaces));
+    if(decimalPlaces == 0)
+        value = Math.round(value);
+
+    // Make the value readable and return it
+    return value + ' ' + SIZE_NOTATIONS[factor] + (value != 1 ? 's' : '');
+};
+
 // Export the class
 module.exports = Formatter;

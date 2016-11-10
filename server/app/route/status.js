@@ -34,12 +34,24 @@ var Formatter = require('../format/Formatter');
 
 // Status index
 router.get('/', function(req, res, next) {
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Get the CPU load average
+    const loadAvg = os.loadavg();
+
     // Layout options object
     var options = {
         status: {
             server: {
+                os: os.type(),
+                platform: os.platform(),
                 arch: os.arch(),
-                loadavg: os.loadavg(),
+                loadavg: [
+                    loadAvg[0] != 0 ? loadAvg[0].toFixed(3) : '?',
+                    loadAvg[1] != 0 ? loadAvg[1].toFixed(3) : '?',
+                    loadAvg[2] != 0 ? loadAvg[2].toFixed(3) : '?',
+                ],
                 cpus: os.cpus(),
                 memory: {
                     total: Formatter.formatBytes(os.totalmem()),
@@ -71,8 +83,18 @@ router.get('/', function(req, res, next) {
         }
     };
 
-    // Create a callback latch
-    var latch = new CallbackLatch();
+    latch.add();
+    var time = process.hrtime();
+    // [ 1800216, 25 ]
+    setTimeout(() => {
+        var diff = process.hrtime(time);
+        // [ 1, 552 ]
+        // console.log(`Benchmark took ${diff[0] * 1e9 + diff[1]} nanoseconds`);
+
+        options.status.server.latency = Formatter.formatNano(diff[0] * 1e9 + diff[1]);
+
+        latch.resolve();
+    }, 0);
 
     // Get the redis status if ready
     if(RedisUtils.isReady()) {
