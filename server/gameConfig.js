@@ -465,10 +465,13 @@ var gameConfig = {
             const SATELLITE_PRICE_FACTOR = 0.1;
             const SATELLITE_PRICE_MIN = 2000;
 
+            // Dynamically determine ping IDs
+            var i = 1;
+
             // Create and return an array of pings
             return [
                 {
-                    id: 1,
+                    id: i++,
                     name: "Radar",
                     price: Math.round(Math.max(teamMoney * RADAR_PRICE_FACTOR, RADAR_PRICE_MIN)),
                     range: 40,
@@ -476,7 +479,7 @@ var gameConfig = {
                     max: 1
                 },
                 {
-                    id: 2,
+                    id: i++,
                     name: "Spy satellite",
                     price: Math.round(Math.max(teamMoney * SATELLITE_PRICE_FACTOR, SATELLITE_PRICE_MIN)),
                     range: -1,
