@@ -4140,7 +4140,7 @@ function buildFactory() {
         '<label for="' + fieldId + '">' + capitalizeFirst(NameConfig.factory.name) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
-        'Building this ' + NameConfig.factory.name + ' will cost you <span class="game-factory-cost">?</span>.';
+        'Building this ' + NameConfig.factory.name + ' will cost you <b class="game-factory-cost">?</b>.';
 
     // Create a variable for the factory name
     var nameField = null;
