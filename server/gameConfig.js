@@ -426,6 +426,9 @@ var gameConfig = {
         }
     },
 
+    /**
+     * Ping configurations.
+     */
     ping: {
         /**
          * Object defining the configuration of a ping, including it's effect strength and price.
@@ -435,7 +438,7 @@ var gameConfig = {
          * @param {Number} price Price to use the ping.
          * @param {Number} range Range of the ping in meters, -1 for an infinite range.
          * @param {Number} duration Duration of the ping's effect in seconds.
-         * @param {Number} max Maximum number of labs this ping can find, -1 for infinite labs.
+         * @param {Number} max Maximum number of factories this ping can find, -1 for infinite factories.
          */
 
         /**
