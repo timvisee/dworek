@@ -1201,14 +1201,39 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                             return;
                         }
 
+                        // Remember the amount of money the ally team has
+                        var allyTeamMoney = 0;
+
                         // Loop through the list of teams, and define whether the team is ally for the user
                         for(var i = 0; i < gameData.standings.length; i++) {
                             // The team is never an ally if the user's team is null
-                            if(team == null)
+                            if(team == null) {
                                 gameData.standings[i].ally = false;
-                            else
-                                gameData.standings[i].ally = gameData.standings[i].id == team.getIdHex();
+                                continue;
+                            }
+
+                            // Determine whether this team is ally, and set the ally status
+                            const isAlly = gameData.standings[i].id == team.getIdHex();
+                            gameData.standings[i].ally = isAlly;
+
+                            // Set the money of the ally team
+                            if(isAlly)
+                                allyTeamMoney = gameData.standings[i].money;
                         }
+
+                        // Get the pings that are applicable for this team, and set the pings field in the game data object
+                        const pings = gameConfig.ping.getPings(allyTeamMoney);
+                        gameData.pings = [];
+
+                        // Create public ping objects, and add them to the game data object
+                        pings.forEach(function(ping) {
+                            gameData.pings.push({
+                                id: ping.id,
+                                name: ping.name,
+                                price: ping.price,
+                                range: ping.range
+                            });
+                        });
 
                         // Resolve the latch
                         latch.resolve();

@@ -541,7 +541,7 @@ Game.prototype.getTeamMoney = function(callback) {
  * @typedef {Object} TeamMoneyObject
  * @param {String} id ID of the team, as a string.
  * @param {String} name Display name of the team.
- * @param {Number} Amount of money the team has.
+ * @param {Number} money Amount of money the team has.
  */
 
 /**
