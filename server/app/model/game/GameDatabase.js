@@ -144,7 +144,9 @@ GameDatabase.layerFetchFieldsFromDatabase = function(a, b, options, callback) {
             options.sortAscending = true;
 
         // Sort
-        findQuery = findQuery.sort(options.sortField, options.sortAscending ? 1 : -1);
+        findQuery = findQuery.sort({
+            [options.sortField]: options.sortAscending ? 1 : -1
+        });
     }
 
     // Limit the results
