@@ -22,7 +22,7 @@
 
 var _ = require('lodash');
 
-var config = require('../../../config');
+var gameConfig = require('../../../gameConfig');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
@@ -239,7 +239,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
 
                                     // Get the location of the entry factory
                                     interspaceLatch.add();
-                                    factory.getFactoryModel().getLocation(function(entryLocation, err) {
+                                    factory.getFactoryModel().getLocation(function(err, entryLocation) {
                                         // Call back errors
                                         if(err !== null) {
                                             callbackError(err);
@@ -247,7 +247,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Get the distance between the new factory and the entry
-                                        if(factoryLocation.getDistanceTo(entryLocation) < config.factory.interspaceMin) {
+                                        if(factoryLocation.getDistanceTo(entryLocation) < gameConfig.factory.interspaceMin) {
                                             // Send a notification to the user if this is the first factory that is too close
                                             if(!isTooClose) {
                                                 // Send a message response to the user
@@ -255,7 +255,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                     error: true,
                                                     // TODO: Dynamically get factory name from game name configuration!
                                                     message: 'It looks like there another lab close by!<br><br>' +
-                                                            'Your new lab must be at least ' + config.factory.interspaceMin + ' meters away from any other lab.',
+                                                            'To build a new lab, you must be at least ' + gameConfig.factory.interspaceMin + ' meters away from any other lab.',
                                                     dialog: true
                                                 }, socket);
                                             }
