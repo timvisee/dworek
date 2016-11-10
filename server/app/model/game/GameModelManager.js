@@ -457,7 +457,7 @@ GameModelManager.prototype.getGamesCountWithStage = function(stage, options, cal
         var fetchFieldOptions = {};
 
         // Set the results limit
-        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null ** options.limit > 0)
+        if(options.hasOwnProperty('limit') && options.limit !== undefined && options.limit !== null && options.limit > 0)
             fetchFieldOptions.limit = options.limit;
 
         // Query the database and check whether the game is valid
