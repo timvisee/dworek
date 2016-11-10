@@ -43,7 +43,7 @@ var gameConfig = {
         /**
          * Initial money amount, when a user starts the game.
          */
-        initialMoney: 100,
+        initialMoney: 200,
 
         /**
          * Initial in.
@@ -206,8 +206,8 @@ var gameConfig = {
          */
         getOutBuyPrice: function() {
             // Define the minimum and maximum price
-            const priceMin = 38;
-            const priceMax = 47;
+            const priceMin = 36;
+            const priceMax = 45;
 
             // Randomize the price
             return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
