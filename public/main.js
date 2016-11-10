@@ -4660,9 +4660,10 @@ function updateGameDataVisuals() {
                     showDialog({
                         title: ping.name,
                         message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
-                        (ping.range >= 0 ? 'This ping has a maximum range of ' + ping.range + ' meters,' : 'This ping has an infinite range,') + ' ' +
-                        (ping.max > 0 ? ('and finds a maximum of ' + ping.max + ' enemy ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) + ' closest to you.') : 'and finds all enemy labs if there are any.') + ' ' +
-                        'If there aren\'t any enemy ' + NameConfig.factory.names + ' to be found, the ping might be wasted.<br><br>' +
+                        '<table class="table-list ui-responsive">' +
+                        '<tr><td>Maximum range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Maximum findings</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) : '<i>Infinite</i>') + '</td></tr>' +
+                        '</table><br>' +
                         capitalizeFirst(NameConfig.factory.names) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
                         actions: [
