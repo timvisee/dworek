@@ -43,6 +43,7 @@ var GameUserModelManager = require('./app/model/gameuser/GameUserModelManager');
 var FactoryModelManager = require('./app/model/factory/FactoryModelManager');
 var RealTime = require('./app/realtime/RealTime');
 var PortUtils = require('./app/util/PortUtils');
+var EventLoopMonitor = require('./app/latency/EventLoopMonitor');
 
 /**
  * Constructor.
@@ -92,6 +93,19 @@ App.prototype.init = function(callback) {
         // Print the library paths, and call back
         (completeCallback) => {
             PathLibrary.printPaths();
+            completeCallback(null);
+        },
+
+        // Initialize event-loop monitoring
+        (completeCallback) => {
+            // Start event-loop monitoring
+            Core.eventLoopMonitor = new EventLoopMonitor(undefined, 10);
+            Core.eventLoopMonitor.start(false);
+
+            // Show a message in the console
+            console.log('Started event-loop monitoring.');
+
+            // Call back
             completeCallback(null);
         },
 

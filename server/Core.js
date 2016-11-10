@@ -112,5 +112,12 @@ Core.gameController = null;
  */
 Core.realTime = null;
 
+/**
+ * Event loop monitor.
+ *
+ * @type {EventLoopMonitor}
+ */
+Core.eventLoopMonitor = null;
+
 // Export the class
 module.exports = Core;
