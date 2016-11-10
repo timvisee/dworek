@@ -33,47 +33,47 @@ block content
             p Status of the resources available to #{app.name} on the machine the server is running on.
             table.table-list.ui-responsive
                 tr: td OS
-                    td: span.cpus= status.server.os
+                    td: span.status-server-os= status.server.os
                         span(style="color: gray;")  (#{status.server.platform}/#{status.server.arch})
                 tr: td CPUs
-                    td: span.cpus= status.server.cpus.length
+                    td: span.status-server-cpus= status.server.cpus.length
                         span(style="color: gray;")  cores
                 tr: td Model
-                    td: small.cpus= status.server.cpus[0].model
-                tr: td RAM
-                    td: span.cpus= status.server.memory.total
+                    td: small: small.status-server-model= status.server.cpus[0].model
+                tr: td Memory
+                    td: span.status-server-memory-total= status.server.memory.total
                         span(style="color: gray;")  total
                 tr: td
-                    td: span.cpus= status.server.memory.used
+                    td: span.status-server-memory-used= status.server.memory.used
                         span(style="color: gray;")  used
                 tr: td
-                    td: span.cpus= status.server.memory.free
+                    td: span.status-server-memory-free= status.server.memory.free
                         span(style="color: gray;")  free
                 tr: td Load
-                    td: span.loadavg1= status.server.loadavg[0]
+                    td: span.status-server-load-1= status.server.loadavg[0]
                         span(style="color: gray;")  avg last minute
                 tr: td
-                    td: span.loadavg5= status.server.loadavg[1]
+                    td: span.status-server-load-5= status.server.loadavg[1]
                         span(style="color: gray;")  avg last 5 minutes
                 tr: td
-                    td: span.loadavg15= status.server.loadavg[2]
+                    td: span.status-server-load-15= status.server.loadavg[2]
                         span(style="color: gray;")  avg last 15 minutes
                 tr: td Latency
                     td: span(style="color: gray;") Recent response times:
                 tr: td
-                    td: span.latency-max= status.server.latency[0]
+                    td: span.status-server-latency-max= status.server.latency[0]
                         span(style="color: gray;")  max
                 tr: td
-                    td: span.latency-min= status.server.latency[1]
+                    td: span.status-server-latency-min= status.server.latency[1]
                         span(style="color: gray;")  min
                 tr: td
-                    td: span.latency-50= status.server.latency[2]
+                    td: span.status-server-latency-50= status.server.latency[2]
                         span(style="color: gray;")  50%-th
                 tr: td
-                    td: span.latency-90= status.server.latency[3]
+                    td: span.status-server-latency-90= status.server.latency[3]
                         span(style="color: gray;")  90%-th
                 tr: td
-                    td: span.latency-99= status.server.latency[4]
+                    td: span.status-server-latency-99= status.server.latency[4]
                         span(style="color: gray;")  99%-th
 
     .nd2-card.wow.fadeInUp
