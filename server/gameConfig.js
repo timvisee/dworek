@@ -237,7 +237,7 @@ var gameConfig = {
          * Minimum amount of space between the centers of two factories in meters.
          * @type {Number}
          */
-        interspaceMin: 12.5,
+        interspaceMin: 15,
 
         /**
          * Get the active operation range in meters.
