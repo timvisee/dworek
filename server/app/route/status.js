@@ -23,6 +23,7 @@
 var express = require('express');
 var router = express.Router();
 var os = require('os');
+var percentile = require('stats-percentile');
 
 var config = require('../../config');
 var appInfo = require('../../appInfo');
@@ -83,18 +84,16 @@ router.get('/', function(req, res, next) {
         }
     };
 
-    latch.add();
-    var time = process.hrtime();
-    // [ 1800216, 25 ]
-    setTimeout(() => {
-        var diff = process.hrtime(time);
-        // [ 1, 552 ]
-        // console.log(`Benchmark took ${diff[0] * 1e9 + diff[1]} nanoseconds`);
-
-        options.status.server.latency = Formatter.formatNano(diff[0] * 1e9 + diff[1]);
-
-        latch.resolve();
-    }, 0);
+    const latencyList = Core.eventLoopMonitor.countLatency();
+    console.log(JSON.stringify(latencyList));
+    console.log("COUNT: " + latencyList.length);
+    options.status.server.latency = [
+        Formatter.formatNano(Math.max.apply(null, latencyList)),
+        Formatter.formatNano(Math.min.apply(null, latencyList)),
+        Formatter.formatNano(percentile.calc(latencyList, 50)),
+        Formatter.formatNano(percentile.calc(latencyList, 90)),
+        Formatter.formatNano(percentile.calc(latencyList, 99))
+    ];
 
     // Get the redis status if ready
     if(RedisUtils.isReady()) {

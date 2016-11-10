@@ -59,8 +59,20 @@ block content
                     td: span.loadavg15= status.server.loadavg[2]
                         span(style="color: gray;")  avg last 15 minutes
                 tr: td Latency
-                    td: span.cpus= status.server.latency
-                        span(style="color: gray;")  (events)
+                    td: span.latency-max= status.server.latency[0]
+                        span(style="color: gray;")  max
+                tr: td
+                    td: span.latency-min= status.server.latency[1]
+                        span(style="color: gray;")  min
+                tr: td
+                    td: span.latency-50= status.server.latency[2]
+                        span(style="color: gray;")  50%-th
+                tr: td
+                    td: span.latency-90= status.server.latency[3]
+                        span(style="color: gray;")  90%-th
+                tr: td
+                    td: span.latency-99= status.server.latency[4]
+                        span(style="color: gray;")  99%-th
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
