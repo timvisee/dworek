@@ -84,9 +84,8 @@ router.get('/', function(req, res, next) {
         }
     };
 
+    // Fetch and process latency data
     const latencyList = Core.eventLoopMonitor.countLatency();
-    console.log(JSON.stringify(latencyList));
-    console.log("COUNT: " + latencyList.length);
     options.status.server.latency = [
         Formatter.formatNano(Math.max.apply(null, latencyList)),
         Formatter.formatNano(Math.min.apply(null, latencyList)),
