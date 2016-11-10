@@ -108,7 +108,7 @@ RealTime.prototype.start = function() {
     // Register the connection event
     this._io.on('connection', function(socket) {
         // Show a status message
-        console.log('A client connected to the real time server, setting things up');
+        console.log('A client connected to the real time server, setting things up.');
 
         // Listen for packets from the client
         socket.on(config.realtime.defaultRoom, function(rawPacket) {
@@ -149,7 +149,7 @@ RealTime.prototype.getPacketProcessor = function() {
  */
 RealTime.prototype.registerHandlers = function() {
     // Show a status message
-    console.log('Registering packet handlers...');
+    console.log('Searching for packet handler plugins...');
 
     // Normalize the path
     const normalizedPath = path.join(__dirname, HANDLERS_DIRECTORY);
@@ -160,7 +160,7 @@ RealTime.prototype.registerHandlers = function() {
     // Read the directory for handlers, and initialize them
     fs.readdirSync(normalizedPath).forEach(function(file) {
         // Show a status message
-        console.log('Loading and registering ' + file + ' handler...');
+        console.log('Loaded ' + file + ' handler.');
 
         // Require the file
         const handler = require(HANDLERS_DIRECTORY + '/' + file);

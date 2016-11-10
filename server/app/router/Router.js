@@ -133,7 +133,7 @@ Router.prototype.init = function(callback) {
     });
 
     // Show a status message
-    console.log('Router started');
+    console.log('Router started.');
 
     // We're done, call back if a callback is defined
     if(callback !== undefined)

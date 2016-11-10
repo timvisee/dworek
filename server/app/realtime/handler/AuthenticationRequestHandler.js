@@ -91,7 +91,7 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
         socket.session.valid = false;
 
         // Show a status message
-        console.log('Authenticated real time client (no session)');
+        console.log('Authenticated real time client. (no session)');
         return;
     }
 
@@ -103,7 +103,7 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
         // Handle errors
         if(err !== null) {
             // Failed to validate session, show the error in the console
-            console.error('Failed to validate session, invalidating session for security reasons');
+            console.error('Failed to validate session, invalidating session for security reasons!');
 
             // Set the authentication result to false
             isValid = false;
@@ -135,12 +135,12 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
         // Don't authenticate if the user instance is null
         if(user == null) {
-            console.error('Failed to authenticate real-time client, user is null');
+            console.error('Failed to authenticate real-time client, user is null!');
             return;
         }
 
         // Show a status message
-        console.log('Authenticated real time client (valid: ' + isValid + ', session: ' + sessionToken + ')');
+        console.log('Authenticated real time client. (valid: ' + isValid + ', session: ' + sessionToken + ')');
 
         // Check whether this user has any queued broadcasts
         if(Core.realTime.hasBroadcasts(user.getIdHex().toLowerCase())) {

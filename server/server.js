@@ -31,7 +31,7 @@ function init() {
     console.log('Starting ' + appInfo.APP_NAME + ' v' + appInfo.VERSION_NAME + ' (' + appInfo.VERSION_CODE + ')' + '...');
 
     // Print the NodeJS version that is used
-    console.log('Running on NodeJS ' + process.version);
+    console.log('Running on NodeJS ' + process.version + '.');
 
     // Initialize the application
     app.init(function(err) {

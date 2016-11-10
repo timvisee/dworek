@@ -46,7 +46,7 @@ var MongoUtils = function() {};
  */
 MongoUtils.connect = function(callback) {
     // Show a status message
-    console.log('Connecting to the database...');
+    console.log('Connecting to database, MongoDB...');
 
     // Connect to the database
     MongoClient.connect(config.db.url, function(err, db) {
@@ -58,7 +58,7 @@ MongoUtils.connect = function(callback) {
         }
 
         // A connection was made, show a status message
-        console.log("Successfully established a connection to the database!");
+        console.log("Successfully established a connection to the database.");
 
         // Set the database instance
         connection = db;

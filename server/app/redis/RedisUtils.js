@@ -82,7 +82,7 @@ RedisUtils.connect = function(callback) {
     // Handle connect
     redisClient.on('connect', function() {
         // Show a status message
-        console.log('Successfully established a connection to Redis!');
+        console.log('Successfully established a connection to Redis.');
 
         // Reset the ready flag
         ready = false;

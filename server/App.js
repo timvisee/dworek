@@ -103,7 +103,7 @@ App.prototype.init = function(callback) {
             Core.eventLoopMonitor.start(false);
 
             // Show a message in the console
-            console.log('Started event-loop monitoring.');
+            console.log('Started event loop monitoring.');
 
             // Call back
             completeCallback(null);
