@@ -34,11 +34,9 @@ block content
             table.table-list.ui-responsive
                 tr: td CPUs
                     td: span.cpus= status.server.cpus.length
-                        span(style="color: gray;")  cores
+                        span(style="color: gray;")  cores (#{status.server.arch})
                 tr: td Model
                     td: small.cpus= status.server.cpus[0].model
-                tr: td Architecture
-                    td: span.arch= status.server.arch
                 tr: td RAM
                     td: span.cpus= status.server.memory.total
                         span(style="color: gray;")  total
