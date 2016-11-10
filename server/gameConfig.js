@@ -308,7 +308,12 @@ var gameConfig = {
          */
         getBuildCost: function(allyFactoryCount, enemyFactoryCount) {
             // Factory base price
-            const basePrice = 400;
+            const FACTORY_BASE_PRICE = 400;
+
+            // Decrease both factory counts by one (to a minimum of 2)
+            // This makes the second factory free too
+            allyFactoryCount = Math.max(allyFactoryCount - 1, 0);
+            enemyFactoryCount = Math.max(enemyFactoryCount - 1, 0);
 
             // The first factory costs nothing
             if(allyFactoryCount <= 0)
@@ -322,7 +327,7 @@ var gameConfig = {
             const ratioOffset = (allyFactoryCount - enemyFactoryCount) / 4;
 
             // Calculate the factory cost and return it
-            return Math.round(basePrice * Math.pow(1.45, allyFactoryCount + ratioOffset));
+            return Math.round(FACTORY_BASE_PRICE * Math.pow(1.45, allyFactoryCount + ratioOffset));
         },
 
         /**
