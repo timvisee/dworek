@@ -118,7 +118,7 @@ Formatter.formatNano = function(nano, decimals) {
 
     // Handle zero cases
     if(nano == 0)
-        return '0 ms';
+        return '<1 nanoseconds';
 
     // Determine the number of decimal places to show
     const decimalPlaces = decimals || 0;
