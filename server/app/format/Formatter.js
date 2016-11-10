@@ -78,5 +78,31 @@ Formatter.formatGoods = function(amount) {
     return Formatter.formatBigNumber(amount);
 };
 
+/**
+ * Format the given number of bytes into a human readable string.
+ *
+ * @param {Number} bytes Number of bytes.
+ * @param {Number} [decimals=2] Number of decimals to show.
+ * @return {String} Readable string.
+ */
+Formatter.formatBytes = function(bytes, decimals) {
+    // Constants
+    const BASE = 1024;
+    const SIZE_NOTATIONS = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    // Handle zero cases
+    if(bytes == 0)
+        return '0 Bytes';
+
+    // Determine the number of decimal places to show
+    const decimalPlaces = decimals || 2;
+
+    // Determine the factor
+    const factor = Math.floor(Math.log(bytes) / Math.log(BASE));
+
+    // Create and return the readable string
+    return parseFloat((bytes / Math.pow(BASE, factor)).toFixed(decimalPlaces)) + ' ' + SIZE_NOTATIONS[factor];
+};
+
 // Export the class
 module.exports = Formatter;
