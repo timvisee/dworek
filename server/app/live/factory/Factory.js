@@ -1672,9 +1672,9 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
         latch.resolve();
     });
 
-    // Get the user state
+    // Get the game stage
     latch.add();
-    gameModel.getUserState(userModel, function(err, userState) {
+    gameModel.getStage(function(err, gameStage) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -1683,63 +1683,74 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
             return;
         }
 
-        // Set the visibility state if the user is a spectator
-        if(userState.spectator)
-            resultObject.visible = true;
-
-        // Set the visibility to true if the factory is pinged
-        if(self.isInPingMemory(liveUser)) {
-            resultObject.visible = true;
-            resultObject.pinged = true;
-        }
-
-        // Determine whether the factory is ally when we fetched the team data
-        latch.add();
-        allyLatch.then(function() {
-            // Make sure the user is a player
-            if(!userState.player) {
-                latch.resolve();
+        // Get the user state
+        gameModel.getUserState(userModel, function(err, userState) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
                 return;
             }
 
-            // Set the ally and visibility status if the teams equal and aren't null
-            if(factoryTeam != null && userTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
-                resultObject.ally = true;
+            // Set the visibility state if the user is a spectator
+            if(userState.spectator || gameStage >= 2)
                 resultObject.visible = true;
+
+            // Set the visibility to true if the factory is pinged
+            if(self.isInPingMemory(liveUser)) {
+                resultObject.visible = true;
+                resultObject.pinged = true;
+            }
+
+            // Determine whether the factory is ally when we fetched the team data
+            latch.add();
+            allyLatch.then(function() {
+                // Make sure the user is a player
+                if(!userState.player) {
+                    latch.resolve();
+                    return;
+                }
+
+                // Set the ally and visibility status if the teams equal and aren't null
+                if(factoryTeam != null && userTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
+                    resultObject.ally = true;
+                    resultObject.visible = true;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // If the user is a player or special player, check whether he's in range
+            // Make sure the user has a recently known location
+            if((userState.player || userState.special) && liveUser.hasRecentLocation() && gameStage < 2) {
+                // Get the factory range
+                latch.add();
+                self.isUserInRange(liveUser, function(err, result) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Set whether the user is in range
+                    resultObject.inRange = result;
+
+                    // Set the visibility state if the factory is in range
+                    if(result)
+                        resultObject.visible = true;
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
             }
 
             // Resolve the latch
             latch.resolve();
         });
-
-        // If the user is a player or special player, check whether he's in range
-        // Make sure the user has a recently known location
-        if((userState.player || userState.special) && liveUser.hasRecentLocation()) {
-            // Get the factory range
-            latch.add();
-            self.isUserInRange(liveUser, function(err, result) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        callback(err);
-                    calledBack = true;
-                    return;
-                }
-
-                // Set whether the user is in range
-                resultObject.inRange = result;
-
-                // Set the visibility state if the factory is in range
-                if(result)
-                    resultObject.visible = true;
-
-                // Resolve the latch
-                latch.resolve();
-            });
-        }
-
-        // Resolve the latch
-        latch.resolve();
     });
 
     // Call back the result object when we're done
