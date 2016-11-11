@@ -460,33 +460,62 @@ var gameConfig = {
          */
         getPings: function(teamMoney) {
             // Minimum possible prices and price factors for the pings
+            const CHEAP_RADAR_TEAM_MONEY_THRESHOLD = 500;
+            const CHEAP_RADAR_PRICE = 75;
             const RADAR_PRICE_FACTOR = 0.05;
             const RADAR_PRICE_MIN = 500;
             const SATELLITE_PRICE_FACTOR = 0.1;
             const SATELLITE_PRICE_MIN = 1000;
+            const ENEMY_HACK_PRICE_FACTOR = 0.2;
+            const ENEMY_HACK_PRICE_MIN = 8000;
+            const ENEMY_HACK_TEAM_MONEY_THRESHOLD = 40000;
 
-            // Dynamically determine ping IDs
+            // Dynamically determine ping IDs, and create an array of pings
             var i = 1;
+            var pings = [];
 
-            // Create and return an array of pings
-            return [
-                {
+            // Add the cheap radar
+            if(teamMoney < CHEAP_RADAR_TEAM_MONEY_THRESHOLD)
+                pings.push({
                     id: i++,
-                    name: "Radar",
-                    price: Math.round(Math.max(teamMoney * RADAR_PRICE_FACTOR, RADAR_PRICE_MIN)),
-                    range: 40,
+                    name: "Cheap Radar",
+                    price: CHEAP_RADAR_PRICE,
+                    range: 25,
                     duration: 45 * 1000,
                     max: 1
-                },
-                {
+                });
+
+            // Add default pings
+            pings.push({
+                id: i++,
+                name: "Radar",
+                price: Math.round(Math.max(teamMoney * RADAR_PRICE_FACTOR, RADAR_PRICE_MIN)),
+                range: 40,
+                duration: 45 * 1000,
+                max: 1
+            });
+            pings.push({
+                id: i++,
+                name: "Spy Satellite",
+                price: Math.round(Math.max(teamMoney * SATELLITE_PRICE_FACTOR, SATELLITE_PRICE_MIN)),
+                range: -1,
+                duration: 45 * 1000,
+                max: 1
+            });
+
+            // Add the expensive enemy hack ping
+            if(teamMoney >= ENEMY_HACK_TEAM_MONEY_THRESHOLD)
+                pings.push({
                     id: i++,
-                    name: "Spy satellite",
-                    price: Math.round(Math.max(teamMoney * SATELLITE_PRICE_FACTOR, SATELLITE_PRICE_MIN)),
+                    name: "Enemy Hack",
+                    price: Math.round(Math.max(teamMoney * ENEMY_HACK_PRICE_FACTOR, ENEMY_HACK_PRICE_MIN)),
                     range: -1,
                     duration: 45 * 1000,
-                    max: 1
-                }
-            ];
+                    max: 2
+                });
+
+            // Return the list of pings
+            return pings;
         }
     }
 };
