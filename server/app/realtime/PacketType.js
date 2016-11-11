@@ -69,6 +69,7 @@ module.exports = {
      * - [dialog]: true to show a dialog, false to not
      * - [toast]: true to show a toast notification, false to not
      * - [ttl]: time to live of toast notification in milliseconds.
+     * - [vibrate=false]: true to vibrate the client device, false if not.
      */
     MESSAGE_RESPONSE: 4,
 

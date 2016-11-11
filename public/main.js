@@ -1039,6 +1039,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
     const dialog = packet.hasOwnProperty('dialog') && !!packet.dialog;
     const toast = packet.hasOwnProperty('toast') && !!packet.toast;
     const ttl = packet.hasOwnProperty('ttl') ? parseInt(packet.ttl) : undefined;
+    const shouldVibrate = packet.hasOwnProperty('vibrate') ? packet.vibrate : false;
 
     // Show a dialog
     if(dialog) {
@@ -1070,6 +1071,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.MESSAGE_RESPONSE, fun
         // Show a toast notification
         showNotification(message, notificationObject);
     }
+
+    // Vibrate if requested
+    if(shouldVibrate)
+        vibrate();
 });
 
 // Handle factory build packets
@@ -4662,7 +4667,7 @@ function updateGameDataVisuals() {
                         message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
                         '<table class="table-list ui-responsive">' +
                         '<tr><td>Maximum range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
-                        '<tr><td>Maximum findings</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Maximum pinged</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) : '<i>Infinite</i>') + '</td></tr>' +
                         '</table><br>' +
                         capitalizeFirst(NameConfig.factory.names) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
