@@ -301,7 +301,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                             }
 
                                             // Don't add the factory if it's already visible
-                                            if(!result) {
+                                            if(result) {
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();
