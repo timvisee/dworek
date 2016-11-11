@@ -381,7 +381,7 @@ GameUserModel.prototype.setUser = function(user, callback) {
 /**
  * Get the team.
  *
- * @param {GameTeamModel~getTeamCallback} callback Called with the team or when an error occurred.
+ * @param {GameUserModel~getTeamCallback} callback Called with the team or when an error occurred.
  */
 GameUserModel.prototype.getTeam = function(callback) {
     this.getField('team', callback);
@@ -390,7 +390,7 @@ GameUserModel.prototype.getTeam = function(callback) {
 /**
  * Called with the team or when an error occurred.
  *
- * @callback TeamModel~getTeamCallback
+ * @callback GameUserModel~getTeamCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {GameTeamModel} Team.
  */
