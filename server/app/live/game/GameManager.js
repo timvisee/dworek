@@ -103,19 +103,26 @@ GameManager.prototype.getGame = function(gameId, callback) {
             }
 
             // Make sure the stage is valid
-            if(stage != 1) {
+            if(stage == 0) {
                 callback(null, null);
                 return;
             }
 
             // Create a game instance for this model
-            var newGame = new Game(game);
+            const newGame = new Game(game);
+            newGame.load(function(err) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
 
-            // Add the game to the list of loaded games
-            self.games.push(newGame);
+                // Add the game to the list of loaded games
+                self.games.push(newGame);
 
-            // Call back the game
-            callback(null, newGame);
+                // Call back the game
+                callback(null, newGame);
+            });
         });
     });
 };
@@ -744,7 +751,8 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
         factories: [],
         shops: [],
         strength: {},
-        standings: []
+        standings: [],
+        pings: []
     };
 
     // Store this instance
@@ -788,10 +796,10 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
         gameData.stage = gameStage;
 
         // Send the game data if the game isn't active
-        if(gameStage != 1) {
-            sendGameData();
-            return;
-        }
+        // if(gameStage != 1) {
+        //     sendGameData();
+        //     return;
+        // }
 
         // Create a callback latch
         var latch = new CallbackLatch();
@@ -1098,26 +1106,26 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
         // Get the game user
         latch.add();
-        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+        Core.model.gameUserModelManager.getGameUser(game, user, function (err, gameUser) {
             // Call back errors
-            if(err !== null) {
-                if(!calledBack)
+            if (err !== null) {
+                if (!calledBack)
                     callback(err);
                 calledBack = true;
                 return;
             }
 
             // Make sure the game user is valid
-            if(gameUser == null) {
+            if (gameUser == null) {
                 latch.resolve();
                 return;
             }
 
             // Get the game user strength
-            gameUser.getStrength(function(err, userStrength) {
+            gameUser.getStrength(function (err, userStrength) {
                 // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
+                if (err !== null) {
+                    if (!calledBack)
                         callback(err);
                     calledBack = true;
                     return;
@@ -1127,21 +1135,27 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                 gameData.strength.value = userStrength;
 
                 // Get the game config
-                game.getConfig(function(err, gameConfig) {
-                    // Call back errors
-                    if(err !== null) {
-                        if(!calledBack)
-                            callback(err);
-                        calledBack = true;
-                        return;
-                    }
+                if(gameStage == 1) {
+                    game.getConfig(function (err, gameConfig) {
+                        // Call back errors
+                        if (err !== null) {
+                            if (!calledBack)
+                                callback(err);
+                            calledBack = true;
+                            return;
+                        }
 
-                    // Get the user strength upgrades
-                    gameData.strength.upgrades = gameConfig.player.getStrengthUpgrades(userStrength);
+                        // Get the user strength upgrades
+                        gameData.strength.upgrades = gameConfig.player.getStrengthUpgrades(userStrength);
 
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                } else {
                     // Resolve the latch
                     latch.resolve();
-                });
+                }
             });
         });
 
@@ -1222,20 +1236,22 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Get the pings that are applicable for this team, and set the pings field in the game data object
-                        const pings = gameConfig.ping.getPings(allyTeamMoney);
-                        gameData.pings = [];
+                        if(gameStage == 1) {
+                            // Get the pings
+                            const pings = gameConfig.ping.getPings(allyTeamMoney);
 
-                        // Create public ping objects, and add them to the game data object
-                        pings.forEach(function (ping) {
-                            gameData.pings.push({
-                                id: ping.id,
-                                name: ping.name,
-                                cost: ping.price,
-                                range: ping.range,
-                                duration: ping.duration,
-                                max: ping.max
+                            // Create public ping objects, and add them to the game data object
+                            pings.forEach(function (ping) {
+                                gameData.pings.push({
+                                    id: ping.id,
+                                    name: ping.name,
+                                    cost: ping.price,
+                                    range: ping.range,
+                                    duration: ping.duration,
+                                    max: ping.max
+                                });
                             });
-                        });
+                        }
 
                         // Resolve the latch
                         latch.resolve();

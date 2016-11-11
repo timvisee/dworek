@@ -4723,7 +4723,7 @@ function updateGameDataVisuals() {
         const list = activePage.find('.current-standings');
 
         if(data.standings.length == 0) {
-            list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br><br>');
+            list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br>');
             return;
         }
 
