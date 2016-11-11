@@ -1192,7 +1192,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     }
 
                     // Get the team the user is in
-                    gameUser.getTeam(function (err, team) {
+                    gameUser.getTeam(function(err, team) {
                         // Call back errors
                         if (err !== null) {
                             if (!calledBack)
@@ -1205,19 +1205,19 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         var allyTeamMoney = 0;
 
                         // Loop through the list of teams, and define whether the team is ally for the user
-                        for (var i = 0; i < gameData.standings.length; i++) {
+                        for(var i = 0; i < gameData.standings.length; i++) {
                             // The team is never an ally if the user's team is null
-                            if (team == null) {
+                            if(team == null) {
                                 gameData.standings[i].ally = false;
                                 continue;
                             }
 
                             // Determine whether this team is ally, and set the ally status
-                            const isAlly = gameData.standings[i].id == team.getIdHex();
+                            var isAlly = gameData.standings[i].id == team.getIdHex();
                             gameData.standings[i].ally = isAlly;
 
                             // Set the money of the ally team
-                            if (isAlly)
+                            if(isAlly)
                                 allyTeamMoney = gameData.standings[i].money;
                         }
 
