@@ -184,7 +184,7 @@ ShopManager.prototype.load = function(callback) {
 };
 
 /**
- * @callback UserManager~loadCallback
+ * @callback ShopManager~loadCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
