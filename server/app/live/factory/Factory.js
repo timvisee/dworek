@@ -685,16 +685,31 @@ Factory.prototype.getTeam = function(callback) {
  * @param {function} callback callback(err, isVisible)
  */
 Factory.prototype.isVisibleFor = function(liveUser, callback) {
-    // Get the visibility state for the user
-    this.getVisibilityState(liveUser, function(err, visibilityState) {
+    // Get the game stage
+    this.getGame().getGameModel().getStage(function(err, gameStage) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // Call back with the result
-        callback(null, visibilityState.visible);
+        // Call back true if the game is finished
+        if(gameStage >= 2) {
+            callback(null, true);
+            return;
+        }
+
+        // Get the visibility state for the user
+        this.getVisibilityState(liveUser, function(err, visibilityState) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Call back with the result
+            callback(null, visibilityState.visible);
+        });
     });
 };
 
