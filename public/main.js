@@ -4662,24 +4662,6 @@ function updateGameDataVisuals() {
 
                 // Bind a click action
                 button.click(function() {
-                    // Get the amount of money the user currently has
-                    var moneyCurrent = 0;
-                    if(hasGameData()) {
-                        const gameData = getGameData();
-                        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
-                            moneyCurrent = gameData.balance.money;
-                    }
-
-                    // Make sure the user has enough money
-                    if(ping.cost > moneyCurrent) {
-                        showDialog({
-                            title: 'Not enough money',
-                            message: 'You don\'t have enough money to execute this ping.<br><br>' +
-                            'Make some money to execute one later in the game!'
-                        });
-                        return;
-                    }
-
                     // Show the ping dialog
                     showDialog({
                         title: ping.name,
@@ -4695,6 +4677,24 @@ function updateGameDataVisuals() {
                                 text: 'Execute ping',
                                 state: 'primary',
                                 action: function() {
+                                    // Get the amount of money the user currently has
+                                    var moneyCurrent = 0;
+                                    if(hasGameData()) {
+                                        const gameData = getGameData();
+                                        if(gameData != null && gameData.hasOwnProperty('balance') && gameData.balance.hasOwnProperty('money'))
+                                            moneyCurrent = gameData.balance.money;
+                                    }
+
+                                    // Make sure the user has enough money
+                                    if(ping.cost > moneyCurrent) {
+                                        showDialog({
+                                            title: 'Not enough money',
+                                            message: 'You don\'t have enough money to execute this ping.<br><br>' +
+                                            'Make some money to execute one later in the game!'
+                                        });
+                                        return;
+                                    }
+
                                     // Send an ping packet
                                     Dworek.realtime.packetProcessor.sendPacket(PacketType.PING_BUY, {
                                         game: Dworek.utils.getGameId(),
