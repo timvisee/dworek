@@ -2003,7 +2003,7 @@ function vibrate(pattern) {
         return;
 
     // Parse the pattern
-    if(pattern === null)
+    if(pattern === null || pattern === undefined)
         pattern = [500, 250, 500];
 
     // Vibrate
