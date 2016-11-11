@@ -1697,8 +1697,10 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
             }
 
             // Set the visibility state if the user is a spectator
-            if(userState.spectator || gameStage >= 2)
+            if(userState.spectator || gameStage >= 2) {
                 resultObject.visible = true;
+                resultObject.inRange = false;
+            }
 
             // Set the visibility to true if the factory is pinged
             if(self.isInPingMemory(liveUser)) {

@@ -109,8 +109,8 @@ GameManager.prototype.getGame = function(gameId, callback) {
             }
 
             // Create a game instance for this model
-            const newGame = new Game(game);
-            newGame.load(function(err) {
+            const loadGame = new Game(game);
+            loadGame.load(function(err) {
                 // Call back errors
                 if(err !== null) {
                     callback(err);
@@ -118,10 +118,10 @@ GameManager.prototype.getGame = function(gameId, callback) {
                 }
 
                 // Add the game to the list of loaded games
-                self.games.push(newGame);
+                self.games.push(loadGame);
 
                 // Call back the game
-                callback(null, newGame);
+                callback(null, loadGame);
             });
         });
     });
