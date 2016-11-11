@@ -461,9 +461,9 @@ var gameConfig = {
         getPings: function(teamMoney) {
             // Minimum possible prices and price factors for the pings
             const RADAR_PRICE_FACTOR = 0.05;
-            const RADAR_PRICE_MIN = 1000;
+            const RADAR_PRICE_MIN = 500;
             const SATELLITE_PRICE_FACTOR = 0.1;
-            const SATELLITE_PRICE_MIN = 2000;
+            const SATELLITE_PRICE_MIN = 1000;
 
             // Dynamically determine ping IDs
             var i = 1;
