@@ -274,7 +274,7 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
 /**
  * Called with the array of factories for the given game and or user.
  *
- * @callback GameModelManager~getFactoriesCallback
+ * @callback FactoryModelManager~getFactoriesCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Array=} Array of FactoryModel factories.
  */
