@@ -287,6 +287,32 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         // Create a variable for the factory distance
                                         var factoryDistance = null;
 
+                                        // Make sure the factory isn't already visible
+                                        factoryLatch.add();
+                                        factory.isVisibleFor(liveUser, function(err, result) {
+                                            // Call back errors
+                                            if(err !== null) {
+                                                callbackError();
+                                                if(!isResolved) {
+                                                    isResolved = true;
+                                                    latch.resolve();
+                                                }
+                                                return;
+                                            }
+
+                                            // Don't add the factory if it's already visible
+                                            if(!result) {
+                                                if(!isResolved) {
+                                                    isResolved = true;
+                                                    latch.resolve();
+                                                }
+                                                return;
+                                            }
+
+                                            // Resolve the factory latch
+                                            factoryLatch.resolve();
+                                        });
+
                                         // Get the factory team
                                         factoryLatch.add();
                                         factory.getTeam(function(err, factoryTeam) {
