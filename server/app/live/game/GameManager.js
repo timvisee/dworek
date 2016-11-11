@@ -1278,6 +1278,12 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
     // Store this instance
     const self = this;
 
+    // Make sure the game isn't null
+    if(game == null) {
+        callback(new Error('Game is null.'));
+        return;
+    }
+
     // Get the live game
     this.getGame(game, function(err, liveGame) {
         // Call back errors
