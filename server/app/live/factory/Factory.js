@@ -685,6 +685,9 @@ Factory.prototype.getTeam = function(callback) {
  * @param {function} callback callback(err, isVisible)
  */
 Factory.prototype.isVisibleFor = function(liveUser, callback) {
+    // Store this instance
+    const self = this;
+
     // Get the game stage
     this.getGame().getGameModel().getStage(function(err, gameStage) {
         // Call back errors
@@ -700,7 +703,7 @@ Factory.prototype.isVisibleFor = function(liveUser, callback) {
         }
 
         // Get the visibility state for the user
-        this.getVisibilityState(liveUser, function(err, visibilityState) {
+        self.getVisibilityState(liveUser, function(err, visibilityState) {
             // Call back errors
             if(err !== null) {
                 callback(err);
