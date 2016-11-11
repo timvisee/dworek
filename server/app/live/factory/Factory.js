@@ -70,6 +70,14 @@ var Factory = function(factory, game) {
      */
     this._userRangeMem = [];
 
+    /**
+     * Array containing live users this factory is pinged for.
+     *
+     * @type {Array} Array of live user objects.
+     * @private
+     */
+    this._userPingMem = [];
+
     // Get and set the factory ID
     if(factory instanceof FactoryModel)
         this._id = factory.getId();
@@ -820,6 +828,92 @@ Factory.prototype.setInRangeMemory = function(liveUser, inRange) {
 };
 
 /**
+ * Check whether the given user is in the pinged memory.
+ *
+ * @param {User} liveUser User.
+ */
+Factory.prototype.isInPingMemory = function(liveUser) {
+    return this._userPingMem.indexOf(liveUser) >= 0;
+};
+
+/**
+ * Set whether the given live user is in the ping memory of the factory.
+ *
+ * @param {User} liveUser Live user instance to set the state for.
+ * @param {boolean} isPinged True to set the in ping state to true, false otherwise.
+ * @param {boolean|undefined=true} sendLocationUpdate True to send new location data to the user, which shows the factory on the map.
+ * @return {boolean} True if the state changed, false if not.
+ */
+Factory.prototype.setInPingMemory = function(liveUser, isPinged, sendLocationUpdate) {
+    // Get the memorized ping state
+    const lastState = this.isInPingMemory(liveUser);
+
+    // Return false if the state didn't change
+    if(lastState == isPinged)
+        return false;
+
+    // Update the ping array
+    if(isPinged)
+        this._userPingMem.push(liveUser);
+    else
+        this._userPingMem.splice(this._userPingMem.indexOf(liveUser), 1);
+
+    // Update the location data for the live user
+    if(sendLocationUpdate === undefined || sendLocationUpdate)
+        Core.gameController.broadcastLocationData(liveUser.getGame(), liveUser, undefined, function(err) {
+            // Show errors
+            if(err !== null) {
+                console.error('Failed to broadcast location data to user.');
+                console.error(err);
+            }
+        });
+
+    // Return the result
+    return true;
+};
+
+/**
+ * Ping this factory for the given user and the given duration.
+ *
+ * @param {User} liveUser User to ping the factory for.
+ * @param {Number} pingDuration Duration of the ping in milliseconds.
+ * @param {boolean|undefined=true} sendLocationUpdate True to send new location data to the user, which shows the factory on the map.
+ * @param {Factory~pingForCallback} [callback] Called back when the ping decayed, or when an error occurred.
+ */
+Factory.prototype.pingFor = function (liveUser, pingDuration, sendLocationUpdate, callback) {
+    // Make sure the user is valid, and that the ping duration is a positive number
+    if(liveUser == null && pingDuration <= 0) {
+        if(_.isFunction(callback))
+            callback(new Error('Invalid live user instance or invalid ping duration.'));
+        return;
+    }
+
+    // Add the live user to the ping memory
+    this.setInPingMemory(liveUser, true, sendLocationUpdate );
+
+    // Store this instance
+    const self = this;
+
+    // Create a timeout to remove the user from the ping memory
+    setTimeout(function() {
+        // Remove the user from the ping memory
+        self.setInPingMemory(liveUser, false, true);
+
+        // Call the callback
+        if(_.isFunction(callback))
+            callback(null);
+
+    }, pingDuration);
+};
+
+/**
+ * Called when the ping has decayed, or when an error occurred.
+ *
+ * @callback Factory~pingForCallback
+ * @param {Error|null} Error instance if an error occurred.
+ */
+
+/**
  * Calculate the input production per tick.
  *
  * @param callback (err, productionValue)
@@ -1468,7 +1562,8 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
     var resultObject = {
         ally: false,
         visible: false,
-        inRange: false
+        inRange: false,
+        pinged: false
     };
 
     // Make sure a valid user is given
@@ -1577,6 +1672,12 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
         if(userState.spectator)
             resultObject.visible = true;
 
+        // Set the visibility to true if the factory is pinged
+        if(self.isInPingMemory(liveUser)) {
+            resultObject.visible = true;
+            resultObject.pinged = true;
+        }
+
         // Determine whether the factory is ally when we fetched the team data
         latch.add();
         allyLatch.then(function() {
@@ -1646,6 +1747,7 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
  * @param {boolean} ally True if this factory is allied, false if not.
  * @param {boolean} visible True if the factory is visible for the user, false if not.
  * @param {boolean} inRange True if the factory is in the user's range, false if not.
+ * @param {boolean} pinged True if the factory is pinged for the user, false if not.
  */
 
 /**
