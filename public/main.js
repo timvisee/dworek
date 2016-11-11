@@ -4666,8 +4666,8 @@ function updateGameDataVisuals() {
                         title: ping.name,
                         message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
                         '<table class="table-list ui-responsive">' +
-                        '<tr><td>Maximum range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
-                        '<tr><td>Maximum pinged</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Max range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? NameConfig.factory.names : NameConfig.factory.name) : '<i>Infinite</i>') + '</td></tr>' +
                         '</table><br>' +
                         capitalizeFirst(NameConfig.factory.names) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
