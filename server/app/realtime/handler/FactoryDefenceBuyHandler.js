@@ -78,7 +78,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to buy upgrade, a server error occurred.',
+            message: 'Failed to buy defence upgrade, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -104,7 +104,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to send your location, you\'re not authenticated.',
+            message: 'Failed to buy defence upgrade, you\'re not authenticated.',
             dialog: true
         }, socket);
         return;

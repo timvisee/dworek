@@ -104,7 +104,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
         // Send a message response to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to send your location, you\'re not authenticated.',
+            message: 'Failed to buy strength upgrade, you\'re not authenticated.',
             dialog: true
         }, socket);
         return;
