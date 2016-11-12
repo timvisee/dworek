@@ -36,7 +36,8 @@ var SessionValidator = require('../router/middleware/SessionValidator');
 router.get('/', function(req, res, next) {
     // Redirect the user to the front page if already logged in
     if(req.session.valid) {
-        res.redirect('/');
+        // Redirect the user to the dashboard or redirect URL page
+        redirectLogin(req, res);
         return;
     }
 
@@ -133,25 +134,38 @@ router.post('/', function(req, res, next) {
 
                 // TODO: Refresh user's client authentication
 
-                // Redirect the user to the redirection page
-                if(req.param('next')) {
-                    // Get the redirection URL
-                    const redirectionUrl = req.param('next');
-
-                    // Make sure the redirection URL is valid
-                    if(Validator.isValidRedirectUrl(redirectionUrl)) {
-                        // Redirect the user to the redirection URL
-                        res.redirect(301, redirectionUrl);
-                        return;
-                    }
-                }
-
-                // Redirect the user to the dashboard
-                res.redirect(301, '/');
+                // Redirect the user to the dashboard or redirection URL when logged in
+                redirectLogin(req, res);
             });
         });
     });
 });
+
+/**
+ * Called after successfully logged in to redirect the user to the proper page.
+ * The user will be redirected to the dashboard by default.
+ * The user will be redirected to the redirection URL if specified in the current page URL.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+function redirectLogin(req, res) {
+    // Redirect the user to the redirection page
+    if(req.param('next')) {
+        // Get the redirection URL
+        const redirectionUrl = req.param('next');
+
+        // Make sure the redirection URL is valid
+        if(Validator.isValidRedirectUrl(redirectionUrl)) {
+            // Redirect the user to the redirection URL
+            res.redirect(301, redirectionUrl);
+            return;
+        }
+    }
+
+    // Redirect the user to the dashboard
+    res.redirect(301, '/');
+}
 
 // Export the module
 module.exports = router;
