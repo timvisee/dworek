@@ -22,6 +22,7 @@
 
 var express = require('express');
 var router = express.Router();
+var _ = require("lodash");
 
 var config = require('../../config');
 var Core = require('../../Core');
@@ -40,12 +41,19 @@ router.get('/', function(req, res, next) {
         return;
     }
 
-    // Show the registration page
-    LayoutRenderer.render(req, res, next, 'register', 'Registration', {
+    // Create an object with the page variables
+    var pageVars = {
         page: {
             leftButton: 'back'
         }
-    });
+    };
+
+    // Set the next property
+    if(_.isString(req.param('next')))
+        pageVars.next = req.param('next');
+
+    // Show the registration page
+    LayoutRenderer.render(req, res, next, 'register', 'Registration', pageVars);
 });
 
 // Register index
