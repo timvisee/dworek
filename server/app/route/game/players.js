@@ -56,11 +56,9 @@ module.exports = {
      * @param next Express next callback.
      */
     get: (req, res, next) => {
-        // Make sure the user is logged in
-        if(!req.session.valid) {
-            LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        // Make sure the user has a valid session
+        if(!req.requireValidSession())
             return;
-        }
 
         // Get the game
         const game = req.game;
@@ -147,11 +145,9 @@ module.exports = {
      * @param {string} category Game user category.
      */
     listPage: (req, res, next, category) => {
-        // Make sure the user is logged in
-        if(!req.session.valid) {
-            LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+        // Make sure the user has a valid session
+        if(!req.requireValidSession())
             return;
-        }
 
         // Get the game and user
         const game = req.game;

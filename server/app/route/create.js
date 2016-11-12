@@ -34,11 +34,9 @@ var GameDatabase = require('../model/game/GameDatabase');
 
 // Create index
 router.get('/', function(req, res, next) {
-    // Make sure the user is logged in
-    if(!req.session.valid) {
-        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+    // Make sure the user has a valid session
+    if(!req.requireValidSession())
         return;
-    }
 
     // Get the game and user
     const user = req.session.user;
@@ -57,11 +55,9 @@ router.post('/', function(req, res, next) {
     // Get the login field values
     var gameName = req.body['field-game-name'];
 
-    // Make sure the user is logged in
-    if(!req.session.valid) {
-        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+    // Make sure the user has a valid session
+    if(!req.requireValidSession())
         return;
-    }
 
     // Get the game and user
     const user = req.session.user;

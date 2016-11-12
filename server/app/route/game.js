@@ -48,11 +48,9 @@ GameParam.attach(router);
 
 // Game page
 router.get('/:game', function(req, res, next) {
-    // Make sure the user is logged in
-    if(!req.session.valid) {
-        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+    // Make sure the user has a valid session
+    if(!req.requireValidSession())
         return;
-    }
 
     // Get the game and user
     const game = req.game;

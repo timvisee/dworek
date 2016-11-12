@@ -23,6 +23,7 @@
 var config = require('../../../config');
 var Core = require('../../../Core');
 var UserModel = require('../../model/user/UserModel');
+var LayoutRenderer = require("../../layout/LayoutRenderer.js");
 
 /**
  * SessionValidator middleware class.
@@ -45,6 +46,30 @@ SessionValidator.route = function(req, res, next) {
         valid: false,
         token: undefined,
         user: undefined
+    };
+
+    /**
+     * Show the login required page.
+     * This renders the page that shows the client he's required to login.
+     */
+    req.showRequireLoginPage = function() {
+        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!');
+    };
+
+    /**
+     * Require the client to have a valid session, the client must be logged in.
+     * Show a login required page if the client doesn't have a valid session.
+     *
+     * @return {boolean} True if the client has a valid session, false if not and the login required page is shown.
+     */
+    req.requireValidSession = function() {
+        // Return true if the session is valid
+        if(req.session.valid)
+            return true;
+
+        // Show the login required page, and return false
+        req.showRequireLoginPage();
+        return false;
     };
 
     // Get the session token
