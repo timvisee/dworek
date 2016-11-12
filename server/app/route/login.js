@@ -141,13 +141,13 @@ router.post('/', function(req, res, next) {
                     // Make sure the redirection URL is valid
                     if(Validator.isValidRedirectUrl(redirectionUrl)) {
                         // Redirect the user to the redirection URL
-                        res.redirect(redirectionUrl);
+                        res.redirect(301, redirectionUrl);
                         return;
                     }
                 }
 
                 // Redirect the user to the dashboard
-                res.redirect('/');
+                res.redirect(301, '/');
             });
         });
     });
