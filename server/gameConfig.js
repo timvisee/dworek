@@ -310,24 +310,24 @@ var gameConfig = {
             // Factory base price
             const FACTORY_BASE_PRICE = 400;
 
-            // Decrease both factory counts by one (to a minimum of 2)
-            // This makes the second factory free too
-            allyFactoryCount = Math.max(allyFactoryCount - 1, 0);
-            enemyFactoryCount = Math.max(enemyFactoryCount - 1, 0);
+            // Decrease both factory counts by one (to a minimum of 5)
+            // This makes the first 5 factories free to build
+            allyFactoryCount = Math.max(allyFactoryCount - 4, 0);
+            enemyFactoryCount = Math.max(enemyFactoryCount - 4, 0);
 
             // The first factory costs nothing
             if(allyFactoryCount <= 0)
                 return 0;
 
-            // The second factory costs the initial money value
-            if(allyFactoryCount == 1)
-                return Math.round(gameConfig.player.initialMoney);
+            // // The second factory costs the initial money value
+            // if(allyFactoryCount == 1)
+            //     return Math.round(gameConfig.player.initialMoney);
 
             // Calculate the level offset due to the ally/enemy factory ratio
             const ratioOffset = (allyFactoryCount - enemyFactoryCount) / 4;
 
             // Calculate the factory cost and return it
-            return Math.round(FACTORY_BASE_PRICE * Math.pow(1.45, allyFactoryCount + ratioOffset));
+            return Math.round(FACTORY_BASE_PRICE * Math.pow(1.4, allyFactoryCount + ratioOffset));
         },
 
         /**
