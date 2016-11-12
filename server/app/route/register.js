@@ -211,14 +211,24 @@ router.post('/', function(req, res, next) {
                         return;
                     }
 
-                    // Show registration success page
-                    LayoutRenderer.render(req, res, next, 'register', 'Success', {
-                        message: 'Welcome ' + firstName + '!\n\n' +
-                        'You\'ve successfully been registered.\n\n' +
-                        'Please click the button below to login and continue to your dashboard.',
+                    // Create the page variables object
+                    var pageVars = {
                         hideBackButton: true,
                         success: true
-                    });
+                    };
+
+                    // Set the proper register message
+                    if(!_.isString(req.param('next')))
+                        pageVars.message = 'Welcome ' + firstName + '!\n\n' +
+                                'You\'ve successfully been registered.\n\n' +
+                                'Please click the button below to login and continue to your dashboard.';
+                    else
+                        pageVars.message = 'Welcome ' + firstName + '!\n\n' +
+                            'You\'ve successfully been registered.\n\n' +
+                            'Please click the button below to continue to the page you wanted to visit.';
+
+                    // Show registration success page
+                    LayoutRenderer.render(req, res, next, 'register', 'Success', pageVars);
                 });
             });
         });
