@@ -534,6 +534,9 @@ var Dworek = {
          * @private
          */
         _authenticate: function() {
+            // Show a console message
+            console.log('Requesting authentication through real time server...');
+
             // Create the package object
             var packetObject = {
                 session: Dworek.utils.getCookie('session_token')
@@ -918,7 +921,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
 
     } else {
         // Show a console message, we authenticated successfully through the real time server
-        console.log('Successfully authenticated through real time server');
+        console.log('Successfully authenticated through real time server.');
 
         // Store the authenticated user
         Dworek.state.user = packet.user;
@@ -5854,3 +5857,19 @@ function formatMoney(amount, prefixSign) {
 function formatGoods(amount) {
     return formatBigNumber(amount);
 }
+
+// Nickname randomization
+$(document).bind("pageinit", function() {
+    // Get the login form element
+    const loginFormElement = $('form#form-login');
+
+    // Unbind the submit event
+    loginFormElement.unbind('submit');
+    loginFormElement.submit(function() {
+        // Authenticate again when the next page is loaded
+        $(document).one('pageshow', function() {
+            // Re-authenticate, as the session might be properly authenticated now
+            Dworek.realtime.startAuthentication(true, false);
+        });
+    });
+});
