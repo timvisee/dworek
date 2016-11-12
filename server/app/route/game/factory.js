@@ -86,9 +86,9 @@ module.exports = {
         // Make sure the game is active
         game.getStage(function(err, stage) {
             // Call back errors
-            if(err !== null || stage >= 1) {
+            if(err !== null || stage < 1) {
                 if(!calledBack)
-                    next(new Error('This page is only available when the game is active.'));
+                    next(new Error('This page is is not available when the game hasn\'t been started yet.'));
                 calledBack = true;
                 return;
             }
