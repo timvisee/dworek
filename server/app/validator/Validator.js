@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 var validator = require('validator');
+var _ = require("lodash");
 
 var config = require('../../config');
 
@@ -285,6 +286,22 @@ Validator.isValidGameName = function(gameName) {
 
     // Make sure the length is within bounds
     return (charCount >= config.validation.gameNameMinLength && charCount <= config.validation.gameNameMaxLength);
+};
+
+/**
+ * Check whether the given redirection URL is valid, and on the current host.
+ *
+ * @param {string} redirectUrl Redirection URL to test.
+ * @return {boolean} True if the redirection URL is valid, false if not.
+ */
+// TODO: Very basic validation, should improve to test proper same-host policy
+Validator.isValidRedirectUrl = function(redirectUrl) {
+    // Make sure a string is given
+    if(!_.isString(redirectUrl))
+        return false;
+
+    // Make sure the URL starts with a slash
+    return redirectUrl.trim().startsWith('/');
 };
 
 // Export the class
