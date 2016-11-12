@@ -7,7 +7,7 @@ block content
 
     - var nextParam = next !== undefined ? '?next=' + next : '';
 
-    form(method='POST', action='/login/' + nextParam + '#')
+    form#form-login(method='POST', action='/login/' + nextParam + '#')
 
         label(for='field-mail') Mail address:
         input(type='text', name='field-mail', id='field-mail', value='', data-clear-btn='true')
