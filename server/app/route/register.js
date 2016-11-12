@@ -222,10 +222,15 @@ router.post('/', function(req, res, next) {
                         pageVars.message = 'Welcome ' + firstName + '!\n\n' +
                                 'You\'ve successfully been registered.\n\n' +
                                 'Please click the button below to login and continue to your dashboard.';
-                    else
+                    else {
+                        // Set the message
                         pageVars.message = 'Welcome ' + firstName + '!\n\n' +
                             'You\'ve successfully been registered.\n\n' +
                             'Please click the button below to continue to the page you wanted to visit.';
+
+                        // Set the next parameter
+                        pageVars.next = req.param('next');
+                    }
 
                     // Show registration success page
                     LayoutRenderer.render(req, res, next, 'register', 'Success', pageVars);
