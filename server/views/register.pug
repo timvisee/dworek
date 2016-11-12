@@ -1,11 +1,13 @@
 extends page
 
 block content
+    - var nextParam = next !== undefined ? '?next=' + next : '';
+
     unless success
         p Enter your mail address and password to register.
 
         br
-        form(method='POST', action='/register/#')
+        form(method='POST', action='/register/' + nextParam + '#')
 
             label(for='field-mail') Mail address:
             input(type='text', name='field-mail', id='field-mail', value='', data-clear-btn='true')
@@ -25,11 +27,16 @@ block content
             br
             .button-list
                 button.ui-btn.ui-btn-raised.clr-primary(type='submit') Register
-                a.ui-btn(href='/login', title='Login') Already have an account?
+                a.ui-btn(href='/login' + nextParam, title='Login') Already have an account?
 
     else
         //- Print the success message
         p: +format(message)
 
         //- Show the dashboard button
-        a.ui-btn.clr-primary(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
+        if next == undefined
+            a.ui-btn.clr-primary(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
+
+        else
+            a.ui-btn.clr-primary(href='/', data-icon='arrow-right', title='Continue', data-ajax='false') Continue
+            a.ui-btn(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard

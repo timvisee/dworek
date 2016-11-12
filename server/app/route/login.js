@@ -22,6 +22,7 @@
 
 var express = require('express');
 var router = express.Router();
+var _ = require("lodash");
 
 var config = require('../../config');
 
@@ -39,12 +40,19 @@ router.get('/', function(req, res, next) {
         return;
     }
 
-    // Show the login page
-    LayoutRenderer.render(req, res, next, 'login', 'Login', {
+    // Build the page vars
+    var pageVars = {
         page: {
             leftButton: 'back'
         }
-    });
+    };
+
+    // Set the next parameter if there is any
+    if(_.isString(req.param('next')))
+        pageVars.next = req.param('next');
+
+    // Show the login page
+    LayoutRenderer.render(req, res, next, 'login', 'Login', pageVars);
 });
 
 // Login index
@@ -123,7 +131,22 @@ router.post('/', function(req, res, next) {
                     return;
                 }
 
-                // Redirect the user
+                // TODO: Refresh user's client authentication
+
+                // Redirect the user to the redirection page
+                if(req.param('next')) {
+                    // Get the redirection URL
+                    const redirectionUrl = req.param('next');
+
+                    // Make sure the redirection URL is valid
+                    if(Validator.isValidRedirectUrl(redirectionUrl)) {
+                        // Redirect the user to the redirection URL
+                        res.redirect(redirectionUrl);
+                        return;
+                    }
+                }
+
+                // Redirect the user to the dashboard
                 res.redirect('/');
             });
         });

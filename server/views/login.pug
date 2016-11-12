@@ -5,7 +5,9 @@ block content
 
     br
 
-    form(method='POST', action='/login/#')
+    - var nextParam = next !== undefined ? '?next=' + next : '';
+
+    form(method='POST', action='/login/' + nextParam + '#')
 
         label(for='field-mail') Mail address:
         input(type='text', name='field-mail', id='field-mail', value='', data-clear-btn='true')
@@ -16,4 +18,4 @@ block content
         br
         .button-list
             button.ui-btn.ui-btn-raised.clr-primary(type='submit') Login
-            a.ui-btn(href='/register', title='Register') Don't have an account?
+            a.ui-btn(href='/register' + nextParam, title='Register') Don't have an account?
