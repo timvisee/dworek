@@ -25,10 +25,12 @@ include base
     ul(data-role='listview')
         li(data-role='list-divider') Pages
 
+        - var nextParam = next !== undefined ? '?next=' + next : '';
+
         unless session.valid
-            li: a(href='/') Frontpage
-            li: a.clr-primary(href='/login') Login
-            li: a.clr-primary(href='/register') Register
+            li: a(href='/' + nextParam) Front page
+            li: a.clr-primary(href='/login' + nextParam) Login
+            li: a.clr-primary(href='/register' + nextParam) Register
         else
             li: a(href='/') Dashboard
             li: a(href='/games') Games

@@ -6,8 +6,10 @@ block content
         #[br]
         Please login or register to continue, or go to the front page.
 
+    - var nextParam = next !== undefined ? '?next=' + next : '';
+
     br
     .button-list
-        a.ui-btn.ui-btn-raised.clr-primary(href='/login?next=' + next, title='Go to the login page') Login
-        a.ui-btn.ui-btn-raised.clr-primary(href='/register?next=' + next, title='Go to the registration page') Register
-        a.ui-btn(href='/', title='Go to the front page') Front page
+        a.ui-btn.ui-btn-raised.clr-primary(href='/login' + nextParam, title='Go to the login page') Login
+        a.ui-btn.ui-btn-raised.clr-primary(href='/register' + nextParam, title='Go to the registration page') Register
+        a.ui-btn(href='/' + nextParam, title='Go to the front page') Front page

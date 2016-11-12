@@ -22,12 +22,13 @@
 
 var express = require('express');
 var router = express.Router();
+var _ = require("lodash");
 
 var ajax = require('./ajax/index');
 var login = require('./login');
 var logout = require('./logout');
 var register = require('./register');
-var games = require('./games')
+var games = require('./games');
 var game = require('./game');
 var about = require('./about');
 var status = require('./status');
@@ -42,7 +43,15 @@ var LayoutRenderer = require('../layout/LayoutRenderer');
 router.get('/', function(req, res, next) {
     // Show the index page if the user isn't logged in, show the dashboard if logged in
     if(!req.session.valid) {
-        LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME);
+        // Define the page variables object
+        var pageVars = {};
+
+        // Set the next property if known
+        if(_.isString(req.param('next')))
+            pageVars.next = req.param('next');
+
+        // Render the index page
+        LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME, pageVars);
         return;
     }
 
