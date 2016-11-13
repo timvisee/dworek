@@ -1531,8 +1531,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
     if(hasFactories)
         updateFactoryMarkers(packet.factories);
 
-    // Focus on everything if enabled
-    if(getFollowEverything())
+    // Focus on everything if enabled, also focus on everything if we should focus on the player, but no player is available
+    if(getFollowEverything() || (getFollowPlayer() && playerMarker == null))
         focusEverything();
 });
 
@@ -3363,9 +3363,15 @@ function focusPlayer(zoom) {
     if(zoom == undefined)
         zoom = false;
 
-    // Make sure the map is created and the player marker is available
-    if(map == null || playerMarker == null)
+    // Make sure the map is created
+    if(map == null)
         return;
+
+    // Make sure a player marker is available, focus on everything if not
+    if(playerMarker == null) {
+        focusEverything();
+        return;
+    }
 
     // Get the player location
     const playerLocation = playerMarker.getLatLng();
