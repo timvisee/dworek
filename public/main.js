@@ -2018,7 +2018,7 @@ function vibrate(pattern) {
  * Determine whether the client has support for native notifications.
  * The client asks for permission if it's supported, but no permission has been granted yet.
  *
- * @param {hasNativeNotificationSupportCallback} callback Called back with the result, or when an error occurred Called back with the result.
+ * @param {hasNativeNotificationSupportCallback} [callback] Called back with the result, or when an error occurred Called back with the result.
  */
 function hasNativeNotificationSupport(callback) {
     // Make sure the native API is available
@@ -5927,16 +5927,9 @@ $(document).bind("pageinit", function() {
     });
 });
 
-
-
-
-$(document).bind('pageinit', function() {
-    // Ask for permission on native notifications
-    hasNativeNotificationSupport(function(hasSupport) {
-        // Show a native notification, for testing
-        if(hasSupport)
-            showNativeNotification('Some message');
-        else
-            alert('Not working!');
-    });
+// Ask for native notification permissions when the client is loaded
+$(document).ready(function() {
+    // Check whether we have support, this automatically asks the user for permission if native notifications are supported
+    hasNativeNotificationSupport();
 });
+
