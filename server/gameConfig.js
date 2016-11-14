@@ -310,10 +310,10 @@ var gameConfig = {
             // Factory base price
             const FACTORY_BASE_PRICE = 400;
 
-            // Decrease both factory counts by one (to a minimum of 5)
-            // This makes the first 5 factories free to build
-            allyFactoryCount = Math.max(allyFactoryCount - 4, 0);
-            enemyFactoryCount = Math.max(enemyFactoryCount - 4, 0);
+            // Decrease both factory counts by one (to a minimum of 4)
+            // This makes the first 4 factories free to build
+            allyFactoryCount = Math.max(allyFactoryCount - 3, 0);
+            enemyFactoryCount = Math.max(enemyFactoryCount - 3, 0);
 
             // The first factory costs nothing
             if(allyFactoryCount <= 0)
