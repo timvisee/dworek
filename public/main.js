@@ -233,6 +233,7 @@ var Dworek = {
          */
         startNativeDroid: function() {
             // Initialize NativeDroid, and store it's instance
+            //noinspection ES6ModulesDependencies,NodeModulesDependencies
             nativeDroid = $.nd2();
 
             // Build
@@ -861,7 +862,7 @@ var Dworek = {
             return '';
         },
 
-        /**
+        /*
          * Determine whether the current browser is Google's Crappy Chrome.
          *
          * @param {boolean} [ios=true] True to also return true if this is Chrome on iOS, false if not.
@@ -872,6 +873,7 @@ var Dworek = {
                 ios = true;
 
             // Prepare some things
+            //noinspection JSUnresolvedVariable,JSCheckFunctionSignatures,JSCheckFunctionSignatures
             var isChromium = window.chrome,
                 winNav = window.navigator,
                 vendorName = winNav.vendor,
@@ -1121,7 +1123,6 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_BUILD, functi
         },
         vibrate: true
     });
-    return;
 });
 
 // Handle factory capture packets
@@ -2013,28 +2014,74 @@ function vibrate(pattern) {
     window.navigator.vibrate(pattern);
 }
 
-// TODO: Complete this feature
-function showNativeNotification() {
-    // Let's check if the browser supports notifications
-    if(!('Notification' in window))
-        alert('This browser does not support desktop notification');
-
-    // Let's check whether notification permissions have already been granted
-    else if(Notification.permission === 'granted')
-        // If it's okay let's create a notification
-        var notification = new Notification('Feature not available yet');
-
-    // Otherwise, we need to ask the user for permission
-    else if(Notification.permission !== 'denied') {
-        Notification.requestPermission(function(permission) {
-            // If the user accepts, let's create a notification
-            if(permission === 'granted')
-                var notification = new Notification('Feature not available yet');
-        });
+/**
+ * Determine whether the client has support for native notifications.
+ * The client asks for permission if it's supported, but no permission has been granted yet.
+ *
+ * @param {hasNativeNotificationSupportCallback} callback Called back with the result, or when an error occurred Called back with the result.
+ */
+function hasNativeNotificationSupport(callback) {
+    // Make sure the native API is available
+    if (!('Notification' in window)) {
+        if(typeof callback === 'function')
+            callback(false);
+        return;
     }
 
-    // At last, if the user has denied notifications, and you
-    // want to be respectful there is no need to bother them any more.
+    // Supported if permissions are granted
+    if (Notification.permission === 'granted') {
+        if(typeof callback === 'function')
+            callback(false);
+        return;
+    }
+
+    // Not supported if the user explicitly clicked deny
+    if (Notification.permission === 'denied') {
+        if(typeof callback === 'function')
+            callback(false);
+        return;
+    }
+
+    // Ask the user for permission
+    Notification.requestPermission(function(permission) {
+        if(typeof callback === 'function')
+            callback(permission === 'granted');
+    });
+}
+
+/**
+ * Called back with the result.
+ *
+ * @callback hasNativeNotificationSupportCallback
+ * @param {boolean} True if native notifications are supported, and can be used. False if not.
+ */
+
+/**
+ * Show a native notification to the user.
+ * Currently only supported by a selected number of browsers.
+ *
+ * @param {string} message Message to show.
+ * @param {boolean} [fallback=true] True to fallback to in-page notifications if native notifications don't work.
+ */
+function showNativeNotification(message, fallback) {
+    // Make sure the notifications are supported, and that the user granted permission
+    hasNativeNotificationSupport(function(result) {
+        // Make sure notifications are supported
+        if(result) {
+            // Show the actual notification, and return
+            new Notification(message);
+            return;
+        }
+
+        // Return if no fallback notification should be used
+        if(fallback !== undefined && !fallback)
+            return;
+
+        // Show a fallback notification
+        showNotification(message, {
+            title: 'Message'
+        });
+    });
 }
 
 // Nickname randomization
@@ -5877,5 +5924,19 @@ $(document).bind("pageinit", function() {
             // Re-authenticate, as the session might be properly authenticated now
             Dworek.realtime.startAuthentication(true, false);
         });
+    });
+});
+
+
+
+
+$(document).bind('pageinit', function() {
+    // Ask for permission on native notifications
+    hasNativeNotificationSupport(function(hasSupport) {
+        // Show a native notification, for testing
+        if(hasSupport)
+            showNativeNotification('Some message');
+        else
+            alert('Not working!');
     });
 });
