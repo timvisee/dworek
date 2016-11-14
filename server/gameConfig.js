@@ -43,7 +43,7 @@ var gameConfig = {
         /**
          * Initial money amount, when a user starts the game.
          */
-        initialMoney: 200,
+        initialMoney: 3000,
 
         /**
          * Initial in.
