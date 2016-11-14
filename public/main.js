@@ -2031,7 +2031,7 @@ function hasNativeNotificationSupport(callback) {
     // Supported if permissions are granted
     if (Notification.permission === 'granted') {
         if(typeof callback === 'function')
-            callback(false);
+            callback(true);
         return;
     }
 
