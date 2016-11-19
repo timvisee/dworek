@@ -32,7 +32,7 @@
     "chai": "3.5.0",
     "mongodb": "2.2.11",
     "redis": "2.6.3",
-    "socket.io": "1.5.1",
+    "socket.io": "1.6.0",
     "validator": "6.1.0",
     "stats-percentile": "1.2.0"
   },
