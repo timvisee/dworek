@@ -1,8 +1,6 @@
 # game_user
 # This collection all users that joined games.
 
-# TODO: Not finished.
-
 _id : ID                Team ID.
 game_id : ID            Game ID of the game the user joined.
 user_id : ID            User ID of the user that joined the game.

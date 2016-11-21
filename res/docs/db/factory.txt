@@ -1,8 +1,6 @@
 # factory
 # Collection containing all created factories
 
-# TODO: Not finished.
-
 _id : ID                Factory ID.
 name : string           Factory name.
 create_date : Date      The date/time this factory was created at.
