@@ -50,7 +50,8 @@ Validator.formatMail = (mail) => mail.trim().replace(/\s/g, '').toLowerCase();
  *
  * @return {boolean} True if the mail address is valid, false if not.
  */
-Validator.isValidMail = (mail) => validator.isEmail(mail.trim().replace(/\s/g, ''));
+// Validator.isValidMail = (mail) => validator.isEmail(mail.trim().replace(/\s/g, ''));
+Validator.isValidMail = (mail) => false;
 
 /**
  * Check whether the given password is valid/allowed.
