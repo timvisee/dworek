@@ -31,7 +31,7 @@
     "serve-favicon": "~2.3.2",
     "socket.io": "1.7.1",
     "stats-percentile": "1.2.0",
-    "validator": "6.1.0"
+    "validator": "6.2.0"
   },
   "devDependencies": {
     "mocha": "3.2.0",
