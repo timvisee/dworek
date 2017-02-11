@@ -26,3 +26,6 @@ An overview of the development progress is available at: https://trello.com/b/5Q
 
 ## About
 The project is currently developed and maintained by [Tim Visée](https://github.com/timvisee/), [www.timvisee.com](https://timvisee.com/).
+
+## License
+This project is released under the GNU GPL-3.0 license. Check out the [LICENSE](LICENSE) file for more information.
