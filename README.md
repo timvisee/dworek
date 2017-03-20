@@ -1,5 +1,5 @@
 [![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)
-[![Dependency status on libraries.io](https://img.shields.io/librariesio/github/timvisee/Dworek.svg)](https://libraries.io/github/timvisee/Dworek)
+[![Dependency status on libraries.io](https://img.shields.io/librariesio/github/timvisee/dworek.svg)](https://libraries.io/github/timvisee/dworek)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
 
@@ -11,8 +11,9 @@ Conquer labs owned by other cartels to become the drug production MVP.
 |Service|Build Status|Public Status|
 |---:|:---|:---|
 |Codeship|[![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)||
-|CircleCI|[![CircleCI](https://img.shields.io/circleci/project/github/timvisee/Dworek.svg)](https://circleci.com/gh/timvisee/Dworek)|[View Status](https://circleci.com/gh/timvisee/Dworek/)|
-|Travis|[![Travis](https://img.shields.io/travis/timvisee/Dworek.svg)](https://travis-ci.org/timvisee/Dworek)|[View Status](https://travis-ci.org/timvisee/Dworek)|
+|CircleCI|[![CircleCI](https://img.shields.io/circleci/project/github/timvisee/dworek.svg)](https://circleci.com/gh/timvisee/dworek)|[View Status](https://circleci.com/gh/timvisee/dworek/)|
+|Travis|[![Travis](https://img.shields.io/travis/timvisee/dworek.svg)](https://travis-ci.org/timvisee/dworek)|[View Status](https://travis-ci.org/timvisee/dworek)|
+
 The project is currently being built automatically using the CI services in the table above.
 
 ## Screenshots
