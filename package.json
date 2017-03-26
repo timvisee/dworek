@@ -28,7 +28,7 @@
     "morgan": "1.8.1",
     "pug": "2.0.0-beta11",
     "redis": "2.7.1",
-    "serve-favicon": "2.4.1",
+    "serve-favicon": "2.4.2",
     "socket.io": "1.7.3",
     "stats-percentile": "1.2.0",
     "validator": "7.0.0"
