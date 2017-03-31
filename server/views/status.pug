@@ -41,14 +41,33 @@ block content
                 tr: td Model
                     td: small: small.status-server-model= status.server.cpus[0].model
                 tr: td Memory
-                    td: span.status-server-memory-total= status.server.memory.total
-                        span(style="color: gray;")  total
+                    td: span(style="color: gray;") Application memory:
                 tr: td
-                    td: span.status-server-memory-used= status.server.memory.used
-                        span(style="color: gray;")  used
+                    td: span.status-server-memory-app-heapFree= status.server.memory_app.heapFree
+                        span(style="color: gray;")  heap free
                 tr: td
-                    td: span.status-server-memory-free= status.server.memory.free
+                    td: span.status-server-memory-app-heapUsed= status.server.memory_app.heapUsed
+                        span(style="color: gray;")  heap used
+                tr: td
+                    td: span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotal
+                        span(style="color: gray;")  heap max
+                tr: td
+                    td: span.status-server-memory-app-rss= status.server.memory_app.rss
+                        span(style="color: gray;")  total (resident set)
+                tr: td
+                    td: span.status-server-memory-app-external= status.server.memory_app.external
+                        span(style="color: gray;")  external
+                tr: td
+                    td: span(style="color: gray;") System memory:
+                tr: td
+                    td: span.status-server-memory-system-free= status.server.memory_system.free
                         span(style="color: gray;")  free
+                tr: td
+                    td: span.status-server-memory-system-used= status.server.memory_system.used
+                        span(style="color: gray;")  used (with cache)
+                tr: td
+                    td: span.status-server-memory-system-total= status.server.memory_system.total
+                        span(style="color: gray;")  total
                 tr: td Load
                     td: span.status-server-load-1= status.server.loadavg[0]
                         span(style="color: gray;")  avg last minute

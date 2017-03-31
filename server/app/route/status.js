@@ -23,6 +23,7 @@
 var express = require('express');
 var router = express.Router();
 var os = require('os');
+var process = require('process');
 var percentile = require('stats-percentile');
 
 var config = require('../../config');
@@ -54,10 +55,17 @@ router.get('/', function(req, res, next) {
                     loadAvg[2] != 0 ? loadAvg[2].toFixed(3) : '?',
                 ],
                 cpus: os.cpus(),
-                memory: {
-                    total: Formatter.formatBytes(os.totalmem()),
+                memory_system: {
+                    free: Formatter.formatBytes(os.freemem()),
                     used: Formatter.formatBytes(os.totalmem() - os.freemem()),
-                    free: Formatter.formatBytes(os.freemem())
+                    total: Formatter.formatBytes(os.totalmem())
+                },
+                memory_app: {
+                    heapFree: Formatter.formatBytes(process.memoryUsage().heapTotal - process.memoryUsage().heapUsed),
+                    heapUsed: Formatter.formatBytes(process.memoryUsage().heapUsed),
+                    heapTotal: Formatter.formatBytes(process.memoryUsage().heapTotal),
+                    rss: Formatter.formatBytes(process.memoryUsage().rss),
+                    external: Formatter.formatBytes(process.memoryUsage().external)
                 }
             },
             web: {
