@@ -50,7 +50,7 @@ block content
                         span(style="color: gray;")  heap used
                 tr: td
                     td: span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotal
-                        span(style="color: gray;")  heap max
+                        span(style="color: gray;")  heap size
                 tr: td
                     td: span.status-server-memory-app-rss= status.server.memory_app.rss
                         span(style="color: gray;")  total (resident set)
@@ -155,7 +155,7 @@ block content
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
-            h3.card-primary-title Cache
+            h3.card-primary-title External Cache
 
         .card-supporting-text.has-action.has-title
             p Status of the in-memory caching server.
