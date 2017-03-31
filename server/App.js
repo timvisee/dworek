@@ -281,10 +281,13 @@ function _webServerOnError(error) {
     if(error.syscall !== 'listen')
         throw error;
 
+    // Get the port
+    var port = config.web.port;
+
     // Build a port/pipe string
-    var bind = typeof this._webPort === 'string'
-        ? 'Pipe ' + this._webPort
-        : 'Port ' + this._webPort;
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
     // Handle specific listen errors with friendly messages
     switch(error.code) {
