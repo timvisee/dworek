@@ -91,7 +91,7 @@ Formatter.formatBytes = function(bytes, decimals) {
     const SIZE_NOTATIONS = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     // Handle zero cases
-    if(bytes == 0)
+    if(bytes === 0 || bytes === undefined || bytes === null)
         return '0 Bytes';
 
     // Determine the number of decimal places to show
