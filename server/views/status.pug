@@ -27,6 +27,35 @@ block content
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
+            h3.card-primary-title Cluster Status
+
+        .card-supporting-text.has-action.has-title
+            p Status of the cluster and it's workers.
+            table.table-list.ui-responsive
+                tr: td Servers
+                    td
+                        td: span= status.cluster.serverCount
+                            span(style='color: gray;')  machine
+                tr: td Workers
+                    td
+                        td: span= status.cluster.workerCount
+                            span(style='color: gray;')  worker processes,
+                            span= ' ' + status.cluster.serverCount
+                            span(style='color: gray;')  hyper visor process
+                tr: td Current
+                    td
+                        td: span(style='color: gray;') Connected through:
+                tr: td
+                    td
+                        td: span= status.cluster.workerId
+                            span(style='color: gray;')  (worker ID)
+                tr: td
+                    td
+                        td: span= status.cluster.pid
+                            span(style='color: gray;')  (PID)
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
             h3.card-primary-title Server Status
 
         .card-supporting-text.has-action.has-title

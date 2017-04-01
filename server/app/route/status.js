@@ -20,6 +20,7 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var cluster = require('cluster');
 var express = require('express');
 var router = express.Router();
 var os = require('os');
@@ -42,9 +43,23 @@ router.get('/', function(req, res, next) {
     // Get the CPU load average
     const loadAvg = os.loadavg();
 
+    // Get the memory usage data
+    var memoryUsage = process.memoryUsage();
+
+    // Determine whether this is the master thread, and get the PID
+    var isMaster = cluster.isMaster;
+    var workerId = !isMaster ? cluster.worker.id : '?';
+
     // Layout options object
     var options = {
         status: {
+            cluster: {
+                serverCount: 1,
+                isMaster: isMaster,
+                workerCount: os.cpus().length,
+                workerId: workerId,
+                pid: process.pid
+            },
             server: {
                 os: os.type(),
                 platform: os.platform(),
@@ -61,11 +76,11 @@ router.get('/', function(req, res, next) {
                     total: Formatter.formatBytes(os.totalmem())
                 },
                 memory_app: {
-                    heapFree: Formatter.formatBytes(process.memoryUsage().heapTotal - process.memoryUsage().heapUsed),
-                    heapUsed: Formatter.formatBytes(process.memoryUsage().heapUsed),
-                    heapTotal: Formatter.formatBytes(process.memoryUsage().heapTotal),
-                    rss: Formatter.formatBytes(process.memoryUsage().rss),
-                    external: Formatter.formatBytes(process.memoryUsage().external)
+                    heapFree: Formatter.formatBytes(memoryUsage.heapTotal - memoryUsage.heapUsed),
+                    heapUsed: Formatter.formatBytes(memoryUsage.heapUsed),
+                    heapTotal: Formatter.formatBytes(memoryUsage.heapTotal),
+                    rss: Formatter.formatBytes(memoryUsage.rss),
+                    external: Formatter.formatBytes(memoryUsage.external)
                 }
             },
             web: {
