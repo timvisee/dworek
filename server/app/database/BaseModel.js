@@ -39,6 +39,12 @@ var RedisUtils = require('../redis/RedisUtils');
 const CACHE_KEY_PREFIX = 'model:';
 
 /**
+ * The name of the Redis channel that is used to broadcast cache changes to
+ * other worker threads. This to ensure all cache is up-to-date.
+ */
+const REDIS_CACHE_BROADCAST_CHANNEL_NAME = 'modelcache';
+
+/**
  * Constructor.
  *
  * @class
@@ -1303,6 +1309,10 @@ BaseModel.prototype.cacheGetField = function(field) {
  * Values will be undefined if they aren't available in cache or if cache is disabled for that specific field.
  */
 BaseModel.prototype.cacheGetFields = function(fields) {
+    // Return undefined if internal cache is disabled
+    if(!config.cache.enable)
+        return undefined;
+
     // Create a results object
     var results = {};
 
@@ -1345,6 +1355,10 @@ BaseModel.prototype.cacheGetFields = function(fields) {
  * @param {*} value Field value.
  */
 BaseModel.prototype.cacheSetField = function(field, value) {
+    // Return when internal cache is disabled
+    if(!config.cache.enable)
+        return;
+
     // Set the field through the bulk function
     this.cacheSetFields({
         [field]: value
@@ -1358,6 +1372,10 @@ BaseModel.prototype.cacheSetField = function(field, value) {
  * @param {Object} fields Object containing the field names as keys, and the values as their values.
  */
 BaseModel.prototype.cacheSetFields = function(fields) {
+    // Return when internal cache is disabled
+    if(!config.cache.enable)
+        return;
+
     // Create an object with the cache values to set
     var cacheObject = {};
 
@@ -1389,6 +1407,9 @@ BaseModel.prototype.cacheSetFields = function(fields) {
 
     // Push the cache object to the object's cache
     this._cache.setCacheMultiple(cacheObject);
+
+    // TODO: Push a message to the master thread using process.send(data)
+    // TODO: Push a message through Redis to update the internal cache in other worker threads.
 };
 
 /**
@@ -1411,6 +1432,10 @@ BaseModel.prototype.cacheHasField = function(field) {
  * @return {boolean} True if all given fields are cached, false otherwise.
  */
 BaseModel.prototype.cacheHasFields = function(fields) {
+    // Return false if internal cache is disabled
+    if(!config.cache.enabled)
+        return false;
+
     // Convert the fields parameter to an array
     if(!Array.isArray(fields))
         fields = [fields];
@@ -1434,8 +1459,16 @@ BaseModel.prototype.cacheHasFields = function(fields) {
  *
  * @param {Array|String} [fields=undefined] An array with field names or a specific field name to flush, undefined to flush all cache.
  */
+// TODO: Add a property to define whether to flush cache in other worker threads, or just in this thread.
 BaseModel.prototype.cacheFlush = function(fields) {
+    // Return if internal cache is diabled
+    if(!config.cache.enable)
+        return false;
+
+    // Flush the cache
     this._cache.flushCache(fields);
+
+    // TODO: Flush all cache in other worker threads!
 };
 
 /**
@@ -1816,7 +1849,7 @@ BaseModel.prototype.redisSetFields = function(fields, callback) {
         // Get and add the Redis key and value to the redis data array
         redisData.push(this.redisGetKey(field));
         redisData.push(value);
-    }
+;   }
 
     // Call back if the Redis data array is empty
     if(redisData.length === 0) {

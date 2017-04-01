@@ -89,7 +89,7 @@ config.db.url = 'mongodb://' + config.db.host + ':' + config.db.port + '/' + con
  ******************************************************************************/
 
 /**
- * Define whether to enable/usage Redis.
+ * Define whether to enable Redis usage.
  * @type {boolean}
  */
 config.redis.enable = true;
@@ -128,6 +128,12 @@ config.redis.cacheExpire = 60 * 5;
 /******************************************************************************
  * Cache configuration.                                                       *
  ******************************************************************************/
+
+/**
+ * Define whether to enable internal cache.
+ * @type {boolean}
+ */
+config.cache.enable = true;
 
 /**
  * Internal cache section.
