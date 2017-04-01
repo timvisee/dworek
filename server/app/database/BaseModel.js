@@ -1309,10 +1309,6 @@ BaseModel.prototype.cacheGetField = function(field) {
  * Values will be undefined if they aren't available in cache or if cache is disabled for that specific field.
  */
 BaseModel.prototype.cacheGetFields = function(fields) {
-    // Return undefined if internal cache is disabled
-    if(!config.cache.enable)
-        return undefined;
-
     // Create a results object
     var results = {};
 
@@ -1325,8 +1321,8 @@ BaseModel.prototype.cacheGetFields = function(fields) {
 
     // Loop through all the fields, fetch and convert their value and add it to the results object
     fields.forEach(function(field) {
-        // Set the value to undefined if cache isn't enabled for this field
-        if(!self.cacheIsFieldEnabled(field)) {
+        // Make sure internal caching is enabled and that the field itself is enabled
+        if(!config.cache.enable || !self.cacheIsFieldEnabled(field)) {
             results[field] = undefined;
             return;
         }
