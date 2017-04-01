@@ -36,15 +36,17 @@ block content
                     td
                         td: span= status.cluster.serverCount
                             span(style='color: gray;')  machine
-                tr: td Workers
+                tr: td Processes
+                    td
+                        td: span= ' ' + status.cluster.serverCount
+                            span(style='color: gray;')  hyper visor process
+                tr: td
                     td
                         td: span= status.cluster.workerCount
-                            span(style='color: gray;')  worker processes,
-                            span= ' ' + status.cluster.serverCount
-                            span(style='color: gray;')  hyper visor process
+                            span(style='color: gray;')  worker processes
                 tr: td Current
                     td
-                        td: span(style='color: gray;') Connected through:
+                        td: span(style='color: gray;') Connected to:
                 tr: td
                     td
                         td: span= status.cluster.workerId
