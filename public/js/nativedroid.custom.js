@@ -348,24 +348,28 @@
 
             // Activate Content Tab
             var oldContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab.nd2Tab-active");
-
-            oldContent.addClass("to-" + directionTo);
-            window.setTimeout(function() {
-                oldContent.removeClass("nd2Tab-active to-" + directionTo);
-            }, 400);
-
             var newContent = obj.closest('.ui-page').find(".nd2Tabs-content-tab[data-tab='" + _self.settings.activeTab + "']");
 
-            newContent.addClass("nd2Tab-active from-" + direction);
+            // Animate the tabs
+            if(Dworek.state.animate) {
+                oldContent.addClass("to-" + directionTo);
+                window.setTimeout(function() {
+                    oldContent.removeClass("nd2Tab-active to-" + directionTo);
+                }, 400);
 
-            window.setTimeout(function() {
-                newContent.removeClass("from-" + direction);
-            }, 150);
+                newContent.addClass("nd2Tab-active from-" + direction);
+                window.setTimeout(function() {
+                    newContent.removeClass("from-" + direction);
+                }, 150);
+            } else {
+                oldContent.removeClass("nd2Tab-active");
+                newContent.addClass("nd2Tab-active");
+            }
 
             // Reset the switching flag
             window.setTimeout(function() {
                 _self.settings.switching = false;
-            }, 400);
+            }, Dworek.state.animate ? 400 : 1);
 
             // Trigger a tab change event
             $(document).trigger('tab-switch', {
