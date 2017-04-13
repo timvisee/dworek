@@ -3436,8 +3436,11 @@ $(document).bind('pageshow', function() {
     if(!Dworek.utils.isGamePage())
         return;
 
+    // Get the map container
+    var mapContainer = getActivePage().find("#map-container");
+
     // Make sure a map container is found on the page
-    if(getActivePage().find('#map-container').length <= 0)
+    if(mapContainer.length <= 0)
         return;
 
     // Update the map size
@@ -3452,8 +3455,17 @@ $(document).bind('pageshow', function() {
 
 // Update the active game and status labels when a new page is being shown
 $(document).bind("tab-switch", function(event, data) {
+    // Get the map container
+    var mapContainer = data.to.find('#map-container');
+
     // Check whether there's a map container on the new page
-    if(data.to.find('#map-container').length > 0) {
+    if(mapContainer.length > 0) {
+        // Make sure any map is available inside the container
+        if(mapContainer.find("div.leaflet-map-pane").length <= 0) {
+            // Reset the map instance, to cause it to be created again
+            map = null;
+        }
+
         // Update the map size
         updateMapSize(true, true);
 
@@ -3466,8 +3478,10 @@ $(document).bind("tab-switch", function(event, data) {
             latlng = [Dworek.state.geoPlayerPosition.coords.latitude, Dworek.state.geoPlayerPosition.coords.longitude];
 
         // Create a map if none has been created yet
-        // TODO: Make sure the map container still exists!?
         if(map == null) {
+            // Show a status message
+            console.log('Initializing the map.');
+
             // Create the map
             map = L.map('map-container').setView(latlng, 18);
 
