@@ -5351,16 +5351,23 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Select the cards
     var attackCard = activePage.find('.card-factory-attack');
+    var attackTab = activePage.find('.tabs-bar-factory li[data-tab=attack]');
     var transferCard = activePage.find('.card-factory-transfer');
+    var transferTab = activePage.find('.tabs-bar-factory li[data-tab=transfer]');
     var defenceCard = activePage.find('.card-factory-defence');
+    var defenceTab = activePage.find('.tabs-bar-factory li[data-tab=defence]');
     var levelCard = activePage.find('.card-factory-level');
+    var levelTab = activePage.find('.tabs-bar-factory li[data-tab=level]');
 
     // Update the upgrade buttons
     if(canModify) {
         // Slide down the cards
         transferCard.slideDown();
+        transferTab.fadeIn();
         defenceCard.slideDown();
+        defenceTab.fadeIn();
         levelCard.slideDown();
+        levelTab.fadeIn();
 
         // Get the upgrade button list element, and clear it
         const upgradeButtonList = defenceCard.find('.upgrade-button-list');
@@ -5657,22 +5664,31 @@ function updateFactoryDataVisuals(firstShow) {
         });
 
     } else {
-        // Hide the cards
+        // Hide the cards and tabs
         if(firstShow) {
             transferCard.hide();
+            transferTab.hide();
             defenceCard.hide();
+            defenceTab.hide();
             levelCard.hide();
+            levelTab.hide();
         } else {
             transferCard.slideUp();
+            transferTab.fadeOut();
             defenceCard.slideUp();
+            defenceTab.fadeOut();
             levelCard.slideUp();
+            levelTab.fadeOut();
         }
+
+        // TODO: Move to a different tab page, if the user is on a page that is now hidden.
     }
 
     // Determine whether the attack card should be shown
     if(data.hasOwnProperty('conquerValue') && data.conquerValue > 0 && data.hasOwnProperty('ally') && !data.ally) {
         // Show the attack card
         attackCard.slideDown();
+        attackTab.fadeIn();
 
         // Determine whether the factory is going to be destroyed
         const willDestroy = data.hasOwnProperty('level') && data.level <= 1;
@@ -5719,11 +5735,15 @@ function updateFactoryDataVisuals(firstShow) {
             });
         });
 
-    } else if(!firstShow)
+    } else if(!firstShow) {
         attackCard.slideUp();
-    else
+        attackTab.hide();
+        // TODO: Move to a different tab when the user is on this tab while it is hidden?
+    } else {
         attackCard.hide();
-
+        attackTab.fadeOut();
+        // TODO: Move to a different tab when the user is on this tab while it is hidden?
+    }
 
     // Get the elements
     const factoryNameLabel = activePage.find('.factory-name');

@@ -1,104 +1,118 @@
 extends page
 
+block tabs
+    ul.tabs-bar-factory(data-role='nd2tabs' data-swipe=true)
+        - var fadeDelay = 0;
+        li.wow.fadeInUp(data-tab='status', data-wow-delay=(fadeDelay += 0.1) + 's') Status
+        li.wow.fadeInUp(data-tab='attack', data-wow-delay=(fadeDelay += 0.1) + 's') Attack
+        li.wow.fadeInUp(data-tab='transfer', data-wow-delay=(fadeDelay += 0.1) + 's') Transfer
+        li.wow.fadeInUp(data-tab='defence', data-wow-delay=(fadeDelay += 0.1) + 's') Defence
+        li.wow.fadeInUp(data-tab='level', data-wow-delay=(fadeDelay += 0.1) + 's') Level
+
 block content
-    .nd2-card.wow.fadeInUp.card-factory-info
-        .card-title.has-supporting-text
-            h3.card-primary-title.factory-name= factory.name
+    div.tab-factory-status(data-role='nd2tab', data-tab='status')
+        .nd2-card.wow.fadeInUp.card-factory-info
+            .card-title.has-supporting-text
+                h3.card-primary-title.factory-name= factory.name
 
-        .card-supporting-text.has-action.has-title
-            table.table-list.ui-responsive
-                tr: td.game-label-input Ingredients
-                    td
-                        span.factory-in= factory.in
-                        | &nbsp;
-                        span.factory-production-in(style="color: gray;") − ? / tick
-                tr: td.game-label-output Drugs
-                    td
-                        span.factory-out= factory.out
-                        | &nbsp;
-                        span.factory-production-out(style="color: gray;") + ? / tick
-
-            hr
-            table.table-list.ui-responsive
-                tr: td Level
-                    td.factory-level= factory.level
-                tr: td Defence
-                    td.factory-defence= factory.defence
-                tr: td In range
-                    td.factory-in-range ?
-                tr: td Conquer value
-                    td.factory-conquer-value= factory.conquerValue
-
-            hr
-            table.table-list.ui-responsive
-                tr: td Team
-                    td.factory-team= factory.teamName
-                tr: td Creator
-                    td.factory-creator= factory.creatorName
-
-    .nd2-card.wow.fadeInUp.card-factory-attack
-        .card-title.has-supporting-text
-            h3.card-primary-title Attack
-
-        .card-supporting-text.has-action.has-title
-            p The lab isn't strong enough to withstand enemy attacks. Attack the lab to take it over.
-            div(align="center")
+            .card-supporting-text.has-action.has-title
                 table.table-list.ui-responsive
-                    tr: td Conquer value
-                        td.factory-conquer-value= factory.conquerValue
+                    tr: td.game-label-input Ingredients
+                        td
+                            span.factory-in= factory.in
+                            | &nbsp;
+                            span.factory-production-in(style="color: gray;") − ? / tick
+                    tr: td.game-label-output Drugs
+                        td
+                            span.factory-out= factory.out
+                            | &nbsp;
+                            span.factory-production-out(style="color: gray;") + ? / tick
 
-        .card-action
-            .row.between-xs: .col-xs-12: .box
-                a.ui-btn.waves-effect.waves-button.action-factory-attack(href='#', data-transition='slide', data-rel='popup')
-                    i.zmdi.zmdi-fire
-                    | &nbsp;&nbsp;Attack
-
-    .nd2-card.wow.fadeInUp.card-factory-transfer
-        .card-title.has-supporting-text
-            h3.card-primary-title Deposit/Withdraw
-
-        .card-supporting-text.has-action.has-title
-            p Deposit and/or withdraw goods here.
-
-        .card-action
-            .row.between-xs: .col-xs-12: .box
-                a.ui-btn.waves-effect.waves-button.action-factory-deposit(href='#', data-transition='slide', data-rel='popup')
-                    i.zmdi.zmdi-arrow-right
-                    | &nbsp;&nbsp;Deposit
-                a.ui-btn.waves-effect.waves-button.action-factory-withdraw(href='#', data-transition='slide', data-rel='popup')
-                    i.zmdi.zmdi-arrow-left
-                    | &nbsp;&nbsp;Withdraw
-
-    .nd2-card.wow.fadeInUp.card-factory-defence
-        .card-title.has-supporting-text
-            h3.card-primary-title Defence
-
-        .card-supporting-text.has-action.has-title
-            p Upgrading the defence makes it harder for enemies to take things over.
-            div(align="center")
-                table.table-list.ui-responsive
-                    tr: td Defence
-                        td.factory-defence= factory.defence
-
-        .card-action
-            .row.between-xs: .col-xs-12: .box.upgrade-button-list
-                div(align="center")
-                    i No upgrades available...<br>
-
-    .nd2-card.wow.fadeInUp.card-factory-level
-        .card-title.has-supporting-text
-            h3.card-primary-title Level
-
-        .card-supporting-text.has-action.has-title
-            p Upgrading the level speeds up production.
-            div(align="center")
+                hr
                 table.table-list.ui-responsive
                     tr: td Level
                         td.factory-level= factory.level
+                    tr: td Defence
+                        td.factory-defence= factory.defence
+                    tr: td In range
+                        td.factory-in-range ?
+                    tr: td Conquer value
+                        td.factory-conquer-value= factory.conquerValue
 
-        .card-action
-            .row.between-xs: .col-xs-12: .box
-                a.ui-btn.waves-effect.waves-button.action-factory-level-upgrade(href='#', data-transition='slide', data-rel='popup')
-                    i.zmdi.zmdi-star
-                    | &nbsp;&nbsp;Upgrade level
-                    span(style='color: gray;') &nbsp;&nbsp;(<span class="factory-next-level-cost">?</span>)
+                hr
+                table.table-list.ui-responsive
+                    tr: td Team
+                        td.factory-team= factory.teamName
+                    tr: td Creator
+                        td.factory-creator= factory.creatorName
+
+    div.tab-factory-attack(data-role='nd2tab', data-tab='attack')
+        .nd2-card.wow.fadeInUp.card-factory-attack
+            .card-title.has-supporting-text
+                h3.card-primary-title Attack
+
+            .card-supporting-text.has-action.has-title
+                p The lab isn't strong enough to withstand enemy attacks. Attack the lab to take it over.
+                div(align="center")
+                    table.table-list.ui-responsive
+                        tr: td Conquer value
+                            td.factory-conquer-value= factory.conquerValue
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.waves-effect.waves-button.action-factory-attack(href='#', data-transition='slide', data-rel='popup')
+                        i.zmdi.zmdi-fire
+                        | &nbsp;&nbsp;Attack
+
+    div.tab-factory-transfer(data-role='nd2tab', data-tab='transfer')
+        .nd2-card.wow.fadeInUp.card-factory-transfer
+            .card-title.has-supporting-text
+                h3.card-primary-title Deposit/Withdraw
+
+            .card-supporting-text.has-action.has-title
+                p Deposit and/or withdraw goods here.
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.waves-effect.waves-button.action-factory-deposit(href='#', data-transition='slide', data-rel='popup')
+                        i.zmdi.zmdi-arrow-right
+                        | &nbsp;&nbsp;Deposit
+                    a.ui-btn.waves-effect.waves-button.action-factory-withdraw(href='#', data-transition='slide', data-rel='popup')
+                        i.zmdi.zmdi-arrow-left
+                        | &nbsp;&nbsp;Withdraw
+
+    div.tab-factory-defence(data-role='nd2tab', data-tab='defence')
+        .nd2-card.wow.fadeInUp.card-factory-defence
+            .card-title.has-supporting-text
+                h3.card-primary-title Defence
+
+            .card-supporting-text.has-action.has-title
+                p Upgrading the defence makes it harder for enemies to take things over.
+                div(align="center")
+                    table.table-list.ui-responsive
+                        tr: td Defence
+                            td.factory-defence= factory.defence
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box.upgrade-button-list
+                    div(align="center")
+                        i No upgrades available...<br>
+
+    div.tab-factory-level(data-role='nd2tab', data-tab='level')
+        .nd2-card.wow.fadeInUp.card-factory-level
+            .card-title.has-supporting-text
+                h3.card-primary-title Level
+
+            .card-supporting-text.has-action.has-title
+                p Upgrading the level speeds up production.
+                div(align="center")
+                    table.table-list.ui-responsive
+                        tr: td Level
+                            td.factory-level= factory.level
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.waves-effect.waves-button.action-factory-level-upgrade(href='#', data-transition='slide', data-rel='popup')
+                        i.zmdi.zmdi-star
+                        | &nbsp;&nbsp;Upgrade level
+                        span(style='color: gray;') &nbsp;&nbsp;(<span class="factory-next-level-cost">?</span>)
