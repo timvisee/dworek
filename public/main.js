@@ -1866,7 +1866,7 @@ function showDialog(options, callback) {
     // Build and open the popup
     popupElement.popup();
     popupElement.popup('open', {
-        transition: 'pop',
+        transition: Dworek.state.animate ? 'pop' : 'none',
         shadow: true,
         positionTo: 'window'
     }).trigger('create');
@@ -5433,14 +5433,23 @@ function updateFactoryDataVisuals(firstShow) {
     // Update the upgrade buttons
     if(canModify) {
         // Slide down the cards
-        transferCard.slideDown();
-        transferTab.fadeIn();
+        if(Dworek.state.animate) {
+            transferCard.slideDown();
+            transferTab.fadeIn();
+            defenceCard.slideDown();
+            defenceTab.fadeIn();
+            levelCard.slideDown();
+            levelTab.fadeIn();
+        } else {
+            transferCard.show();
+            transferTab.show();
+            defenceCard.show();
+            defenceTab.show();
+            levelCard.show();
+            levelTab.show();
+        }
         transferTabNone.hide();
-        defenceCard.slideDown();
-        defenceTab.fadeIn();
         defenceTabNone.hide();
-        levelCard.slideDown();
-        levelTab.fadeIn();
         levelTabNone.hide();
 
         // Get the upgrade button list element, and clear it
@@ -5750,14 +5759,23 @@ function updateFactoryDataVisuals(firstShow) {
             levelTab.hide();
             levelTabNone.show();
         } else {
-            transferCard.slideUp();
-            transferTab.fadeOut();
+            if(Dworek.state.animate) {
+                transferCard.slideUp();
+                transferTab.fadeOut();
+                defenceCard.slideUp();
+                defenceTab.fadeOut();
+                levelCard.slideUp();
+                levelTab.fadeOut();
+            } else {
+                transferCard.hide();
+                transferTab.hide();
+                defenceCard.hide();
+                defenceTab.hide();
+                levelCard.hide();
+                levelTab.hide();
+            }
             transferTabNone.show();
-            defenceCard.slideUp();
-            defenceTab.fadeOut();
             defenceTabNone.show();
-            levelCard.slideUp();
-            levelTab.fadeOut();
             levelTabNone.show();
         }
     }
@@ -5765,8 +5783,13 @@ function updateFactoryDataVisuals(firstShow) {
     // Determine whether the attack card should be shown
     if(data.hasOwnProperty('conquerValue') && data.conquerValue > 0 && data.hasOwnProperty('ally') && !data.ally) {
         // Show the attack card
-        attackCard.slideDown();
-        attackTab.fadeIn();
+        if(Dworek.state.animate) {
+            attackCard.slideDown();
+            attackTab.fadeIn();
+        } else {
+            attackCard.show();
+            attackTab.show();
+        }
         attackTabNone.hide();
 
         // Determine whether the factory is going to be destroyed
@@ -5819,8 +5842,13 @@ function updateFactoryDataVisuals(firstShow) {
             attackCard.hide();
             attackTab.hide();
         } else {
-            attackCard.slideUp();
-            attackTab.fadeOut();
+            if(Dworek.state.animate) {
+                attackCard.slideUp();
+                attackTab.fadeOut();
+            } else {
+                attackCard.hide();
+                attackTab.hide();
+            }
         }
 
         attackTabNone.show();
