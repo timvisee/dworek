@@ -365,7 +365,18 @@ App.prototype._initDatabase = function(callback) {
  */
 App.prototype._initRedis = function(callback) {
     // Connect to Redis
-    RedisUtils.connect(callback);
+    RedisUtils.connect(function(err, redisClient) {
+        // Filter the error
+        if(err !== null && err !== undefined) {
+            console.warn("Failed to connect to Redis server on initialization. Redis usage has been disabled.");
+            console.warn("Redis error:");
+            console.warn(err);
+        }
+
+        // Call back
+        if(callback !== null && callback !== undefined)
+            callback(null, redisClient);
+    });
 };
 
 /**
