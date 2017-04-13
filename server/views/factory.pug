@@ -3,24 +3,10 @@ extends page
 block content
     .nd2-card.wow.fadeInUp.card-factory-info
         .card-title.has-supporting-text
-            h3.card-primary-title Lab summary
+            h3.card-primary-title.factory-name= factory.name
 
         .card-supporting-text.has-action.has-title
             table.table-list.ui-responsive
-                tr: td Name
-                    td.factory-name= factory.name
-                tr: td Level
-                    td.factory-level= factory.level
-                tr: td Creator
-                    td.factory-creator= factory.creatorName
-                tr: td Team
-                    td.factory-team= factory.teamName
-                tr: td In range
-                    td.factory-in-range ?
-                tr: td Defence
-                    td.factory-defence= factory.defence
-                tr: td Conquer value
-                    td.factory-conquer-value= factory.conquerValue
                 tr: td.game-label-input Ingredients
                     td
                         span.factory-in= factory.in
@@ -31,6 +17,24 @@ block content
                         span.factory-out= factory.out
                         | &nbsp;
                         span.factory-production-out(style="color: gray;") + ? / tick
+
+            hr
+            table.table-list.ui-responsive
+                tr: td Level
+                    td.factory-level= factory.level
+                tr: td Defence
+                    td.factory-defence= factory.defence
+                tr: td In range
+                    td.factory-in-range ?
+                tr: td Conquer value
+                    td.factory-conquer-value= factory.conquerValue
+
+            hr
+            table.table-list.ui-responsive
+                tr: td Team
+                    td.factory-team= factory.teamName
+                tr: td Creator
+                    td.factory-creator= factory.creatorName
 
     .nd2-card.wow.fadeInUp.card-factory-attack
         .card-title.has-supporting-text
