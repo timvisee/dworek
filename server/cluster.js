@@ -37,11 +37,21 @@ if(cluster.isMaster) {
     // Print the number of available CPUs for workers
     console.log('Available CPUs for workers: ' + CPU_COUNT);
 
+    // Load the configuration
+    const config = require('./config');
+
     // Determine the number of workers
-    const workerCount = 1;
+    var workerCount = CPU_COUNT;
+
+    // Get the maximum count from the configuration
+    if(config.cluster.maxWorkerCount !== null && config.cluster.maxWorkerCount !== undefined)
+        workerCount = min(config.cluster.maxWorkerCount, CPU_COUNT);
+
+    // Show the number of workers to use
+    console.log('Using number of workers: ' + workerCount);
 
     // Start the workers
-    console.log('Staring ' + workerCount + ' worker' + (workerCount != 1 ? 's' : '') + '...');
+    console.log('Staring ' + workerCount + ' worker' + (workerCount !== 1 ? 's' : '') + '...');
 
     // Fork the workers
     for(var i = 0; i < workerCount; i++)

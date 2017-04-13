@@ -30,6 +30,7 @@ config.redis = {};
 config.cache = {};
 config.api = {};
 config.realtime = {};
+config.cluster = {};
 config.web = {};
 config.user = {};
 config.security = {};
@@ -146,6 +147,21 @@ config.cache.internal = {};
  * @type {*|number}
  */
 config.cache.internal.flushInterval = 5 * 60 * 1000;
+
+
+/******************************************************************************
+ * Cluster configuration.                                                     *
+ ******************************************************************************/
+
+/**
+ * Maximum number of allowed worker threads.
+ * Null or undefined to set it to unlimited.
+ *
+ * Warning: Multiple works don't seem to work properly yet along with Socket.IO.
+ *
+ * @type {null|number}
+ */
+config.cluster.maxWorkerCount = 1;
 
 
 /******************************************************************************
