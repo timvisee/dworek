@@ -220,7 +220,7 @@ var Dworek = {
              * Define whether to use animations.
              * Disabled animations should make the application much more responsive on slow devices.
              */
-            animate: false
+            animate: true
         },
 
         /**

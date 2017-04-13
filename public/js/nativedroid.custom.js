@@ -751,11 +751,15 @@
 
                 _self.globalSettings();
                 _self.bindNavigationSwipe();
-                if(!rebuild)
-                    _self.iniWow();
-                _self.iniWaves();
-                _self.iniSmoothTransition();
-                _self.iniGoogleAnalytics();
+
+                if(Dworek === undefined || !!Dworek.state.animate) {
+                    if(!rebuild)
+                        _self.iniWow();
+                    //_self.iniWaves();
+                    _self.iniSmoothTransition();
+                }
+
+                //_self.iniGoogleAnalytics();
 
             };
 
