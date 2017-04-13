@@ -130,10 +130,10 @@ var Dworek = {
      * State section.
      */
     state: {
-        /**
-         * True if the user authenticated over the real time server, false if not.
-         * @type {boolean}
-         */
+            /**
+             * True if the user authenticated over the real time server, false if not.
+             * @type {boolean}
+             */
             loggedIn: false,
 
             /**
@@ -214,7 +214,13 @@ var Dworek = {
              * Last known reconnection attempt count.
              * @type {Number} Last known reconnection attempt count.
              */
-            lastReconnectAttempt: 0
+            lastReconnectAttempt: 0,
+
+            /**
+             * Define whether to use animations.
+             * Disabled animations should make the application much more responsive on slow devices.
+             */
+            animate: false
         },
 
         /**
@@ -226,6 +232,9 @@ var Dworek = {
 
             // Connect to the real time server
             this.realtime.connect();
+
+            // Apply the current animation state
+            applyAnimationState();
         },
 
         /**
@@ -902,6 +911,22 @@ $(function() {
    // Start Dworek
     Dworek.start();
 });
+
+/**
+ * Apply the current animation configuration to all objects on the page.
+ */
+function applyAnimationState() {
+    // Set map options when the map is loaded
+    if(map != null) {
+        map.options.fadeAnimation = Dworek.state.animate;
+        map.options.zoomAnimation = Dworek.state.animate;
+        map.options.markerZoomAnimation = Dworek.state.animate;
+        map.options.inertia = Dworek.state.animate;
+    }
+
+    // Set the jQuery animation properties (untested)
+    jQuery.fx.off = !Dworek.state.animate;
+}
 
 // Register an authentication response packet handler
 Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, function(packet) {
@@ -2094,18 +2119,22 @@ $(document).bind("pageinit", function() {
      * Set the nickname field to a random nickname.
      */
     function setRandomNickname() {
-        const animationClass = 'animated';
-        const animationTypeClass = 'bounceInLeft';
+        if(Dworek.state.animate) {
+            const animationClass = 'animated';
+            const animationTypeClass = 'bounceInLeft';
 
-        // Remove animation classes from previous times
-        if(nicknameField.hasClass(animationTypeClass))
-            nicknameField.removeClass(animationTypeClass);
+            // Remove animation classes from previous times
+            if(nicknameField.hasClass(animationTypeClass))
+                nicknameField.removeClass(animationTypeClass);
 
-        // Animate the text field and set a random nickname next tick
-        setTimeout(function() {
-            nicknameField.addClass(animationClass + ' ' + animationTypeClass);
+            // Animate the text field and set a random nickname next tick
+            setTimeout(function() {
+                nicknameField.addClass(animationClass + ' ' + animationTypeClass);
+                nicknameField.val(getRandomNickname());
+            }, 1);
+        } else {
             nicknameField.val(getRandomNickname());
-        }, 1);
+        }
     }
 
     // Check whether we should randomize on page creation
@@ -2990,7 +3019,7 @@ function updateStatusLabels() {
     error = error || (hasBattery && batteryLevel >= 0 && batteryLevel <= 10);
 
     // Determine whether to animate the status icon
-    const iconAnimate = playing;
+    const iconAnimate = Dworek.state.animate && playing;
     const iconAnimateDuration = !error ? 10 : 1.5;
 
     // Set the animation state of the icon
@@ -3374,6 +3403,7 @@ function setFollowEverything(state, options) {
 
     // Merge the options object with the defaults
     options = merge(defaultOptions, options, true);
+
     // Get the old state
     const oldState = followEverything;
 
@@ -3424,8 +3454,8 @@ function focusPlayer(zoom) {
     const playerLocation = playerMarker.getLatLng();
 
     // Focus on the player marker and/or zoom depending on the zoom parameter
-    if(zoom)
-        map.setView(playerLocation, 18);
+    if(!Dworek.state.animate || zoom)
+        map.setView(playerLocation, 18, {animate: Dworek.state.animate});
     else
         map.panTo(playerLocation);
 }
@@ -3482,8 +3512,19 @@ $(document).bind("tab-switch", function(event, data) {
             // Show a status message
             console.log('Initializing the map.');
 
+            // Build the map options
+            var mapOptions = {};
+
+            // Add animation options when animations are disabled
+            if(!Dworek.state.animate) {
+                mapOptions.fadeAnimation = false;
+                mapOptions.zoomAnimation = false;
+                mapOptions.makerZoomAnimation = false;
+                mapOptions.inertia = false;
+            }
+
             // Create the map
-            map = L.map('map-container').setView(latlng, 18);
+            map = L.map('map-container', mapOptions).setView(latlng, 18);
 
             // Set up the tile layers
             L.tileLayer('https://api.mapbox.com/styles/v1/timvisee/cirawmn8f001ch4m27llnb45d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGltdmlzZWUiLCJhIjoiY2lyZXY5cDhzMDAxM2lsbTNicGViaTZkYyJ9.RqbUkoWLWeh_WZoyoxxt-Q', {
@@ -4158,7 +4199,8 @@ function focusEverything() {
         L.featureGroup(fitters).getBounds(),
         {
             paddingTopLeft: [5, 5],
-            paddingBottomRight: [35, 35]
+            paddingBottomRight: [35, 35],
+            animate: Dworek.state.animate
         }
     );
 }
@@ -4381,13 +4423,24 @@ $(document).bind("pageshow", function() {
 });
 
 function cardAnimationSlideIn(element) {
-    element.addClass('animated bounceInDown').hide().slideDown();
+    if(Dworek.state.animate)
+        // Animate
+        element.addClass('animated bounceInDown').hide().slideDown();
+    else
+        // Just show
+        element.show();
 }
 
 function cardAnimationSlideOut(element) {
-    element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(500).slideUp(function() {
-        $(this).remove();
-    });
+    if(Dworek.state.animate)
+        // Animate
+        element.removeClass('animated bounceInLeft').addClass('animated fadeOutRight').delay(500).slideUp(function() {
+            $(this).remove();
+        });
+    else
+        // Just hide
+        element.remove();
+
 }
 
 /**
@@ -5831,8 +5884,14 @@ function updateFactoryDataVisuals(firstShow) {
                 factoryConquerLabel.html('<span style="color: green;">' +  data.conquerValue + '</span>' + suffix);
             else if(data.conquerValue <= 0)
                 factoryConquerLabel.html('<span style="color: orangered;">' +  data.conquerValue + '</span>' + suffix);
-            else
-                factoryConquerLabel.html('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+            else {
+                if(Dworek.state.animate)
+                    // Animate
+                    factoryConquerLabel.html('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+                else
+                    // Don't animate
+                    factoryConquerLabel.html('<span style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+            }
         }
     }
 
@@ -5845,8 +5904,14 @@ function updateFactoryDataVisuals(firstShow) {
         if(data.hasOwnProperty('productionIn')) {
             if(data.in >= data.productionIn)
                 factoryInLabel.html(visible ? ('<span style="color: green;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
-            else
-                factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
+            else {
+                if(Dworek.state.animate)
+                    // Animate
+                    factoryInLabel.html(visible ? ('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
+                else
+                    // Don't animate
+                    factoryInLabel.html(visible ? ('<span style="color: red; display: inline-block;">' + formatGoods(data.in) + '</span>') : hiddenLabel);
+            }
         } else
             factoryInLabel.html(visible ? formatGoods(data.in) : hiddenLabel);
 
