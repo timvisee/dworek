@@ -45,7 +45,7 @@ if(cluster.isMaster) {
 
     // Get the maximum count from the configuration
     if(config.cluster.maxWorkerCount !== null && config.cluster.maxWorkerCount !== undefined)
-        workerCount = min(config.cluster.maxWorkerCount, CPU_COUNT);
+        workerCount = Math.min(config.cluster.maxWorkerCount, CPU_COUNT);
 
     // Show the number of workers to use
     console.log('Using number of workers: ' + workerCount);
