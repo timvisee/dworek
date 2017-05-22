@@ -24,7 +24,7 @@
     "express": "4.15.2",
     "geolib": "2.0.22",
     "lodash": "4.17.4",
-    "mongodb": "2.2.26",
+    "mongodb": "2.2.27",
     "morgan": "1.8.1",
     "pug": "2.0.0-beta11",
     "redis": "2.7.1",
