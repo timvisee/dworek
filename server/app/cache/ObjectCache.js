@@ -82,7 +82,7 @@ ObjectCache.prototype.setCache = function(field, value) {
  */
 ObjectCache.prototype.setCacheMultiple = function(values) {
     // Make sure the given value isn't null or undefined
-    if(values == undefined || values == null)
+    if(values === undefined || values === null)
         return;
 
     // Loop through all keys in the object, and add them individually
