@@ -25,7 +25,7 @@
     "geolib": "2.0.22",
     "lodash": "4.17.4",
     "mongodb": "2.2.27",
-    "morgan": "1.8.1",
+    "morgan": "1.8.2",
     "pug": "2.0.0-beta11",
     "redis": "2.7.1",
     "serve-favicon": "2.4.3",
