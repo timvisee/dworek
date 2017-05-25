@@ -78,7 +78,7 @@ Core.model.gameUserModelManager = null;
 Core.model.factoryModelManager = null;
 
 /**
- * HTTP server instance.
+ * HTTP(S) server instance.
  *
  * @type {*} Server instance.
  */

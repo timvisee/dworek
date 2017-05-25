@@ -41,11 +41,9 @@ if(cluster.isMaster) {
     const config = require('./config');
 
     // Determine the number of workers
-    var workerCount = CPU_COUNT;
-
-    // Get the maximum count from the configuration
-    if(config.cluster.maxWorkerCount !== null && config.cluster.maxWorkerCount !== undefined)
-        workerCount = Math.min(config.cluster.maxWorkerCount, CPU_COUNT);
+    const workerCount = config.cluster.maxWorkerCount !== null && config.cluster.maxWorkerCount !== undefined ?
+            workerCount = Math.min(config.cluster.maxWorkerCount, CPU_COUNT) :
+            CPU_COUNT;
 
     // Show the number of workers to use
     console.log('Using number of workers: ' + workerCount);

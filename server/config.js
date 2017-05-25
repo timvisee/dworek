@@ -157,7 +157,7 @@ config.cache.internal.flushInterval = 5 * 60 * 1000;
  * Maximum number of allowed worker threads.
  * Null or undefined to set it to unlimited.
  *
- * Warning: Multiple works don't seem to work properly yet along with Socket.IO.
+ * Warning: Multiple workers don't seem to work properly yet along with Socket.IO.
  *
  * @type {null|number}
  */

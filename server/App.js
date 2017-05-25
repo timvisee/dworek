@@ -21,13 +21,13 @@
  ******************************************************************************/
 
 var async = require('async');
+var debug = require('debug')(config.debug.name);
 var express = require('express');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
 
 var config = require('./config');
-var debug = require('debug')(config.debug.name);
 
 var Core = require('./Core');
 var GameController = require('./app/live/game/GameManager');
@@ -67,6 +67,7 @@ var App = function(init) {
      * @type {Number}
      * @private
      */
+    // TODO: Is this used? This variable might be in Core instead.
     this._webPort = null;
 
     // Initialize
@@ -265,7 +266,7 @@ App.prototype._initWebServer = function() {
         Core.server = http.createServer(Core.expressApp);
     }
 
-    // Listen on provided port, on all network interfaces.
+    // Listen on the provided port, on all network interfaces.
     Core.server.listen(Core._webPort);
     Core.server.on('error', _webServerOnError);
     Core.server.on('listening', _webServerOnListening);
@@ -310,7 +311,7 @@ function _webServerOnError(error) {
 }
 
 /**
- * Event listener for HTTP server listening event.
+ * Event listener for HTTP(S) server listening event.
  */
 function _webServerOnListening() {
     // Get the address
