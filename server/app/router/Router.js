@@ -26,6 +26,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var Raven = require('raven');
+
+var config = require('../../config');
 
 var appInfo = require('../../appInfo');
 var routes = require('../route/index');
@@ -128,7 +131,12 @@ Router.prototype.init = function(callback) {
             }
         });
 
+        // Capture the exception for Sentry monitoring
+        if(config.sentry.enable)
+            Raven.captureException(err);
+
         // Print the error message to the console
+        console.error('An error occurred while loading a page.');
         console.error(err.stack);
     });
 
