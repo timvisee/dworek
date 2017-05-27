@@ -227,6 +227,9 @@ var Dworek = {
          * Start the client.
          */
         start: function() {
+            // Start Sentry error monitoring
+            this.startSentryMonitoring();
+
             // Start native droid
             this.startNativeDroid();
 
@@ -236,6 +239,18 @@ var Dworek = {
             // Apply the current animation state
             applyAnimationState();
         },
+
+        /**
+         * Start Sentry error monitoring on the web appliation.
+         */
+        startSentryMonitoring: function() {
+			// Start error monitoring with Sentry
+			// TODO: Make this configurable
+			// TODO: Don't hardcode the DSN (url)
+			Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install();
+
+            // TODO: Supply some user (session) context
+		},
 
         /**
          * Start NativeDroid and related modules.
@@ -911,14 +926,6 @@ $(function() {
     // Start Dworek
 	// TODO: Should this be changed to Dworek.state.start() ?
     Dworek.start();
-});
-
-// Start error monitoring when ready
-$(document).ready(function() {
-    // Start error monitoring with Sentry
-	// TODO: Make this configurable
-	// TODO: Don't hardcode the DSN (url)
-	Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install();
 });
 
 /**
