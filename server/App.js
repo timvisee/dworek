@@ -28,6 +28,7 @@ var express = require('express');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+var Raven = require('raven');
 
 var Core = require('./Core');
 var GameController = require('./app/live/game/GameManager');
@@ -85,6 +86,9 @@ App.prototype.init = function(callback) {
     // Create a core instance if it hasn't been instantiated yet
     if(this.core === null)
         this.core = new Core();
+
+    // Initialize sentry monitoring
+    _initSentryMonitoring();
 
     // Store the current instance
     const self = this;
@@ -188,6 +192,27 @@ App.prototype.init = function(callback) {
 App.prototype.isInit = function() {
     return this._init;
 };
+
+/**
+ * Initialize, set up and enable sentry error monitoring if enabled in the configuration file.
+ * @private
+ */
+function _initSentryMonitoring() {
+    // Load the sentry properties
+    const sentryEnable = config.sentry.enable;
+    const sentryDsn = config.sentry.dsn;
+
+    // Enable Sentry monitoring
+    if (sentryEnable) {
+        // Show an status message
+        console.log('Enabling Sentry error monitoring...');
+
+        // Configure and enable Raven for Sentry
+        Raven.config(sentryDsn).install();
+
+    } else
+        console.log('Not enabling Sentry error monitoring, disabled in config.');
+}
 
 /**
  * Initialize the game controller.

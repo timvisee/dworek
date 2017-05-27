@@ -37,6 +37,7 @@ config.security = {};
 config.session = {};
 config.validation = {};
 config.game = {};
+config.sentry = {};
 
 
 /******************************************************************************
@@ -374,6 +375,27 @@ config.game.locationDecayTime = 30 * 1000;
  * @type {number}
  */
 config.game.locationUpdateInterval = 5 * 1000;
+
+
+/******************************************************************************
+ * Sentry error monitoring configuration.                                     *
+ ******************************************************************************/
+
+/**
+ * Define whether Sentry error monitoring is enabled.
+ * @type {boolean}
+ */
+config.sentry.enable = false;
+
+/**
+ * The Sentry DSN to monitor to.
+ *
+ * The DSN can be found on the following page:
+ * https://docs.sentry.io/clients/node/
+ *
+ * @type {string}
+ */
+config.sentry.dsn = 'https://********:********@sentry.io/000000';
 
 
 // Export the configuration
