@@ -227,11 +227,6 @@ var Dworek = {
          * Start the client.
          */
         start: function() {
-            // Enable Raven error reporting
-            // TODO: Make this configurable
-            // TODO: Don't hardcode the DSL
-            Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install()
-
             // Start native droid
             this.startNativeDroid();
 
@@ -913,8 +908,17 @@ if(!Date.now)
 
 // Wait for initialization
 $(function() {
-   // Start Dworek
+    // Start Dworek
+	// TODO: Should this be changed to Dworek.state.start() ?
     Dworek.start();
+});
+
+// Start error monitoring when ready
+$(document).ready(function() {
+    // Start error monitoring with Sentry
+	// TODO: Make this configurable
+	// TODO: Don't hardcode the DSN (url)
+	Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install();
 });
 
 /**
