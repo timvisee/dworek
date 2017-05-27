@@ -227,6 +227,11 @@ var Dworek = {
          * Start the client.
          */
         start: function() {
+            // Enable Raven error reporting
+            // TODO: Make this configurable
+            // TODO: Don't hardcode the DSL
+            Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install()
+
             // Start native droid
             this.startNativeDroid();
 
