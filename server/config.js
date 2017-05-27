@@ -391,9 +391,9 @@ config.sentry.enable = false;
  * The Sentry DSN to monitor to.
  *
  * The DSN can be found on the following page:
- * https://docs.sentry.io/clients/node/
+ * https://docs.sentry.io/quickstart/#configure-the-dsn
  *
- * @type {string}
+ * @type {string|undefined}
  */
 config.sentry.dsn = 'https://********:********@sentry.io/000000';
 
