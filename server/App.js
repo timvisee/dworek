@@ -206,7 +206,7 @@ App.prototype._initSentryMonitoring = function() {
     // Enable Sentry monitoring
     if (sentryEnable) {
         // Show an status message
-        console.log('Enabling Sentry error monitoring...');
+        console.log('Enabling Sentry error monitoring on worker ' + process.pid + '...');
 
         // Configure and enable Raven for Sentry
         Raven.config(sentryDsn).install();
