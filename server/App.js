@@ -88,7 +88,7 @@ App.prototype.init = function(callback) {
         this.core = new Core();
 
     // Initialize sentry monitoring
-    _initSentryMonitoring();
+    this._initSentryMonitoring();
 
     // Store the current instance
     const self = this;
@@ -195,9 +195,10 @@ App.prototype.isInit = function() {
 
 /**
  * Initialize, set up and enable sentry error monitoring if enabled in the configuration file.
+ *
  * @private
  */
-function _initSentryMonitoring() {
+App.prototype._initSentryMonitoring = function() {
     // Load the sentry properties
     const sentryEnable = config.sentry.enable;
     const sentryDsn = config.sentry.dsn;
@@ -212,7 +213,7 @@ function _initSentryMonitoring() {
 
     } else
         console.log('Not enabling Sentry error monitoring, disabled in config.');
-}
+};
 
 /**
  * Initialize the game controller.
