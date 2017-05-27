@@ -120,8 +120,12 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     Core.gameController.games.forEach(function(liveGame) {
         // Loop through the shops
         liveGame.shopManager.shops.forEach(function(liveShop) {
+            // Skip if we already found the shop
+            if(foundShop)
+                return;
+
             // Check whether this is the correct shop
-            if(!liveShop.getToken() == rawShop)
+            if(liveShop.getToken() !== rawShop)
                 return;
 
             // Set the found flag
@@ -176,9 +180,10 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                 // Check whether we should use the maximum possible amount
                                 if(rawAll === true)
                                     outAmount = outCurrent;
-                                else
-                                // Parse the raw amount
+                                else {
+                                    // Parse the raw amount
                                     outAmount = parseInt(rawOutAmount);
+                                }
 
                                 // Make sure the amount isn't above the maximum
                                 if(outAmount > outCurrent) {
