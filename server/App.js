@@ -20,14 +20,14 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var config = require('./config');
+
 var async = require('async');
 var debug = require('debug')(config.debug.name);
 var express = require('express');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
-
-var config = require('./config');
 
 var Core = require('./Core');
 var GameController = require('./app/live/game/GameManager');
