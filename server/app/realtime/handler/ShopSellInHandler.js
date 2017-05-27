@@ -120,8 +120,12 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     Core.gameController.games.forEach(function(liveGame) {
         // Loop through the shops
         liveGame.shopManager.shops.forEach(function(liveShop) {
+            // Skip if we already found the shop
+            if(foundShop)
+                return;
+
             // Check whether this is the correct shop
-            if(!liveShop.getToken() == rawShop)
+            if(liveShop.getToken() !== rawShop)
                 return;
 
             // Set the found flag
