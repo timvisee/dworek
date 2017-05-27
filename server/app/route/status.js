@@ -112,9 +112,9 @@ router.get('/', function(req, res, next) {
     options.status.server.latency = [
         Formatter.formatNano(Math.max.apply(null, latencyList)),
         Formatter.formatNano(Math.min.apply(null, latencyList)),
-        Formatter.formatNano(percentile.calc(latencyList, 50)),
-        Formatter.formatNano(percentile.calc(latencyList, 90)),
-        Formatter.formatNano(percentile.calc(latencyList, 99))
+        Formatter.formatNano(percentile(latencyList, 50)),
+        Formatter.formatNano(percentile(latencyList, 90)),
+        Formatter.formatNano(percentile(latencyList, 99))
     ];
 
     // Get the redis status if ready
