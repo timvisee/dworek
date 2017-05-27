@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var Raven = require('raven');
+
 var appInfo = require('./appInfo');
 
 // Define the cluster and count the number of CPU cores
@@ -34,11 +36,26 @@ if(cluster.isMaster) {
     // Show the master and a message that workers will be started
     console.log('Master ' + process.pid + ' online');
 
-    // Print the number of available CPUs for workers
-    console.log('Available CPUs for workers: ' + CPU_COUNT);
-
     // Load the configuration
     const config = require('./config');
+
+    // Load the sentry properties
+    const sentryEnable = config.sentry.enable;
+    const sentryDsn = config.sentry.dsn;
+
+    // Enable Sentry monitoring
+    if(sentryEnable) {
+        // Show an status message
+        console.log('Enabling Sentry error monitoring...');
+
+        // Configure and enable Raven for Sentry
+        Raven.config(sentryDsn).install();
+
+    } else
+        console.log('Not enabling Sentry error monitoring, disabled in config.');
+
+    // Print the number of available CPUs for workers
+    console.log('Available CPUs for workers: ' + CPU_COUNT);
 
     // Determine the number of workers
     const workerCount = config.cluster.maxWorkerCount !== null && config.cluster.maxWorkerCount !== undefined ?
