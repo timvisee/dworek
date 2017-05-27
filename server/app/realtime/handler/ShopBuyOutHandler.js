@@ -116,6 +116,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     // Create a found flag
     var foundShop = false;
 
+    // TODO: Remove after testing
+    console.log("TEST: A");
+
     // Loop through the games and shops to find the correct shop
     Core.gameController.games.forEach(function(liveGame) {
         // Loop through the shops
@@ -127,6 +130,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
             // Set the found flag
             foundShop = true;
 
+            // TODO: Remove after testing
+            console.log("TEST: B");
+
             // Get the game user
             Core.model.gameUserModelManager.getGameUser(liveGame.getGameModel(), user, function(err, gameUser) {
                 // Call back errors
@@ -134,6 +140,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                     callbackError();
                     return;
                 }
+
+                // TODO: Remove after testing
+                console.log("TEST: C");
 
                 // Get the live user
                 liveGame.getUser(user, function(err, liveUser) {
@@ -143,6 +152,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                         return;
                     }
 
+                    // TODO: Remove after testing
+                    console.log("TEST: D");
+
                     // Make sure the user is in range
                     liveShop.isUserInRange(liveUser, function(err, inRange) {
                         // Call back errors
@@ -150,6 +162,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                             callbackError();
                             return;
                         }
+
+                        // TODO: Remove after testing
+                        console.log("TEST: E");
 
                         // Get the price
                         const price = liveShop.getOutBuyPrice();
@@ -162,6 +177,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                 return;
                             }
 
+                            // TODO: Remove after testing
+                            console.log("TEST: F");
+
                             // Get the current amount of money the user has
                             gameUser.getMoney(function(err, moneyCurrent) {
                                 // Call back errors
@@ -169,6 +187,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                     callbackError();
                                     return;
                                 }
+
+                                // TODO: Remove after testing
+                                console.log("TEST: G");
 
                                 // Determine the amount of out to deposit
                                 var outAmount = 0;
@@ -214,6 +235,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                         return;
                                     }
 
+                                    // TODO: Remove after testing
+                                    console.log("TEST: H");
+
                                     // Calculate the income
                                     const moneyAmount = Math.round(outAmount * price);
 
@@ -224,6 +248,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                             callbackError();
                                             return;
                                         }
+
+                                        // TODO: Remove after testing
+                                        console.log("TEST: I");
 
                                         // Send updated game data to the user
                                         Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
@@ -242,6 +269,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                             // Call back errors
                                             if (err !== null)
                                                 callbackError();
+
+                                            // TODO: Remove after testing
+                                            console.log("TEST: J");
 
                                             // Send a notification to the user
                                             // TODO: Get the in and money name from the name configuration of the current game
