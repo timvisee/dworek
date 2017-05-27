@@ -213,19 +213,6 @@ App.prototype._initSentryMonitoring = function() {
 
     } else
         console.log('Not enabling Sentry error monitoring, disabled in config.');
-
-    // TODO: Remove after testing
-    // Create an error to test Sentry monitoring
-    setInterval(function() {
-        if(Math.random() < 0.5)
-            try {
-                doSomething(a[0]);
-            } catch (e) {
-                Raven.captureException(e);
-            }
-        else
-            doSomething(a[0]);
-    }, 17 * 1000);
 };
 
 /**
