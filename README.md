@@ -1,5 +1,4 @@
 [![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)
-[![Dependency status on libraries.io](https://img.shields.io/librariesio/github/timvisee/dworek.svg)](https://libraries.io/github/timvisee/dworek)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
 
