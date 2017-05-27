@@ -76,15 +76,15 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
         if(calledBack)
             return;
 
+        // Set the called back flag
+        calledBack = true;
+
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
             message: 'Failed to deposit, a server error occurred.',
             dialog: true
         }, socket);
-
-        // Set the called back flag
-        calledBack = true;
     };
 
     // Make sure a session is given
@@ -101,7 +101,7 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
     const rawAll = packet.all;
 
     // Determine whether to deposit the in or out good type
-    const typeIn = rawGoodType == 'in';
+    const typeIn = rawGoodType === 'in';
 
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid) {
@@ -120,7 +120,7 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
         // Callback errors
-        if(err !== null) {
+        if(!isValidFactory || err !== null) {
             callbackError();
             return;
         }
@@ -144,16 +144,18 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
                     return;
                 }
 
+                // Get the live game instance
                 Core.gameController.getGame(game, function(err, liveGame) {
                     // Callback errors
-                    if(err !== null || liveGame == null) {
+                    if(err !== null || liveGame === null) {
                         callbackError();
                         return;
                     }
 
+                    // Get the live factory instance
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
                         // Callback errors
-                        if(err !== null || liveFactory == null) {
+                        if(err !== null || liveFactory === null) {
                             callbackError();
                             return;
                         }
@@ -252,152 +254,151 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
 
                             // Continue when the good amounts are fetched
                             latch.then(function() {
+                                // Determine the amount to deposit
+                                var depositAmount = 0;
 
-                            });
+                                // Check whether we should use the maximum amount
+                                if(rawAll === true)
+                                    depositAmount = userGoodsCurrent;
+                                else {
+                                    // Parse the raw amount
+                                    depositAmount = parseInt(rawAmount);
+                                }
 
-                            // Determine the amount to deposit
-                            var depositAmount = 0;
+                                // Make sure the amount isn't above the maximum
+                                if(depositAmount > userGoodsCurrent) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Failed to deposit, you don\'t have this much goods available.',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
 
-                            // Check whether we should use the maximum amount
-                            if(rawAll === true)
-                                depositAmount = userGoodsCurrent;
-                            else
-                                // Parse the raw amount
-                                depositAmount = parseInt(rawAmount);
+                                // Make sure the amount isn't below zero
+                                if(depositAmount < 0) {
+                                    callbackError();
+                                    return;
+                                }
 
-                            // Make sure the amount isn't above the maximum
-                            if(depositAmount > userGoodsCurrent) {
-                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                    error: true,
-                                    message: 'Failed to deposit, you don\'t have this much goods available.',
-                                    dialog: true
-                                }, socket);
-                                return;
-                            }
+                                // Make the sure the amount isn't zero
+                                if(depositAmount === 0) {
+                                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: '<i>You can\'t deposit no nothin\'.</i>',
+                                        dialog: true
+                                    }, socket);
+                                    return;
+                                }
 
-                            // Make sure the amount isn't below zero
-                            if(depositAmount < 0) {
-                                callbackError();
-                                return;
-                            }
+                                // Reset the latch to it's identity
+                                latch.identity();
 
-                            // Make the sure the amount isn't zero
-                            if(depositAmount == 0) {
-                                Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                    error: true,
-                                    message: '<i>You can\'t deposit no nothin\'.</i>',
-                                    dialog: true
-                                }, socket);
-                                return;
-                            }
+                                // Deposit the correct type of goods from the factory, and withdraw them to the user
+                                if(typeIn) {
+                                    // Deposit the in to the factory
+                                    latch.add();
+                                    factoryModel.addIn(depositAmount, function(err) {
+                                        // Callback errors
+                                        if(err !== null) {
+                                            callbackError();
+                                            return;
+                                        }
 
-                            // Reset the latch to it's identity
-                            latch.identity();
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
 
-                            // Deposit the correct type of goods from the factory, and withdraw them to the user
-                            if(typeIn) {
-                                // Deposit the in to the factory
-                                latch.add();
-                                factoryModel.addIn(depositAmount, function(err) {
-                                    // Callback errors
-                                    if(err !== null) {
-                                        callbackError();
-                                        return;
-                                    }
+                                    // Withdraw the in from the user
+                                    latch.add();
+                                    gameUser.subtractIn(depositAmount, function(err) {
+                                        // Callback errors
+                                        if(err !== null) {
+                                            callbackError();
+                                            return;
+                                        }
 
-                                    // Resolve the latch
-                                    latch.resolve();
-                                });
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
+                                } else {
+                                    // Deposit the out to the factory
+                                    latch.add();
+                                    factoryModel.addOut(depositAmount, function(err) {
+                                        // Callback errors
+                                        if(err !== null) {
+                                            callbackError();
+                                            return;
+                                        }
 
-                                // Withdraw the in from the user
-                                latch.add();
-                                gameUser.subtractIn(depositAmount, function(err) {
-                                    // Callback errors
-                                    if(err !== null) {
-                                        callbackError();
-                                        return;
-                                    }
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
 
-                                    // Resolve the latch
-                                    latch.resolve();
-                                });
-                            } else {
-                                // Deposit the out to the factory
-                                latch.add();
-                                factoryModel.addOut(depositAmount, function(err) {
-                                    // Callback errors
-                                    if(err !== null) {
-                                        callbackError();
-                                        return;
-                                    }
+                                    // Withdraw the out from the user
+                                    latch.add();
+                                    gameUser.subtractOut(depositAmount, function(err) {
+                                        // Callback errors
+                                        if(err !== null) {
+                                            callbackError();
+                                            return;
+                                        }
 
-                                    // Resolve the latch
-                                    latch.resolve();
-                                });
+                                        // Resolve the latch
+                                        latch.resolve();
+                                    });
+                                }
 
-                                // Withdraw the out from the user
-                                latch.add();
-                                gameUser.subtractOut(depositAmount, function(err) {
-                                    // Callback errors
-                                    if(err !== null) {
-                                        callbackError();
-                                        return;
-                                    }
-
-                                    // Resolve the latch
-                                    latch.resolve();
-                                });
-                            }
-
-                            // Continue when we finished the transaction
-                            latch.then(function() {
-                                // Send updated game data to the user
-                                Core.gameController.sendGameData(game, user, undefined, function(err) {
-                                    // Handle errors
-                                    if(err !== null) {
-                                        console.error(err);
-                                        console.error('Failed to broadcast factory data');
-                                    }
-                                });
-
-                                // Broadcast the factory data, since it's updated
-                                liveFactory.broadcastData(function(err) {
-                                    // Handle errors
-                                    if(err !== null) {
-                                        console.error(err);
-                                        console.error('Failed to broadcast factory data');
-                                    }
-                                });
-
-                                // Get the live user instance
-                                liveGame.getUser(user, function(err, liveUser) {
-                                    // Handle errors
-                                    if(err !== null) {
-                                        console.error(err);
-                                        console.error('Failed to send transaction success');
-                                        return;
-                                    }
-
-                                    // Get the user's balance table
-                                    liveUser.getBalanceTable({
-                                        ['previous' + (typeIn ? 'In' : 'Out')]: userGoodsCurrent
-                                    }, function (err, balanceTable) {
+                                // Continue when we finished the transaction
+                                latch.then(function() {
+                                    // Send updated game data to the user
+                                    Core.gameController.sendGameData(game, user, undefined, function(err) {
                                         // Handle errors
-                                        if (err !== null) {
+                                        if(err !== null) {
+                                            console.error(err);
+                                            console.error('Failed to broadcast factory data');
+                                        }
+                                    });
+
+                                    // Broadcast the factory data, since it's updated
+                                    liveFactory.broadcastData(function(err) {
+                                        // Handle errors
+                                        if(err !== null) {
+                                            console.error(err);
+                                            console.error('Failed to broadcast factory data');
+                                        }
+                                    });
+
+                                    // Get the live user instance
+                                    liveGame.getUser(user, function(err, liveUser) {
+                                        // Handle errors
+                                        if(liveUser === null || err !== null) {
                                             console.error(err);
                                             console.error('Failed to send transaction success');
                                             return;
                                         }
 
-                                        // Send a notification to the user
-                                        // TODO: Get the in name from the game's name configuration
-                                        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                                            error: false,
-                                            message: 'Deposited ' + Formatter.formatGoods(depositAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (depositAmount == 1 ? '' : 's') + '.<br><br>' + balanceTable,
-                                            dialog: false,
-                                            toast: true,
-                                            ttl: 10 * 1000
-                                        }, socket);
+                                        // Get the user's balance table
+                                        liveUser.getBalanceTable({
+                                            ['previous' + (typeIn ? 'In' : 'Out')]: userGoodsCurrent
+                                        }, function (err, balanceTable) {
+                                            // Handle errors
+                                            if (balanceTable === null || balanceTable === undefined || err !== null) {
+                                                console.error(err);
+                                                console.error('Failed to send transaction success');
+                                                return;
+                                            }
+
+                                            // Send a notification to the user
+                                            // TODO: Get the in name from the game's name configuration
+                                            Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+                                                error: false,
+                                                message: 'Deposited ' + Formatter.formatGoods(depositAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (depositAmount === 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                dialog: false,
+                                                toast: true,
+                                                ttl: 10 * 1000
+                                            }, socket);
+                                        });
                                     });
                                 });
                             });

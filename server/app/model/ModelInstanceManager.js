@@ -50,7 +50,7 @@ var ModelInstanceManager = function(modelConstructor) {
 };
 
 /**
- * Create a new model instance for the given model object ID.
+ * Create a new model instance for the given model object ID, or return the already existing one.
  *
  * @param {ObjectId|String} id Object ID.
  * @param {Object} [localCache] Object with fields and values to cache locally, which greatly benefits performance.

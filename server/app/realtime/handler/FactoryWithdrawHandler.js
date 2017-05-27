@@ -76,15 +76,15 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
         if(calledBack)
             return;
 
+        // Set the called back flag
+        calledBack = true;
+
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
             message: 'Failed to withdraw, a server error occurred.',
             dialog: true
         }, socket);
-
-        // Set the called back flag
-        calledBack = true;
     };
 
     // Make sure a session is given
@@ -101,7 +101,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
     const rawAll = packet.all;
 
     // Determine whether to withdraw the in or out good type
-    const typeIn = rawGoodType == 'in';
+    const typeIn = rawGoodType === 'in';
 
     // Make sure the user is authenticated
     if(!_.has(socket, 'session.valid') || !socket.session.valid) {
@@ -119,8 +119,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
-        // Callback errors
-        if(err !== null) {
+        // Call back errors
+        if(!isValidFactory || err !== null) {
             callbackError();
             return;
         }
@@ -144,16 +144,18 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                     return;
                 }
 
+                // Get the livev game instance
                 Core.gameController.getGame(game, function(err, liveGame) {
                     // Callback errors
-                    if(err !== null || liveGame == null) {
+                    if(err !== null || liveGame === null) {
                         callbackError();
                         return;
                     }
 
+                    // Get the live factory instance
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
                         // Callback errors
-                        if(err !== null || liveFactory == null) {
+                        if(err !== null || liveFactory === null) {
                             callbackError();
                             return;
                         }
@@ -258,9 +260,10 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 // Check whether we should use the maximum amount
                                 if(rawAll === true)
                                     withdrawAmount = factoryGoodsCurrent;
-                                else
+                                else {
                                     // Parse the raw amount
                                     withdrawAmount = parseInt(rawAmount);
+                                }
 
                                 // Make sure the amount isn't above the maximum
                                 if(withdrawAmount > factoryGoodsCurrent) {
@@ -279,7 +282,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // Make the sure the amount isn't zero
-                                if(withdrawAmount == 0) {
+                                if(withdrawAmount === 0) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
                                         message: '<i>You can\'t withdraw no nothin\'.</i>',
@@ -369,7 +372,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     // Get the live user
                                     liveGame.getUser(user, function(err, liveUser) {
                                         // Handle errors
-                                        if(err !== null) {
+                                        if(liveUser === null || err !== null) {
                                             console.error(err);
                                             console.error('Failed to send transaction success');
                                             return;
@@ -380,7 +383,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                             ['previous' + (typeIn ? 'In' : 'Out')]: userGoodsCurrent
                                         }, function(err, balanceTable) {
                                             // Handle errors
-                                            if (err !== null) {
+                                            if (balanceTable === null || balanceTable === undefined || err !== null) {
                                                 console.error(err);
                                                 console.error('Failed to send transaction success');
                                                 return;
@@ -390,7 +393,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the out name from the game's name configuration
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (withdrawAmount == 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (withdrawAmount === 1 ? '' : 's') + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

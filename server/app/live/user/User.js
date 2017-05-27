@@ -1094,7 +1094,7 @@ User.prototype.getBalanceTable = function (options, callback) {
  *
  * @callback User~getBalanceTableCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
- * @param {string=} String with the balance table as HTML.
+ * @param {string|undefined} String with the balance table as HTML.
  */
 
 /**
