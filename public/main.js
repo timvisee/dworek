@@ -244,6 +244,9 @@ var Dworek = {
          * Start Sentry error monitoring on the web appliation.
          */
         startSentryMonitoring: function() {
+            // Show a status message
+            console.log('Starting error monitoring with Sentry...');
+
 			// Start error monitoring with Sentry
 			// TODO: Make this configurable
 			// TODO: Don't hardcode the DSN (url)
