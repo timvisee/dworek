@@ -131,13 +131,16 @@ Router.prototype.init = function(callback) {
             }
         });
 
-        // Capture the exception for Sentry monitoring
-        if(config.sentry.enable)
-            Raven.captureException(err);
+        // Handle errors when this isn't an 404 page
+        if(err.status != 404) {
+            // Capture the exception for Sentry monitoring
+            if(config.sentry.enable)
+                Raven.captureException(err);
 
-        // Print the error message to the console
-        console.error('An error occurred while loading a page.');
-        console.error(err.stack);
+            // Print the error message to the console
+            console.error('An error occurred while loading a page.');
+            console.error(err.stack);
+        }
     });
 
     // Show a status message
