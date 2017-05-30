@@ -733,11 +733,7 @@ var Dworek = {
          * @return {boolean} True if we're on the status page.
          */
         isStatusPage: function() {
-            // Create a regular expression to fetch the game ID from the URL
-            const result = document.location.pathname.trim().match(/^\/(status)\/.*$/);
-
-            // Return true if any result was found
-            return (result !== null && result.length > 0);
+            return document.location.pathname.trim().toLowerCase().startsWith('/status');
         },
 
 
