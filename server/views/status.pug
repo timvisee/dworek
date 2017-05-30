@@ -190,7 +190,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the in-memory caching server.
-            table.table-list.ui-responsive.status-redis
+            table.table-list.ui-responsive.status-redis(style='width: 100%')
                 tr: td Status
                     td
                         if status.redis.online
@@ -202,6 +202,8 @@ block content
                         td #{status.redis.uptime} seconds
                     tr: td Queries processed
                         td.status-redis-commandCount= status.redis.commandCount
+                    tr: td(colspan=2)
+                            div#status-chart-redis-commandCount(style='width: 100%; height: 200px;')
                     tr: td Cached fields
                         td= status.redis.keyCount
                     tr: td Used memory

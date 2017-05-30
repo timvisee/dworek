@@ -6112,13 +6112,14 @@ $(document).ready(function() {
 var statusUpdateRequestHandle = null;
 
 /**
+ * A chart to show the redis command count status.
+ */
+var statusChartRedisCommandCount = null;
+
+/**
  * Send an application status update request to the main server.
  */
 function sendApplicationStatusUpdateRequest() {
-    // Show a status message
-    console.log('Sending application status update request...');
-
-    // Send the actual request
     Dworek.realtime.packetProcessor.sendPacket(PacketType.APP_STATUS_REQUEST, {});
 }
 
@@ -6150,7 +6151,55 @@ $(document).bind('pageshow', function() {
         // Create the timer and store it's handle
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
     }
+
+    // Create a chart for the Redis command count
+    statusChartRedisCommandCount = Highcharts.chart('status-chart-redis-commandCount', {
+        chart: {
+            type: 'spline',
+            animation: Highcharts.svg,
+            marginRight: 10,
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 100
+        },
+        yAxis: {
+            title: {
+                text: 'Queries'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' + this.y;
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        series: [{
+            name: 'Queries processed'
+        }],
+        credits: false
+    });
+
 });
+
+/**
+ * Last known application status object.
+ */
+var appStatus = null;
 
 // Register an application status update handler
 Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, function(packet) {
@@ -6160,12 +6209,23 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
 		return;
 	}
 
-	// Show a status message
-    console.log('Received application status update');
-
 	// Get the status
 	var status = packet.status;
 
 	// Update the Redis command count
     $('table.status-redis tr td.status-redis-commandCount').html(status.redis.commandCount);
+
+    // Update the charts if old data is available to compare it to
+    if(appStatus !== null) {
+        // Get the current time
+        var time = (new Date()).getTime();
+
+        // Add a dynamic command count point, remove old points
+        statusChartRedisCommandCount.series[0].addPoint([time, status.redis.commandCount - appStatus.redis.commandCount], true);
+        if(statusChartRedisCommandCount.series[0].data.length > 20)
+            statusChartRedisCommandCount.series[0].removePoint(0, false);
+    }
+
+    // Store the app status
+    appStatus = status;
 });
