@@ -230,8 +230,26 @@ block content
                             div#status-chart-redis-commandCount(style='width: 100%; height: 200px;')
                     tr: td Cached fields
                         td.status-redis-keyCount= status.redis.keyCount
-                    tr: td Used memory
-                        td.status-redis-memory= status.redis.memory
+                    tr: td(colspan=2)
+                        div#status-chart-redis-keyCount(style='width: 100%; height: 200px;')
+                    tr: td Memory
+                        td
+                            span.status-redis-memory-used= status.redis.memoryHuman
+                            span(style="color: gray;")  used
+                    tr: td
+                        td
+                            span.status-redis-memory-lua= status.redis.memoryLuaHuman
+                            span(style="color: gray;")  LUA
+                    tr: td
+                        td
+                            span.status-redis-memory-rss= status.redis.memoryRssHuman
+                            span(style="color: gray;")  resident set
+                    tr: td
+                        td
+                            span.status-redis-memory-peak= status.redis.memoryPeakHuman
+                            span(style="color: gray;")  peak
+                    tr: td(colspan=2)
+                        div#status-chart-redis-memory(style='width: 100%; height: 200px;')
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text

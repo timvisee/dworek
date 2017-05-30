@@ -6215,11 +6215,11 @@ $(document).bind('pageshow', function() {
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
     }
 
-    // Create the application memory graph
+    // Create the application memory chart
     createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
         yAxis: {
             title: {
-                text: 'Memory'
+                text: 'Application Memory'
             },
             labels: {
                 formatter: function() {
@@ -6227,8 +6227,6 @@ $(document).bind('pageshow', function() {
                 },
                 step: 1
             },
-            minTickInterval: 1024 * 1024 * 10,
-            minPadding: 0
         },
         tooltip: {
             formatter: buildChartTooltipFormatter(formatBytes)
@@ -6246,19 +6244,17 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the serer memory graph
+    // Create the serer memory chart
     createStatusChart('status-chart-server-memory-system', 'server.memory_system', {
         yAxis: {
             title: {
-                text: 'Memory'
+                text: 'System Memory'
             },
             labels: {
                 formatter: function() {
                     return formatBytes(this.value);
                 }
             },
-            minTickInterval: 1024 * 1024 * 100,
-            minPadding: 0
         },
         tooltip: {
             formatter: buildChartTooltipFormatter(formatBytes)
@@ -6272,11 +6268,11 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the server load average graph
+    // Create the server load average chart
     createStatusChart('status-chart-server-load', 'server.loadavg', {
         yAxis: {
             title: {
-                text: 'Load'
+                text: 'System Load'
             },
         },
         tooltip: {
@@ -6293,12 +6289,12 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the server latency graph
+    // Create the server latency chart
     createStatusChart('status-chart-server-latency', 'server.latency', {
         yAxis: {
             type: 'logarithmic',
             title: {
-                text: 'Latency'
+                text: 'Request Latency'
             },
             labels: {
                 formatter: function() {
@@ -6323,11 +6319,11 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the realtime connections count graph
+    // Create the realtime connections count chart
     createStatusChart('status-chart-realtime-connections', 'realtime.connections', {
         yAxis: {
             title: {
-                text: 'Clients'
+                text: 'Connected Clients'
             },
             allowDecimals: false,
         },
@@ -6341,11 +6337,11 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the active game count graph
+    // Create the active game count chart
     createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
         yAxis: {
             title: {
-                text: 'Games'
+                text: 'Active Games'
             },
             allowDecimals: false,
         },
@@ -6359,12 +6355,12 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the redis command count graph
+    // Create the Redis command count chart
     createStatusChart('status-chart-redis-commandCount', 'redis.commandCount', {
         yAxis: {
             type: 'logarithmic',
             title: {
-                text: 'Queries'
+                text: 'Processed Queries'
             },
             allowDecimals: false,
         },
@@ -6378,7 +6374,51 @@ $(document).bind('pageshow', function() {
         }],
     });
 
-    // Create the cache object/field count graph
+    // Create the Redis key count chart
+    createStatusChart('status-chart-redis-keyCount', 'redis.keyCount', {
+        yAxis: {
+            title: {
+                text: 'Cached fields'
+            },
+            allowDecimals: false,
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(function(val) {
+                return formatBigNumber(val) + ' fields';
+            })
+        },
+        series: [{
+            name: 'Cached fields'
+        }],
+    });
+
+    // Create the Redis memory chart
+    createStatusChart('status-chart-redis-memory', 'redis.memory', {
+        yAxis: {
+            title: {
+                text: 'Redis Memory'
+            },
+            labels: {
+                formatter: function() {
+                    return formatBytes(this.value);
+                }
+            },
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(formatBytes)
+        },
+        series: [{
+            name: 'Used'
+        }, {
+            name: 'LUA'
+        }, {
+            name: 'Rss'
+        }, {
+            name: 'Peak'
+        }],
+    });
+
+    // Create the cache object/field count chart
     createStatusChart('status-chart-cache-count', 'cache.count', {
         yAxis: {
             title: {
@@ -6565,11 +6605,14 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-redis tr td.status-redis-uptime').html(formatBigNumber(status.redis.uptime) + ' seconds');
     $('table.status-redis tr td.status-redis-commandCount').html(formatBigNumber(status.redis.commandCount));
     $('table.status-redis tr td.status-redis-keyCount').html(formatBigNumber(status.redis.keyCount));
-    $('table.status-redis tr td.status-redis-memory').html(status.redis.memory);
+    $('table.status-redis tr td.status-redis-memory-used').html(status.redis.memoryHuman);
+    $('table.status-redis tr td.status-redis-memory-lua').html(status.redis.memoryLuaHuman);
+    $('table.status-redis tr td.status-redis-memory-rss').html(status.redis.memoryRssHuman);
+    $('table.status-redis tr td.status-redis-memory-peak').html(status.redis.memoryPeakHuman);
     $('table.status-cache tr td.status-cache-objectCount').html(formatBigNumber(status.cache.objectCount));
     $('table.status-cache tr td.status-cache-fieldCount').html(formatBigNumber(status.cache.fieldCount));
 
-    // Update the application memory graph
+    // Update the application memory chart
     addStatusChartValues('server.memory_app', [
         status.server.memory_app.heapFree,
         status.server.memory_app.heapUsed,
@@ -6578,31 +6621,42 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
         status.server.memory_app.external,
     ]);
 
-    // Update the server memory graph
+    // Update the server memory chart
     addStatusChartValues('server.memory_system', [
         status.server.memory_system.free,
         status.server.memory_system.used,
         status.server.memory_system.total,
     ]);
 
-    // Update the server load average graph (if changed)
+    // Update the server load average chart (if changed)
     if(appStatus == null || appStatus.server.loadavg.toString() != status.server.loadavg.toString())
         addStatusChartValues('server.loadavg', status.server.loadavg);
 
-    // Update the server latency graph
+    // Update the server latency chart
     addStatusChartValues('server.latency', status.server.latency);
 
-    // Update the active game count graph
+    // Update the active game count chart
     addStatusChartValues('live.gameCount', status.live.gameCount);
 
-    // Update the realtime connections graph
+    // Update the realtime connections chart
     addStatusChartValues('realtime.connections', status.realtime.connections);
 
-    // Update the Redis command count graph
+    // Update the Redis command count chart
     if(appStatus !== null)
         addStatusChartValues('redis.commandCount', status.redis.commandCount - appStatus.redis.commandCount);
 
-    // Update the cached object/fields count graph
+    // Update the Redis key count chart
+    addStatusChartValues('redis.keyCount', status.redis.keyCount);
+
+    // Update the Redis memory chart
+    addStatusChartValues('redis.memory', [
+        status.redis.memory,
+        status.redis.memoryLua,
+        status.redis.memoryRss,
+        status.redis.memoryPeak
+    ]);
+
+    // Update the cached object/fields count chart
     addStatusChartValues('cache.count', [
         status.cache.objectCount,
         status.cache.fieldCount,

@@ -159,7 +159,14 @@ StatusUtils.getStatus = function(callback) {
             status.redis.uptime = parseInt(redisInfo.uptime_in_seconds);
             status.redis.commandCount = parseInt(redisInfo.total_commands_processed);
             status.redis.keyCount = redisDbInfo != undefined ? redisDbInfo.keys : 0;
-            status.redis.memory = redisInfo.used_memory_peak_human;
+            status.redis.memory = parseInt(redisInfo.used_memory);
+            status.redis.memoryHuman = Formatter.formatBytes(status.redis.memory);
+            status.redis.memoryLua = parseInt(redisInfo.used_memory_lua);
+            status.redis.memoryLuaHuman = Formatter.formatBytes(status.redis.memoryLua);
+            status.redis.memoryRss = parseInt(redisInfo.used_memory_rss);
+            status.redis.memoryRssHuman = Formatter.formatBytes(status.redis.memoryRss);
+            status.redis.memoryPeak = parseInt(redisInfo.used_memory_peak);
+            status.redis.memoryPeakHuman = Formatter.formatBytes(status.redis.memoryPeak);
 
             // Resolve the latch
             latch.resolve();
