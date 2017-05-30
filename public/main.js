@@ -728,6 +728,20 @@ var Dworek = {
         },
 
         /**
+         * Determine whether we're on a status page.
+         *
+         * @return {boolean} True if we're on the status page.
+         */
+        isStatusPage: function() {
+            // Create a regular expression to fetch the game ID from the URL
+            const result = document.location.pathname.trim().match(/^\/(status)\/.*$/);
+
+            // Return true if any result was found
+            return (result !== null && result.length > 0);
+        },
+
+
+        /**
          * Get the game ID of the game pages we're currently on.
          *
          * @return {string|null} Game ID or null if we're not on a game page.
@@ -6095,17 +6109,49 @@ $(document).ready(function() {
     hasNativeNotificationSupport();
 });
 
-// TODO: Remove this after testing
-// Request a status update each two seconds
-setTimeout(function() {
-    // Request an status update packet
-    console.log('Requesting application update... (test)');
-    Dworek.realtime.packetProcessor.sendPacket(PacketType.APP_STATUS_REQUEST, {});
-}, 2000);
+/**
+ * A variable that stores the handle of the status update request timer when active.
+ * @type {int|null}
+ */
+var statusUpdateRequestHandle = null;
 
-// TODO: Remove this after testing
-// Register an application status update handler
-Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, function(packet) {
-    console.log('Received application status update:');
-    console.log(packet.status);
+/**
+ * Send an application status update request to the main server.
+ */
+function sendApplicationStatusUpdateRequest() {
+    // Show a status message
+    console.log('Sending application status update request...');
+
+    // Send the actual request
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.APP_STATUS_REQUEST, {});
+}
+
+// Update the map size when a page is shown
+$(document).bind('pageshow', function() {
+    // Make sure we're on the status page
+    if(!Dworek.utils.isStatusPage()) {
+        // Stop the status update timer if active
+        if(statusUpdateRequestHandle !== null) {
+            // Show a status message
+            console.log('Stopping application status update request timer...');
+
+            // Stop the request update timer
+            clearInterval(statusUpdateRequestHandle);
+
+            // Reset the status update request handle to null
+            statusUpdateRequestHandle = null;
+        }
+
+        // We're done, return
+        return;
+    }
+
+    // Start a request update timer
+    if(statusUpdateRequestHandle === null) {
+        // Show a status message
+        console.log('Starting application status update request timer...');
+
+        // Create the timer and store it's handle
+        statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
+    }
 });
