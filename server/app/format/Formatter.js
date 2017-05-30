@@ -114,7 +114,7 @@ Formatter.formatBytes = function(bytes, decimals) {
 Formatter.formatNano = function(nano, decimals) {
     // Constants
     const BASE = 1000;
-    const SIZE_NOTATIONS = ['nanosecond', 'microsecond', 'millisecond', 'second'];
+    const SIZE_NOTATIONS = ['ns', 'μs', 'ms', 's'];
 
     // Handle zero cases
     if(nano == 0)
@@ -132,7 +132,8 @@ Formatter.formatNano = function(nano, decimals) {
         value = Math.round(value);
 
     // Make the value readable and return it
-    return value + ' ' + SIZE_NOTATIONS[factor] + (value != 1 ? 's' : '');
+    // return value + ' ' + SIZE_NOTATIONS[factor] + (value != 1 ? 's' : '');
+    return value + ' ' + SIZE_NOTATIONS[factor];
 };
 
 // Export the class

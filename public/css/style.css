@@ -21,6 +21,7 @@
  ******************************************************************************/
 table.table-list tr td,
 .table-list table tr td {
+  width: 50%;
   text-align: left;
   line-height: 1.6em; }
 

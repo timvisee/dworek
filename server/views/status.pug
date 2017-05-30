@@ -14,7 +14,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of your current session.
-            table.table-list.ui-responsive.session-user
+            table.table-list.ui-responsive.session-user(style='width: 100%')
                 tr: td Logged in
                     td
                         if session.valid
@@ -31,7 +31,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the cluster and it's workers.
-            table.table-list.ui-responsive.status-cluster
+            table.table-list.ui-responsive.status-cluster(style='width: 100%')
                 tr: td Servers
                     td
                         span.status-cluster-machineCount= status.cluster.serverCount
@@ -61,7 +61,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the resources available to #{app.name} on the machine the server is running on.
-            table.table-list.ui-responsive.status-server
+            table.table-list.ui-responsive.status-server(style='width: 100%')
                 tr: td OS
                     td: span.status-server-os= status.server.os
                         span(style="color: gray;")  (#{status.server.platform}/#{status.server.arch})
@@ -88,7 +88,7 @@ block content
                 tr: td
                     td
                         span.status-server-memory-app-rss= status.server.memory_app.rssHuman
-                        span(style="color: gray;")  total (resident set)
+                        span(style="color: gray;")  resident set
                 tr: td
                     td
                         span.status-server-memory-app-external= status.server.memory_app.externalHuman
@@ -102,23 +102,25 @@ block content
                 tr: td
                     td
                         span.status-server-memory-system-used= status.server.memory_system.usedHuman
-                        span(style="color: gray;")  used (with cache)
+                        span(style="color: gray;")  used
                 tr: td
                     td
                         span.status-server-memory-system-total= status.server.memory_system.totalHuman
                         span(style="color: gray;")  total
+                tr: td(colspan=2)
+                    div#status-chart-server-memory-system(style='width: 100%; height: 200px;')
                 tr: td Load
                     td
                         span.status-server-load-1= status.server.loadavgHuman[0]
-                        span(style="color: gray;")  avg last minute
+                        span(style="color: gray;")  avg 1 min
                 tr: td
                     td
                         span.status-server-load-5= status.server.loadavgHuman[1]
-                        span(style="color: gray;")  avg last 5 minutes
+                        span(style="color: gray;")  avg 5 min
                 tr: td
                     td
                         span.status-server-load-15= status.server.loadavgHuman[2]
-                        span(style="color: gray;")  avg last 15 minutes
+                        span(style="color: gray;")  avg 15 min
                 tr: td Latency
                     td: span(style="color: gray;") Recent response times:
                 tr: td
@@ -141,6 +143,8 @@ block content
                     td
                         span.status-server-latency-99= status.server.latencyHuman[4]
                         span(style="color: gray;")  99%-th
+                tr: td(colspan=2)
+                    div#status-chart-server-latency(style='width: 100%; height: 200px;')
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -148,7 +152,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the sub-system processing the logic for all active games.
-            table.table-list.ui-responsive.status-live
+            table.table-list.ui-responsive.status-live(style='width: 100%')
                 tr: td Status
                     td.status-live-status
                         if status.live.gameCount > 0
@@ -164,7 +168,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the server handling all real-time connections to clients.
-            table.table-list.ui-responsive.status-realtime
+            table.table-list.ui-responsive.status-realtime(style='width: 100%')
                 tr: td Status
                     td.status-realtime-online
                         if status.realtime.online
@@ -173,6 +177,8 @@ block content
                             span(style='color: red;') Offline
                 tr: td Connected clients
                     td.status-realtime-connections= status.realtime.connections
+                tr: td(colspan=2)
+                    div#status-chart-realtime-connections(style='width: 100%; height: 200px;')
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -180,7 +186,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the web server providing you this front-end.
-            table.table-list.ui-responsive.status-web
+            table.table-list.ui-responsive.status-web(style='width: 100%')
                 tr: td Status
                     td.status-web-online: span(style='color: green;') Online
                 tr: td Uptime
@@ -192,7 +198,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the database server.
-            table.table-list.ui-responsive.status-mongo
+            table.table-list.ui-responsive.status-mongo(style='width: 100%')
                 tr: td Status
                     td.status-mongo-online
                         if status.mongo.online
@@ -231,7 +237,7 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the high-performance internal caching sub-system.
-            table.table-list.ui-responsive.status-cache
+            table.table-list.ui-responsive.status-cache(style='width: 100%')
                 tr: td Cached objects
                     td.status-cache-objectCount= status.cache.objectCount
                 tr: td Cached fields
