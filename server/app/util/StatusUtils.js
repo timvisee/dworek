@@ -81,9 +81,9 @@ StatusUtils.getStatus = function(callback) {
             platform: os.platform(),
             arch: os.arch(),
             loadavg: [
-                loadAvg[0] !== 0 ? parseFloat(loadAvg[0]) : '?',
-                loadAvg[1] !== 0 ? parseFloat(loadAvg[1]) : '?',
-                loadAvg[2] !== 0 ? parseFloat(loadAvg[2]) : '?',
+                loadAvg[0] >= 0 ? parseFloat(loadAvg[0]) : '?',
+                loadAvg[1] >= 0 ? parseFloat(loadAvg[1]) : '?',
+                loadAvg[2] >= 0 ? parseFloat(loadAvg[2]) : '?',
             ],
             cpus: os.cpus(),
             memory_system: {
