@@ -81,9 +81,9 @@ StatusUtils.getStatus = function(callback) {
             platform: os.platform(),
             arch: os.arch(),
             loadavg: [
-                loadAvg[0] !== 0 ? loadAvg[0] : '?',
-                loadAvg[1] !== 0 ? loadAvg[1] : '?',
-                loadAvg[2] !== 0 ? loadAvg[2] : '?',
+                loadAvg[0] !== 0 ? parseFloat(loadAvg[0]) : '?',
+                loadAvg[1] !== 0 ? parseFloat(loadAvg[1]) : '?',
+                loadAvg[2] !== 0 ? parseFloat(loadAvg[2]) : '?',
             ],
             cpus: os.cpus(),
             memory_system: {
@@ -195,7 +195,7 @@ StatusUtils.getStatus = function(callback) {
         return Formatter.formatNano(val)
     });
     status.server.loadavgHuman = status.server.loadavg.map(function(val) {
-        if(val % 1 === 0)
+        if(typeof val === 'number')
             return val.toFixed(3);
         else
             return val;
