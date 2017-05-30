@@ -6539,10 +6539,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-cluster tr td span.status-cluster-workerId').html(status.cluster.workerId);
     $('table.status-cluster tr td span.status-cluster-pid').html(status.cluster.pid);
     $('table.status-server tr td span.status-server-cpus').html(status.server.cpus.length);
-    $('table.status-server tr td span.status-server-app-heapFree').html(status.server.memory_app.heapFreeHuman);
-    $('table.status-server tr td span.status-server-app-heapUsed').html(status.server.memory_app.heapUsedHuman);
-    $('table.status-server tr td span.status-server-app-heapTotal').html(status.server.memory_app.heapTotalHuman);
-    $('table.status-server tr td span.status-server-app-rss').html(status.server.memory_app.rssHuman);
+    $('table.status-server tr td span.status-server-memory-app-heapFree').html(status.server.memory_app.heapFreeHuman);
+    $('table.status-server tr td span.status-server-memory-app-heapUsed').html(status.server.memory_app.heapUsedHuman);
+    $('table.status-server tr td span.status-server-memory-app-heapTotal').html(status.server.memory_app.heapTotalHuman);
+    $('table.status-server tr td span.status-server-memory-app-rss').html(status.server.memory_app.rssHuman);
     $('table.status-server tr td span.status-server-memory-system-free').html(status.server.memory_system.freeHuman);
     $('table.status-server tr td span.status-server-memory-system-used').html(status.server.memory_system.usedHuman);
     $('table.status-server tr td span.status-server-memory-system-total').html(status.server.memory_system.totalHuman);
