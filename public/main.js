@@ -2839,7 +2839,7 @@ $(document).bind("pagecreate", function() {
 
 /**
  * Check whether the given value is a JavaScript object.
- * Arrays are not considered objects.
+ * Arrays and functions are not considered objects.
  *
  * @param {*} value The value to check.
  * @return {boolean} True if the value is an object, false if not.
@@ -2854,7 +2854,7 @@ function isObject(value) {
     const type = typeof value;
 
     // Compare the types and return the result
-    return !!value && (type == 'object' || type == 'function');
+    return !!value && type == 'object';
 }
 
 /**
@@ -2862,11 +2862,11 @@ function isObject(value) {
  * Object b overwrites a.
  *
  * @param {Object} a Object A.
- * @param {Object} b Object B.
+ * @param {Object} b Object B, being put onto A.
  * @param {boolean} [recursive=true] True to merge recursively, false to merge flat objects.
  * @return {*} Merged object.
  */
-// TODO: Move this function to some utilities file
+// TODO: Move this function to some utilities section
 function merge(a, b, recursive) {
     // Set the default value for the recursive param
     if(recursive === undefined)
@@ -2876,6 +2876,10 @@ function merge(a, b, recursive) {
     if(isObject(a) && isObject(b)) {
         // Loop through all the keys
         for(var key in b) {
+            // Make sure B owns the property
+            if(!b.hasOwnProperty(key))
+                continue;
+
             // Check whether we should merge two objects recursively, or whether we should merge flag
             if(recursive && isObject(a[key]) && isObject(b[key]))
                 a[key] = merge(a[key], b[key], true);
@@ -6053,6 +6057,65 @@ function formatBigNumber(num) {
     return parts.join(".");
 }
 
+
+/**
+ * Format the given number of bytes into a human readable string.
+ *
+ * @param {Number} bytes Number of bytes.
+ * @param {Number} [decimals=2] Number of decimals to show.
+ * @return {String} Readable string.
+ */
+function formatBytes(bytes, decimals) {
+    // Constants
+    const BASE = 1024;
+    const SIZE_NOTATIONS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    // Handle zero cases
+    if(bytes === 0 || bytes === undefined || bytes === null)
+        return '0 B';
+
+    // Determine the number of decimal places to show
+    const decimalPlaces = decimals || 2;
+
+    // Determine the factor
+    const factor = Math.floor(Math.log(bytes) / Math.log(BASE));
+
+    // Create and return the readable string
+    return parseFloat((bytes / Math.pow(BASE, factor)).toFixed(decimalPlaces)) + ' ' + SIZE_NOTATIONS[factor];
+}
+
+/**
+ * Format the given number of nanoseconds into a human readable string.
+ *
+ * @param {Number} nano Number of nanoseconds.
+ * @param {Number} [decimals=0] Number of decimals to show.
+ * @return {String} Readable string.
+ */
+function formatNano(nano, decimals) {
+    // Constants
+    const BASE = 1000;
+    const SIZE_NOTATIONS = ['ns', 'μs', 'ms', 's'];
+
+    // Handle zero cases
+    if(nano == 0)
+        return '<1 ns';
+
+    // Determine the number of decimal places to show
+    const decimalPlaces = decimals || 0;
+
+    // Determine the factor
+    const factor = Math.floor(Math.log(nano) / Math.log(BASE));
+
+    // Create and return the readable string
+    var value = parseFloat((nano / Math.pow(BASE, factor)).toFixed(decimalPlaces));
+    if(decimalPlaces == 0)
+        value = Math.round(value);
+
+    // Make the value readable and return it
+    // return value + ' ' + SIZE_NOTATIONS[factor] + (value != 1 ? 's' : '');
+    return value + ' ' + SIZE_NOTATIONS[factor];
+}
+
 /**
  * Format money.
  *
@@ -6152,54 +6215,309 @@ $(document).bind('pageshow', function() {
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
     }
 
-    // Create a chart for the Redis command count
-    statusChartRedisCommandCount = Highcharts.chart('status-chart-redis-commandCount', {
-        chart: {
-            type: 'spline',
-            animation: Highcharts.svg,
-            marginRight: 10,
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            type: 'datetime',
-            tickPixelInterval: 100
-        },
+    // Create the application memory graph
+    createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
         yAxis: {
+            title: {
+                text: 'Memory'
+            },
+            labels: {
+                formatter: function() {
+                    return formatBytes(this.value);
+                },
+                step: 1
+            },
+            minTickInterval: 1024 * 1024 * 10,
+            minPadding: 0
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(formatBytes)
+        },
+        series: [{
+            name: 'Heap free'
+        }, {
+            name: 'Heap used'
+        }, {
+            name: 'Heap size'
+        }, {
+            name: 'Resident set'
+        }, {
+            name: 'External'
+        }],
+    });
+
+    // Create the serer memory graph
+    createStatusChart('status-chart-server-memory-system', 'server.memory_system', {
+        yAxis: {
+            title: {
+                text: 'Memory'
+            },
+            labels: {
+                formatter: function() {
+                    return formatBytes(this.value);
+                }
+            },
+            minTickInterval: 1024 * 1024 * 100,
+            minPadding: 0
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(formatBytes)
+        },
+        series: [{
+            name: 'Free'
+        }, {
+            name: 'Used'
+        }, {
+            name: 'Total'
+        }],
+    });
+
+    // Create the server load average graph
+    createStatusChart('status-chart-server-load', 'server.loadavg', {
+        yAxis: {
+            title: {
+                text: 'Load'
+            },
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(function(val) {
+                return val.toFixed(3) + ' load';
+            })
+        },
+        series: [{
+            name: '1 minute'
+        }, {
+            name: '5 minutes'
+        }, {
+            name: '15 minutes'
+        }],
+    });
+
+    // Create the server latency graph
+    createStatusChart('status-chart-server-latency', 'server.latency', {
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Latency'
+            },
+            labels: {
+                formatter: function() {
+                    return formatNano(this.value);
+                }
+            },
+            allowDecimals: false,
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(formatNano)
+        },
+        series: [{
+            name: 'Max'
+        }, {
+            name: 'Min'
+        }, {
+            name: '50%-th'
+        }, {
+            name: '90%-th'
+        }, {
+            name: '99%-th'
+        }],
+    });
+
+    // Create the realtime connections count graph
+    createStatusChart('status-chart-realtime-connections', 'realtime.connections', {
+        yAxis: {
+            title: {
+                text: 'Clients'
+            },
+            allowDecimals: false,
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(function(val) {
+                return val + ' clients';
+            })
+        },
+        series: [{
+            name: 'Connected clients'
+        }],
+    });
+
+    // Create the active game count graph
+    createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
+        yAxis: {
+            title: {
+                text: 'Games'
+            },
+            allowDecimals: false,
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(function(val) {
+                return val + ' games';
+            })
+        },
+        series: [{
+            name: 'Active games'
+        }],
+    });
+
+    // Create the redis command count graph
+    createStatusChart('status-chart-redis-commandCount', 'redis.commandCount', {
+        yAxis: {
+            type: 'logarithmic',
             title: {
                 text: 'Queries'
             },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
+            allowDecimals: false,
         },
         tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' + this.y;
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        exporting: {
-            enabled: false
+            formatter: buildChartTooltipFormatter(function(val) {
+                return formatBigNumber(val) + ' queries';
+            })
         },
         series: [{
             name: 'Queries processed'
         }],
-        credits: false
     });
 
+    // Create the cache object/field count graph
+    createStatusChart('status-chart-cache-count', 'cache.count', {
+        yAxis: {
+            title: {
+                text: 'Amount'
+            },
+            allowDecimals: false,
+        },
+        tooltip: {
+            formatter: buildChartTooltipFormatter(formatBigNumber)
+        },
+        series: [{
+            name: 'Cached objects'
+        }, {
+            name: 'Cached fields'
+        }],
+    });
 });
 
 /**
  * Last known application status object.
  */
 var appStatus = null;
+
+/**
+ * Object of status charts.
+ */
+var statusCharts = {};
+
+/**
+ * Default configuration for the status charts.
+ */
+const statusChartsDefaults =  {
+    chart: {
+        type: 'spline',
+        animation: Highcharts.svg,
+        marginRight: 10,
+    },
+    title: {
+        text: ''
+    },
+    xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 100
+    },
+    yAxis: {
+        plotLines: [{
+            value: 0,
+            width: 1,
+            color: '#808080'
+        }]
+    },
+    plotOptions: {
+        spline: {
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    tooltip: {
+        formatter: buildChartTooltipFormatter()
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+        enabled: false
+    },
+    credits: false,
+};
+
+/**
+ * Build a tooltip formatter for a chart.
+ *
+ * @param {function} Formatter function.
+ *
+ * @return Formatter function.
+ */
+function buildChartTooltipFormatter(formatter) {
+    return function () {
+        // Define a default formatter
+        if(formatter === undefined)
+            formatter = function(val) {
+                return val;
+            };
+
+        // Build the formatted string and return it
+        return '<b>' + this.series.name + '</b><br/>' +
+            Highcharts.dateFormat('%H:%M:%S', this.x) + '<br/>' + formatter(this.y);
+    }
+}
+
+/**
+ * Create a status chart.
+ *
+ * @param {string} id ID of the div to render the chart in.
+ * @param {string} chartNamespace Namespace of the chart.
+ * @param {object} options Chart specific options.
+ *
+ * @return Chart object.
+ */
+function createStatusChart(id, chartNamespace, options) {
+    // Merge the chart options
+    var chartOptions = jQuery.extend({}, statusChartsDefaults, options);
+
+    // Create and store the chart, also return it
+    return statusCharts[chartNamespace] = Highcharts.chart(id, chartOptions);
+}
+
+/**
+ * Add new points to a status chart.
+ *
+ * @param {string} chartNamespace Namespace of the chart.
+ * @param {array|mixed} values Array of values to add, or a single value.
+ */
+function addStatusChartValues(chartNamespace, values) {
+    // Make sure the chart is available
+    if(statusCharts[chartNamespace] === null || statusCharts[chartNamespace] === undefined)
+        return;
+
+    // Convert the values in an array if it isn't an array right now
+    if(!Array.isArray(values))
+        values = [values];
+
+    // Loop through the values, and add them to the chart
+    for(var i = 0; i < values.length; i++) {
+        // Get the current time
+        var time = (new Date()).getTime();
+
+        // Determine whether this is the last value
+        var isLast = i == values.length - 1;
+
+        // Add the new point
+        statusCharts[chartNamespace].series[i].addPoint([time, values[i]], isLast);
+
+        // Remove old entries
+        if(statusCharts[chartNamespace].series[i].data.length > 30)
+            statusCharts[chartNamespace].series[i].removePoint(0, false);
+    }
+}
 
 // Register an application status update handler
 Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, function(packet) {
@@ -6251,16 +6569,44 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-cache tr td.status-cache-objectCount').html(formatBigNumber(status.cache.objectCount));
     $('table.status-cache tr td.status-cache-fieldCount').html(formatBigNumber(status.cache.fieldCount));
 
-    // Update the charts if old data is available to compare it to
-    if(appStatus !== null) {
-        // Get the current time
-        var time = (new Date()).getTime();
+    // Update the application memory graph
+    addStatusChartValues('server.memory_app', [
+        status.server.memory_app.heapFree,
+        status.server.memory_app.heapUsed,
+        status.server.memory_app.heapTotal,
+        status.server.memory_app.rss,
+        status.server.memory_app.external,
+    ]);
 
-        // Add a dynamic command count point, remove old points
-        statusChartRedisCommandCount.series[0].addPoint([time, status.redis.commandCount - appStatus.redis.commandCount], true);
-        if(statusChartRedisCommandCount.series[0].data.length > 20)
-            statusChartRedisCommandCount.series[0].removePoint(0, false);
-    }
+    // Update the server memory graph
+    addStatusChartValues('server.memory_system', [
+        status.server.memory_system.free,
+        status.server.memory_system.used,
+        status.server.memory_system.total,
+    ]);
+
+    // Update the server load average graph (if changed)
+    if(appStatus == null || appStatus.server.loadavg.toString() != status.server.loadavg.toString())
+        addStatusChartValues('server.loadavg', status.server.loadavg);
+
+    // Update the server latency graph
+    addStatusChartValues('server.latency', status.server.latency);
+
+    // Update the active game count graph
+    addStatusChartValues('live.gameCount', status.live.gameCount);
+
+    // Update the realtime connections graph
+    addStatusChartValues('realtime.connections', status.realtime.connections);
+
+    // Update the Redis command count graph
+    if(appStatus !== null)
+        addStatusChartValues('redis.commandCount', status.redis.commandCount - appStatus.redis.commandCount);
+
+    // Update the cached object/fields count graph
+    addStatusChartValues('cache.count', [
+        status.cache.objectCount,
+        status.cache.fieldCount,
+    ]);
 
     // Store the app status
     appStatus = status;

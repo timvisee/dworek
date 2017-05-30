@@ -71,9 +71,7 @@ block content
                         span(style="color: gray;")  cores
                 tr: td Model
                     td: small: small.status-server-model= status.server.cpus[0].model
-                tr: td Memory
-                    td: span(style="color: gray;") Application memory:
-                tr: td
+                tr: td App Memory
                     td
                         span.status-server-memory-app-heapFree= status.server.memory_app.heapFreeHuman
                         span(style="color: gray;")  heap free
@@ -93,9 +91,9 @@ block content
                     td
                         span.status-server-memory-app-external= status.server.memory_app.externalHuman
                         span(style="color: gray;")  external
-                tr: td
-                    td: span(style="color: gray;") System memory:
-                tr: td
+                tr: td(colspan=2)
+                    div#status-chart-server-memory-app(style='width: 100%; height: 200px;')
+                tr: td System Memory
                     td
                         span.status-server-memory-system-free= status.server.memory_system.freeHuman
                         span(style="color: gray;")  free
@@ -121,6 +119,8 @@ block content
                     td
                         span.status-server-load-15= status.server.loadavgHuman[2]
                         span(style="color: gray;")  avg 15 min
+                tr: td(colspan=2)
+                    div#status-chart-server-load(style='width: 100%; height: 200px;')
                 tr: td Latency
                     td: span(style="color: gray;") Recent response times:
                 tr: td
@@ -161,6 +161,8 @@ block content
                             span Idle
                 tr: td Active games
                     td.status-live-gameCount: span.activeGameCount= status.live.gameCount
+                tr: td(colspan=2)
+                    div#status-chart-live-gameCount(style='width: 100%; height: 200px;')
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -242,3 +244,5 @@ block content
                     td.status-cache-objectCount= status.cache.objectCount
                 tr: td Cached fields
                     td.status-cache-fieldCount #{status.cache.fieldCount}
+                tr: td(colspan=2)
+                    div#status-chart-cache-count(style='width: 100%; height: 200px;')

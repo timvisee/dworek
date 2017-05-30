@@ -88,11 +88,11 @@ Formatter.formatGoods = function(amount) {
 Formatter.formatBytes = function(bytes, decimals) {
     // Constants
     const BASE = 1024;
-    const SIZE_NOTATIONS = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const SIZE_NOTATIONS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     // Handle zero cases
     if(bytes === 0 || bytes === undefined || bytes === null)
-        return '0 Bytes';
+        return '0 B';
 
     // Determine the number of decimal places to show
     const decimalPlaces = decimals || 2;
@@ -118,7 +118,7 @@ Formatter.formatNano = function(nano, decimals) {
 
     // Handle zero cases
     if(nano == 0)
-        return '<1 nanoseconds';
+        return '<1 ns';
 
     // Determine the number of decimal places to show
     const decimalPlaces = decimals || 0;
