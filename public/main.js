@@ -6234,7 +6234,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
             yAxis: {
                 title: {
-                    text: 'Application Memory'
+                    text: 'Application memory'
                 },
                 labels: {
                     formatter: function() {
@@ -6263,7 +6263,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-server-memory-system', 'server.memory_system', {
             yAxis: {
                 title: {
-                    text: 'System Memory'
+                    text: 'System memory'
                 },
                 labels: {
                     formatter: function() {
@@ -6287,7 +6287,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-server-load', 'server.loadavg', {
             yAxis: {
                 title: {
-                    text: 'System Load'
+                    text: 'System load'
                 },
             },
             tooltip: {
@@ -6309,7 +6309,7 @@ $(document).bind('pageshow', function() {
             yAxis: {
                 type: 'logarithmic',
                 title: {
-                    text: 'Request Latency'
+                    text: 'Request latency'
                 },
                 labels: {
                     formatter: function() {
@@ -6338,7 +6338,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-realtime-connections', 'realtime.connections', {
             yAxis: {
                 title: {
-                    text: 'Connected Clients'
+                    text: 'Connected clients'
                 },
                 allowDecimals: false,
             },
@@ -6356,7 +6356,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
             yAxis: {
                 title: {
-                    text: 'Active Games'
+                    text: 'Active games'
                 },
                 allowDecimals: false,
             },
@@ -6375,7 +6375,7 @@ $(document).bind('pageshow', function() {
             yAxis: {
                 type: 'logarithmic',
                 title: {
-                    text: 'Processed Queries'
+                    text: 'Processed queries'
                 },
                 allowDecimals: false,
             },
@@ -6411,7 +6411,7 @@ $(document).bind('pageshow', function() {
         createStatusChart('status-chart-redis-memory', 'redis.memory', {
             yAxis: {
                 title: {
-                    text: 'Redis Memory'
+                    text: 'Cache memory'
                 },
                 labels: {
                     formatter: function() {
