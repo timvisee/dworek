@@ -6151,3 +6151,21 @@ $(document).bind('pageshow', function() {
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
     }
 });
+
+// Register an application status update handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, function(packet) {
+	// Make sure the required fields are available
+    if(!packet.hasOwnProperty('status')) {
+		throw new Error('Received malformed packet, missing status data in application update packet');
+		return;
+	}
+
+	// Show a status message
+    console.log('Received application status update');
+
+	// Get the status
+	var status = packet.status;
+
+	// Update the Redis command count
+    $('table.status-redis tr td.status-redis-commandCount').html(status.redis.commandCount);
+});
