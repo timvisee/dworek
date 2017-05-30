@@ -6231,11 +6231,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-server tr td span.status-server-load-1').html(status.server.loadavg[0]);
     $('table.status-server tr td span.status-server-load-5').html(status.server.loadavg[1]);
     $('table.status-server tr td span.status-server-load-15').html(status.server.loadavg[2]);
-    $('table.status-server tr td span.status-server-latency-max').html(status.server.latency[0]);
-    $('table.status-server tr td span.status-server-latency-min').html(status.server.latency[1]);
-    $('table.status-server tr td span.status-server-latency-50').html(status.server.latency[2]);
-    $('table.status-server tr td span.status-server-latency-90').html(status.server.latency[3]);
-    $('table.status-server tr td span.status-server-latency-99').html(status.server.latency[4]);
+    $('table.status-server tr td span.status-server-latency-max').html(status.server.latencyHuman[0]);
+    $('table.status-server tr td span.status-server-latency-min').html(status.server.latencyHuman[1]);
+    $('table.status-server tr td span.status-server-latency-50').html(status.server.latencyHuman[2]);
+    $('table.status-server tr td span.status-server-latency-90').html(status.server.latencyHuman[3]);
+    $('table.status-server tr td span.status-server-latency-99').html(status.server.latencyHuman[4]);
     // TODO: Update status-live-status
     $('table.status-live tr td.status-live-gameCount').html(formatBigNumber(status.live.gameCount));
     // TODO: Update status-realtime-online

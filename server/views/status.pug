@@ -126,23 +126,23 @@ block content
                     td: span(style="color: gray;") Recent response times:
                 tr: td
                     td
-                        span.status-server-latency-max= status.server.latency[0]
+                        span.status-server-latency-max= status.server.latencyHuman[0]
                         span(style="color: gray;")  max
                 tr: td
                     td
-                        span.status-server-latency-min= status.server.latency[1]
+                        span.status-server-latency-min= status.server.latencyHuman[1]
                         span(style="color: gray;")  min
                 tr: td
                     td
-                        span.status-server-latency-50= status.server.latency[2]
+                        span.status-server-latency-50= status.server.latencyHuman[2]
                         span(style="color: gray;")  50%-th
                 tr: td
                     td
-                        span.status-server-latency-90= status.server.latency[3]
+                        span.status-server-latency-90= status.server.latencyHuman[3]
                         span(style="color: gray;")  90%-th
                 tr: td
                     td
-                        span.status-server-latency-99= status.server.latency[4]
+                        span.status-server-latency-99= status.server.latencyHuman[4]
                         span(style="color: gray;")  99%-th
 
     .nd2-card.wow.fadeInUp

@@ -125,12 +125,17 @@ StatusUtils.getStatus = function(callback) {
     // Fetch and process latency data
     const latencyList = Core.eventLoopMonitor.countLatency();
     status.server.latency = [
-        Formatter.formatNano(Math.max.apply(null, latencyList)),
-        Formatter.formatNano(Math.min.apply(null, latencyList)),
-        Formatter.formatNano(percentile(latencyList, 50)),
-        Formatter.formatNano(percentile(latencyList, 90)),
-        Formatter.formatNano(percentile(latencyList, 99))
+        Math.max.apply(null, latencyList),
+        Math.min.apply(null, latencyList),
+        percentile(latencyList, 50),
+        percentile(latencyList, 90),
+        percentile(latencyList, 99)
     ];
+
+    // Create a humanly readable variant
+    status.server.latencyHuman = status.server.latency.map(function(val) {
+        return Formatter.formatNano(val)
+    });
 
     // Get the redis status if ready
     if(RedisUtils.isReady()) {
