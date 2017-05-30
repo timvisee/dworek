@@ -47,7 +47,7 @@ var StatusUtils = function() {};
 /**
  * Get an object containing all relevant status.
  *
- * @param {function} callback Callback containing the status object.
+ * @param {StatusUtils~getStatusCallback} callback Callback containing the status object.
  */
 StatusUtils.getStatus = function(callback) {
     // Do not fetch the status when the callback isn't a function
@@ -183,6 +183,12 @@ StatusUtils.getStatus = function(callback) {
         callback(null, status);
     });
 };
+
+/**
+ * @callback StatusUtils~getStatusCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {object} Object containing all status properties.
+ */
 
 // Export the class
 module.exports = StatusUtils;

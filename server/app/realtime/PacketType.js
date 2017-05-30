@@ -361,5 +361,18 @@ module.exports = {
      * - pingId: ID of the ping to buy
      * - cost: Cost of the ping (check)
      */
-    PING_BUY: 32
+    PING_BUY: 32,
+
+    /**
+     * Request an application status update packet.
+     */
+    APP_STATUS_REQUEST: 33,
+
+    /**
+     * An update with the latest application status.
+     *
+     * Data:
+     * - status: object with all status properties
+     */
+    APP_STATUS_UPDATE: 34,
 };
