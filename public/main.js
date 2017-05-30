@@ -6212,8 +6212,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
 	// Get the status
 	var status = packet.status;
 
-	// Update the Redis command count
+	// Update the Redis status
+    $('table.status-redis tr td.status-redis-uptime').html(status.redis.uptime + ' seconds');
     $('table.status-redis tr td.status-redis-commandCount').html(status.redis.commandCount);
+    $('table.status-redis tr td.status-redis-keyCount').html(status.redis.keyCount);
+    $('table.status-redis tr td.status-redis-memory').html(status.redis.memory);
 
     // Update the charts if old data is available to compare it to
     if(appStatus !== null) {

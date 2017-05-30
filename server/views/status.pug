@@ -199,15 +199,15 @@ block content
                             span(style='color: red;') Offline
                 if status.redis.online
                     tr: td Uptime
-                        td #{status.redis.uptime} seconds
+                        td.status-redis-uptime #{status.redis.uptime} seconds
                     tr: td Queries processed
                         td.status-redis-commandCount= status.redis.commandCount
                     tr: td(colspan=2)
                             div#status-chart-redis-commandCount(style='width: 100%; height: 200px;')
                     tr: td Cached fields
-                        td= status.redis.keyCount
+                        td.status-redis-keyCount= status.redis.keyCount
                     tr: td Used memory
-                        td= status.redis.memory
+                        td.status-redis-memory= status.redis.memory
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
