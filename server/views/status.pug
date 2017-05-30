@@ -125,10 +125,6 @@ block content
                     td: span(style="color: gray;") Recent response times:
                 tr: td
                     td
-                        span.status-server-latency-max= status.server.latencyHuman[0]
-                        span(style="color: gray;")  max
-                tr: td
-                    td
                         span.status-server-latency-min= status.server.latencyHuman[1]
                         span(style="color: gray;")  min
                 tr: td
@@ -143,6 +139,10 @@ block content
                     td
                         span.status-server-latency-99= status.server.latencyHuman[4]
                         span(style="color: gray;")  99%-th
+                tr: td
+                    td
+                        span.status-server-latency-max= status.server.latencyHuman[0]
+                        span(style="color: gray;")  max
                 tr: td(colspan=2)
                     div#status-chart-server-latency(style='width: 100%; height: 200px;')
 
