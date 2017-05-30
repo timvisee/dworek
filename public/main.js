@@ -6213,7 +6213,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
 	var status = packet.status;
 
 	// Update the Redis status
-    $('table.status-redis tr td.status-redis-uptime').html(status.redis.uptime + ' seconds');
+    $('table.status-redis tr td.status-redis-uptime').html(formatBigNumber(status.redis.uptime) + ' seconds');
     $('table.status-redis tr td.status-redis-commandCount').html(formatBigNumber(status.redis.commandCount));
     $('table.status-redis tr td.status-redis-keyCount').html(formatBigNumber(status.redis.keyCount));
     $('table.status-redis tr td.status-redis-memory').html(status.redis.memory);
