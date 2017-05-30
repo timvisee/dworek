@@ -59,7 +59,9 @@ const PacketType = {
     FACTORY_BUILD: 29,
     FACTORY_CAPTURED: 30,
     FACTORY_DESTROYED: 31,
-    PING_BUY: 32
+    PING_BUY: 32,
+    APP_STATUS_REQUEST: 33,
+    APP_STATUS_UPDATE: 34
 };
 
 /**
@@ -6093,3 +6095,17 @@ $(document).ready(function() {
     hasNativeNotificationSupport();
 });
 
+// TODO: Remove this after testing
+// Request a status update each two seconds
+setTimeout(function() {
+    // Request an status update packet
+    console.log('Requesting application update... (test)');
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.APP_STATUS_REQUEST, {});
+}, 2000);
+
+// TODO: Remove this after testing
+// Register an application status update handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, function(packet) {
+    console.log('Received application status update:');
+    console.log(packet.status);
+});
