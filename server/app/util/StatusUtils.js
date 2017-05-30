@@ -81,22 +81,22 @@ StatusUtils.getStatus = function(callback) {
             platform: os.platform(),
             arch: os.arch(),
             loadavg: [
-                loadAvg[0] !== 0 ? loadAvg[0].toFixed(3) : '?',
-                loadAvg[1] !== 0 ? loadAvg[1].toFixed(3) : '?',
-                loadAvg[2] !== 0 ? loadAvg[2].toFixed(3) : '?',
+                loadAvg[0] !== 0 ? loadAvg[0] : '?',
+                loadAvg[1] !== 0 ? loadAvg[1] : '?',
+                loadAvg[2] !== 0 ? loadAvg[2] : '?',
             ],
             cpus: os.cpus(),
             memory_system: {
-                free: Formatter.formatBytes(os.freemem()),
-                used: Formatter.formatBytes(os.totalmem() - os.freemem()),
-                total: Formatter.formatBytes(os.totalmem())
+                free: os.freemem(),
+                used: os.totalmem() - os.freemem(),
+                total: os.totalmem()
             },
             memory_app: {
-                heapFree: Formatter.formatBytes(memoryUsage.heapTotal - memoryUsage.heapUsed),
-                heapUsed: Formatter.formatBytes(memoryUsage.heapUsed),
-                heapTotal: Formatter.formatBytes(memoryUsage.heapTotal),
-                rss: Formatter.formatBytes(memoryUsage.rss),
-                external: Formatter.formatBytes(memoryUsage.external)
+                heapFree: memoryUsage.heapTotal - memoryUsage.heapUsed,
+                heapUsed: memoryUsage.heapUsed,
+                heapTotal: memoryUsage.heapTotal,
+                rss: memoryUsage.rss,
+                external: memoryUsage.external
             }
         },
         web: {
@@ -131,11 +131,6 @@ StatusUtils.getStatus = function(callback) {
         percentile(latencyList, 90),
         percentile(latencyList, 99)
     ];
-
-    // Create a humanly readable variant
-    status.server.latencyHuman = status.server.latency.map(function(val) {
-        return Formatter.formatNano(val)
-    });
 
     // Get the redis status if ready
     if(RedisUtils.isReady()) {
@@ -182,6 +177,22 @@ StatusUtils.getStatus = function(callback) {
         for(var object of modelManager._instanceManager._instances.values())
             status.cache.fieldCount += object._baseModel._cache.getCacheCount();
     }
+
+    // Add humanly formatted properties
+    status.server.latencyHuman = status.server.latency.map(function(val) {
+        return Formatter.formatNano(val)
+    });
+    status.server.loadavgHuman = status.server.loadavg.map(function(val) {
+        return val.toFixed(3)
+    });
+    status.memory_system.freeHuman = Formatter.formatBytes(status.memory_system.free);
+    status.memory_system.usedHuman = Formatter.formatBytes(status.memory_system.used);
+    status.memory_system.totalHuman = Formatter.formatBytes(status.memory_system.total);
+    status.memory_app.heapFreeHuman = Formatter.formatBytes(status.memory_app.heapFree);
+    status.memory_app.heapUsedHuman = Formatter.formatBytes(status.memory_app.heapUsed);
+    status.memory_app.heapTotalHuman = Formatter.formatBytes(status.memory_app.heapTotal);
+    status.memory_app.rssHuman = Formatter.formatBytes(status.memory_app.rss);
+    status.memory_app.externalHuman = Formatter.formatBytes(status.memory_app.external);
 
     // Call back when all status is fetched
     latch.then(function () {

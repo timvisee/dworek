@@ -132,7 +132,7 @@ Router.prototype.init = function(callback) {
         });
 
         // Handle errors when this isn't an 404 page
-        if(err.status != 404) {
+        if(err.status !== 404) {
             // Capture the exception for Sentry monitoring
             if(config.sentry.enable)
                 Raven.captureException(err);

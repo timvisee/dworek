@@ -75,49 +75,49 @@ block content
                     td: span(style="color: gray;") Application memory:
                 tr: td
                     td
-                        span.status-server-memory-app-heapFree= status.server.memory_app.heapFree
+                        span.status-server-memory-app-heapFree= status.server.memory_app.heapFreeHuman
                         span(style="color: gray;")  heap free
                 tr: td
                     td
-                        span.status-server-memory-app-heapUsed= status.server.memory_app.heapUsed
+                        span.status-server-memory-app-heapUsed= status.server.memory_app.heapUsedHuman
                         span(style="color: gray;")  heap used
                 tr: td
                     td
-                        span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotal
+                        span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotalHuman
                         span(style="color: gray;")  heap size
                 tr: td
                     td
-                        span.status-server-memory-app-rss= status.server.memory_app.rss
+                        span.status-server-memory-app-rss= status.server.memory_app.rssHuman
                         span(style="color: gray;")  total (resident set)
                 tr: td
                     td
-                        span.status-server-memory-app-external= status.server.memory_app.external
+                        span.status-server-memory-app-external= status.server.memory_app.externalHuman
                         span(style="color: gray;")  external
                 tr: td
                     td: span(style="color: gray;") System memory:
                 tr: td
                     td
-                        span.status-server-memory-system-free= status.server.memory_system.free
+                        span.status-server-memory-system-free= status.server.memory_system.freeHuman
                         span(style="color: gray;")  free
                 tr: td
                     td
-                        span.status-server-memory-system-used= status.server.memory_system.used
+                        span.status-server-memory-system-used= status.server.memory_system.usedHuman
                         span(style="color: gray;")  used (with cache)
                 tr: td
                     td
-                        span.status-server-memory-system-total= status.server.memory_system.total
+                        span.status-server-memory-system-total= status.server.memory_system.totalHuman
                         span(style="color: gray;")  total
                 tr: td Load
                     td
-                        span.status-server-load-1= status.server.loadavg[0]
+                        span.status-server-load-1= status.server.loadavgHuman[0]
                         span(style="color: gray;")  avg last minute
                 tr: td
                     td
-                        span.status-server-load-5= status.server.loadavg[1]
+                        span.status-server-load-5= status.server.loadavgHuman[1]
                         span(style="color: gray;")  avg last 5 minutes
                 tr: td
                     td
-                        span.status-server-load-15= status.server.loadavg[2]
+                        span.status-server-load-15= status.server.loadavgHuman[2]
                         span(style="color: gray;")  avg last 15 minutes
                 tr: td Latency
                     td: span(style="color: gray;") Recent response times:
