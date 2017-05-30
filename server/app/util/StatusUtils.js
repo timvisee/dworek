@@ -185,14 +185,14 @@ StatusUtils.getStatus = function(callback) {
     status.server.loadavgHuman = status.server.loadavg.map(function(val) {
         return val.toFixed(3)
     });
-    status.memory_system.freeHuman = Formatter.formatBytes(status.memory_system.free);
-    status.memory_system.usedHuman = Formatter.formatBytes(status.memory_system.used);
-    status.memory_system.totalHuman = Formatter.formatBytes(status.memory_system.total);
-    status.memory_app.heapFreeHuman = Formatter.formatBytes(status.memory_app.heapFree);
-    status.memory_app.heapUsedHuman = Formatter.formatBytes(status.memory_app.heapUsed);
-    status.memory_app.heapTotalHuman = Formatter.formatBytes(status.memory_app.heapTotal);
-    status.memory_app.rssHuman = Formatter.formatBytes(status.memory_app.rss);
-    status.memory_app.externalHuman = Formatter.formatBytes(status.memory_app.external);
+    status.server.memory_system.freeHuman = Formatter.formatBytes(status.server.memory_system.free);
+    status.server.memory_system.usedHuman = Formatter.formatBytes(status.server.memory_system.used);
+    status.server.memory_system.totalHuman = Formatter.formatBytes(status.server.memory_system.total);
+    status.server.memory_app.heapFreeHuman = Formatter.formatBytes(status.server.memory_app.heapFree);
+    status.server.memory_app.heapUsedHuman = Formatter.formatBytes(status.server.memory_app.heapUsed);
+    status.server.memory_app.heapTotalHuman = Formatter.formatBytes(status.server.memory_app.heapTotal);
+    status.server.memory_app.rssHuman = Formatter.formatBytes(status.server.memory_app.rss);
+    status.server.memory_app.externalHuman = Formatter.formatBytes(status.server.memory_app.external);
 
     // Call back when all status is fetched
     latch.then(function () {
