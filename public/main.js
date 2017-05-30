@@ -6296,11 +6296,11 @@ $(document).bind('pageshow', function() {
                 })
             },
             series: [{
-                name: '1 minute'
+                name: '1 minute load average'
             }, {
-                name: '5 minutes'
+                name: '5 minutes load average'
             }, {
-                name: '15 minutes'
+                name: '15 minutes load average'
             }],
         });
 
