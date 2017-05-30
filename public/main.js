@@ -6202,6 +6202,19 @@ $(document).bind('pageshow', function() {
             statusUpdateRequestHandle = null;
         }
 
+        // Destroy all status charts
+        for(var key in statusCharts) {
+            // Make sure the key is valid
+            if(!statusCharts.hasOwnProperty(key))
+                continue;
+
+            // Destroy the chart
+            statusCharts[key].destroy();
+        }
+
+        // Reset the charts object
+        statusCharts = {};
+
         // We're done, return
         return;
     }
@@ -6213,228 +6226,228 @@ $(document).bind('pageshow', function() {
 
         // Create the timer and store it's handle
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
-    }
 
-    // Create the application memory chart
-    createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
-        yAxis: {
-            title: {
-                text: 'Application Memory'
-            },
-            labels: {
-                formatter: function() {
-                    return formatBytes(this.value);
+        // Create the application memory chart
+        createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
+            yAxis: {
+                title: {
+                    text: 'Application Memory'
                 },
-                step: 1
+                labels: {
+                    formatter: function() {
+                        return formatBytes(this.value);
+                    },
+                    step: 1
+                },
             },
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(formatBytes)
-        },
-        series: [{
-            name: 'Heap free'
-        }, {
-            name: 'Heap used'
-        }, {
-            name: 'Heap size'
-        }, {
-            name: 'Resident set'
-        }, {
-            name: 'External'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatBytes)
+            },
+            series: [{
+                name: 'Heap free'
+            }, {
+                name: 'Heap used'
+            }, {
+                name: 'Heap size'
+            }, {
+                name: 'Resident set'
+            }, {
+                name: 'External'
+            }],
+        });
 
-    // Create the serer memory chart
-    createStatusChart('status-chart-server-memory-system', 'server.memory_system', {
-        yAxis: {
-            title: {
-                text: 'System Memory'
+        // Create the serer memory chart
+        createStatusChart('status-chart-server-memory-system', 'server.memory_system', {
+            yAxis: {
+                title: {
+                    text: 'System Memory'
+                },
+                labels: {
+                    formatter: function() {
+                        return formatBytes(this.value);
+                    }
+                },
             },
-            labels: {
-                formatter: function() {
-                    return formatBytes(this.value);
-                }
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatBytes)
             },
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(formatBytes)
-        },
-        series: [{
-            name: 'Free'
-        }, {
-            name: 'Used'
-        }, {
-            name: 'Total'
-        }],
-    });
+            series: [{
+                name: 'Free'
+            }, {
+                name: 'Used'
+            }, {
+                name: 'Total'
+            }],
+        });
 
-    // Create the server load average chart
-    createStatusChart('status-chart-server-load', 'server.loadavg', {
-        yAxis: {
-            title: {
-                text: 'System Load'
+        // Create the server load average chart
+        createStatusChart('status-chart-server-load', 'server.loadavg', {
+            yAxis: {
+                title: {
+                    text: 'System Load'
+                },
             },
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(function(val) {
-                return val.toFixed(3) + ' load';
-            })
-        },
-        series: [{
-            name: '1 minute'
-        }, {
-            name: '5 minutes'
-        }, {
-            name: '15 minutes'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return val.toFixed(3) + ' load';
+                })
+            },
+            series: [{
+                name: '1 minute'
+            }, {
+                name: '5 minutes'
+            }, {
+                name: '15 minutes'
+            }],
+        });
 
-    // Create the server latency chart
-    createStatusChart('status-chart-server-latency', 'server.latency', {
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Request Latency'
+        // Create the server latency chart
+        createStatusChart('status-chart-server-latency', 'server.latency', {
+            yAxis: {
+                type: 'logarithmic',
+                title: {
+                    text: 'Request Latency'
+                },
+                labels: {
+                    formatter: function() {
+                        return formatNano(this.value);
+                    }
+                },
+                allowDecimals: false,
             },
-            labels: {
-                formatter: function() {
-                    return formatNano(this.value);
-                }
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatNano)
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(formatNano)
-        },
-        series: [{
-            name: 'Max'
-        }, {
-            name: 'Min'
-        }, {
-            name: '50%-th'
-        }, {
-            name: '90%-th'
-        }, {
-            name: '99%-th'
-        }],
-    });
+            series: [{
+                name: 'Max'
+            }, {
+                name: 'Min'
+            }, {
+                name: '50%-th'
+            }, {
+                name: '90%-th'
+            }, {
+                name: '99%-th'
+            }],
+        });
 
-    // Create the realtime connections count chart
-    createStatusChart('status-chart-realtime-connections', 'realtime.connections', {
-        yAxis: {
-            title: {
-                text: 'Connected Clients'
+        // Create the realtime connections count chart
+        createStatusChart('status-chart-realtime-connections', 'realtime.connections', {
+            yAxis: {
+                title: {
+                    text: 'Connected Clients'
+                },
+                allowDecimals: false,
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(function(val) {
-                return val + ' clients';
-            })
-        },
-        series: [{
-            name: 'Connected clients'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return val + ' clients';
+                })
+            },
+            series: [{
+                name: 'Connected clients'
+            }],
+        });
 
-    // Create the active game count chart
-    createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
-        yAxis: {
-            title: {
-                text: 'Active Games'
+        // Create the active game count chart
+        createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
+            yAxis: {
+                title: {
+                    text: 'Active Games'
+                },
+                allowDecimals: false,
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(function(val) {
-                return val + ' games';
-            })
-        },
-        series: [{
-            name: 'Active games'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return val + ' games';
+                })
+            },
+            series: [{
+                name: 'Active games'
+            }],
+        });
 
-    // Create the Redis command count chart
-    createStatusChart('status-chart-redis-commandCount', 'redis.commandCount', {
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Processed Queries'
+        // Create the Redis command count chart
+        createStatusChart('status-chart-redis-commandCount', 'redis.commandCount', {
+            yAxis: {
+                type: 'logarithmic',
+                title: {
+                    text: 'Processed Queries'
+                },
+                allowDecimals: false,
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(function(val) {
-                return formatBigNumber(val) + ' queries';
-            })
-        },
-        series: [{
-            name: 'Queries processed'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return formatBigNumber(val) + ' queries';
+                })
+            },
+            series: [{
+                name: 'Queries processed'
+            }],
+        });
 
-    // Create the Redis key count chart
-    createStatusChart('status-chart-redis-keyCount', 'redis.keyCount', {
-        yAxis: {
-            title: {
-                text: 'Cached fields'
+        // Create the Redis key count chart
+        createStatusChart('status-chart-redis-keyCount', 'redis.keyCount', {
+            yAxis: {
+                title: {
+                    text: 'Cached fields'
+                },
+                allowDecimals: false,
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(function(val) {
-                return formatBigNumber(val) + ' fields';
-            })
-        },
-        series: [{
-            name: 'Cached fields'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return formatBigNumber(val) + ' fields';
+                })
+            },
+            series: [{
+                name: 'Cached fields'
+            }],
+        });
 
-    // Create the Redis memory chart
-    createStatusChart('status-chart-redis-memory', 'redis.memory', {
-        yAxis: {
-            title: {
-                text: 'Redis Memory'
+        // Create the Redis memory chart
+        createStatusChart('status-chart-redis-memory', 'redis.memory', {
+            yAxis: {
+                title: {
+                    text: 'Redis Memory'
+                },
+                labels: {
+                    formatter: function() {
+                        return formatBytes(this.value);
+                    }
+                },
             },
-            labels: {
-                formatter: function() {
-                    return formatBytes(this.value);
-                }
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatBytes)
             },
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(formatBytes)
-        },
-        series: [{
-            name: 'Used'
-        }, {
-            name: 'LUA'
-        }, {
-            name: 'Rss'
-        }, {
-            name: 'Peak'
-        }],
-    });
+            series: [{
+                name: 'Used'
+            }, {
+                name: 'LUA'
+            }, {
+                name: 'Rss'
+            }, {
+                name: 'Peak'
+            }],
+        });
 
-    // Create the cache object/field count chart
-    createStatusChart('status-chart-cache-count', 'cache.count', {
-        yAxis: {
-            title: {
-                text: 'Amount'
+        // Create the cache object/field count chart
+        createStatusChart('status-chart-cache-count', 'cache.count', {
+            yAxis: {
+                title: {
+                    text: 'Amount'
+                },
+                allowDecimals: false,
             },
-            allowDecimals: false,
-        },
-        tooltip: {
-            formatter: buildChartTooltipFormatter(formatBigNumber)
-        },
-        series: [{
-            name: 'Cached objects'
-        }, {
-            name: 'Cached fields'
-        }],
-    });
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatBigNumber)
+            },
+            series: [{
+                name: 'Cached objects'
+            }, {
+                name: 'Cached fields'
+            }],
+        });
+    }
 });
 
 /**
@@ -6520,6 +6533,9 @@ function buildChartTooltipFormatter(formatter) {
  * @return Chart object.
  */
 function createStatusChart(id, chartNamespace, options) {
+    // Parse the namespace
+    chartNamespace = chartNamespace.replace(".", "_");
+
     // Merge the chart options
     var chartOptions = jQuery.extend({}, statusChartsDefaults, options);
 
@@ -6534,6 +6550,9 @@ function createStatusChart(id, chartNamespace, options) {
  * @param {array|mixed} values Array of values to add, or a single value.
  */
 function addStatusChartValues(chartNamespace, values) {
+    // Parse the namespace
+    chartNamespace = chartNamespace.replace(".", "_");
+
     // Make sure the chart is available
     if(statusCharts[chartNamespace] === null || statusCharts[chartNamespace] === undefined)
         return;
