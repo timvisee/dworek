@@ -6227,6 +6227,9 @@ $(document).bind('pageshow', function() {
         // Create the timer and store it's handle
         statusUpdateRequestHandle = setInterval(sendApplicationStatusUpdateRequest, 1000);
 
+        // Reset the last known application status
+        appStatus = null;
+
         // Create the application memory chart
         createStatusChart('status-chart-server-memory-app', 'server.memory_app', {
             yAxis: {
