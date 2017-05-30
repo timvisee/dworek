@@ -132,6 +132,11 @@ StatusUtils.getStatus = function(callback) {
         percentile(latencyList, 99)
     ];
 
+    // Make sure the minimum value is valid
+    var minVal = status.server.latency[1];
+    if(minVal === null || minVal === undefined || minVal < 0)
+        status.server.latency[1] = 0;
+
     // Get the redis status if ready
     if(RedisUtils.isReady()) {
         // Get the Redis connection
