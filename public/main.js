@@ -6213,10 +6213,43 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
 	var status = packet.status;
 
 	// Update the Redis status
+    // TODO: Update status-user-valid
+    // TODO: Update status-user-firstName
+    $('table.status-cluster tr td span.status-cluster-machineCount').html(status.cluster.serverCount);
+    $('table.status-cluster tr td span.status-cluster-serverCount').html(status.cluster.serverCount);
+    $('table.status-cluster tr td span.status-cluster-workerCount').html(status.cluster.workerCount);
+    $('table.status-cluster tr td span.status-cluster-workerId').html(status.cluster.workerId);
+    $('table.status-cluster tr td span.status-cluster-pid').html(status.cluster.pid);
+    $('table.status-server tr td span.status-server-cpus').html(status.server.cpus.length);
+    $('table.status-server tr td span.status-server-app-heapFree').html(status.server.memory_app.heapFree);
+    $('table.status-server tr td span.status-server-app-heapUsed').html(status.server.memory_app.heapUsed);
+    $('table.status-server tr td span.status-server-app-heapTotal').html(status.server.memory_app.heapTotal);
+    $('table.status-server tr td span.status-server-app-rss').html(status.server.memory_app.rss);
+    $('table.status-server tr td span.status-server-memory-system-free').html(status.server.memory_system.free);
+    $('table.status-server tr td span.status-server-memory-system-used').html(status.server.memory_system.used);
+    $('table.status-server tr td span.status-server-memory-system-total').html(status.server.memory_system.total);
+    $('table.status-server tr td span.status-server-load-1').html(status.server.loadavg[0]);
+    $('table.status-server tr td span.status-server-load-5').html(status.server.loadavg[1]);
+    $('table.status-server tr td span.status-server-load-15').html(status.server.loadavg[2]);
+    $('table.status-server tr td span.status-server-latency-max').html(status.server.latency[0]);
+    $('table.status-server tr td span.status-server-latency-min').html(status.server.latency[1]);
+    $('table.status-server tr td span.status-server-latency-50').html(status.server.latency[2]);
+    $('table.status-server tr td span.status-server-latency-90').html(status.server.latency[3]);
+    $('table.status-server tr td span.status-server-latency-99').html(status.server.latency[4]);
+    // TODO: Update status-live-status
+    $('table.status-live tr td.status-live-gameCount').html(formatBigNumber(status.live.gameCount));
+    // TODO: Update status-realtime-online
+    $('table.status-realtime tr td.status-realtime-connections').html(formatBigNumber(status.realtime.connections));
+    // TODO: Update status-web-online
+    $('table.status-web tr td.status-web-uptime').html(formatBigNumber(status.web.uptime) + ' seconds');
+    // TODO: Update status-mongo-online
+    // TODO: Update status-redis-online
     $('table.status-redis tr td.status-redis-uptime').html(formatBigNumber(status.redis.uptime) + ' seconds');
     $('table.status-redis tr td.status-redis-commandCount').html(formatBigNumber(status.redis.commandCount));
     $('table.status-redis tr td.status-redis-keyCount').html(formatBigNumber(status.redis.keyCount));
     $('table.status-redis tr td.status-redis-memory').html(status.redis.memory);
+    $('table.status-cache tr td.status-cache-objectCount').html(formatBigNumber(status.cache.objectCount));
+    $('table.status-cache tr td.status-cache-fieldCount').html(formatBigNumber(status.cache.fieldCount));
 
     // Update the charts if old data is available to compare it to
     if(appStatus !== null) {

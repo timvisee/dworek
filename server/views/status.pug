@@ -14,16 +14,16 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of your current session.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.session-user
                 tr: td Logged in
                     td
                         if session.valid
-                            span(style='color: green;') Yes
+                            span.session-user-valid(style='color: green;') Yes
                         else
                             | No
                 if session.valid
                     tr: td Name
-                        td: i= session.user.firstName
+                        td: i.session-user-firstName= session.user.firstName
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -31,29 +31,31 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the cluster and it's workers.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-cluster
                 tr: td Servers
                     td
-                        td: span= status.cluster.serverCount
+                        td: span.status-cluster-machineCount= status.cluster.serverCount
                             span(style='color: gray;')  machine
                 tr: td Processes
                     td
-                        td: span= ' ' + status.cluster.serverCount
+                        td: span.status-cluster-serverCount= ' ' + status.cluster.serverCount
                             span(style='color: gray;')  hyper visor process
                 tr: td
                     td
-                        td: span= status.cluster.workerCount
+                        td: span.status-cluster-workerCount= status.cluster.workerCount
                             span(style='color: gray;')  worker processes
                 tr: td Current
                     td
                         td: span(style='color: gray;') Connected to:
                 tr: td
                     td
-                        td: span= status.cluster.workerId
+                        td
+                            span.status-cluster-workerId= status.cluster.workerId
                             span(style='color: gray;')  (worker ID)
                 tr: td
                     td
-                        td: span= status.cluster.pid
+                        td
+                            span.status-cluster-pid= status.cluster.pid
                             span(style='color: gray;')  (PID)
 
     .nd2-card.wow.fadeInUp
@@ -62,68 +64,85 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the resources available to #{app.name} on the machine the server is running on.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-server
                 tr: td OS
                     td: span.status-server-os= status.server.os
                         span(style="color: gray;")  (#{status.server.platform}/#{status.server.arch})
                 tr: td CPUs
-                    td: span.status-server-cpus= status.server.cpus.length
+                    td
+                        span.status-server-cpus= status.server.cpus.length
                         span(style="color: gray;")  cores
                 tr: td Model
                     td: small: small.status-server-model= status.server.cpus[0].model
                 tr: td Memory
                     td: span(style="color: gray;") Application memory:
                 tr: td
-                    td: span.status-server-memory-app-heapFree= status.server.memory_app.heapFree
+                    td
+                        span.status-server-memory-app-heapFree= status.server.memory_app.heapFree
                         span(style="color: gray;")  heap free
                 tr: td
-                    td: span.status-server-memory-app-heapUsed= status.server.memory_app.heapUsed
+                    td
+                        span.status-server-memory-app-heapUsed= status.server.memory_app.heapUsed
                         span(style="color: gray;")  heap used
                 tr: td
-                    td: span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotal
+                    td
+                        span.status-server-memory-app-heapTotal= status.server.memory_app.heapTotal
                         span(style="color: gray;")  heap size
                 tr: td
-                    td: span.status-server-memory-app-rss= status.server.memory_app.rss
+                    td
+                        span.status-server-memory-app-rss= status.server.memory_app.rss
                         span(style="color: gray;")  total (resident set)
                 tr: td
-                    td: span.status-server-memory-app-external= status.server.memory_app.external
+                    td
+                        span.status-server-memory-app-external= status.server.memory_app.external
                         span(style="color: gray;")  external
                 tr: td
                     td: span(style="color: gray;") System memory:
                 tr: td
-                    td: span.status-server-memory-system-free= status.server.memory_system.free
+                    td
+                        span.status-server-memory-system-free= status.server.memory_system.free
                         span(style="color: gray;")  free
                 tr: td
-                    td: span.status-server-memory-system-used= status.server.memory_system.used
+                    td
+                        span.status-server-memory-system-used= status.server.memory_system.used
                         span(style="color: gray;")  used (with cache)
                 tr: td
-                    td: span.status-server-memory-system-total= status.server.memory_system.total
+                    td
+                        span.status-server-memory-system-total= status.server.memory_system.total
                         span(style="color: gray;")  total
                 tr: td Load
-                    td: span.status-server-load-1= status.server.loadavg[0]
+                    td
+                        span.status-server-load-1= status.server.loadavg[0]
                         span(style="color: gray;")  avg last minute
                 tr: td
-                    td: span.status-server-load-5= status.server.loadavg[1]
+                    td
+                        span.status-server-load-5= status.server.loadavg[1]
                         span(style="color: gray;")  avg last 5 minutes
                 tr: td
-                    td: span.status-server-load-15= status.server.loadavg[2]
+                    td
+                        span.status-server-load-15= status.server.loadavg[2]
                         span(style="color: gray;")  avg last 15 minutes
                 tr: td Latency
                     td: span(style="color: gray;") Recent response times:
                 tr: td
-                    td: span.status-server-latency-max= status.server.latency[0]
+                    td
+                        span.status-server-latency-max= status.server.latency[0]
                         span(style="color: gray;")  max
                 tr: td
-                    td: span.status-server-latency-min= status.server.latency[1]
+                    td
+                        span.status-server-latency-min= status.server.latency[1]
                         span(style="color: gray;")  min
                 tr: td
-                    td: span.status-server-latency-50= status.server.latency[2]
+                    td
+                        span.status-server-latency-50= status.server.latency[2]
                         span(style="color: gray;")  50%-th
                 tr: td
-                    td: span.status-server-latency-90= status.server.latency[3]
+                    td
+                        span.status-server-latency-90= status.server.latency[3]
                         span(style="color: gray;")  90%-th
                 tr: td
-                    td: span.status-server-latency-99= status.server.latency[4]
+                    td
+                        span.status-server-latency-99= status.server.latency[4]
                         span(style="color: gray;")  99%-th
 
     .nd2-card.wow.fadeInUp
@@ -132,15 +151,15 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the sub-system processing the logic for all active games.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-live
                 tr: td Status
-                    td
+                    td.status-live-status
                         if status.live.gameCount > 0
                             span(style='color: green;') Working
                         else
                             span Idle
                 tr: td Active games
-                    td: span.activeGameCount= status.live.gameCount
+                    td.status-live-gameCount: span.activeGameCount= status.live.gameCount
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -148,15 +167,15 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the server handling all real-time connections to clients.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-realtime
                 tr: td Status
-                    td
+                    td.status-realtime-online
                         if status.realtime.online
                             span(style='color: green;') Online
                         else
                             span(style='color: red;') Offline
                 tr: td Connected clients
-                    td= status.realtime.connections
+                    td.status-realtime-connections= status.realtime.connections
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -164,11 +183,11 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the web server providing you this front-end.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-web
                 tr: td Status
-                    td: span(style='color: green;') Online
+                    td.status-web-online: span(style='color: green;') Online
                 tr: td Uptime
-                    td #{status.web.uptime} seconds
+                    td.status-web-uptime #{status.web.uptime} seconds
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
@@ -176,9 +195,9 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the database server.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-mongo
                 tr: td Status
-                    td
+                    td.status-mongo-online
                         if status.mongo.online
                             span(style='color: green;') Online
                         else
@@ -192,7 +211,7 @@ block content
             p Status of the in-memory caching server.
             table.table-list.ui-responsive.status-redis(style='width: 100%')
                 tr: td Status
-                    td
+                    td.status-redis-online
                         if status.redis.online
                             span(style='color: green;') Online
                         else
@@ -215,8 +234,8 @@ block content
 
         .card-supporting-text.has-action.has-title
             p Status of the high-performance internal caching sub-system.
-            table.table-list.ui-responsive
+            table.table-list.ui-responsive.status-cache
                 tr: td Cached objects
-                    td= status.cache.objectCount
+                    td.status-cache-objectCount= status.cache.objectCount
                 tr: td Cached fields
-                    td #{status.cache.fieldCount}
+                    td.status-cache-fieldCount #{status.cache.fieldCount}
