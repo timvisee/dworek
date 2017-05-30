@@ -195,7 +195,10 @@ StatusUtils.getStatus = function(callback) {
         return Formatter.formatNano(val)
     });
     status.server.loadavgHuman = status.server.loadavg.map(function(val) {
-        return val.toFixed(3)
+        if(val % 1 === 0)
+            return val.toFixed(3);
+        else
+            return val;
     });
     status.server.memory_system.freeHuman = Formatter.formatBytes(status.server.memory_system.free);
     status.server.memory_system.usedHuman = Formatter.formatBytes(status.server.memory_system.used);
