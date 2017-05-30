@@ -733,7 +733,7 @@ var Dworek = {
          * @return {boolean} True if we're on the status page.
          */
         isStatusPage: function() {
-            return document.location.pathname.trim().toLowerCase().startsWith('/status');
+            return document.location.pathname.trim().toLowerCase().lastIndexOf('/status', 0) === 0;
         },
 
 
