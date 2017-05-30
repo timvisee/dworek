@@ -6352,11 +6352,11 @@ $(document).bind('pageshow', function() {
             }],
         });
 
-        // Create the active game count chart
+        // Create the loaded game count chart
         createStatusChart('status-chart-live-gameCount', 'live.gameCount', {
             yAxis: {
                 title: {
-                    text: 'Active games'
+                    text: 'Loaded games'
                 },
                 allowDecimals: false,
             },
@@ -6366,7 +6366,7 @@ $(document).bind('pageshow', function() {
                 })
             },
             series: [{
-                name: 'Active games'
+                name: 'Loaded games'
             }],
         });
 
@@ -6657,7 +6657,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     // Update the server latency chart
     addStatusChartValues('server.latency', status.server.latency);
 
-    // Update the active game count chart
+    // Update the loaded game count chart
     addStatusChartValues('live.gameCount', status.live.gameCount);
 
     // Update the realtime connections chart
