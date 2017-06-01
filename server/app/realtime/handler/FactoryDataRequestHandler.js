@@ -24,7 +24,6 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var Coordinate = require('../../coordinate/Coordinate');
 
 /**
  * Type of packets to handle by this handler.

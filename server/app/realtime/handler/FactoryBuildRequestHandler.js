@@ -26,7 +26,6 @@ var gameConfig = require('../../../gameConfig');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var Coordinate = require('../../coordinate/Coordinate');
 var CallbackLatch = require('../../util/CallbackLatch');
 var Validator = require('../../validator/Validator');
 var FactoryDatabase = require('../../model/factory/FactoryDatabase');
