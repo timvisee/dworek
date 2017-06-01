@@ -394,7 +394,7 @@ UserModel.prototype.isPro = function(callback) {
  * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 UserModel.prototype.setCreateDate = function(isAdmin, callback) {
-    this.setField('is?admin', isAdmin, callback);
+    this.setField('is_admin', isAdmin, callback);
 };
 
 /**
@@ -404,7 +404,7 @@ UserModel.prototype.setCreateDate = function(isAdmin, callback) {
  * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 UserModel.prototype.setCreateDate = function(isPro, callback) {
-    this.setField('is?pro', isPro, callback);
+    this.setField('is_pro', isPro, callback);
 };
 
 /**
