@@ -20,8 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var _ = require('lodash');
-var geolib = require('geolib');
+const _ = require('lodash');
+const geolib = require('geolib');
 
 /**
  * Coordinate class.
@@ -31,7 +31,7 @@ var geolib = require('geolib');
  * @class
  * @constructor
  */
-var Coordinate = function(raw) {
+var Coordinate = (raw) => {
     /**
      * Latitude.
      * @type {Number}
@@ -51,7 +51,7 @@ var Coordinate = function(raw) {
  * @param {Object} raw Raw location object.
  * @return {Coordinate|null} Coordinate or null if parsing failed.
  */
-Coordinate.parse = function(raw) {
+Coordinate.parse = (raw) => {
     // Make sure the object contains the required properties
     if(!raw.hasOwnProperty('latitude') || !raw.hasOwnProperty('longitude'))
         return null;
@@ -69,10 +69,8 @@ Coordinate.parse = function(raw) {
  *
  * @return {string} Serialized coordinate.
  */
-Coordinate.prototype.serialize = function() {
-    // Stringify the coordinate and return it
-    return JSON.stringify(this);
-};
+Coordinate.prototype.serialize =
+    () => JSON.stringify(this);
 
 /**
  * Deserialize a previously serialized coordinate.
@@ -81,10 +79,8 @@ Coordinate.prototype.serialize = function() {
  *
  * @return {Coordinate|null} Serialized coordinate, or null on error.
  */
-Coordinate.deserialize = function(serialized) {
-    // Convert the serialize data into an object, and parse that as coordinate
-    return Coordinate.parse(JSON.parse(serialized));
-};
+Coordinate.deserialize =
+    (serialized) => Coordinate.parse(JSON.parse(serialized));
 
 /**
  * Get the distance to the other given location in meters.
@@ -92,20 +88,18 @@ Coordinate.deserialize = function(serialized) {
  * @param {Coordinate} other Other location.
  * @return {Number} Distance in meters.
  */
-Coordinate.prototype.getDistanceTo = function(other) {
-    return geolib.getDistance(this, other, 1, 2);
-};
+Coordinate.prototype.getDistanceTo =
+    (other) => geolib.getDistance(this, other, 1, 2);
 
 /**
  * Check whether the coordinate is in the range of the other given coordinate.
  *
  * @param {Coordinate} other Other location.
- * @param {Number} range Range in meters.
+ * @param {Number} maxRange Maximum range in meters (inclusive).
  * @return {boolean} True if the other coordinate is in range, false is not.
  */
-Coordinate.prototype.isInRange = function(other, range) {
-    return this.getDistanceTo(other) <= range;
-};
+Coordinate.prototype.isInRange =
+    (other, maxRange) => this.getDistanceTo(other) <= maxRange;
 
 // Export the module
 module.exports = Coordinate;
