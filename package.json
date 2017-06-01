@@ -7,13 +7,13 @@
     "start": "node ./bin/cluster",
     "test": "mocha ./server/test --recursive"
   },
-  "homepage": "https://github.com/timvisee/Dworek",
+  "homepage": "https://github.com/timvisee/dworek",
   "repository": {
     "type": "git",
-    "url": "https://github.com/timvisee/Dworek"
+    "url": "https://github.com/timvisee/dworek"
   },
   "bugs": {
-    "url": "https://github.com/timvisee/Dworek/issues"
+    "url": "https://github.com/timvisee/dworek/issues"
   },
   "dependencies": {
     "async": "2.4.1",
