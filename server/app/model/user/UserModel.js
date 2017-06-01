@@ -371,16 +371,6 @@ UserModel.prototype.isAdmin = function(callback) {
  */
 
 /**
- * Set whether the user is administrator.
- *
- * @param {boolean} isAdmin True if the user is administrator, false if not.
- * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
- */
-UserModel.prototype.setCreateDate = function(isAdmin, callback) {
-    this.setField('is?admin', isAdmin, callback);
-};
-
-/**
  * Check whether this user is pro.
  *
  * @param {UserModel~isProCallback} callback Called with the result or when an error occurred.
@@ -396,6 +386,16 @@ UserModel.prototype.isPro = function(callback) {
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {boolean} True if the user is pro, false if not.
  */
+
+/**
+ * Set whether the user is administrator.
+ *
+ * @param {boolean} isAdmin True if the user is administrator, false if not.
+ * @param {UserModel~setFieldCallback} callback Called on success, or when an error occurred.
+ */
+UserModel.prototype.setCreateDate = function(isAdmin, callback) {
+    this.setField('is?admin', isAdmin, callback);
+};
 
 /**
  * Set whether the user is pro.
