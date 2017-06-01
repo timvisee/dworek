@@ -31,7 +31,7 @@ var ObjectId = require('mongodb').ObjectId;
  * @class
  * @constructor
  */
-var ModelInstanceManager = function(modelConstructor) {
+var ModelInstanceManager = (modelConstructor) => {
     /**
      * Weak map of model instances.
      *
@@ -56,7 +56,7 @@ var ModelInstanceManager = function(modelConstructor) {
  * @param {Object} [localCache] Object with fields and values to cache locally, which greatly benefits performance.
  * @return {Object} Model object instance.
  */
-ModelInstanceManager.prototype.create = function(id, localCache) {
+ModelInstanceManager.prototype.create = (id, localCache) => {
     // Parse the ID
     id = this._parseId(id);
 
@@ -84,9 +84,8 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
  * @param {ObjectId|String} id Object ID.
  * @return {Object|undefined} Model object instance or undefined if no instance with the given ID is known.
  */
-ModelInstanceManager.prototype.get = function(id) {
-    return this._instances.get(this._parseId(id));
-};
+ModelInstanceManager.prototype.get =
+    (id) => this._instances.get(this._parseId(id));
 
 /**
  * Check whether an instance for the given object ID exists.
@@ -94,9 +93,8 @@ ModelInstanceManager.prototype.get = function(id) {
  * @param {ObjectId|String} id Object ID.
  * @return {boolean} True if an instance exists, false if not.
  */
-ModelInstanceManager.prototype.has = function(id) {
-    return this._instances.has(this._parseId(id));
-};
+ModelInstanceManager.prototype.has =
+    (id) => this._instances.has(this._parseId(id));
 
 /**
  * Parse an object ID to make it usable as key in the instances map.
@@ -106,7 +104,7 @@ ModelInstanceManager.prototype.has = function(id) {
  *
  * @private
  */
-ModelInstanceManager.prototype._parseId = function(id) {
+ModelInstanceManager.prototype._parseId = (id) => {
     // Convert the ID to a string if it isn't
     if(!_.isString(id))
         id = id.toString();
@@ -120,16 +118,15 @@ ModelInstanceManager.prototype._parseId = function(id) {
  *
  * @return {Number} Number of instances.
  */
-ModelInstanceManager.prototype.count = function() {
-    return this._instances.size;
-};
+ModelInstanceManager.prototype.count =
+    () => this._instances.size;
 
 /**
  * Clear the list of instances.
  *
  * @param {boolean} [clearModelCache=true] True to also clear the internal cache of the managed models, false to ignore this.
  */
-ModelInstanceManager.prototype.clear = function(clearModelCache) {
+ModelInstanceManager.prototype.clear = (clearModelCache) => {
     // Clear the model cache
     if(clearModelCache || clearModelCache === undefined)
         this.clearModelCache();
@@ -141,7 +138,7 @@ ModelInstanceManager.prototype.clear = function(clearModelCache) {
 /**
  * Clear the cache for the managed model instances.
  */
-ModelInstanceManager.prototype.clearModelCache = function() {
+ModelInstanceManager.prototype.clearModelCache = () => {
     this._instances.forEach((instance) => instance._baseModel.cacheFlush());
 };
 
