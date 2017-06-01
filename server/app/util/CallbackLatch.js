@@ -25,7 +25,7 @@
  *
  * @returns {CallbackLatch} CallbackLatch instance.
  */
-var SmartCallback = function() {
+var CallbackLatch = function() {
 
     /**
      * Number of callbacks we're waiting for.
@@ -44,9 +44,9 @@ var SmartCallback = function() {
 };
 
 /**
- * Set the smart callback object to it's identity.
+ * Set the callback latch object to it's identity.
  */
-SmartCallback.prototype.identity = function() {
+CallbackLatch.prototype.identity = function() {
     this._count = 0;
     this._finalCallback = null;
 };
@@ -56,7 +56,7 @@ SmartCallback.prototype.identity = function() {
  *
  * @param {Number} [amount=1] Amount to increase by.
  */
-SmartCallback.prototype.add = function(amount) {
+CallbackLatch.prototype.add = function(amount) {
     // Parse the amount value
     if(amount === undefined)
         amount = 1;
@@ -68,7 +68,7 @@ SmartCallback.prototype.add = function(amount) {
 /**
  * Resolve a callback.
  */
-SmartCallback.prototype.resolve = function() {
+CallbackLatch.prototype.resolve = function() {
     // Increase the count
     this._count--;
 
@@ -82,7 +82,7 @@ SmartCallback.prototype.resolve = function() {
  *
  * @param {function} callback Finish callback.
  */
-SmartCallback.prototype.then = function(callback) {
+CallbackLatch.prototype.then = function(callback) {
     // Set the finishing callback
     this._finalCallback = callback;
 
@@ -92,4 +92,4 @@ SmartCallback.prototype.then = function(callback) {
 };
 
 // Export the user class
-module.exports = SmartCallback;
+module.exports = CallbackLatch;
