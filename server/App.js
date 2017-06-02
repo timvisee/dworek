@@ -216,10 +216,10 @@ App.prototype._initSentryMonitoring = function() {
 };
 
 /**
- * Initialize the game controller.
+ * Initialize the game manager.
  */
 App.prototype._initGameController = function(callback) {
-    // Initialize the game controller
+    // Initialize the game manager
     Core.gameManager = new GameManager();
 
     // Load all active games

@@ -48,12 +48,16 @@ block content
                     td: span(style='color: gray;') Connected to:
                 tr: td
                     td
-                        span.status-cluster-workerId= status.cluster.workerId
+                        span.status-cluster-worker-id= status.cluster.worker.id
                         span(style='color: gray;')  (worker ID)
                 tr: td
                     td
                         span.status-cluster-pid= status.cluster.pid
                         span(style='color: gray;')  (PID)
+                tr: td
+                    td
+                        span.status-cluster-worker-uptime= status.cluster.worker.uptime
+                        span(style='color: gray;')  (uptime sec)
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text

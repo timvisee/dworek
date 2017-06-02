@@ -99,9 +99,9 @@ Core.expressApp = null;
 Core.router = null;
 
 /**
- * Game controller instance.
+ * Game manager instance.
  *
- * @type {GameManager|null} Game controller instance, or null if the core hasn't been initialized.
+ * @type {GameManager|null} Game manager instance, or null if the core hasn't been initialized.
  */
 Core.gameManager = null;
 
