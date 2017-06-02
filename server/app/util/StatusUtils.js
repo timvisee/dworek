@@ -104,7 +104,7 @@ StatusUtils.getStatus = function(callback) {
             uptime: Math.round(os.uptime())
         },
         live: {
-            gameCount: Core.gameController.getLoadedGameCount()
+            gameCount: Core.gameManager.getLoadedGameCount()
         },
         realtime: {
             online: Core.realTime.isOnline(),

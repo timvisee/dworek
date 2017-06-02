@@ -395,7 +395,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
             });
 
             // Update the game data for everyone
-            Core.gameController.sendGameDataToAll(self.game.getGameModel(), function(err) {
+            Core.gameManager.sendGameDataToAll(self.game.getGameModel(), function(err) {
                 // Handle errors
                 if(err !== null) {
                     console.error(err);

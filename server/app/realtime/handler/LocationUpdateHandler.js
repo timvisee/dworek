@@ -164,7 +164,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
 
         // Get the live game
         latch.add();
-        Core.gameController.getGame(game, function(err, result) {
+        Core.gameManager.getGame(game, function(err, result) {
             // Call back errors
             if(err !== null || result == null) {
                 callbackError();

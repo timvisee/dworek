@@ -739,7 +739,7 @@ FactoryModel.prototype.getLiveFactory = function(callback) {
         }
 
         // Get the live game this factory is in
-        Core.gameController.getGame(game, function(err, liveGame) {
+        Core.gameManager.getGame(game, function(err, liveGame) {
             // Call back errors
             if(err !== null) {
                 callback(err);

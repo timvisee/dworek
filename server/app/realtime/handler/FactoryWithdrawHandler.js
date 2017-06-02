@@ -144,7 +144,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                 }
 
                 // Get the livev game instance
-                Core.gameController.getGame(game, function(err, liveGame) {
+                Core.gameManager.getGame(game, function(err, liveGame) {
                     // Callback errors
                     if(err !== null || liveGame === null) {
                         callbackError();
@@ -351,7 +351,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 // Continue when we finished the transaction
                                 latch.then(function() {
                                     // Send updated game data to the user
-                                    Core.gameController.sendGameData(game, user, undefined, function(err) {
+                                    Core.gameManager.sendGameData(game, user, undefined, function(err) {
                                         // Handle errors
                                         if(err !== null) {
                                             console.error(err);

@@ -136,7 +136,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                     return;
                 }
 
-                Core.gameController.getGame(game, function(err, liveGame) {
+                Core.gameManager.getGame(game, function(err, liveGame) {
                     if(err !== null || liveGame == null) {
                         callbackError();
                         return;

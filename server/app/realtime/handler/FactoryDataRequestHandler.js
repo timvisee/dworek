@@ -127,7 +127,7 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
             }
 
             // Get the live game
-            Core.gameController.getGame(game, function(err, liveGame) {
+            Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
                 if(err !== null || liveGame == null) {
                     callbackError();

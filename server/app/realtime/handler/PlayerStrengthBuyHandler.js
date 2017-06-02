@@ -127,7 +127,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                 return;
             }
 
-            Core.gameController.getGame(game, function(err, liveGame) {
+            Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
                 if(err !== null || liveGame == null) {
                     callbackError();
@@ -218,7 +218,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Update the game state for this user
-                                        Core.gameController.sendGameData(game, user, undefined, function(err) {
+                                        Core.gameManager.sendGameData(game, user, undefined, function(err) {
                                             if(err !== null)
                                                 console.error('Failed to send game data to user, ignoring');
                                         });

@@ -31,7 +31,7 @@ var fs = require('fs');
 var Raven = require('raven');
 
 var Core = require('./Core');
-var GameController = require('./app/live/game/GameManager');
+var GameManager = require('./app/live/game/GameManager');
 var MongoUtils = require('./app/mongo/MongoUtils');
 var RedisUtils = require('./app/redis/RedisUtils');
 var Router = require('./app/router/Router');
@@ -220,10 +220,10 @@ App.prototype._initSentryMonitoring = function() {
  */
 App.prototype._initGameController = function(callback) {
     // Initialize the game controller
-    Core.gameController = new GameController();
+    Core.gameManager = new GameManager();
 
     // Load all active games
-    Core.gameController.load(callback);
+    Core.gameManager.load(callback);
 };
 
 /**

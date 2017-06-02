@@ -110,7 +110,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
     const user = socket.session.user;
 
     // Get the live game instance
-    Core.gameController.getGame(rawGame, function(err, liveGame) {
+    Core.gameManager.getGame(rawGame, function(err, liveGame) {
         // Call back errors
         if(err !== null || liveGame == null) {
             callbackError();

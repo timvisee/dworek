@@ -51,7 +51,7 @@ var GameManager = function() {
 
     // Set up the location update interval
     setInterval(function() {
-        Core.gameController.broadcastLocationData(undefined, undefined, undefined, function(err) {
+        Core.gameManager.broadcastLocationData(undefined, undefined, undefined, function(err) {
             // Show errors in the console
             if(err !== null)
                 console.error('An error occurred while broadcasting location data to clients, ignoring (' + err + ')');
@@ -1161,7 +1161,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
         // Get the game standings
         latch.add();
-        Core.gameController.getGame(game, function(err, liveGame) {
+        Core.gameManager.getGame(game, function(err, liveGame) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)

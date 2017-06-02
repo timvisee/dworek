@@ -155,7 +155,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
             }
 
             // Get the live game instance
-            Core.gameController.getGame(game, function(err, liveGame) {
+            Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
                 if(err !== null || liveGame == null) {
                     callbackError(err);
@@ -391,7 +391,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                 });
 
                                                 // Send new game data to everyone
-                                                Core.gameController.sendGameDataToAll(game, function (err) {
+                                                Core.gameManager.sendGameDataToAll(game, function (err) {
                                                     // Handle errors
                                                     if (err !== null) {
                                                         console.error('Failed to send game data updates, ignoring');

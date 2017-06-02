@@ -115,7 +115,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     var foundShop = false;
 
     // Loop through the games and shops to find the correct shop
-    Core.gameController.games.forEach(function(liveGame) {
+    Core.gameManager.games.forEach(function(liveGame) {
         // Loop through the shops
         liveGame.shopManager.shops.forEach(function(liveShop) {
             // Skip if we already found the shop
@@ -229,7 +229,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Send updated game data to the user
-                                        Core.gameController.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
+                                        Core.gameManager.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
                                             // Handle errors
                                             if(err !== null) {
                                                 console.error(err);

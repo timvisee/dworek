@@ -148,7 +148,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                 }
 
                 // Get the live game
-                Core.gameController.getGame(gameModel, function(err, liveGame) {
+                Core.gameManager.getGame(gameModel, function(err, liveGame) {
                     // Call back errors
                     if(err !== null) {
                         callbackError();
@@ -459,7 +459,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Send updated location data to the user
-                                        Core.gameController.broadcastLocationData(liveUser.getGame().getGameModel(), liveUser.getUserModel(), undefined, function(err) {
+                                        Core.gameManager.broadcastLocationData(liveUser.getGame().getGameModel(), liveUser.getUserModel(), undefined, function(err) {
                                             // Show errors
                                             if(err !== null) {
                                                 console.error('Failed to broadcast location data to user.');
@@ -468,7 +468,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         });
 
                                         // Send updated game data to all users
-                                        Core.gameController.sendGameDataToAll(liveUser.getGame().getGameModel(), function(err) {
+                                        Core.gameManager.sendGameDataToAll(liveUser.getGame().getGameModel(), function(err) {
                                             // Show errors
                                             if(err !== null) {
                                                 console.error('Failed to broadcast game data to all users.');

@@ -216,7 +216,7 @@ Shop.prototype.load = function(callback) {
             }, self.getUser().getUserModel());
 
             // Send the game data to the user
-            Core.gameController.sendGameData(self.getGame().getGameModel(), self.getUser().getUserModel(), undefined, function(err) {
+            Core.gameManager.sendGameData(self.getGame().getGameModel(), self.getUser().getUserModel(), undefined, function(err) {
                 // Handle errors
                 if(err !== null) {
                     console.error('Failed to send game data to user:');

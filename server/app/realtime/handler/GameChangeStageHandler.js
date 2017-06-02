@@ -242,7 +242,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 // Load/unload the game
                 if(stage == 1)
                     // Load the game
-                    Core.gameController.loadGame(game, function(err) {
+                    Core.gameManager.loadGame(game, function(err) {
                         // Handle errors
                         if(err !== null) {
                             // Send a message response to the user
@@ -260,7 +260,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
 
                 else {
                     // Unload the game if it's still loaded and broadcast the stage
-                    Core.gameController.unloadGame(game);
+                    Core.gameManager.unloadGame(game);
                     broadcastStageFunction();
                 }
             });

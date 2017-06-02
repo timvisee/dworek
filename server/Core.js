@@ -103,7 +103,7 @@ Core.router = null;
  *
  * @type {GameManager|null} Game controller instance, or null if the core hasn't been initialized.
  */
-Core.gameController = null;
+Core.gameManager = null;
 
 /**
  * Real time server instance.

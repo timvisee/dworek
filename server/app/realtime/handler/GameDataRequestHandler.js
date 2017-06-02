@@ -121,7 +121,7 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
         }
 
         // Send the game data to the user
-        Core.gameController.sendGameData(game, user, socket, function(err) {
+        Core.gameManager.sendGameData(game, user, socket, function(err) {
             // Call back errors
             if(err !== null)
                 callbackError();

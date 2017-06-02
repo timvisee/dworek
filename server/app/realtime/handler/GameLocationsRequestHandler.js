@@ -120,7 +120,7 @@ GameLocationsRequestHandler.prototype.handler = function(packet, socket) {
         }
 
         // Send the location data to the user
-        Core.gameController.broadcastLocationData(game, user, socket, function(err) {
+        Core.gameManager.broadcastLocationData(game, user, socket, function(err) {
             // Call back errors
             if(err !== null)
                 callbackError();
