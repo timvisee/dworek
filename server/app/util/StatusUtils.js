@@ -73,11 +73,11 @@ StatusUtils.getStatus = function(callback) {
             serverCount: 1,
             isMaster: isMaster,
             workerCount: os.cpus().length,
+        },
+        worker: {
+            id: workerId,
             pid: process.pid,
-            worker: {
-                id: workerId,
-                uptime: Math.floor(process.uptime())
-            }
+            uptime: Math.floor(process.uptime())
         },
         server: {
             os: os.type(),

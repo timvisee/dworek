@@ -30,7 +30,7 @@ block content
             h3.card-primary-title Cluster Status
 
         .card-supporting-text.has-action.has-title
-            p Status of the cluster and it's workers.
+            p Status of the cluster and the available workers.
             table.table-list.ui-responsive.status-cluster(style='width: 100%')
                 tr: td Servers
                     td
@@ -44,20 +44,24 @@ block content
                     td
                         span.status-cluster-workerCount= status.cluster.workerCount
                         span(style='color: gray;')  worker processes
-                tr: td Current
-                    td: span(style='color: gray;') Connected to:
-                tr: td
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Worker Status
+
+        .card-supporting-text.has-action.has-title
+            p Status of the worker you're currently connected to.
+            table.table-list.ui-responsive.status-worker(style='width: 100%')
+                tr: td Worker ID
                     td
-                        span.status-cluster-worker-id= status.cluster.worker.id
-                        span(style='color: gray;')  (worker ID)
-                tr: td
+                        span.status-worker-id= status.worker.id
+                tr: td Process ID
                     td
-                        span.status-cluster-pid= status.cluster.pid
-                        span(style='color: gray;')  (PID)
-                tr: td
+                        span.status-worker-pid= status.worker.pid
+                tr: td Uptime
                     td
-                        span.status-cluster-worker-uptime= status.cluster.worker.uptime
-                        span(style='color: gray;')  (uptime sec)
+                        span.status-worker-uptime= status.worker.uptime
+                        span(style='color: gray;')  seconds
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
