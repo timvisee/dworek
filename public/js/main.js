@@ -6598,9 +6598,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-cluster tr td span.status-cluster-machineCount').html(status.cluster.serverCount);
     $('table.status-cluster tr td span.status-cluster-serverCount').html(status.cluster.serverCount);
     $('table.status-cluster tr td span.status-cluster-workerCount').html(status.cluster.workerCount);
-    $('table.status-cluster tr td span.status-worker-id').html(status.worker.id);
-    $('table.status-cluster tr td span.status-worker-pid').html(status.worker.pid);
-    $('table.status-cluster tr td span.status-worker-uptime').html(formatBigNumber(status.worker.uptime));
+    $('table.status-worker tr td span.status-worker-id').html(status.worker.id);
+    $('table.status-worker tr td span.status-worker-pid').html(status.worker.pid);
+    $('table.status-worker tr td span.status-worker-uptime').html(formatBigNumber(status.worker.uptime));
     $('table.status-server tr td span.status-server-cpus').html(status.server.cpus.length);
     $('table.status-server tr td span.status-server-memory-app-heapFree').html(status.server.memory_app.heapFreeHuman);
     $('table.status-server tr td span.status-server-memory-app-heapUsed').html(status.server.memory_app.heapUsedHuman);

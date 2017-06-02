@@ -36,14 +36,14 @@ block content
                     td
                         span.status-cluster-machineCount= status.cluster.serverCount
                         span(style='color: gray;')  machine
-                tr: td Processes
+                tr: td Hypervisors
                     td
                         span.status-cluster-serverCount= ' ' + status.cluster.serverCount
-                        span(style='color: gray;')  hyper visor process
-                tr: td
+                        span(style='color: gray;')  process(es)
+                tr: td Workers
                     td
                         span.status-cluster-workerCount= status.cluster.workerCount
-                        span(style='color: gray;')  worker processes
+                        span(style='color: gray;')  process(es)
 
     .nd2-card.wow.fadeInUp
         .card-title.has-supporting-text
