@@ -6047,6 +6047,10 @@ $(document).bind('pageshow', function() {
  * @returns {string} Formatted number.
  */
 function formatBigNumber(num) {
+    // Return zero if undefined
+    if(num === undefined || num === null)
+        return 0;
+
     // Split the number by a dot (for decimal numbers)
     const parts = num.toString().split(".");
 

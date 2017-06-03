@@ -47,6 +47,11 @@ var ModelInstanceManager = function(modelConstructor) {
      * @private
      */
     this._modelConstructor = modelConstructor;
+
+    /**
+     * Number of queries executed.
+     */
+    this._queryCount = 0;
 };
 
 /**
@@ -59,6 +64,9 @@ var ModelInstanceManager = function(modelConstructor) {
 ModelInstanceManager.prototype.create = function(id, localCache) {
     // Parse the ID
     id = this._parseId(id);
+
+    // Update the query count
+    this._queryCount++;
 
     // Return the instance if it's known
     if(this.has(id))
@@ -85,6 +93,10 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
  * @return {Object|undefined} Model object instance or undefined if no instance with the given ID is known.
  */
 ModelInstanceManager.prototype.get = function(id) {
+    // Update the query count
+    this._queryCount++;
+
+    // Get the value
     return this._instances.get(this._parseId(id));
 };
 
@@ -95,6 +107,10 @@ ModelInstanceManager.prototype.get = function(id) {
  * @return {boolean} True if an instance exists, false if not.
  */
 ModelInstanceManager.prototype.has = function(id) {
+    // Update the query count
+    this._queryCount++;
+
+    // Get the result
     return this._instances.has(this._parseId(id));
 };
 
@@ -130,6 +146,9 @@ ModelInstanceManager.prototype.count = function() {
  * @param {boolean} [clearModelCache=true] True to also clear the internal cache of the managed models, false to ignore this.
  */
 ModelInstanceManager.prototype.clear = function(clearModelCache) {
+    // Update the query count
+    this._queryCount++;
+
     // Clear the model cache
     if(clearModelCache || clearModelCache === undefined)
         this.clearModelCache();

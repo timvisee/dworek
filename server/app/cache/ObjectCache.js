@@ -35,6 +35,11 @@ var ObjectCache = function() {
      * @private
      */
     this._cache = new Map();
+
+    /**
+     * Number of queries executed.
+     */
+    this._queryCount = 0;
 };
 
 /**
@@ -46,7 +51,7 @@ var ObjectCache = function() {
  */
 ObjectCache.prototype.hasCache = function(field) {
     // Increase the query count
-    Core.internalCacheQueryCount += 1;
+    this._queryCount++;
 
     // Return true if the field is cached
     return this._cache.has(field);
@@ -60,7 +65,7 @@ ObjectCache.prototype.hasCache = function(field) {
  */
 ObjectCache.prototype.getCache = function(field) {
     // Increase the query count
-    Core.internalCacheQueryCount += 1;
+    this._queryCount++;
 
     // Get the cached value
     return this._cache.get(field);
@@ -83,7 +88,7 @@ ObjectCache.prototype.getCacheCount = function() {
  */
 ObjectCache.prototype.setCache = function(field, value) {
     // Increase the query count
-    Core.internalCacheQueryCount += 1;
+    this._queryCount++;
 
     // Set the cache value
     this._cache.set(field, value);

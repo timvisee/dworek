@@ -119,12 +119,5 @@ Core.realTime = null;
  */
 Core.eventLoopMonitor = null;
 
-/**
- * Internal cache status.
- */
-Core.internalCache = {
-    queryCount: 0
-};
-
 // Export the class
 module.exports = Core;
