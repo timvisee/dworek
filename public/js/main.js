@@ -6450,6 +6450,25 @@ $(document).bind('pageshow', function() {
                 name: 'Cached fields'
             }],
         });
+
+        // Create the Redis command count chart
+        createStatusChart('status-chart-cache-queryCount', 'cache.queryCount', {
+            yAxis: {
+                type: 'logarithmic',
+                title: {
+                    text: 'Processed queries'
+                },
+                allowDecimals: false,
+            },
+            tooltip: {
+                formatter: buildChartTooltipFormatter(function(val) {
+                    return formatBigNumber(val) + ' queries';
+                })
+            },
+            series: [{
+                name: 'Queries processed'
+            }],
+        });
     }
 });
 
@@ -6685,6 +6704,10 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
         status.cache.objectCount,
         status.cache.fieldCount,
     ]);
+
+    // Update the internal cache query count command count chart
+    if(appStatus !== null)
+        addStatusChartValues('cache.queryCount', status.cache.queryCount - appStatus.cache.queryCount);
 
     // Store the app status
     appStatus = status;
