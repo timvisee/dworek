@@ -266,13 +266,13 @@ block content
         .card-supporting-text.has-action.has-title
             p Status of the high-performance internal caching sub-system.
             table.table-list.ui-responsive.status-cache(style='width: 100%')
+                tr: td Queries processed
+                    td.status-cache-queryCount= status.cache.queryCount
+                tr: td(colspan=2)
+                    div#status-chart-cache-queryCount(style='width: 100%; height: 200px;')
                 tr: td Cached objects
                     td.status-cache-objectCount= status.cache.objectCount
                 tr: td Cached fields
                     td.status-cache-fieldCount= status.cache.fieldCount
                 tr: td(colspan=2)
                     div#status-chart-cache-count(style='width: 100%; height: 200px;')
-                tr: td Queries processed
-                    td.status-cache-queryCount= status.cache.queryCount
-                tr: td(colspan=2)
-                    div#status-chart-cache-queryCount(style='width: 100%; height: 200px;')

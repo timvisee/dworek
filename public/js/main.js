@@ -6433,25 +6433,7 @@ $(document).bind('pageshow', function() {
             }],
         });
 
-        // Create the cache object/field count chart
-        createStatusChart('status-chart-cache-count', 'cache.count', {
-            yAxis: {
-                title: {
-                    text: 'Amount'
-                },
-                allowDecimals: false,
-            },
-            tooltip: {
-                formatter: buildChartTooltipFormatter(formatBigNumber)
-            },
-            series: [{
-                name: 'Cached objects'
-            }, {
-                name: 'Cached fields'
-            }],
-        });
-
-        // Create the Redis command count chart
+        // Create the internal cache query count chart
         createStatusChart('status-chart-cache-queryCount', 'cache.queryCount', {
             yAxis: {
                 type: 'logarithmic',
@@ -6467,6 +6449,24 @@ $(document).bind('pageshow', function() {
             },
             series: [{
                 name: 'Queries processed'
+            }],
+        });
+
+        // Create the cache object/field count chart
+        createStatusChart('status-chart-cache-count', 'cache.count', {
+            yAxis: {
+                title: {
+                    text: 'Amount'
+                },
+                allowDecimals: false,
+            },
+            tooltip: {
+                formatter: buildChartTooltipFormatter(formatBigNumber)
+            },
+            series: [{
+                name: 'Cached objects'
+            }, {
+                name: 'Cached fields'
             }],
         });
     }
@@ -6651,9 +6651,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-redis tr td.status-redis-memory-lua').html(status.redis.memoryLuaHuman);
     $('table.status-redis tr td.status-redis-memory-rss').html(status.redis.memoryRssHuman);
     $('table.status-redis tr td.status-redis-memory-peak').html(status.redis.memoryPeakHuman);
+    $('table.status-cache tr td.status-cache-queryCount').html(formatBigNumber(status.cache.queryCount));
     $('table.status-cache tr td.status-cache-objectCount').html(formatBigNumber(status.cache.objectCount));
     $('table.status-cache tr td.status-cache-fieldCount').html(formatBigNumber(status.cache.fieldCount));
-    $('table.status-cache tr td.status-cache-queryCount').html(formatBigNumber(status.cache.queryCount));
 
     // Update the application memory chart
     addStatusChartValues('server.memory_app', [
@@ -6699,15 +6699,15 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
         status.redis.memoryPeak
     ]);
 
+    // Update the internal cache query count command count chart
+    if(appStatus !== null)
+        addStatusChartValues('cache.queryCount', status.cache.queryCount - appStatus.cache.queryCount);
+
     // Update the cached object/fields count chart
     addStatusChartValues('cache.count', [
         status.cache.objectCount,
         status.cache.fieldCount,
     ]);
-
-    // Update the internal cache query count command count chart
-    if(appStatus !== null)
-        addStatusChartValues('cache.queryCount', status.cache.queryCount - appStatus.cache.queryCount);
 
     // Store the app status
     appStatus = status;
