@@ -196,7 +196,6 @@ StatusUtils.getStatus = function(callback) {
             status.cache.fieldCount += object._baseModel._cache.getCacheCount();
         }
     }
-    status.cache.queryCount = Core.internalCacheQueryCount;
 
     // Add humanly formatted properties
     status.server.latencyHuman = status.server.latency.map(function(val) {
