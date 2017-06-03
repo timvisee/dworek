@@ -269,6 +269,8 @@ block content
                 tr: td Cached objects
                     td.status-cache-objectCount= status.cache.objectCount
                 tr: td Cached fields
-                    td.status-cache-fieldCount #{status.cache.fieldCount}
+                    td.status-cache-fieldCount= status.cache.fieldCount
                 tr: td(colspan=2)
                     div#status-chart-cache-count(style='width: 100%; height: 200px;')
+                tr: td Queries processed
+                    td.status-cache-queryCount= status.cache.queryCount

@@ -6634,6 +6634,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     $('table.status-redis tr td.status-redis-memory-peak').html(status.redis.memoryPeakHuman);
     $('table.status-cache tr td.status-cache-objectCount').html(formatBigNumber(status.cache.objectCount));
     $('table.status-cache tr td.status-cache-fieldCount').html(formatBigNumber(status.cache.fieldCount));
+    $('table.status-cache tr td.status-cache-queryCount').html(formatBigNumber(status.cache.queryCount));
 
     // Update the application memory chart
     addStatusChartValues('server.memory_app', [

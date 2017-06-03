@@ -121,7 +121,8 @@ StatusUtils.getStatus = function(callback) {
         },
         cache: {
             objectCount: 0,
-            fieldCount: 0
+            fieldCount: 0,
+            queryCount: Core.internalCache.queryCount
         }
     };
 
