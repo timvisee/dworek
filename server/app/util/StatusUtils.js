@@ -120,9 +120,9 @@ StatusUtils.getStatus = function(callback) {
             online: RedisUtils.isReady()
         },
         cache: {
+            queryCount: Core.internalCacheQueryCount !== undefined ? Core.internalCacheQueryCount : 0,
             objectCount: 0,
-            fieldCount: 0,
-            queryCount: Core.internalCache.queryCount
+            fieldCount: 0
         }
     };
 
