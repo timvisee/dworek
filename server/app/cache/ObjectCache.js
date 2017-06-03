@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var Core = require('../../Core');
+
 /**
  * Constructor.
  *
@@ -43,6 +45,10 @@ var ObjectCache = function() {
  * @returns {boolean} True if this field is available, false if not.
  */
 ObjectCache.prototype.hasCache = function(field) {
+    // Increase the query count
+    Core.internalCache.queryCount++;
+
+    // Return true if the field is cached
     return this._cache.has(field);
 };
 
@@ -53,6 +59,10 @@ ObjectCache.prototype.hasCache = function(field) {
  * @returns {*|undefined} Cached value, or undefined if the field is unknown.
  */
 ObjectCache.prototype.getCache = function(field) {
+    // Increase the query count
+    Core.internalCache.queryCount++;
+
+    // Get the cached value
     return this._cache.get(field);
 };
 
@@ -72,6 +82,10 @@ ObjectCache.prototype.getCacheCount = function() {
  * @param {*} value Value to cache.
  */
 ObjectCache.prototype.setCache = function(field, value) {
+    // Increase the query count
+    Core.internalCache.queryCount++;
+
+    // Set the cache value
     this._cache.set(field, value);
 };
 
