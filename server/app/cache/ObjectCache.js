@@ -52,6 +52,7 @@ var ObjectCache = function() {
 ObjectCache.prototype.hasCache = function(field) {
     // Increase the query count
     this._queryCount++;
+    Core.status.internalCache.queryCount++;
 
     // Return true if the field is cached
     return this._cache.has(field);
@@ -66,7 +67,8 @@ ObjectCache.prototype.hasCache = function(field) {
 ObjectCache.prototype.getCache = function(field) {
     // Increase the query count
     this._queryCount++;
-
+    Core.status.internalCache.queryCount++;
+    
     // Get the cached value
     return this._cache.get(field);
 };
@@ -89,7 +91,8 @@ ObjectCache.prototype.getCacheCount = function() {
 ObjectCache.prototype.setCache = function(field, value) {
     // Increase the query count
     this._queryCount++;
-
+    Core.status.internalCache.queryCount++;
+    
     // Set the cache value
     this._cache.set(field, value);
 };
