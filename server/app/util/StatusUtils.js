@@ -120,7 +120,7 @@ StatusUtils.getStatus = function(callback) {
             online: RedisUtils.isReady()
         },
         cache: {
-            queryCount: 0,
+            queryCount: Core.status.internalCache.queryCount,
             objectCount: 0,
             fieldCount: 0
         }
@@ -187,16 +187,16 @@ StatusUtils.getStatus = function(callback) {
         var modelManager = Core.model[modelManagerName];
 
         // Append the number of queries on the objects, and the objects itself
-        status.cache.queryCount += modelManager._instanceManager._queryCount;
+        //status.cache.queryCount += modelManager._instanceManager._queryCount;
         status.cache.objectCount += modelManager._instanceManager.count();
 
         // Iterate through the objects
         for(var object of modelManager._instanceManager._instances.values()) {
-            status.cache.queryCount += object._baseModel._cache._queryCount;
+            //status.cache.queryCount += object._baseModel._cache._queryCount;
             status.cache.fieldCount += object._baseModel._cache.getCacheCount();
         }
     }
-    status.cache.queryCount = 123;
+    //status.cache.queryCount = 123;
 
     // Add humanly formatted properties
     status.server.latencyHuman = status.server.latency.map(function(val) {
