@@ -119,5 +119,14 @@ Core.realTime = null;
  */
 Core.eventLoopMonitor = null;
 
+/**
+ * Global applicati status.
+ */
+Core.status = {
+    internalCache: {
+        queryCount: 0
+    }
+};
+
 // Export the class
 module.exports = Core;
