@@ -51,7 +51,7 @@ var PacketProcessor = function() {
  * @param {Object} rawPacket Raw packet to process.
  * @param socket SocketIO socket this packet was received from.
  */
-PacketProcessor.prototype.receivePacked = function(rawPacket, socket) {
+PacketProcessor.prototype.receivePacket = function(rawPacket, socket) {
     // Make sure the packet is an object
     if(!_.isObject(rawPacket)) {
         console.log('Received malformed packet, packet isn\'t an object, ignoring');

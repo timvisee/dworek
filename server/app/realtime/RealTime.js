@@ -112,7 +112,7 @@ RealTime.prototype.start = function() {
 
         // Listen for packets from the client
         socket.on(config.realtime.defaultRoom, function(rawPacket) {
-            self.packetProcessor.receivePacked(rawPacket, socket);
+            self.packetProcessor.receivePacket(rawPacket, socket);
         });
     });
 };
