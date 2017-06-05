@@ -522,6 +522,9 @@ var Dworek = {
                 // De-authenticate
                 self._deauthenticate();
 
+                // Reset the current app status
+                appStatus = null;
+
                 // Show a notification regarding the disconnect
                 showNotification('You\'ve lost connection...', {
                     vibrate: true,
