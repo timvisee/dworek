@@ -1361,7 +1361,7 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
  */
 Factory.prototype.tick = function(callback) {
     // TODO: Remove this debug message after testing
-    console.log('Processing factory tick...');
+    console.log('Processing factory tick... (' + this._id.toString() + ')');
 
     // Create a callback latch
     var latch = new CallbackLatch();
