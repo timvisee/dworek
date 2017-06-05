@@ -1405,7 +1405,7 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
             
             // TODO: Remove this message after debugging
             // Show a debug message
-            console.debug('Scheduled tick with a delay of: ' + delay);
+            console.log('Scheduled tick with a delay of: ' + delay);
         });
     });
 
