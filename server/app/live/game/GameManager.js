@@ -205,7 +205,7 @@ GameManager.prototype.load = function(callback) {
     // Start the game tick
     setInterval(function() {
         // Run a game tick
-        self.tick(function(err) {
+        self.tick(gameConfig.game.tickInterval, function(err) {
             // Report errors
             if(err !== null) {
                 console.error(err);
@@ -307,9 +307,7 @@ GameManager.prototype.loadGame = function(gameId, callback) {
             // Handle errors
             if(err !== null)
                 console.error('Failed to fetch game name, ignoring.');
-
             else
-                // Show a status message
                 console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
 
             // Call back
@@ -1348,14 +1346,28 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
  * Run a game tick.
  * This invokes a game tick for games that are currently active.
  *
+ * @param {int} scheduleTime Time in milliseconds ticks may be scheduled in.
  * @param {GameManager~tickCallback} [callback] Called when the tick has been processed, or when an error occurred.
  */
-GameManager.prototype.tick = function(callback) {
+GameManager.prototype.tick = function(scheduleTime, callback) {
+    // Parse the schedule time
+    if(scheduleTime < 0 || scheduleTime === undefined || scheduleTime === null)
+        scheduleTime = 0;
+
     // Create a new callback latch
     var latch = new CallbackLatch();
 
     // We may only call back once
     var calledBack = false;
+
+    // Count the number of ticks that need to be processed
+    var tickCount = 0;
+    this.games.forEach(function(liveGame) {
+        tickCount += liveGame.factoryManager.factories.length;
+    });
+
+    // Define the delay value in milliseconds
+    var delay = 0;
 
     // Loop through all the games, and tick the factories
     this.games.forEach(function(liveGame) {
@@ -1364,20 +1376,36 @@ GameManager.prototype.tick = function(callback) {
             // Add a latch for this factory
             latch.add();
 
-            // Tick the factory
-            liveFactory.tick(function(err) {
-                // Call back errors
-                if(err !== null) {
-                    if(!calledBack)
-                        if(_.isFunction(callback))
-                            callback(err);
-                    calledBack = true;
-                    return;
-                }
+            // Increase the delay
+            if(scheduleTime !== 0)
+                delay += scheduleTime / tickCount;
 
-                // Resolve the latch
-                latch.resolve();
-            });
+            // Define a function to invoke the tick
+            var doTick = function() {
+                liveFactory.tick(function(err) {
+                    // Call back errors
+                    if(err !== null) {
+                        if(!calledBack)
+                            if(_.isFunction(callback))
+                                callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Resolve the latch
+                    latch.resolve();
+                });
+            };
+
+            // Run tasks with a delay of zero immediately and schedule delayed tasks
+            if(delay === 0)
+                doTick();
+            else
+                setTimeout(doTick, parseInt(delay));
+            
+            // TODO: Remove this message after debugging
+            // Show a debug message
+            console.debug('Scheduled tick with a delay of: ' + delay);
         });
     });
 
