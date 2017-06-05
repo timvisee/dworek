@@ -51,7 +51,7 @@ var GameManager = function() {
 
     // Set up the location update interval
     setInterval(function() {
-        Core.gameManager.broadcastLocationData(undefined, undefined, undefined, function(err) {
+        Core.gameManager.broadcastLocationData(config.game.locationUpdateInterval, undefined, undefined, undefined, function(err) {
             // Show errors in the console
             if(err !== null)
                 console.error('An error occurred while broadcasting location data to clients, ignoring (' + err + ')');
@@ -393,6 +393,7 @@ GameManager.prototype.unloadGame = function(gameId) {
 /**
  * Broadcast the location status of all loaded games to all real-time connected clients.
  *
+ * @param {int|null|undefined} scheduleTime=0 Time in milliseconds ticks may be scheduled in. Zero to not schedule.
  * @param {GameModel|Game|ObjectId|string|undefined} [gameConstraint=undefined] Game instance or ID if the locations should only be
  * broadcasted to the given game, undefined to broadcast to all games.
  * @param {UserModel|User|ObjectId|string|undefined} [userConstraint=undefined] User instance or ID if the locations should only be
@@ -400,7 +401,7 @@ GameManager.prototype.unloadGame = function(gameId) {
  * @param {Array|*|undefined} sockets Array of sockets or a single socket to send the location data to. Undefined or an empty array to send to all sockets for the user.
  * @param {GameManager~broadcastDataCallback} [callback] Called on success or when an error occurred.
  */
-GameManager.prototype.broadcastLocationData = function(gameConstraint, userConstraint, sockets, callback) {
+GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstraint, userConstraint, sockets, callback) {
     // Get the game ID if set
     if((gameConstraint instanceof GameModel) || (gameConstraint instanceof Game))
         gameConstraint = gameConstraint.getId();
@@ -420,6 +421,10 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
         callback(new Error('Invalid user instance'));
         return;
     }
+    
+    // Parse the schedule time
+    if(scheduleTime < 0 || scheduleTime === undefined || scheduleTime === null)
+        scheduleTime = 0;
 
     // Parse the sockets
     if(sockets === undefined)
@@ -433,6 +438,9 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
     // Create a callback latch for all games
     var latch = new CallbackLatch();
 
+    // Create a list of games and users to broadcast locations to
+    var entries = [];
+
     // Loop through the games
     this.games.forEach(function(liveGame) {
         // Check whether a game constraint is set
@@ -442,11 +450,34 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
         // Loop through the game users
         liveGame.userManager.users.forEach(function(liveUser) {
             // Check whether a game constraint is set
-            if(userConstraint != undefined && !liveUser.getId().equals(userConstraint))
+            if (userConstraint != undefined && !liveUser.getId().equals(userConstraint))
                 return;
 
-            // Add a latch
-            latch.add();
+            // Add the live game and user as entry
+            entries.push({
+                liveGame,
+                liveUser
+            });
+        });
+    });
+
+    // Define the delay value in milliseconds
+    var delay = 0;
+
+    // Loop through the games
+    entries.forEach(function(entry) {
+        // Add a latch
+        latch.add();
+
+        // Create a function to execute the broadcast
+        var doBroadcast = function() {
+            // TODO: Remove this debug message after testing
+            // Show a debug message
+            console.log('Executing broadcast for user: ' + liveUser.getIdHex());
+            
+            // Get the entry values
+            var liveGame = entry.liveGame;
+            var liveUser = entry.liveUser;
 
             // Get the user model
             const userModel = liveUser.getUserModel();
@@ -709,7 +740,7 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                     };
 
                     // Create a packet and send it to the correct user/sockets
-                    if(sockets.length == 0)
+                    if(sockets.length === 0)
                         Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LOCATIONS_UPDATE, packetObject, liveUser);
                     else
                         Core.realTime.packetProcessor.sendPacket(PacketType.GAME_LOCATIONS_UPDATE, packetObject, sockets);
@@ -718,7 +749,17 @@ GameManager.prototype.broadcastLocationData = function(gameConstraint, userConst
                     latch.resolve();
                 });
             });
-        });
+        };
+
+        // Run tasks with a delay of zero immediately and schedule delayed tasks
+        if(delay === 0)
+            doBroadcast();
+        else
+            setTimeout(doBroadcast, parseInt(delay));
+
+        // Increase the delay
+        if(config.game.spreadTicks && scheduleTime !== 0)
+            delay += scheduleTime / entries.length;
     });
 
     // Call back when we're done
@@ -1346,7 +1387,7 @@ GameManager.prototype.sendGameDataToAll = function(game, callback) {
  * Run a game tick.
  * This invokes a game tick for games that are currently active.
  *
- * @param {int} scheduleTime Time in milliseconds ticks may be scheduled in.
+ * @param {int|null|undefined} scheduleTime=0 Time in milliseconds ticks may be scheduled in. Zero to not schedule.
  * @param {GameManager~tickCallback} [callback] Called when the tick has been processed, or when an error occurred.
  */
 GameManager.prototype.tick = function(scheduleTime, callback) {

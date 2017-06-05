@@ -878,7 +878,7 @@ Factory.prototype.setInPingMemory = function(liveUser, isPinged, sendLocationUpd
 
     // Update the location data for the live user
     if(sendLocationUpdate === undefined || sendLocationUpdate)
-        Core.gameManager.broadcastLocationData(liveUser.getGame(), liveUser, undefined, function(err) {
+        Core.gameManager.broadcastLocationData(isPinged ? config.game.locationUpdateInterval : null, liveUser.getGame(), liveUser, undefined, function(err) {
             // Show errors
             if(err !== null) {
                 console.error('Failed to broadcast location data to user.');
@@ -2457,7 +2457,7 @@ Factory.prototype.attack = function(user, callback) {
                         });
 
                         // Broadcast location data
-                        Core.gameManager.broadcastLocationData(self.getGame(), undefined, undefined, function(err) {
+                        Core.gameManager.broadcastLocationData(null, self.getGame(), undefined, undefined, function(err) {
                             // Handle errors
                             if(err !== null) {
                                 console.error('Failed to broadcast updated location data to users, ignoring');

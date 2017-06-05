@@ -536,7 +536,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
 
             // Update the user's location data
             latch.add();
-            Core.gameManager.broadcastLocationData(self.getGame(), self, socket, function(err) {
+            Core.gameManager.broadcastLocationData(null, self.getGame(), self, socket, function(err) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)

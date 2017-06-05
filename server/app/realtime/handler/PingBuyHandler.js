@@ -459,7 +459,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         }
 
                                         // Send updated location data to the user
-                                        Core.gameManager.broadcastLocationData(liveUser.getGame().getGameModel(), liveUser.getUserModel(), undefined, function(err) {
+                                        Core.gameManager.broadcastLocationData(null, liveUser.getGame().getGameModel(), liveUser.getUserModel(), undefined, function(err) {
                                             // Show errors
                                             if(err !== null) {
                                                 console.error('Failed to broadcast location data to user.');
