@@ -68,8 +68,7 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
     id = this._parseId(id);
 
     // Update the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
+    this._increaseQueryCount();
 
     // Return the instance if it's known
     if(this.has(id))
@@ -97,8 +96,7 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
  */
 ModelInstanceManager.prototype.get = function(id) {
     // Update the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
+    this._increaseQueryCount();
 
     // Get the value
     return this._instances.get(this._parseId(id));
@@ -112,8 +110,7 @@ ModelInstanceManager.prototype.get = function(id) {
  */
 ModelInstanceManager.prototype.has = function(id) {
     // Update the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
+    this._increaseQueryCount();
 
     // Get the result
     return this._instances.has(this._parseId(id));
@@ -142,6 +139,10 @@ ModelInstanceManager.prototype._parseId = function(id) {
  * @return {Number} Number of instances.
  */
 ModelInstanceManager.prototype.count = function() {
+    // Update the query count
+    this._increaseQueryCount();
+
+    // Return the count
     return this._instances.size;
 };
 
@@ -152,8 +153,7 @@ ModelInstanceManager.prototype.count = function() {
  */
 ModelInstanceManager.prototype.clear = function(clearModelCache) {
     // Update the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
+    this._increaseQueryCount();
 
     // Clear the model cache
     if(clearModelCache || clearModelCache === undefined)
@@ -167,7 +167,21 @@ ModelInstanceManager.prototype.clear = function(clearModelCache) {
  * Clear the cache for the managed model instances.
  */
 ModelInstanceManager.prototype.clearModelCache = function() {
+    // Update the query count
+    this._increaseQueryCount();
+
+    // Clear
     this._instances.forEach((instance) => instance._baseModel.cacheFlush());
+};
+
+/**
+ * Increase the query count by one.
+ *
+ * @private
+ */
+ModelInstanceManager.prototype._increaseQueryCount = function() {
+    this._queryCount++;
+    Core.status.internalCache.queryCount++;
 };
 
 // Export the class

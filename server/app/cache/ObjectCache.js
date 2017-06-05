@@ -51,8 +51,7 @@ var ObjectCache = function() {
  */
 ObjectCache.prototype.hasCache = function(field) {
     // Increase the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
+    this._increaseQueryCount();
 
     // Return true if the field is cached
     return this._cache.has(field);
@@ -66,9 +65,8 @@ ObjectCache.prototype.hasCache = function(field) {
  */
 ObjectCache.prototype.getCache = function(field) {
     // Increase the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
-    
+    this._increaseQueryCount();
+
     // Get the cached value
     return this._cache.get(field);
 };
@@ -79,6 +77,10 @@ ObjectCache.prototype.getCache = function(field) {
  * @returns {Number} Total number of cached fields.
  */
 ObjectCache.prototype.getCacheCount = function() {
+    // Increase the query count
+    this._increaseQueryCount();
+
+    // Return the size
     return this._cache.size;
 };
 
@@ -90,9 +92,8 @@ ObjectCache.prototype.getCacheCount = function() {
  */
 ObjectCache.prototype.setCache = function(field, value) {
     // Increase the query count
-    this._queryCount++;
-    Core.status.internalCache.queryCount++;
-    
+    this._increaseQueryCount();
+
     // Set the cache value
     this._cache.set(field, value);
 };
@@ -121,6 +122,9 @@ ObjectCache.prototype.setCacheMultiple = function(values) {
  * @param {Array|string} [fields] Array of fields or a specific field as a string to flush.
  */
 ObjectCache.prototype.flushCache = function(fields) {
+    // Increase the query count
+    this._increaseQueryCount();
+
     // Flush all if no field is given
     if(fields === undefined) {
         this._cache = new Map();
@@ -134,6 +138,16 @@ ObjectCache.prototype.flushCache = function(fields) {
     // Loop through the list of fields, and delete them one by one
     for(var i = 0, fieldCount = fields.length; i < fieldCount; i++)
         this._cache.delete(fields[i]);
+};
+
+/**
+ * Increase the query count by one.
+ *
+ * @private
+ */
+ObjectCache.prototype._increaseQueryCount = function() {
+    this._queryCount++;
+    Core.status.internalCache.queryCount++;
 };
 
 // Export the user class
