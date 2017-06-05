@@ -1400,7 +1400,7 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
                 setTimeout(doTick, parseInt(delay));
 
             // Increase the delay
-            if(scheduleTime !== 0)
+            if(config.game.spreadTicks && scheduleTime !== 0)
                 delay += scheduleTime / tickCount;
         });
     });
