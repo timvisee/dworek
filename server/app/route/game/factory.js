@@ -106,8 +106,14 @@ module.exports = {
 
                 // Make sure the factory is valid
                 if(!valid) {
-                    if(!calledBack)
-                        next(new Error('Invalid factory ID'));
+                    if(!calledBack) {
+                        // Create an error instance, and configure it
+                        var err = new Error('This factory does not exist.');
+                        err.status = 404;
+
+                        // Call back the error
+                        next(err);
+                    }
                     calledBack = true;
                     return;
                 }

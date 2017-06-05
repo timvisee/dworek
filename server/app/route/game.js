@@ -58,7 +58,12 @@ router.get('/:game', function(req, res, next) {
 
     // Call back if the game is invalid
     if(game === undefined) {
-        next(new Error('Invalid game.'));
+        // Create an error instance, and configure it
+        var err = new Error('This game does not exist.');
+        err.status = 404;
+
+        // Call back the error
+        next(err);
         return;
     }
 
