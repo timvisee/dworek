@@ -475,13 +475,6 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
             var liveGame = entry.liveGame;
             var liveUser = entry.liveUser;
 
-            // TODO: Remove this debug message after testing
-            // Show a debug message
-            if(liveUser !== null || liveUser !== undefined)
-                console.log('Executing broadcast for user: ' + liveUser.getIdHex());
-            else
-                console.log('Executing broadcast for user: ?');
-
             // Get the user model
             const userModel = liveUser.getUserModel();
 

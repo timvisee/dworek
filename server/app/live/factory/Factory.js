@@ -1360,9 +1360,6 @@ Factory.prototype.isUserInRange = function(liveUser, callback) {
  * @param {Factory~tickCallback} callback Called on success or when an error occurred.
  */
 Factory.prototype.tick = function(callback) {
-    // TODO: Remove this debug message after testing
-    console.log('Processing factory tick... (' + this._id.toString() + ')');
-
     // Create a callback latch
     var latch = new CallbackLatch();
 
