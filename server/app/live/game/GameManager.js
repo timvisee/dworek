@@ -1398,6 +1398,10 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
                 doTick();
             else
                 setTimeout(doTick, parseInt(delay));
+
+            // Increase the delay
+            if(scheduleTime !== 0)
+                delay += scheduleTime / tickCount;
         });
     });
 
