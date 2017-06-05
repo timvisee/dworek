@@ -23,6 +23,8 @@
 var _ = require('lodash');
 var ObjectId = require('mongodb').ObjectId;
 
+var Core = require('../../Core');
+
 /**
  * ModelInstanceManager class.
  *
@@ -67,6 +69,7 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
 
     // Update the query count
     this._queryCount++;
+    Core.status.internalCache.queryCount++;
 
     // Return the instance if it's known
     if(this.has(id))
@@ -95,6 +98,7 @@ ModelInstanceManager.prototype.create = function(id, localCache) {
 ModelInstanceManager.prototype.get = function(id) {
     // Update the query count
     this._queryCount++;
+    Core.status.internalCache.queryCount++;
 
     // Get the value
     return this._instances.get(this._parseId(id));
@@ -109,6 +113,7 @@ ModelInstanceManager.prototype.get = function(id) {
 ModelInstanceManager.prototype.has = function(id) {
     // Update the query count
     this._queryCount++;
+    Core.status.internalCache.queryCount++;
 
     // Get the result
     return this._instances.has(this._parseId(id));
@@ -148,6 +153,7 @@ ModelInstanceManager.prototype.count = function() {
 ModelInstanceManager.prototype.clear = function(clearModelCache) {
     // Update the query count
     this._queryCount++;
+    Core.status.internalCache.queryCount++;
 
     // Clear the model cache
     if(clearModelCache || clearModelCache === undefined)
