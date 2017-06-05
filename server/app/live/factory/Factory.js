@@ -235,7 +235,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
     var latch = new CallbackLatch();
 
     // Parse the sockets
-    if(sockets == undefined)
+    if(sockets === undefined)
         sockets = [];
     else if(!_.isArray(sockets))
         sockets = [sockets];
@@ -448,9 +448,9 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                         latch.resolve();
                     });
 
-                    // Get the game user
+                    // Get the team
                     latch.add();
-                    Core.model.gameUserModelManager.getGameUser(game, creator, function(err, gameUser) {
+                    factoryModel.getTeam(function(err, factoryTeam) {
                         // Call back errors
                         if(err !== null) {
                             if(!calledBack)
@@ -459,8 +459,8 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                             return;
                         }
 
-                        // Get the team
-                        factoryModel.getTeam(function(err, factoryTeam) {
+                        // Get the team name
+                        factoryTeam.getName(function(err, teamName) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)
@@ -469,22 +469,11 @@ Factory.prototype.sendData = function(user, sockets, callback) {
                                 return;
                             }
 
-                            // Get the team name
-                            factoryTeam.getName(function(err, teamName) {
-                                // Call back errors
-                                if(err !== null) {
-                                    if(!calledBack)
-                                        callback(err);
-                                    calledBack = true;
-                                    return;
-                                }
+                            // Set the team name
+                            factoryData.teamName = teamName;
 
-                                // Set the team name
-                                factoryData.teamName = teamName;
-
-                                // Resolve the latch
-                                latch.resolve();
-                            });
+                            // Resolve the latch
+                            latch.resolve();
                         });
                     });
 
@@ -727,7 +716,7 @@ Factory.prototype.updateVisibilityState = function(liveUser, callback) {
     const self = this;
 
     // Call back if the user is null
-    if(liveUser == null) {
+    if(liveUser === null) {
         callback(null);
         return;
     }
@@ -798,7 +787,7 @@ Factory.prototype.setInVisibilityMemory = function(liveUser, visible) {
     const lastState = this.isInVisibilityMemory(liveUser);
 
     // Return false if the state didn't change
-    if(lastState == visible)
+    if(lastState === visible)
         return false;
 
     // Update the visibility array
@@ -832,7 +821,7 @@ Factory.prototype.setInRangeMemory = function(liveUser, inRange) {
     const lastState = this.isInRangeMemory(liveUser);
 
     // Return false if the state didn't change
-    if(lastState == inRange)
+    if(lastState === inRange)
         return false;
 
     // Update the range array
@@ -867,7 +856,7 @@ Factory.prototype.setInPingMemory = function(liveUser, isPinged, sendLocationUpd
     const lastState = this.isInPingMemory(liveUser);
 
     // Return false if the state didn't change
-    if(lastState == isPinged)
+    if(lastState === isPinged)
         return false;
 
     // Update the ping array
@@ -900,7 +889,7 @@ Factory.prototype.setInPingMemory = function(liveUser, isPinged, sendLocationUpd
  */
 Factory.prototype.pingFor = function (liveUser, pingDuration, sendLocationUpdate, callback) {
     // Make sure the user is valid, and that the ping duration is a positive number
-    if(liveUser == null && pingDuration <= 0) {
+    if(liveUser === null && pingDuration <= 0) {
         if(_.isFunction(callback))
             callback(new Error('Invalid live user instance or invalid ping duration.'));
         return;
@@ -1258,7 +1247,7 @@ Factory.prototype.canModify = function(user, callback) {
     // Continue when we're done fetching both teams
     latch.then(function() {
         // Call back if any of the teams is null
-        if(factoryTeam == null || userTeam == null) {
+        if(factoryTeam === null || userTeam === null) {
             callback(null, false);
             return;
         }
@@ -1299,7 +1288,7 @@ Factory.prototype.canModify = function(user, callback) {
  */
 Factory.prototype.isUserInRange = function(liveUser, callback) {
     // Make sure a proper live user is given, and that he has a recent location
-    if(liveUser == null || !liveUser.hasRecentLocation()) {
+    if(liveUser === null || !liveUser.hasRecentLocation()) {
         callback(null, false);
         return;
     }
@@ -1461,6 +1450,14 @@ Factory.prototype.tick = function(callback) {
         // Update the in and out values
         latch.add();
         self.getFactoryModel().setIn(valueIn - productionIn, function(err) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
             // Make sure we've enough in
             if(valueIn < productionIn) {
                 callback(null);
@@ -1473,6 +1470,14 @@ Factory.prototype.tick = function(callback) {
 
         latch.add();
         self.getFactoryModel().setOut(valueOut + productionOut, function(err) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
             // Make sure we've enough in
             if(valueIn < productionIn) {
                 callback(null);
@@ -1585,14 +1590,14 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
     };
 
     // Make sure a valid user is given
-    if(liveUser == null) {
+    if(liveUser === null) {
         callback(null, resultObject);
         return;
     }
 
     // Get the factory model and make sure it's valid
     const factoryModel = this.getFactoryModel();
-    if(factoryModel == null) {
+    if(factoryModel === null) {
         callback(null, resultObject);
         return;
     }
@@ -1648,7 +1653,7 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
         }
 
         // Resolve the latch if the game user is null
-        if(gameUser == null) {
+        if(gameUser === null) {
             latch.resolve();
             allyLatch.resolve();
             return;
@@ -1718,7 +1723,7 @@ Factory.prototype.getVisibilityState = function(liveUser, callback) {
                 }
 
                 // Set the ally and visibility status if the teams equal and aren't null
-                if(factoryTeam != null && userTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
+            if(factoryTeam !== null && userTeam !== null && factoryTeam.getId().equals(userTeam.getId())) {
                     resultObject.ally = true;
                     resultObject.visible = true;
                 }
@@ -1884,7 +1889,7 @@ Factory.prototype.getConquer = function(callback) {
             // Process the user's team and strength when fetched
             userLatch.then(function() {
                 // Process the strength if valid
-                if(userStrength != null) {
+                if(userStrength !== null) {
                     // Add or subtract the user strength from the conquer value, depending if the user is an ally or not
                     conquerValue += ally ? -userStrength : userStrength;
 
@@ -1925,7 +1930,7 @@ Factory.prototype.getConquer = function(callback) {
  */
 Factory.prototype.isTeam = function(otherTeam, callback) {
     // Call back if the other team is null
-    if(otherTeam == null) {
+    if(otherTeam === null) {
         callback(null, false);
         return;
     }
@@ -1939,7 +1944,7 @@ Factory.prototype.isTeam = function(otherTeam, callback) {
         }
 
         // Call back false if the team is unknown
-        if(team == null) {
+        if(team === null) {
             callback(null, false);
             return;
         }
@@ -2007,7 +2012,7 @@ Factory.prototype.attack = function(user, callback) {
         }
 
         // Make sure the user's team isn't null
-        if(result == null) {
+        if(result === null) {
             if(!calledBack)
                 callback(new Error('User doesn\'t have team'));
             calledBack = true;
@@ -2050,7 +2055,7 @@ Factory.prototype.attack = function(user, callback) {
         latch.identity();
         
         // Make sure the user's team is different than the factories team
-        if(factoryTeam != null && factoryTeam.getId().equals(userTeam.getId())) {
+        if(factoryTeam !== null && factoryTeam.getId().equals(userTeam.getId())) {
             if(!calledBack)
                 callback(new Error('User can\'t take over ally factory'));
             calledBack = true;
@@ -2151,7 +2156,7 @@ Factory.prototype.attack = function(user, callback) {
                                 }
 
                                 // Make sure the user's team is known
-                                if(otherTeam == null)
+                                if(otherTeam === null)
                                     return;
 
                                 // Check whether this is the user itself
@@ -2416,7 +2421,7 @@ Factory.prototype.attack = function(user, callback) {
                                     }
 
                                     // Make sure the user's team is known
-                                    if(otherTeam == null)
+                                    if(otherTeam === null)
                                         return;
 
                                     // Check whether this is the user itself
