@@ -6387,7 +6387,7 @@ $(document).bind('pageshow', function() {
             },
             tooltip: {
                 formatter: buildChartTooltipFormatter(function(val) {
-                    return formatBigNumber(val) + ' queries';
+                    return val + ' queries';
                 })
             },
             series: [{
@@ -6405,7 +6405,7 @@ $(document).bind('pageshow', function() {
             },
             tooltip: {
                 formatter: buildChartTooltipFormatter(function(val) {
-                    return formatBigNumber(val) + ' fields';
+                    return val + ' fields';
                 })
             },
             series: [{
@@ -6449,7 +6449,7 @@ $(document).bind('pageshow', function() {
             },
             tooltip: {
                 formatter: buildChartTooltipFormatter(function(val) {
-                    return formatBigNumber(val) + ' queries';
+                    return val + ' queries';
                 })
             },
             series: [{
@@ -6466,7 +6466,7 @@ $(document).bind('pageshow', function() {
                 allowDecimals: false,
             },
             tooltip: {
-                formatter: buildChartTooltipFormatter(formatBigNumber)
+                formatter: buildChartTooltipFormatter()
             },
             series: [{
                 name: 'Cached objects'
