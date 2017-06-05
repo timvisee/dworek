@@ -377,12 +377,12 @@ config.game.locationDecayTime = 30 * 1000;
 config.game.locationUpdateInterval = 5 * 1000;
 
 /**
- * Define whether to spread the ticks that have to be invoked automatically over
- * the available time frame, instead of invoking all actions at once.
+ * Define whether to spread all tasks that have to be invoked automatically over
+ * their available time frame, instead of invoking them all at once.
  *
  * This will schedule factory tick processing, location updates and more.
  *
- * True to schedule and spread, false to execute all at once.
+ * True to schedule and spread, false to invoke all at once.
  *
  * @type {boolean}
  */
