@@ -6047,9 +6047,9 @@ $(document).bind('pageshow', function() {
  * @returns {string} Formatted number.
  */
 function formatBigNumber(num) {
-    // Return zero if undefined
+    // Return zero for undefined/null values
     if(num === undefined || num === null)
-        return 0;
+        return '0';
 
     // Split the number by a dot (for decimal numbers)
     const parts = num.toString().split(".");
@@ -6377,7 +6377,6 @@ $(document).bind('pageshow', function() {
         // Create the Redis command count chart
         createStatusChart('status-chart-redis-commandCount', 'redis.commandCount', {
             yAxis: {
-                type: 'logarithmic',
                 title: {
                     text: 'Processed queries'
                 },
@@ -6440,7 +6439,6 @@ $(document).bind('pageshow', function() {
         // Create the internal cache query count chart
         createStatusChart('status-chart-cache-queryCount', 'cache.queryCount', {
             yAxis: {
-                type: 'logarithmic',
                 title: {
                     text: 'Processed queries'
                 },
