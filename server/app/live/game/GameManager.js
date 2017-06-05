@@ -1376,10 +1376,6 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
             // Add a latch for this factory
             latch.add();
 
-            // Increase the delay
-            if(scheduleTime !== 0)
-                delay += scheduleTime / tickCount;
-
             // Define a function to invoke the tick
             var doTick = function() {
                 liveFactory.tick(function(err) {
@@ -1402,10 +1398,6 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
                 doTick();
             else
                 setTimeout(doTick, parseInt(delay));
-            
-            // TODO: Remove this message after debugging
-            // Show a debug message
-            console.log('Scheduled tick with a delay of: ' + delay);
         });
     });
 
