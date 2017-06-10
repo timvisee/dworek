@@ -56,7 +56,7 @@ Formatter.formatBigNumber = function(num) {
  */
 Formatter.formatMoney = function(amount, prefixSign) {
     // Set the parameter defaults
-    if(prefixSign == undefined)
+    if(prefixSign === undefined)
         prefixSign = true;
 
     // Format the amount of money
@@ -117,7 +117,7 @@ Formatter.formatNano = function(nano, decimals) {
     const SIZE_NOTATIONS = ['ns', 'μs', 'ms', 's'];
 
     // Handle zero cases
-    if(nano == 0)
+    if(nano === 0)
         return '<1 ns';
 
     // Determine the number of decimal places to show
@@ -128,7 +128,7 @@ Formatter.formatNano = function(nano, decimals) {
 
     // Create and return the readable string
     var value = parseFloat((nano / Math.pow(BASE, factor)).toFixed(decimalPlaces));
-    if(decimalPlaces == 0)
+    if(decimalPlaces === 0)
         value = Math.round(value);
 
     // Make the value readable and return it

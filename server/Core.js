@@ -120,7 +120,7 @@ Core.realTime = null;
 Core.eventLoopMonitor = null;
 
 /**
- * Global applicati status.
+ * Global application status.
  */
 Core.status = {
     internalCache: {
