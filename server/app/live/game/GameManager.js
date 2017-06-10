@@ -258,7 +258,7 @@ GameManager.prototype.load = function(callback) {
 };
 
 /**
- * @callback GameController~loadCallback
+ * @callback GameManager~loadCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  */
 
