@@ -122,7 +122,7 @@ Router.prototype.init = function(callback) {
             'We can\'t load your page because some error occurred on our end.\n\n' +
             'The web administrators are freaking out right now, running around, bashing buttons, rebooting systems...\n\n' +
             'A team of wizards and magicians has been dispatched to deal with this situation.',
-            showStacktrace: dev,
+            showStacktrace: dev && err.status !== 404,
             statusCode: err.status,
             stacktrace: !dev ? {} : {
                 message: err.message,
