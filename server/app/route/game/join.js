@@ -104,7 +104,7 @@ module.exports = {
             // Create a flag that defines whether the user has a nickname
             var hasNickname = false;
 
-            // Determine whether the user has a nickname
+            // Make the request to join the game
             latch.add();
             GameUserDatabase.addGameUserRequest(game, user, function(err) {
                 // Call back errors
