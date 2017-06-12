@@ -791,6 +791,12 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
         pings: []
     };
 
+    // Convert the sockets to an array
+    if(sockets === undefined)
+        sockets = [];
+    else if(!_.isArray(sockets))
+        sockets = [sockets];
+
     // Store this instance
     const self = this;
 
@@ -1305,12 +1311,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             sendGameData();
         });
     });
-
-    // Convert the sockets to an array
-    if(sockets === undefined)
-        sockets = [];
-    else if(!_.isArray(sockets))
-        sockets = [sockets];
 };
 
 /**

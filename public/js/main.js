@@ -3216,7 +3216,7 @@ function processLocationError(error, showErrorDialog) {
         // Define the message to show to the user
         var dialogMessage = 'We were unable to determine your location.<br><br>' +
             'Please make sure the location functionality and GPS is enabled on your device.<br><br>' +
-            'It might take a while for your device to determine your location.' +
+            'It might take a while for your device to determine your location. ' +
             'Please keep testing your GPS until your location is found.';
 
 
