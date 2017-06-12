@@ -126,6 +126,12 @@ config.redis.url = 'redis://' + config.redis.host + ':' + config.redis.port + '/
  */
 config.redis.cacheExpire = 60 * 5;
 
+/**
+ * Define whether to flush everything when the connection to Redis becomes ready.
+ * @type {boolean}
+ */
+config.redis.flushWhenReady = true;
+
 
 /******************************************************************************
  * Cache configuration.                                                       *

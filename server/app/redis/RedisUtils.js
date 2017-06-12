@@ -93,14 +93,42 @@ RedisUtils.connect = function(callback) {
         // Show a message
         console.log('Redis is ready!');
 
-        // Set the ready flag
-        ready = true;
+        // Create a callback latch
+        var latch = new CallbackLatch();
 
-        // Call the callback
-        if(callback != undefined)
-            if(!calledBack)
-                callback(err, redisClient);
-        calledBack = true;
+        // Flush everything when ready
+        if(config.redis.flushWhenReady) {
+            // Add a latch and show the message
+            latch.add();
+            console.log('Flushing Redis because it became ready...');
+
+            // Flush everything
+            redisClient.flushall(function(redisErr) {
+                // Catch errors
+                if(redisErr !== null && redisErr !== undefined) {
+                    // Show a message
+                    console.log('An error occurred when flushing Redis, ignoring...');
+
+                    // Set the error
+                    err = redisErr;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        }
+
+        // Continue when the latch is done
+        latch.then(function() {
+            // Set the ready flag
+            ready = true;
+
+            // Call the callback
+            if(callback !== undefined)
+                if(!calledBack)
+                    callback(err, redisClient);
+            calledBack = true;
+        });
     });
 
     // Handle reconnecting
