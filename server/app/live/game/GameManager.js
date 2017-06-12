@@ -499,6 +499,7 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
 
                 // Update the show flags
                 showTeamPlayers = userState.player;
+                // TODO: Always show all players for spectators?
                 showAllPlayers = userState.spectator || (!userState.player && userState.special);
 
                 // Resolve the latch
