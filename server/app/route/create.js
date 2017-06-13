@@ -41,12 +41,27 @@ router.get('/', function(req, res, next) {
     // Get the game and user
     const user = req.session.user;
 
-    // Show the game creation page
-    LayoutRenderer.render(req, res, next, 'gamecreate', 'Create game', {
-        page: {
-            leftButton: 'back'
-        },
-        created: false
+    // The user must be an administrator
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            next(err);
+            return;
+        }
+
+        // Make sure the user is an administrator
+        if(!isAdmin) {
+            LayoutRenderer.render(req, res, next, 'nopermission', 'Oeps!');
+            return;
+        }
+
+        // Show the game creation page
+        LayoutRenderer.render(req, res, next, 'gamecreate', 'Create game', {
+            page: {
+                leftButton: 'back'
+            },
+            created: false
+        });
     });
 });
 
@@ -62,44 +77,59 @@ router.post('/', function(req, res, next) {
     // Get the game and user
     const user = req.session.user;
 
-    // Validate game name
-    if(!Validator.isValidGameName(gameName)) {
-        // Show a warning if the user hadn't filled in their game name
-        if(gameName.length === 0) {
-            // Show an error page
-            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
-                message: 'The game name is missing.\n\n' +
-                'Please go back and fill in a game name.'
-            });
-            return;
-        }
-
-        // Show an error page
-        LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
-            message: 'The game name you\'ve entered doesn\'t seem to be valid.\n\n' +
-            'Please go back and enter the preferred game name'
-        });
-        return;
-    }
-
-    // Create a session for the user
-    GameDatabase.addGame(user, gameName, function(err, gameModel) {
+    // The user must be an administrator
+    user.isAdmin(function(err, isAdmin) {
         // Call back errors
-        if(err !== null) {
+        if (err !== null) {
             next(err);
             return;
         }
 
-        // Show the game creation page
-        LayoutRenderer.render(req, res, next, 'gamecreate', 'Game created', {
-            page: {
-                leftButton: 'back'
-            },
-            created: true,
-            game: {
-                id: gameModel.getIdHex(),
-                name: gameName
+        // Make sure the user is an administrator
+        if(!isAdmin) {
+            LayoutRenderer.render(req, res, next, 'nopermission', 'Oeps!');
+            return;
+        }
+
+        // Validate game name
+        if (!Validator.isValidGameName(gameName)) {
+            // Show a warning if the user hadn't filled in their game name
+            if (gameName.length === 0) {
+                // Show an error page
+                LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
+                    message: 'The game name is missing.\n\n' +
+                    'Please go back and fill in a game name.'
+                });
+                return;
             }
+
+            // Show an error page
+            LayoutRenderer.render(req, res, next, 'error', 'Whoops!', {
+                message: 'The game name you\'ve entered doesn\'t seem to be valid.\n\n' +
+                'Please go back and enter the preferred game name'
+            });
+            return;
+        }
+
+        // Create a session for the user
+        GameDatabase.addGame(user, gameName, function (err, gameModel) {
+            // Call back errors
+            if (err !== null) {
+                next(err);
+                return;
+            }
+
+            // Show the game creation page
+            LayoutRenderer.render(req, res, next, 'gamecreate', 'Game created', {
+                page: {
+                    leftButton: 'back'
+                },
+                created: true,
+                game: {
+                    id: gameModel.getIdHex(),
+                    name: gameName
+                }
+            });
         });
     });
 });
