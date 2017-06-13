@@ -3535,6 +3535,8 @@ function initMap(element) {
     if(element === undefined || element === null)
         element = getActivePage();
 
+    // TODO: Only initialize/update if the map tab is s hown (if the page has tabs)
+
     // Get the map container
     var mapContainer = element.find('#map-container');
 
