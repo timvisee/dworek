@@ -57,6 +57,7 @@ router.get('/', function(req, res, next) {
 
     // Create a callback latch
     var latch = new CallbackLatch();
+    var calledBack = false;
 
     // Create an object with layout options
     var options = {
@@ -72,9 +73,11 @@ router.get('/', function(req, res, next) {
     latch.add(2);
     getGameList(0, 3, function(err, games) {
         // Call back errors
-        if(err !== null)
-            next(err);
-        else
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+        } else
             options.games.games.open = games;
 
         // Resolve the latch
@@ -82,9 +85,11 @@ router.get('/', function(req, res, next) {
     });
     getGameList(1, 3, function(err, games) {
         // Call back errors
-        if(err !== null)
-            next(err);
-        else
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+        } else
             options.games.games.active = games;
 
         // Resolve the latch
@@ -137,8 +142,6 @@ function getGameList(stage, limit, callback) {
 
     // Create a callback latch to determine whether to start rendering the layout
     var latch = new CallbackLatch();
-
-    // Define whether we called back
     var calledBack = false;
 
     // Get the list of active games
