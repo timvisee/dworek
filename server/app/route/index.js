@@ -69,8 +69,7 @@ router.get('/', function(req, res, next) {
     };
 
     // Count the games
-    latch.add();
-    latch.add();
+    latch.add(2);
     getGameList(0, 3, function(err, games) {
         // Call back errors
         if(err !== null)
