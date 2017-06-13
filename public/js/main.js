@@ -3536,7 +3536,7 @@ function initMap(element) {
         element = getActivePage();
 
     // Get the map container
-    var mapContainer = data.to.find('#map-container');
+    var mapContainer = element.find('#map-container');
 
     // Check whether there's a map container on the new page
     if(mapContainer.length > 0) {
