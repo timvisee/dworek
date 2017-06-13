@@ -581,10 +581,10 @@ GameUserModelManager.prototype.getUserGameState = function(game, user, callback)
             var dataSplitted = result.split(';');
 
             // Create a UserGameState object
-            userGameState.player = dataSplitted[0] == '1';
-            userGameState.special = dataSplitted[1] == '1';
-            userGameState.spectator = dataSplitted[2] == '1';
-            userGameState.requested = dataSplitted[3] == '1';
+            userGameState.player = dataSplitted[0] === '1';
+            userGameState.special = dataSplitted[1] === '1';
+            userGameState.spectator = dataSplitted[2] === '1';
+            userGameState.requested = dataSplitted[3] === '1';
 
             // Call back with the result
             callback(null, userGameState);

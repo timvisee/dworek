@@ -102,7 +102,7 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null || result === 0) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -170,17 +170,17 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
     var queryObject = {};
 
     // Add the game and user to the query object if specified
-    if(game != null)
+    if(game !== null)
         queryObject.game_id = game.getId();
-    if(user != null)
+    if(user !== null)
         queryObject.user_id = user.getId();
 
     // Create a callback latch
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key
-    var redisCacheKey = REDIS_KEY_ROOT + ':' +(game != null ? game.getIdHex() : '0' ) +
-        ':' +(user != null ? user.getIdHex() : '0' ) + ':getFactories';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + (game !== null ? game.getIdHex() : '0' ) +
+        ':' + (user !== null ? user.getIdHex() : '0' ) + ':getFactories';
 
     // Store this instance
     const self = this;
@@ -203,7 +203,7 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null || result === 0) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -217,6 +217,11 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
 
             // Loop over the factory IDs and create factory models
             rawFactoryIds.forEach(function(factoryId) {
+                // Skip if the ID is nothing
+                if(factoryId.trim().length === 0)
+                    return;
+
+                // Add the factory
                 factories.push(self._instanceManager.create(factoryId));
             });
 

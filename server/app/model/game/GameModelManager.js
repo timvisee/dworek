@@ -282,6 +282,10 @@ GameModelManager.prototype.getGamesWithStage = function(stage, options, callback
 
             // Loop through the game ID's to construct game instances
             gameData.forEach(function(data) {
+                // Skip if the data is nothing
+                if(data.trim().length === 0)
+                    return;
+
                 // Split the data parts
                 var dataParts = data.split(',');
 

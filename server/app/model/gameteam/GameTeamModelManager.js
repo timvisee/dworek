@@ -249,7 +249,14 @@ GameTeamModelManager.prototype.getGameTeams = function(game, callback) {
             var teams = [];
 
             // Loop through the team IDs
-            teamIds.forEach((teamId) => teams.push(self._instanceManager.create(teamId)));
+            teamIds.forEach(function(teamId) {
+                // Skip if the ID is nothing
+                if(teamId.trim().length === 0)
+                    return;
+
+                // Add the team
+                teams.push(self._instanceManager.create(teamId))
+            });
 
             // Call back the list of teams
             //noinspection JSCheckFunctionSignatures
@@ -367,7 +374,7 @@ GameTeamModelManager.prototype.getGameTeamCount = function(game, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null || result === 0) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
