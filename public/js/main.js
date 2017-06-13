@@ -3521,8 +3521,20 @@ $(document).bind('pageshow', function() {
         focusEverything();
 });
 
-// Update the active game and status labels when a new page is being shown
-$(document).bind("tab-switch", function(event, data) {
+/**
+ * Initialize the map container if available.
+ *
+ * This will properly re-initialize the map element if the map has decayed.
+ *
+ * @param {element|undefined} [element] The element to look inside of to find
+ *                                      the map. If none is given, the page
+ *                                      that is currently active is used.
+ */
+function initMap(element) {
+    // Use the page that is currently active when no element is given
+    if(element === undefined || element === null)
+        element = getActivePage();
+
     // Get the map container
     var mapContainer = data.to.find('#map-container');
 
@@ -3666,17 +3678,7 @@ $(document).bind("tab-switch", function(event, data) {
         // Invalidate the map size, because the container size might be changed
         map.invalidateSize();
     }
-});
-
-// Invalidate the map size each second
-setTimeout(function() {
-    updateMapSize(true, false);
-}, 1000);
-
-// Update the map size when the window is resized
-$(window).resize(function() {
-    updateMapSize(true, true);
-});
+}
 
 /**
  * Update the map size.
@@ -3697,6 +3699,26 @@ function updateMapSize(invalidateSize, updateDiv) {
     if(invalidateSize)
         map.invalidateSize(true);
 }
+
+// Initialize/update the map when a page is shown
+$(document).bind('pageshow', function(event) {
+    initMap();
+});
+
+// Initialize/update the map when a tab is shown
+$(document).bind('tab-switch', function(event, data) {
+    initMap(data.to);
+});
+
+// Invalidate the map size each second
+setTimeout(function() {
+    updateMapSize(true, false);
+}, 1000);
+
+// Update the map size when the window is resized
+$(window).resize(function() {
+    updateMapSize(true, true);
+});
 
 /**
  * Refresh the location data for the map.
