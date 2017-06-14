@@ -448,8 +448,6 @@ GameModel.prototype.getTeamCount = function(callback) {
 GameModel.prototype.hasManagePermission = function(user, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
-
-    // Keep track whether we called back or not
     var calledBack = false;
 
     // Check whether the user is administrator
@@ -465,8 +463,9 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
 
         // Call back true if the user is administrator
         if(isAdmin) {
+            if(!calledBack)
+                callback(null, true);
             calledBack = true;
-            callback(null, true);
             return;
         }
 
@@ -486,15 +485,16 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
         }
 
         // Make sure a valid user was fetched, resolve the latch if not
-        if(host == undefined) {
+        if(host === undefined) {
             latch.resolve();
             return;
         }
 
         // Call back true if the user is host of the game
         if(host.getId().equals(user.getId())) {
+            if(!calledBack)
+                callback(null, true);
             calledBack = true;
-            callback(null, true);
             return;
         }
 
@@ -503,7 +503,11 @@ GameModel.prototype.hasManagePermission = function(user, callback) {
     });
 
     // Call back false if we reach the callback latch
-    latch.then(() => callback(null, false));
+    latch.then(function() {
+        if(!calledBack)
+            callback(null, false);
+        calledBack = true;
+    });
 };
 
 /**
