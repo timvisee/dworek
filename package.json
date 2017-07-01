@@ -27,7 +27,7 @@
     "mongodb": "2.2.28",
     "morgan": "1.8.2",
     "pug": "2.0.0-beta11",
-    "raven": "2.0.2",
+    "raven": "2.1.0",
     "redis": "2.7.1",
     "serve-favicon": "2.4.3",
     "socket.io": "1.7.4",
