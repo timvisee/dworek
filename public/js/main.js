@@ -3348,14 +3348,43 @@ function setGpsState(state) {
     return true;
 }
 
+/**
+ * Map instance.
+ */
 var map = null;
+
+/**
+ * Current player marker instance.
 var playerMarker = null;
+
+/**
+ * Other players' instances.
+ */
 var playersMarkers = [];
+
+/**
+ * Visible factory markers.
+ */
 var factoryMarkers = [];
 
+/**
+ * Button to toggle to follow the current player.
+ */
 var mapFollowPlayerButton = null;
+
+/**
+ * Button to toggle to follow everything.
+ */
 var mapFollowEverythingButton = null;
+
+/**
+ * True to follow the player, when it moves.
+ */
 var followPlayer = false;
+
+/**
+ * True to follow everything when any markers move.
+ */
 var followEverything = false;
 
 /**
