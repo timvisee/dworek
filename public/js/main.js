@@ -99,7 +99,8 @@ const NameConfig = {
         name: 'Dworek'
     },
     currency: {
-        name: 'dollars',
+        name: 'dollar',
+        names: 'dollars',
         sign: '$'
     },
     factory: {
@@ -107,13 +108,16 @@ const NameConfig = {
         names: 'labs'
     },
     shop: {
-        name: 'dealer'
+        name: 'dealer',
+        names: 'dealers'
     },
     in: {
-        name: 'ingredients'
+        name: 'ingredient',
+        names: 'ingredients'
     },
     out: {
-        name: 'drugs'
+        name: 'drug'
+        names: 'drugs'
     }
 };
 
@@ -3985,7 +3989,7 @@ function updatePlayerMarkers(users) {
                 '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
                 '    </tr>' +
                 '    <tr>' +
-                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.name) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
+                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(NameConfig.shop.names) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
                 '    </tr>';
 
             // Add a range part if the user is a shop
@@ -4008,7 +4012,7 @@ function updatePlayerMarkers(users) {
             if(user.shop.isShop && user.shop.inRange) {
                 // Buy button
                 actions.push({
-                    text: 'Buy ' + NameConfig.in.name,
+                    text: 'Buy ' + NameConfig.in.names,
                     icon: 'zmdi zmdi-arrow-left',
                     action: function() {
                         // Show the buy dialog
@@ -4018,7 +4022,7 @@ function updatePlayerMarkers(users) {
 
                 // Sell button
                 actions.push({
-                    text: 'Sell ' + NameConfig.out.name,
+                    text: 'Sell ' + NameConfig.out.names,
                     icon: 'zmdi zmdi-arrow-right',
                     action: function() {
                         // Show the sell dialog
@@ -4695,15 +4699,15 @@ function updateGameDataVisuals() {
                 '        <h3 class="card-primary-title">Local dealer</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>' + shop.name + ' is currently dealing high quality goods around your location.</p>' +
+                '        <p>' + NameConfig.shop.name + ' is currently dealing high quality goods around your location.</p>' +
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.in.name + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.in.names + ' unit</span></td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.out.name + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + NameConfig.out.names + ' unit</span></td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
@@ -4713,7 +4717,7 @@ function updateGameDataVisuals() {
                 '                <div class="box">' +
                 '                    <a href="#" id="' + buyButtonId + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-arrow-left"></i>&nbsp;' +
-                '                        Buy ' + NameConfig.in.name + '' +
+                '                        Buy ' + NameConfig.in.names + '' +
                 '                    </a>' +
                 '                    <a href="#" id= "' + sellButtonId + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-arrow-right"></i>&nbsp;' +
@@ -4947,7 +4951,7 @@ function updateGameDataVisuals() {
         data.standings.forEach(function(entry) {
             tableHtml += '<tr>' +
                 '<td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
-                '<td>' + formatMoney(entry.money, false) + ' <span style="color: gray">' + NameConfig.currency.name + '</span></td>' +
+                '<td>' + formatMoney(entry.money, false) + ' <span style="color: gray">' + NameConfig.currency.names + '</span></td>' +
                 '</tr>'
         });
 
@@ -5010,8 +5014,8 @@ function showShopBuyDialog(shopToken) {
     if(moneyMax <= 0) {
         showDialog({
             title: 'Not enough money',
-            message: 'You don\'t have enough money to spend on ' + NameConfig.in.name + '.<br><br>' +
-            'Please make some money by selling ' + NameConfig.out.name + ' first before coming back.'
+            message: 'You don\'t have enough money to spend on ' + NameConfig.in.names + '.<br><br>' +
+            'Please make some money by selling ' + NameConfig.out.names + ' first before coming back.'
         });
         return;
     }
@@ -5026,11 +5030,11 @@ function showShopBuyDialog(shopToken) {
 
     // Show the dialog
     showDialog({
-        title: 'Buy ' + NameConfig.in.name,
-        message: 'Enter the amount of ' + NameConfig.in.name + ' you\'d like to buy.<br><br>' +
-        '<label for="' + inFieldId + '">Amount of ' + NameConfig.in.name + ':</label>' +
+        title: 'Buy ' + NameConfig.in.names,
+        message: 'Enter the amount of ' + NameConfig.in.names + ' you\'d like to buy.<br><br>' +
+        '<label for="' + inFieldId + '">Amount of ' + NameConfig.in.names + ':</label>' +
         '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + inDefault + '" min="' + inMin + '" max="' + inMax + '" data-highlight="true">' +
-        '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.name + ':</label>' +
+        '<label for="' + moneyFieldId + '">Cost in ' + NameConfig.currency.names + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
@@ -5048,7 +5052,7 @@ function showShopBuyDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Buying ' + NameConfig.in.name + '...');
+                    showNotification('Buying ' + NameConfig.in.names + '...');
                 }
             },
             {
@@ -5062,7 +5066,7 @@ function showShopBuyDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Buying all ' + NameConfig.in.name + '...');
+                    showNotification('Buying all ' + NameConfig.in.names + '...');
                 }
             },
             {
@@ -5202,7 +5206,7 @@ function showShopSellDialog(shopToken) {
     if(outCurrent <= 0) {
         showDialog({
             title: 'No ' + NameConfig.out.name,
-            message: 'You don\'t have any ' + NameConfig.out.name + ' to sell.<br><br>' +
+            message: 'You don\'t have any ' + NameConfig.out.names + ' to sell.<br><br>' +
             'Please make some ' + NameConfig.out.name + ' using ' + NameConfig.factory.name + 's before coming back.'
         });
         return;
@@ -5225,11 +5229,11 @@ function showShopSellDialog(shopToken) {
     // Show the dialog
     //noinspection JSCheckFunctionSignatures
     showDialog({
-        title: 'Sell ' + NameConfig.out.name,
-        message: 'Enter the amount of ' + NameConfig.out.name + ' you\'d like to sell.<br><br>' +
-        '<label for="' + outFieldId + '">Amount of ' + NameConfig.out.name + ':</label>' +
+        title: 'Sell ' + NameConfig.out.names,
+        message: 'Enter the amount of ' + NameConfig.out.names + ' you\'d like to sell.<br><br>' +
+        '<label for="' + outFieldId + '">Amount of ' + NameConfig.out.names + ':</label>' +
         '<input type="range" name="' + outFieldId + '" id="' + outFieldId + '" value="' + outDefault + '" min="' + outMin + '" max="' + outMax + '" data-highlight="true">' +
-        '<label for="' + moneyFieldId + '">Income in ' + NameConfig.currency.name + ':</label>' +
+        '<label for="' + moneyFieldId + '">Income in ' + NameConfig.currency.names + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
@@ -5247,7 +5251,7 @@ function showShopSellDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Selling ' + NameConfig.out.name + '...');
+                    showNotification('Selling ' + NameConfig.out.names + '...');
                 }
             },
             {
@@ -5261,7 +5265,7 @@ function showShopSellDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Selling all ' + NameConfig.out.name + '...');
+                    showNotification('Selling all ' + NameConfig.out.names + '...');
                 }
             },
             {
@@ -5716,7 +5720,7 @@ function updateFactoryDataVisuals(firstShow) {
                 message: 'Choose the type of goods to deposit.',
                 actions: [
                     {
-                        text: 'Deposit ' + NameConfig.in.name,
+                        text: 'Deposit ' + NameConfig.in.names,
                         state: 'primary',
                         action: function() {
                             // Show the deposit dialog
@@ -5724,7 +5728,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Deposit ' + NameConfig.out.name,
+                        text: 'Deposit ' + NameConfig.out.names,
                         action: function() {
                             // Show the deposit dialog
                             depositDialog('out');
@@ -5816,7 +5820,7 @@ function updateFactoryDataVisuals(firstShow) {
                 message: 'Choose the type of goods to withdraw.',
                 actions: [
                     {
-                        text: 'Withdraw ' + NameConfig.out.name,
+                        text: 'Withdraw ' + NameConfig.out.names,
                         state: 'primary',
                         action: function() {
                             // Show the withdraw dialog
@@ -5824,7 +5828,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Withdraw ' + NameConfig.in.name,
+                        text: 'Withdraw ' + NameConfig.in.names,
                         action: function() {
                             // Show the withdraw dialog
                             withdrawDialog('in');
@@ -5894,11 +5898,11 @@ function updateFactoryDataVisuals(firstShow) {
         attackButton.click(function() {
             // Define the attack message
             var dialogMessage = 'This ' + NameConfig.factory.name + ' will be taken over by your team when you attack it to use for your own production.<br><br>' +
-                    'Part of the current ' + NameConfig.in.name + ', ' + NameConfig.out.name + ' and defence in this ' + NameConfig.factory.name + ' will be lost because of this.<br><br>' +
+                    'Part of the current ' + NameConfig.in.names + ', ' + NameConfig.out.names + ' and defence in this ' + NameConfig.factory.name + ' will be lost because of this.<br><br>' +
                 'Are you sure you want to attack this ' + NameConfig.factory.name + '?';
             if(willDestroy)
                 dialogMessage = 'This ' + NameConfig.factory.name + ' will be destroyed when you attack it because it\'s level is too low.<br><br>' +
-                    'The current amount of ' + NameConfig.in.name + ' and ' + NameConfig.out.name + ' in this ' + NameConfig.factory.name + ' will be lost.<br><br>' +
+                    'The current amount of ' + NameConfig.in.names + ' and ' + NameConfig.out.names + ' in this ' + NameConfig.factory.name + ' will be lost.<br><br>' +
                     'Are you sure you want to attack this ' + NameConfig.factory.name + '?';
 
             // Show the dialog
@@ -5918,7 +5922,7 @@ function updateFactoryDataVisuals(firstShow) {
                             });
 
                             // Show a notification
-                            showNotification('Attacking ' + NameConfig.in.name + '...');
+                            showNotification('Attacking ' + NameConfig.in.names + '...');
                         }
                     },
                     {
