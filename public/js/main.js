@@ -116,7 +116,7 @@ const NameConfig = {
         names: 'ingredients'
     },
     out: {
-        name: 'drug'
+        name: 'drug',
         names: 'drugs'
     }
 };
@@ -4966,7 +4966,7 @@ function updateGameDataVisuals() {
                         message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
                         '<table class="table-list ui-responsive">' +
                         '<tr><td>Max range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
-                        '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? renderNameConfig('factory.names') : renderNameConfig('factory.name)') : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? renderNameConfig('factory.names') : renderNameConfig('factory.name')) : '<i>Infinite</i>') + '</td></tr>' +
                         '</table><br>' +
                         renderNameConfig('factory.names', { capitalizeFirst: true }) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
