@@ -162,15 +162,32 @@ Object.byString = function(o, s) {
  * encapsulated between curly brackets.
  *
  * @param {string} node The node or key for the languages text.
+ * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
  *
  * @return {string} The text value.
  */
-function renderNameConfig(node) {
+function renderNameConfig(node, options) {
+    // Define the default options object
+    const defaults = {
+        capitalizeFirst: false
+    };
+
+    // Set the options to their defaults if unset
+    if(options === undefined || options === null)
+        options = {};
+
+    // Merge the options
+    options = merge(defaults, options);
+
     // Trim the node string
     node = node.trim();
 
     // Get the language text value
     var text = Object.byString(NameConfig, node);
+
+    // Capitalize the first character if set
+    if(options.capitalizeFirst && text.length > 0)
+        text = capitalizeFirst(text);
 
     // Set the text to the node itself if it's still undefined,
     // because the node was invalid
@@ -1225,7 +1242,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_BUILD, functi
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: capitalizeFirst(renderNameConfig('factory.name')) + ' built',
+            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' built',
             message: 'The ' + renderNameConfig('factory.name') + ' <b>' + factoryName + '</b> has successfully been built!',
             actions: [
                 {
@@ -1271,7 +1288,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: capitalizeFirst(renderNameConfig('factory.name')) + ' captured',
+            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
             message: 'You\'ve successfully captured the <b>' + factoryName + '</b> ' + renderNameConfig('factory.name') + '!',
             actions: [
                 {
@@ -1287,7 +1304,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(renderNameConfig('factory.name')) + ' captured',
+                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
                 message: '<b>' + userName + '</b> captured this ' + renderNameConfig('factory.name') + ' and it is now owned by our team.',
                 actions: [
                     {
@@ -1314,7 +1331,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(renderNameConfig('factory.name')) + ' taken over',
+                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' taken over',
                 message: 'This ' + renderNameConfig('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
                 actions: [
                     {
@@ -1340,7 +1357,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
     if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
         // Show a dialog
         showDialog({
-            title: capitalizeFirst(renderNameConfig('factory.name')) + ' captured',
+            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
             message: 'This ' + renderNameConfig('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
             actions: [
                 {
@@ -1380,7 +1397,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: capitalizeFirst(renderNameConfig('factory.name')) + ' destroyed',
+            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
             message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + renderNameConfig('factory.name') + '!',
             actions: [
                 {
@@ -1397,7 +1414,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(renderNameConfig('factory.name')) + ' destroyed',
+                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
                 message: '<b>' + userName + '</b> destroyed this ' + renderNameConfig('factory.name') + ' and it is now owned by our team.',
                 actions: [
                     {
@@ -1421,7 +1438,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(renderNameConfig('factory.name')) + ' destroyed',
+                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
                 message: 'This ' + renderNameConfig('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
                 actions: [
                     {
@@ -1444,7 +1461,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
     if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
         // Show a dialog
         showDialog({
-            title: capitalizeFirst(renderNameConfig('factory.name')) + ' destroyed',
+            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
             message: 'This ' + renderNameConfig('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
             actions: [
                 {
@@ -4052,7 +4069,7 @@ function updatePlayerMarkers(users) {
                 '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
                 '    </tr>' +
                 '    <tr>' +
-                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + capitalizeFirst(renderNameConfig('shop.names')) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
+                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + renderNameConfig('shop.names', { capitalizeFirst: true }) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
                 '    </tr>';
 
             // Add a range part if the user is a shop
@@ -4263,7 +4280,7 @@ function updateFactoryMarkers(factories) {
 
             // Show a dialog
             showDialog({
-                title: capitalizeFirst(renderNameConfig('factory.name')),
+                title: renderNameConfig('factory.name', { capitalizeFirst: true }),
                 message: dialogBody,
                 actions: [
                     {
@@ -4414,7 +4431,7 @@ function buildFactory() {
 
     // Build the dialog message
     var dialogMessage = 'Enter a name for the ' + renderNameConfig('factory.name') + ':<br><br>' +
-        '<label for="' + fieldId + '">' + capitalizeFirst(renderNameConfig('factory.name')) + ' name</label>' +
+        '<label for="' + fieldId + '">' + renderNameConfig('factory.name', { capitalizeFirst: true }) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
         'Building this ' + renderNameConfig('factory.name') + ' will cost you <b class="game-factory-cost">?</b>.';
@@ -4424,11 +4441,11 @@ function buildFactory() {
 
     // Show a dialog message
     showDialog({
-        title: 'Build ' + capitalizeFirst(renderNameConfig('factory.name')),
+        title: 'Build ' + renderNameConfig('factory.name', { capitalizeFirst: true }),
         message: dialogMessage,
         actions: [
             {
-                text: 'Build ' + capitalizeFirst(renderNameConfig('factory.name')),
+                text: 'Build ' + renderNameConfig('factory.name', { capitalizeFirst: true }),
                 state: 'primary',
                 action: function() {
                     // Send a factory creation request
@@ -4652,7 +4669,7 @@ function updateGameDataVisuals() {
         if(showFactoryBuild && factoryBuildCardElement.length == 0) {
             gameActionsList.prepend('<div class="nd2-card wow card-factory-build">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Build a ' + capitalizeFirst(renderNameConfig('factory.name')) + '</h3>' +
+                '        <h3 class="card-primary-title">Build a ' + renderNameConfig('factory.name', { capitalizeFirst: true }) + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
                 '        <p>Build a ' + renderNameConfig('factory.name') + ' at your current location to expand your fleet and start producing more ' + renderNameConfig('out.name') + '.</p>' +
@@ -4951,7 +4968,7 @@ function updateGameDataVisuals() {
                         '<tr><td>Max range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
                         '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? renderNameConfig('factory.names') : renderNameConfig('factory.name)') : '<i>Infinite</i>') + '</td></tr>' +
                         '</table><br>' +
-                        capitalizeFirst(renderNameConfig('factory.names')) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
+                        renderNameConfig('factory.names', { capitalizeFirst: true }) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
                         actions: [
                             {
