@@ -206,6 +206,22 @@ function renderNameConfig(node, options) {
 }
 
 /**
+ * Render the text/name for the given node/key in the current language.
+ * This encapsulates the text in a span element, to allow dynamic langauge
+ * updates on the page.
+ * The result string with the text and span element is returned as a string.
+ *
+ * If no known text is found for the given node, the node itself is returned,
+ * encapsulated between curly brackets.
+ *
+ * @param {string} node The node or key for the languages text.
+ * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
+ *
+ * @return {string} The text value.
+ */
+const __ = renderNameConfig;
+
+/**
  * An object to define name config rendering properties.
  *
  * @typedef {Object} RenderNameConfigOptions
@@ -1255,11 +1271,11 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_BUILD, functi
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' built',
-            message: 'The ' + renderNameConfig('factory.name') + ' <b>' + factoryName + '</b> has successfully been built!',
+            title: __('factory.name', { capitalizeFirst: true }) + ' built',
+            message: 'The ' + __('factory.name') + ' <b>' + factoryName + '</b> has successfully been built!',
             actions: [
                 {
-                    text: 'View ' + renderNameConfig('factory.name'),
+                    text: 'View ' + __('factory.name'),
                     state: 'primary',
                     action: navigateToFactory
                 },
@@ -1301,8 +1317,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
-            message: 'You\'ve successfully captured the <b>' + factoryName + '</b> ' + renderNameConfig('factory.name') + '!',
+            title: __('factory.name', { capitalizeFirst: true }) + ' captured',
+            message: 'You\'ve successfully captured the <b>' + factoryName + '</b> ' + __('factory.name') + '!',
             actions: [
                 {
                     text: 'Close'
@@ -1317,8 +1333,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
-                message: '<b>' + userName + '</b> captured this ' + renderNameConfig('factory.name') + ' and it is now owned by our team.',
+                title: __('factory.name', { capitalizeFirst: true }) + ' captured',
+                message: '<b>' + userName + '</b> captured this ' + __('factory.name') + ' and it is now owned by our team.',
                 actions: [
                     {
                         text: 'Close'
@@ -1344,8 +1360,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' taken over',
-                message: 'This ' + renderNameConfig('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+                title: __('factory.name', { capitalizeFirst: true }) + ' taken over',
+                message: 'This ' + __('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
                 actions: [
                     {
                         text: 'Close'
@@ -1355,7 +1371,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 
         } else {
             // Show a notification
-            showNotification('<b>' + userName + '</b> took over one of our ' + renderNameConfig('factory.name') + 's', {
+            showNotification('<b>' + userName + '</b> took over one of our ' + __('factory.name') + 's', {
                 action: {
                     text: 'View',
                     action: navigateToFactory
@@ -1370,8 +1386,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
     if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
         // Show a dialog
         showDialog({
-            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' captured',
-            message: 'This ' + renderNameConfig('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+            title: __('factory.name', { capitalizeFirst: true }) + ' captured',
+            message: 'This ' + __('factory.name') + ' has been captured by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
             actions: [
                 {
                     text: 'Close'
@@ -1410,8 +1426,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
     if(isSelf) {
         // Show a dialog
         showDialog({
-            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
-            message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + renderNameConfig('factory.name') + '!',
+            title: __('factory.name', { capitalizeFirst: true }) + ' destroyed',
+            message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + __('factory.name') + '!',
             actions: [
                 {
                     text: 'Game overview',
@@ -1427,8 +1443,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
-                message: '<b>' + userName + '</b> destroyed this ' + renderNameConfig('factory.name') + ' and it is now owned by our team.',
+                title: __('factory.name', { capitalizeFirst: true }) + ' destroyed',
+                message: '<b>' + userName + '</b> destroyed this ' + __('factory.name') + ' and it is now owned by our team.',
                 actions: [
                     {
                         text: 'Game overview',
@@ -1451,8 +1467,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
         if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
             // Show a dialog
             showDialog({
-                title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
-                message: 'This ' + renderNameConfig('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+                title: __('factory.name', { capitalizeFirst: true }) + ' destroyed',
+                message: 'This ' + __('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
                 actions: [
                     {
                         text: 'Game overview',
@@ -1463,7 +1479,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
         } else {
             // Show a notification
-            showNotification('<b>' + userName + '</b> destroyed one of our ' + renderNameConfig('factory.name') + 's', {
+            showNotification('<b>' + userName + '</b> destroyed one of our ' + __('factory.name') + 's', {
                 vibrate: true
             });
         }
@@ -1474,8 +1490,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
     if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
         // Show a dialog
         showDialog({
-            title: renderNameConfig('factory.name', { capitalizeFirst: true }) + ' destroyed',
-            message: 'This ' + renderNameConfig('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+            title: __('factory.name', { capitalizeFirst: true }) + ' destroyed',
+            message: 'This ' + __('factory.name') + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
             actions: [
                 {
                     text: 'Game overview',
@@ -3319,7 +3335,7 @@ function processLocationError(error, showErrorDialog) {
 
         // Handle the permission denied error
         if(error.code == error.PERMISSION_DENIED)
-            dialogMessage = renderNameConfig('app.name') + ' doesn\'t have permission to use your device\'s location.<br><br>' +
+            dialogMessage = __('app.name') + ' doesn\'t have permission to use your device\'s location.<br><br>' +
                 'Please allow this application to use your location and test your GPS again.';
 
         // Handle the position unavailable error
@@ -4082,7 +4098,7 @@ function updatePlayerMarkers(users) {
                 '        <td class="left"><i class="zmdi zmdi-star zmdi-hc-fw"></i> Ally</td><td>' + (user.ally ? '<span style="color: green;">Yes</span>' : '<span style="color: red;">No</span>') + '</td>' +
                 '    </tr>' +
                 '    <tr>' +
-                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + renderNameConfig('shop.names', { capitalizeFirst: true }) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
+                '        <td class="left"><i class="zmdi zmdi-shopping-cart zmdi-hc-fw"></i> ' + __('shop.names', { capitalizeFirst: true }) + '</td><td>' + (user.shop.isShop ? 'Yes' : 'No') + '</td>' +
                 '    </tr>';
 
             // Add a range part if the user is a shop
@@ -4105,7 +4121,7 @@ function updatePlayerMarkers(users) {
             if(user.shop.isShop && user.shop.inRange) {
                 // Buy button
                 actions.push({
-                    text: 'Buy ' + renderNameConfig('in.names'),
+                    text: 'Buy ' + __('in.names'),
                     icon: 'zmdi zmdi-arrow-left',
                     action: function() {
                         // Show the buy dialog
@@ -4115,7 +4131,7 @@ function updatePlayerMarkers(users) {
 
                 // Sell button
                 actions.push({
-                    text: 'Sell ' + renderNameConfig('out.names'),
+                    text: 'Sell ' + __('out.names'),
                     icon: 'zmdi zmdi-arrow-right',
                     action: function() {
                         // Show the sell dialog
@@ -4293,11 +4309,11 @@ function updateFactoryMarkers(factories) {
 
             // Show a dialog
             showDialog({
-                title: renderNameConfig('factory.name', { capitalizeFirst: true }),
+                title: __('factory.name', { capitalizeFirst: true }),
                 message: dialogBody,
                 actions: [
                     {
-                        text: 'View ' + renderNameConfig('factory.name'),
+                        text: 'View ' + __('factory.name'),
                         state: 'primary',
                         action: function() {
                             Dworek.utils.navigateToPage('/game/' + Dworek.utils.getGameId() + '/factory/' + factory.factory, true, true, 'flip');
@@ -4443,22 +4459,22 @@ function buildFactory() {
     const fieldId = generateUniqueId('field-factory-name');
 
     // Build the dialog message
-    var dialogMessage = 'Enter a name for the ' + renderNameConfig('factory.name') + ':<br><br>' +
-        '<label for="' + fieldId + '">' + renderNameConfig('factory.name', { capitalizeFirst: true }) + ' name</label>' +
+    var dialogMessage = 'Enter a name for the ' + __('factory.name') + ':<br><br>' +
+        '<label for="' + fieldId + '">' + __('factory.name', { capitalizeFirst: true }) + ' name</label>' +
         '<input type="text" name="' + fieldId + '" id="' + fieldId + '" value="" data-clear-btn="true" />' +
         '<br><br>' +
-        'Building this ' + renderNameConfig('factory.name') + ' will cost you <b class="game-factory-cost">?</b>.';
+        'Building this ' + __('factory.name') + ' will cost you <b class="game-factory-cost">?</b>.';
 
     // Create a variable for the factory name
     var nameField = null;
 
     // Show a dialog message
     showDialog({
-        title: 'Build ' + renderNameConfig('factory.name', { capitalizeFirst: true }),
+        title: 'Build ' + __('factory.name', { capitalizeFirst: true }),
         message: dialogMessage,
         actions: [
             {
-                text: 'Build ' + renderNameConfig('factory.name', { capitalizeFirst: true }),
+                text: 'Build ' + __('factory.name', { capitalizeFirst: true }),
                 state: 'primary',
                 action: function() {
                     // Send a factory creation request
@@ -4468,7 +4484,7 @@ function buildFactory() {
                     });
 
                     // Show a notification
-                    showNotification('Building ' + renderNameConfig('factory.name') + '...');
+                    showNotification('Building ' + __('factory.name') + '...');
                 }
             },
             {
@@ -4682,10 +4698,10 @@ function updateGameDataVisuals() {
         if(showFactoryBuild && factoryBuildCardElement.length == 0) {
             gameActionsList.prepend('<div class="nd2-card wow card-factory-build">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Build a ' + renderNameConfig('factory.name', { capitalizeFirst: true }) + '</h3>' +
+                '        <h3 class="card-primary-title">Build a ' + __('factory.name', { capitalizeFirst: true }) + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>Build a ' + renderNameConfig('factory.name') + ' at your current location to expand your fleet and start producing more ' + renderNameConfig('out.name') + '.</p>' +
+                '        <p>Build a ' + __('factory.name') + ' at your current location to expand your fleet and start producing more ' + __('out.name') + '.</p>' +
                 '    </div>' +
                 '    <div class="card-action">' +
                 '        <div class="row between-xs">' +
@@ -4693,7 +4709,7 @@ function updateGameDataVisuals() {
                 '                <div class="box">' +
                 '                    <a href="#" class="ui-btn waves-effect waves-button action-factory-build">' +
                 '                        <i class="zmdi zmdi-pin"></i>&nbsp;' +
-                '                        Build ' + renderNameConfig('factory.name') + '&nbsp;&nbsp;(<span class="game-factory-cost">?</span>)' +
+                '                        Build ' + __('factory.name') + '&nbsp;&nbsp;(<span class="game-factory-cost">?</span>)' +
                 '                    </a>' +
                 '                </div>' +
                 '            </div>' +
@@ -4739,7 +4755,7 @@ function updateGameDataVisuals() {
                 '                <div class="box">' +
                 '                    <a href="/game/' + gameId + '/factory/' + factory.id + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-zoom-in"></i>&nbsp;' +
-                '                        View ' + renderNameConfig('factory.name') + '' +
+                '                        View ' + __('factory.name') + '' +
                 '                    </a>' +
                 '                </div>' +
                 '            </div>' +
@@ -4789,18 +4805,18 @@ function updateGameDataVisuals() {
             // Create a new card for this shop
             gameActionsList.prepend('<div class="nd2-card wow ' + shopCardSelector + '" data-shop-token="' + shop.token + '">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Local ' + renderNameConfig('shop.name') + '</h3>' +
+                '        <h3 class="card-primary-title">Local ' + __('shop.name') + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>' + renderNameConfig('shop.name') + ' is currently dealing high quality goods around your location.</p>' +
+                '        <p>' + __('shop.name') + ' is currently dealing high quality goods around your location.</p>' +
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + renderNameConfig('in.names') + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + __('in.names') + ' unit</span></td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + renderNameConfig('out.names') + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + __('out.names') + ' unit</span></td>' +
                 '            </tr>' +
                 '        </table>' +
                 '    </div>' +
@@ -4810,11 +4826,11 @@ function updateGameDataVisuals() {
                 '                <div class="box">' +
                 '                    <a href="#" id="' + buyButtonId + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-arrow-left"></i>&nbsp;' +
-                '                        Buy ' + renderNameConfig('in.names') + '' +
+                '                        Buy ' + __('in.names') + '' +
                 '                    </a>' +
                 '                    <a href="#" id= "' + sellButtonId + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-arrow-right"></i>&nbsp;' +
-                '                        Sell ' + renderNameConfig('out.name') + '' +
+                '                        Sell ' + __('out.name') + '' +
                 '                    </a>' +
                 '                </div>' +
                 '            </div>' +
@@ -4979,9 +4995,9 @@ function updateGameDataVisuals() {
                         message: 'Are you sure you want to execute this ping for <b>' + formatMoney(ping.cost, true) + '</b>?<br><br>' +
                         '<table class="table-list ui-responsive">' +
                         '<tr><td>Max range</td><td> ' + (ping.range >= 0 ? ping.range + ' meters' : '<i>Infinite</i>') + '</td></tr>' +
-                        '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? renderNameConfig('factory.names') : renderNameConfig('factory.name')) : '<i>Infinite</i>') + '</td></tr>' +
+                        '<tr><td>Max discoveries</td><td>' + (ping.max > 0 ? ping.max + ' ' + (ping.max != 1 ? __('factory.names') : __('factory.name')) : '<i>Infinite</i>') + '</td></tr>' +
                         '</table><br>' +
-                        renderNameConfig('factory.names', { capitalizeFirst: true }) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
+                        __('factory.names', { capitalizeFirst: true }) + ' that have been found, will appear on your map for just ' + Math.round(ping.duration / 1000) + ' seconds.<br><br>' +
                         'The ping will be consumed immediately after executing.',
                         actions: [
                             {
@@ -5044,7 +5060,7 @@ function updateGameDataVisuals() {
         data.standings.forEach(function(entry) {
             tableHtml += '<tr>' +
                 '<td><span style="color: ' + (entry.ally ? 'green' : 'red') + ';">' + entry.name + '</span></td>' +
-                '<td>' + formatMoney(entry.money, false) + ' <span style="color: gray">' + renderNameConfig('currency.names') + '</span></td>' +
+                '<td>' + formatMoney(entry.money, false) + ' <span style="color: gray">' + __('currency.names') + '</span></td>' +
                 '</tr>'
         });
 
@@ -5107,8 +5123,8 @@ function showShopBuyDialog(shopToken) {
     if(moneyMax <= 0) {
         showDialog({
             title: 'Not enough money',
-            message: 'You don\'t have enough money to spend on ' + renderNameConfig('in.names') + '.<br><br>' +
-            'Please make some money by selling ' + renderNameConfig('out.names') + ' first before coming back.'
+            message: 'You don\'t have enough money to spend on ' + __('in.names') + '.<br><br>' +
+            'Please make some money by selling ' + __('out.names') + ' first before coming back.'
         });
         return;
     }
@@ -5123,11 +5139,11 @@ function showShopBuyDialog(shopToken) {
 
     // Show the dialog
     showDialog({
-        title: 'Buy ' + renderNameConfig('in.names'),
-        message: 'Enter the amount of ' + renderNameConfig('in.names') + ' you\'d like to buy.<br><br>' +
-        '<label for="' + inFieldId + '">Amount of ' + renderNameConfig('in.names') + ':</label>' +
+        title: 'Buy ' + __('in.names'),
+        message: 'Enter the amount of ' + __('in.names') + ' you\'d like to buy.<br><br>' +
+        '<label for="' + inFieldId + '">Amount of ' + __('in.names') + ':</label>' +
         '<input type="range" name="' + inFieldId + '" id="' + inFieldId + '" value="' + inDefault + '" min="' + inMin + '" max="' + inMax + '" data-highlight="true">' +
-        '<label for="' + moneyFieldId + '">Cost in ' + renderNameConfig('currency.names') + ':</label>' +
+        '<label for="' + moneyFieldId + '">Cost in ' + __('currency.names') + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
@@ -5145,7 +5161,7 @@ function showShopBuyDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Buying ' + renderNameConfig('in.names') + '...');
+                    showNotification('Buying ' + __('in.names') + '...');
                 }
             },
             {
@@ -5159,7 +5175,7 @@ function showShopBuyDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Buying all ' + renderNameConfig('in.names') + '...');
+                    showNotification('Buying all ' + __('in.names') + '...');
                 }
             },
             {
@@ -5298,9 +5314,9 @@ function showShopSellDialog(shopToken) {
     // Make sure the user has any out to sell
     if(outCurrent <= 0) {
         showDialog({
-            title: 'No ' + renderNameConfig('out.name'),
-            message: 'You don\'t have any ' + renderNameConfig('out.names') + ' to sell.<br><br>' +
-            'Please make some ' + renderNameConfig('out.name') + ' using ' + renderNameConfig('factory.name') + 's before coming back.'
+            title: 'No ' + __('out.name'),
+            message: 'You don\'t have any ' + __('out.names') + ' to sell.<br><br>' +
+            'Please make some ' + __('out.name') + ' using ' + __('factory.name') + 's before coming back.'
         });
         return;
     }
@@ -5322,11 +5338,11 @@ function showShopSellDialog(shopToken) {
     // Show the dialog
     //noinspection JSCheckFunctionSignatures
     showDialog({
-        title: 'Sell ' + renderNameConfig('out.names'),
-        message: 'Enter the amount of ' + renderNameConfig('out.names') + ' you\'d like to sell.<br><br>' +
-        '<label for="' + outFieldId + '">Amount of ' + renderNameConfig('out.names') + ':</label>' +
+        title: 'Sell ' + __('out.names'),
+        message: 'Enter the amount of ' + __('out.names') + ' you\'d like to sell.<br><br>' +
+        '<label for="' + outFieldId + '">Amount of ' + __('out.names') + ':</label>' +
         '<input type="range" name="' + outFieldId + '" id="' + outFieldId + '" value="' + outDefault + '" min="' + outMin + '" max="' + outMax + '" data-highlight="true">' +
-        '<label for="' + moneyFieldId + '">Income in ' + renderNameConfig('currency.names') + ':</label>' +
+        '<label for="' + moneyFieldId + '">Income in ' + __('currency.names') + ':</label>' +
         '<input type="range" name="' + moneyFieldId + '" id="' + moneyFieldId + '" value="' + moneyDefault + '" min="' + moneyMin + '" max="' + moneyMax + '" data-highlight="true">',
         actions: [
             {
@@ -5344,7 +5360,7 @@ function showShopSellDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Selling ' + renderNameConfig('out.names') + '...');
+                    showNotification('Selling ' + __('out.names') + '...');
                 }
             },
             {
@@ -5358,7 +5374,7 @@ function showShopSellDialog(shopToken) {
                     });
 
                     // Show a notification
-                    showNotification('Selling all ' + renderNameConfig('out.names') + '...');
+                    showNotification('Selling all ' + __('out.names') + '...');
                 }
             },
             {
@@ -5668,7 +5684,7 @@ function updateFactoryDataVisuals(firstShow) {
                     showDialog({
                         title: 'Defence upgrade',
                         message: 'Are you sure you want to buy this upgrade for <b>' + formatMoney(upgrade.cost, true) + '</b>?<br><br>' +
-                        'This will improve the ' + renderNameConfig('factory.name') + ' with <b>' + upgrade.defence + '</b> defence.',
+                        'This will improve the ' + __('factory.name') + ' with <b>' + upgrade.defence + '</b> defence.',
                         actions: [
                             {
                                 text: 'Buy upgrade',
@@ -5751,7 +5767,7 @@ function updateFactoryDataVisuals(firstShow) {
                     // Nothing to deposit, show a message dialog
                     showDialog({
                         title: 'Nothing to deposit',
-                        message: 'You currently don\'t have any ' + NameConfig[goodType].name + ' that you can deposit to this ' + renderNameConfig('factory.name') + '.'
+                        message: 'You currently don\'t have any ' + NameConfig[goodType].name + ' that you can deposit to this ' + __('factory.name') + '.'
                     });
                     return;
                 }
@@ -5813,7 +5829,7 @@ function updateFactoryDataVisuals(firstShow) {
                 message: 'Choose the type of goods to deposit.',
                 actions: [
                     {
-                        text: 'Deposit ' + renderNameConfig('in.names'),
+                        text: 'Deposit ' + __('in.names'),
                         state: 'primary',
                         action: function() {
                             // Show the deposit dialog
@@ -5821,7 +5837,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Deposit ' + renderNameConfig('out.names'),
+                        text: 'Deposit ' + __('out.names'),
                         action: function() {
                             // Show the deposit dialog
                             depositDialog('out');
@@ -5851,7 +5867,7 @@ function updateFactoryDataVisuals(firstShow) {
                     // Nothing to deposit, show a message dialog
                     showDialog({
                         title: 'Nothing to withdraw',
-                        message: 'There currently isn\'t any ' + NameConfig[goodType].name + ' that you can withdraw from this ' + renderNameConfig('factory.name') + '.'
+                        message: 'There currently isn\'t any ' + NameConfig[goodType].name + ' that you can withdraw from this ' + __('factory.name') + '.'
                     });
                     return;
                 }
@@ -5913,7 +5929,7 @@ function updateFactoryDataVisuals(firstShow) {
                 message: 'Choose the type of goods to withdraw.',
                 actions: [
                     {
-                        text: 'Withdraw ' + renderNameConfig('out.names'),
+                        text: 'Withdraw ' + __('out.names'),
                         state: 'primary',
                         action: function() {
                             // Show the withdraw dialog
@@ -5921,7 +5937,7 @@ function updateFactoryDataVisuals(firstShow) {
                         }
                     },
                     {
-                        text: 'Withdraw ' + renderNameConfig('in.names'),
+                        text: 'Withdraw ' + __('in.names'),
                         action: function() {
                             // Show the withdraw dialog
                             withdrawDialog('in');
@@ -5990,17 +6006,17 @@ function updateFactoryDataVisuals(firstShow) {
         // Bind the attack button
         attackButton.click(function() {
             // Define the attack message
-            var dialogMessage = 'This ' + renderNameConfig('factory.name') + ' will be taken over by your team when you attack it to use for your own production.<br><br>' +
-                    'Part of the current ' + renderNameConfig('in.names') + ', ' + renderNameConfig('out.names') + ' and defence in this ' + renderNameConfig('factory.name') + ' will be lost because of this.<br><br>' +
-                'Are you sure you want to attack this ' + renderNameConfig('factory.name') + '?';
+            var dialogMessage = 'This ' + __('factory.name') + ' will be taken over by your team when you attack it to use for your own production.<br><br>' +
+                    'Part of the current ' + __('in.names') + ', ' + __('out.names') + ' and defence in this ' + __('factory.name') + ' will be lost because of this.<br><br>' +
+                'Are you sure you want to attack this ' + __('factory.name') + '?';
             if(willDestroy)
-                dialogMessage = 'This ' + renderNameConfig('factory.name') + ' will be destroyed when you attack it because it\'s level is too low.<br><br>' +
-                    'The current amount of ' + renderNameConfig('in.names') + ' and ' + renderNameConfig('out.names') + ' in this ' + renderNameConfig('factory.name') + ' will be lost.<br><br>' +
-                    'Are you sure you want to attack this ' + renderNameConfig('factory.name') + '?';
+                dialogMessage = 'This ' + __('factory.name') + ' will be destroyed when you attack it because it\'s level is too low.<br><br>' +
+                    'The current amount of ' + __('in.names') + ' and ' + __('out.names') + ' in this ' + __('factory.name') + ' will be lost.<br><br>' +
+                    'Are you sure you want to attack this ' + __('factory.name') + '?';
 
             // Show the dialog
             showDialog({
-                title: 'Attack ' + renderNameConfig('factory.name'),
+                title: 'Attack ' + __('factory.name'),
                 message: dialogMessage,
                 actions: [
                     {
@@ -6015,7 +6031,7 @@ function updateFactoryDataVisuals(firstShow) {
                             });
 
                             // Show a notification
-                            showNotification('Attacking ' + renderNameConfig('in.names') + '...');
+                            showNotification('Attacking ' + __('in.names') + '...');
                         }
                     },
                     {
@@ -6290,7 +6306,7 @@ function formatMoney(amount, prefixSign) {
     amount = formatBigNumber(amount);
 
     // Return the number, prefix the money sign if specified
-    return (prefixSign ? renderNameConfig('currency.sign') : '') + amount;
+    return (prefixSign ? __('currency.sign') : '') + amount;
 }
 
 /**
