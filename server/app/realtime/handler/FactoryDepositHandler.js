@@ -392,7 +392,7 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the in name from the game's name configuration
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Deposited ' + Formatter.formatGoods(depositAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (depositAmount === 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                message: 'Deposited ' + Formatter.formatGoods(depositAmount) + ' ' + __((typeIn ? 'in' : 'out') + '.name') + (depositAmount === 1 ? '' : 's') + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

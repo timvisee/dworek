@@ -1065,6 +1065,9 @@ User.prototype.getBalanceTable = function (options, callback) {
         latch.resolve();
     });
 
+    // Get the live game
+    const liveGame = this.getGame();
+
     // Call back the table when we fetched the required information
     latch.then(function() {
         // Build and call back the table
@@ -1077,11 +1080,11 @@ User.prototype.getBalanceTable = function (options, callback) {
                     '        <td>' + Formatter.formatMoney(userMoney) + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatMoney(options.previousMoney) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '        <td><i>Ingredients:</i>&nbsp;&nbsp;</td>' +
+                    '        <td><i>' + liveGame.__('in.names', { capitalizeFirst: true }) + ':</i>&nbsp;&nbsp;</td>' +
                     '        <td>' + Formatter.formatGoods(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousIn) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '        <td><i>Drugs:</i>&nbsp;&nbsp;</td>' +
+                    '        <td><i>' + liveGame.__('out.names', { capitalizeFirst: true }) + ':</i>&nbsp;&nbsp;</td>' +
                     '        <td>' + Formatter.formatGoods(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousOut) + ')</span>' : '') + '</td>' +
                     '    </tr>' +
                     '</table>'

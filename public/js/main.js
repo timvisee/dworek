@@ -1344,7 +1344,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 
         } else {
             // Show a notification
-            showNotification('<b>' + userName + '</b> captured an enemy lab', {
+            showNotification('<b>' + userName + '</b> captured an enemy ' + __('factory.name'), {
                 action: {
                     text: 'View',
                     action: navigateToFactory
@@ -1397,7 +1397,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 
     } else {
         // Show a notification
-        showNotification('A lab has been captured by <b>' + userName + '</b>', {
+        showNotification('A ' + __('factory.name') + 'has been captured by <b>' + userName + '</b>', {
             action: {
                 text: 'View',
                 action: navigateToFactory
@@ -1455,7 +1455,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
         } else {
             // Show a notification
-            showNotification('<b>' + userName + '</b> destroyed an enemy lab', {
+            showNotification('<b>' + userName + '</b> destroyed an enemy ' + __('factory.name'), {
                 vibrate: true
             });
         }
@@ -1502,7 +1502,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
     } else {
         // Show a notification
-        showNotification('A lab has been destroyed by <b>' + userName + '</b>');
+        showNotification('A ' + __('factory.name') + ' has been destroyed by <b>' + userName + '</b>');
     }
 });
 
@@ -4445,7 +4445,7 @@ function capitalizeFirst(str) {
 function buildFactory() {
     // Make sure a game is active
     if(Dworek.state.activeGame == null) {
-        showNotification('You must be in an active game build a lab');
+        showNotification('You must be in an active game build a ' + __('factory.name'));
         return;
     }
 

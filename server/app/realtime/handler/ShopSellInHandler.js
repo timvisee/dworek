@@ -51,7 +51,7 @@ var ShopSellInHandler = function(init) {
  */
 ShopSellInHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -77,7 +77,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Transaction failed, a server error occurred. Code: ' + (code != undefined ? code : '-1'),
+            message: 'Transaction failed, a server error occurred. Code: ' + (code !== undefined ? code : '-1'),
             dialog: true
         }, socket);
 
@@ -140,7 +140,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                 // Get the live user
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
-                    if(err !== null || liveUser == null) {
+                    if(err !== null || liveUser === null) {
                         callbackError(3);
                         return;
                     }
@@ -203,7 +203,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // The user must buy something
-                                if(moneyAmount == 0 || inAmount == 0) {
+                                if(moneyAmount === 0 || inAmount === 0) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
                                         message: '<i>You can\'t buy no nothin\'.</i>',
@@ -250,7 +250,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the in and money name from the name configuration of the current game
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Bought ' + Formatter.formatGoods(inAmount) + ' ingredient' + (inAmount == 1 ? '' : 's') + ' for ' + Formatter.formatGoods(moneyAmount) + '.<br><br>' + balanceTable,
+                                                message: 'Bought ' + Formatter.formatGoods(inAmount) + ' ' + liveGame.__('in.name' + (inAmount === 1 ? '' : 's')) + ' for ' + Formatter.formatGoods(moneyAmount) + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

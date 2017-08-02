@@ -51,7 +51,7 @@ var ShopBuyOutHandler = function(init) {
  */
 ShopBuyOutHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -140,7 +140,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                 // Get the live user
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
-                    if(err !== null || liveUser == null) {
+                    if(err !== null || liveUser === null) {
                         callbackError();
                         return;
                     }
@@ -200,7 +200,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                 }
 
                                 // Make the sure the amount isn't zero
-                                if(outAmount == 0) {
+                                if(outAmount === 0) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
                                         message: '<i>You can\'t sell no nothin\'.</i>',
@@ -250,7 +250,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the in and money name from the name configuration of the current game
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Sold ' + Formatter.formatGoods(outAmount) + ' drug' + (outAmount == 1 ? '' : 's') + ' for ' + Formatter.formatMoney(moneyAmount) + '.<br><br>' + balanceTable,
+                                                message: 'Sold ' + Formatter.formatGoods(outAmount) + ' ' + liveGame.__('out.name' + (outAmount === 1 ? '' : 's')) + ' for ' + Formatter.formatMoney(moneyAmount) + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

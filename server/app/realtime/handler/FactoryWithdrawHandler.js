@@ -52,7 +52,7 @@ var FactoryWithdrawHandler = function(init) {
  */
 FactoryWithdrawHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -392,7 +392,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the out name from the game's name configuration
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + (typeIn ? 'ingredient' : 'drug') + (withdrawAmount === 1 ? '' : 's') + '.<br><br>' + balanceTable,
+                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + __((typeIn ? 'in' : 'out') + '.name'+ (withdrawAmount === 1 ? '' : 's')) + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000

@@ -411,9 +411,9 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         if(factoryCount  > 0) {
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'You pinged one ' + factoryCount + ' enemy lab' + (factoryCount != 1 ? 's' : '') + '!<br><br>' +
-                                                (factoryCount != 1 ? 'The labs are now visible on your map.' : 'The lab is now visible on your map.') + ' ' +
-                                                'Take a quick look because ' + (factoryCount != 1 ? 'they disappear' : 'it disappears') + ' in ' + (selectedPing.duration / 1000) + ' seconds.',
+                                                message: 'You pinged one ' + factoryCount + ' enemy ' + liveGame.__('factory.name') + (factoryCount !== 1 ? 's' : '') + '!<br><br>' +
+                                                (factoryCount !== 1 ? 'The ' + liveGame.__('factory.names') + ' are now visible on your map.' : 'The ' + liveGame.__('factory.name') + ' is now visible on your map.') + ' ' +
+                                                'Take a quick look because ' + (factoryCount !== 1 ? 'they disappear' : 'it disappears') + ' in ' + (selectedPing.duration / 1000) + ' seconds.',
                                                 dialog: true,
                                                 toast: false,
                                                 vibrate: true
@@ -421,7 +421,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         } else {
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'You didn\'t ping any enemy labs!',
+                                                message: 'You didn\'t ping any enemy ' + liveGame.__('factory.name') + '!',
                                                 dialog: false,
                                                 toast: true,
                                                 vibrate: true
@@ -451,7 +451,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                                 // TODO: Get the factory name from the game's configuration
                                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                     error: false,
-                                                    message: 'One of your pinged labs has decayed...',
+                                                    message: 'One of your pinged ' + liveGame.__('factory.names') + ' has decayed...',
                                                     dialog: false,
                                                     toast: true
                                                 }, socket);

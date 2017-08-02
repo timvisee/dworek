@@ -55,7 +55,7 @@ var FactoryBuildRequestHandler = function(init) {
  */
 FactoryBuildRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -89,7 +89,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
         calledBack = true;
 
         // Print the error to the console if anything is given
-        if(err != undefined) {
+        if(err !== undefined) {
             console.error('Failed to build factory on client request:');
             console.error(err);
         }
@@ -137,7 +137,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
             console.error(err);
 
@@ -149,7 +149,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
         // Make sure the game is active
         game.getStage(function(err, stage) {
             // Call back errors
-            if(err !== null || stage != 1) {
+            if(err !== null || stage !== 1) {
                 callbackError(err);
                 return;
             }
@@ -157,7 +157,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
             // Get the live game instance
             Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
-                if(err !== null || liveGame == null) {
+                if(err !== null || liveGame === null) {
                     callbackError(err);
                     return;
                 }
@@ -165,7 +165,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                 // Get the game user
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
-                    if(err !== null || liveUser == null) {
+                    if(err !== null || liveUser === null) {
                         callbackError(err);
                         return;
                     }
@@ -193,7 +193,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                         }
 
                         // Make sure the user has a team
-                        if(team == null) {
+                        if(team === null) {
                             callbackError();
                             return;
                         }
@@ -253,8 +253,8 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                     error: true,
                                                     // TODO: Dynamically get factory name from game name configuration!
-                                                    message: 'It looks like there another lab close by!<br><br>' +
-                                                            'To build a new lab, you must be at least ' + gameConfig.factory.interspaceMin + ' meters away from any other lab.',
+                                                    message: 'It looks like there another ' + liveGame.__('factory.name') + ' close by!<br><br>' +
+                                                            'To build a new ' + liveGame.__('factory.name') + ', you must be at least ' + gameConfig.factory.interspaceMin + ' meters away from any other lab.',
                                                     dialog: true
                                                 }, socket);
                                             }
@@ -369,7 +369,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                             }
 
                                                             // Make sure the user's team is known
-                                                            if(otherTeam == null)
+                                                            if(otherTeam === null)
                                                                 return;
 
                                                             // Check whether this is the user itself

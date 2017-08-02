@@ -20,11 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var mongo = require('mongodb');
-var ObjectId = mongo.ObjectId;
-
-var config = require('../../../config');
-
 var Core = require('../../../Core');
 var CallbackLatch = require('../../util/CallbackLatch');
 var TokenGenerator = require('../../token/TokenGenerator');
@@ -80,6 +75,7 @@ var Shop = function(user, shopManager) {
      * @type {Number}
      * @private
      */
+    // TODO: Is this still used? Remove it if not.
     this._range = null;
 
     /**
@@ -180,9 +176,12 @@ Shop.prototype.load = function(callback) {
         latch.resolve();
     });
 
+    // Get the live game
+    const liveGame = this.getGame();
+
     // Get the game's configuration
     latch.add();
-    this.getGame().getConfig(function(err, gameConfig) {
+    liveGame.getConfig(function(err, gameConfig) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -209,7 +208,7 @@ Shop.prototype.load = function(callback) {
 
             // Send a notification to the current shop user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message: 'You\'re no longer a dealer',
+                message: 'You\'re no longer a ' + liveGame.__('shop.name'),
                 error: false,
                 toast: true,
                 dialog: false
@@ -241,7 +240,7 @@ Shop.prototype.load = function(callback) {
                 }
 
                 // Return if the team is null
-                if(team == null) {
+                if(team === null) {
                     console.error('Failed to find new shop user, user\'s team is null');
                     return;
                 }
@@ -265,20 +264,20 @@ Shop.prototype.load = function(callback) {
                         }
 
                         // Reschedule the shop transfer if no new user was found and the delta is not below zero
-                        if(newUser == null && delta >= 0) {
+                        if(newUser === null && delta >= 0) {
                             setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
                             return;
                         }
 
                         // Schedule the shop transfer (also for the new user)
-                        if(newUser != null)
+                        if(newUser !== null)
                             self.getShopManager().scheduleUser(newUser);
                         setTimeout(functionTransfer, alertTime);
 
                         // Determine what message to show to the current shop owner
-                        var message = 'Your dealer ability will be given to another player soon...';
-                        if(newUser == null)
-                            message = 'You will lose your dealer ability soon...';
+                        var message = 'Your ' + liveGame.__('shop.name') + ' ability will be given to another player soon...';
+                        if(newUser === null)
+                            message = 'You will lose your ' + liveGame.__('shop.name') + ' ability soon...';
 
                         // Send a notification to the current shop user
                         Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
@@ -291,8 +290,6 @@ Shop.prototype.load = function(callback) {
                 });
             });
         };
-
-
 
         // Set a timer to prepare the shop transfer
         setTimeout(functionPrepareTransfer, lifeTime - alertTime);
@@ -383,7 +380,7 @@ Shop.prototype.updateVisibilityState = function(liveUser, callback) {
     const self = this;
 
     // Call back if the user is null
-    if(liveUser == null) {
+    if(liveUser === null) {
         callback(null);
         return;
     }
@@ -430,7 +427,7 @@ Shop.prototype.setInRangeMemory = function(liveUser, inRange) {
     const lastState = this.isInRangeMemory(liveUser);
 
     // Return false if the state didn't change
-    if(lastState == inRange)
+    if(lastState === inRange)
         return false;
 
     // Update the range array
@@ -451,7 +448,7 @@ Shop.prototype.setInRangeMemory = function(liveUser, inRange) {
  */
 Shop.prototype.isUserInRange = function(liveUser, callback) {
     // Make sure a valid user is given
-    if(liveUser == null) {
+    if(liveUser === null) {
         callback(null, false);
         return;
     }
@@ -525,7 +522,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
     };
 
     // Make sure a valid user is given
-    if(liveUser == null) {
+    if(liveUser === null) {
         callback(null, resultObject);
         return;
     }
@@ -535,7 +532,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
     const shopUserModel = shopLiveUser.getUserModel();
 
     // Make sure a user model is available
-    if(shopUserModel == null) {
+    if(shopUserModel === null) {
         callback(null, resultObject);
         return;
     }
@@ -572,7 +569,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
         }
 
         // Resolve the latch if the game user is null
-        if(shopGameUser == null) {
+        if(shopGameUser === null) {
             allyLatch.resolve();
             return;
         }
@@ -608,7 +605,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
         }
 
         // Resolve the latch if the game user is null
-        if(gameUser == null) {
+        if(null === gameUser) {
             latch.resolve();
             allyLatch.resolve();
             return;
@@ -660,7 +657,7 @@ Shop.prototype.getVisibilityState = function(liveUser, callback) {
             }
 
             // Set the ally status if the teams equal and aren't null
-            if(shopTeam != null && userTeam != null && shopTeam.getId().equals(userTeam.getId()))
+            if(null !== shopTeam && null !== userTeam && shopTeam.getId().equals(userTeam.getId()))
                 resultObject.ally = true;
 
             // Resolve the latch

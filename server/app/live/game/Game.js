@@ -601,6 +601,21 @@ Game.prototype.renderNameConfig = function(node, options) {
 };
 
 /**
+ * This routes the call to the rendering function the language manager for this game.
+ *
+ * Render the text/name for the given node/key in the current language.
+ * This encapsulates the text in a span element, to allow dynamic language updates on the page.
+ * The result string with the text and span element is returned as a string.
+ *
+ * If no known text is found for the given node, the node itself is returned,
+ * encapsulated between curly brackets.
+ *
+ * @param {string} node The node or key for the language text.
+ * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
+ */
+Game.prototype.__ = Game.prototype.renderNameConfig;
+
+/**
  * Get the game as a string.
  *
  * @return {String} String representation.
