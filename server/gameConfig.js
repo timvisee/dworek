@@ -219,12 +219,6 @@ var gameConfig = {
      */
     factory: {
         /**
-         * Factory name.
-         * @type {String}
-         */
-        name: 'Lab',
-
-        /**
          * Get the operation range in meters.
          * @param {Number} level Current factory level.
          * @return {Number} Range in meters.
