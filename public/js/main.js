@@ -153,6 +153,15 @@ Object.byString = function(o, s) {
 }
 
 /**
+ * Default render name config options object.
+ *
+ * @type {RenderNameConfigOptions}
+ */
+const RENDER_NAME_CONFIG_OPTIONS_DEFAULTS = {
+    capitalizeFirst: false
+};
+
+/**
  * Render the text/name for the given node/key in the current language.
  * This encapsulates the text in a span element, to allow dynamic langauge
  * updates on the page.
@@ -167,17 +176,12 @@ Object.byString = function(o, s) {
  * @return {string} The text value.
  */
 function renderNameConfig(node, options) {
-    // Define the default options object
-    const defaults = {
-        capitalizeFirst: false
-    };
-
     // Set the options to their defaults if unset
     if(options === undefined || options === null)
         options = {};
 
     // Merge the options
-    options = merge(defaults, options);
+    options = merge(RENDER_NAME_CONFIG_OPTIONS_DEFAULTS, options);
 
     // Trim the node string
     node = node.trim();
@@ -195,11 +199,20 @@ function renderNameConfig(node, options) {
         text = '{' + node + '}';
 
     // Replace the dots in the node string with hyphens to make it class compatible
-    var textClass = text.replace('.', '-');
+    const textClass = text.replace('.', '-');
 
     // Encapsulate and return the string in the span element
     return '<span class="lang lang-' + textClass + '">' + text + '</span>';
 }
+
+/**
+ * An object to define name config rendering properties.
+ *
+ * @typedef {Object} RenderNameConfigOptions
+ * 
+ * @param {boolean=false} [capitalizeFirst] Capitalize the first letter of the
+ * text.
+ */
 
 /**
  * Default real time packet room type.
@@ -4403,11 +4416,11 @@ function bindFactoryBuildButton() {
 
 /**
  * Upper case the first character in a string.
- * @param {string} string String to uppercase the first character of.
+ * @param {string} str String to uppercase the first character of.
  * @return {string} Processed string.
  */
-function capitalizeFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
@@ -4776,7 +4789,7 @@ function updateGameDataVisuals() {
             // Create a new card for this shop
             gameActionsList.prepend('<div class="nd2-card wow ' + shopCardSelector + '" data-shop-token="' + shop.token + '">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Local dealer</h3>' +
+                '        <h3 class="card-primary-title">Local ' + renderNameConfig('shop.name') + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
                 '        <p>' + renderNameConfig('shop.name') + ' is currently dealing high quality goods around your location.</p>' +

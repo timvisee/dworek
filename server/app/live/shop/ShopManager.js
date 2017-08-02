@@ -81,7 +81,7 @@ ShopManager.prototype.getShop = function(token, callback) {
     // Loop through the list of shops
     this.shops.forEach(function(entry) {
         // Skip if we already found a shop
-        if(result != null)
+        if(result !== null)
             return;
 
         // Check whether the token equals
@@ -109,7 +109,7 @@ ShopManager.prototype.getShop = function(token, callback) {
  */
 ShopManager.prototype.getShopByUser = function(liveUser, callback) {
     // Make sure a live user was given
-    if(liveUser == null)
+    if(liveUser === null)
         return null;
 
     // Keep track of the found shop
@@ -118,7 +118,7 @@ ShopManager.prototype.getShopByUser = function(liveUser, callback) {
     // Loop through the list of shops
     this.shops.forEach(function(entry) {
         // Skip if we already found a shop
-        if(result != null)
+        if(result !== null)
             return;
 
         // Check whether the token equals
@@ -167,7 +167,7 @@ ShopManager.prototype.load = function(callback) {
         const workerInterval = gameConfig.shop.workerInterval;
 
         // Stop any old worker
-        if(self._worker != null)
+        if(self._worker !== null)
             clearInterval(self._worker);
 
         // Start a worker
@@ -193,7 +193,7 @@ ShopManager.prototype.load = function(callback) {
  */
 ShopManager.prototype.unload = function() {
     // Stop the shop worker
-    if(this._worker != null) {
+    if(this._worker !== null) {
         clearInterval(this._worker);
         this._worker = null;
     }
@@ -232,7 +232,7 @@ ShopManager.prototype.worker = function() {
             }
 
             // Continue if we can't find a game user for this user
-            if(gameUser == null) {
+            if(gameUser === null) {
                 latch.resolve();
                 return;
             }
@@ -247,7 +247,7 @@ ShopManager.prototype.worker = function() {
                 }
 
                 // Skip if the team is null
-                if(userTeam == null) {
+                if(userTeam === null) {
                     latch.resolve();
                     return;
                 }
@@ -315,7 +315,7 @@ ShopManager.prototype.worker = function() {
                         }
 
                         // Make sure a new user was found
-                        if(newUser == null)
+                        if(newUser === null)
                             return;
 
                         // Schedule the user
@@ -438,7 +438,7 @@ ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
             }
 
             // Continue if the team is null
-            if(team == null)
+            if(team === null)
                 return;
 
             // Check whether the teams equal
@@ -564,7 +564,7 @@ ShopManager.prototype.findNewShopUsers = function(teamId, callback) {
             }
 
             // Continue if the game user is null
-            if(gameUser == null) {
+            if(gameUser === null) {
                 latch.resolve();
                 return;
             }
@@ -580,7 +580,7 @@ ShopManager.prototype.findNewShopUsers = function(teamId, callback) {
                 }
 
                 // Make sure the team is valid
-                if(userTeam == null) {
+                if(userTeam === null) {
                     latch.resolve();
                     return;
                 }
@@ -662,7 +662,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
             }
 
             // Continue if we can't find a game user for this user
-            if(gameUser == null) {
+            if(gameUser === null) {
                 latch.resolve();
                 return;
             }
@@ -676,7 +676,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
                 }
 
                 // Skip if the team is null or if the team doesn't equal the specified team
-                if(userTeam == null || !userTeam.getId().equals(teamId)) {
+                if(userTeam === null || !userTeam.getId().equals(teamId)) {
                     latch.resolve();
                     return;
                 }

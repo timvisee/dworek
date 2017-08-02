@@ -51,7 +51,7 @@ var GameDataRequestHandler = function(init) {
  */
 GameDataRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -111,7 +111,7 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
             console.error(err);
 

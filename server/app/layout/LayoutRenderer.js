@@ -25,6 +25,7 @@ var crypto = require('crypto');
 
 var appInfo = require('../../appInfo');
 
+var Core = require("../../Core");
 var MergeUtils = require('../util/MergeUtils');
 var CallbackLatch = require('../util/CallbackLatch');
 
@@ -67,7 +68,11 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
             leftButton: 'menu',
             rightButton: 'options',
             url: req.originalUrl
-        }
+        },
+        lang: {
+            manager: null,
+        },
+        __: (node) => '{' + node + '}',
     };
 
     // Create a callback latch
@@ -151,6 +156,28 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
 
             // Set the mail address, and define the avatar URL
             config.session.user.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=200&d=mm';
+
+            // Resolve the latch
+            latch.resolve();
+        });
+    }
+
+    // Set the language manager if a game instance is available
+    if(req.game !== undefined && req.game !== null) {
+        // Get the live game
+        latch.add();
+        Core.gameManager.getGame(req.game, function(err, liveGame) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the language manager and render function
+            config.lang.manager = liveGame.getLangManager();
+            config.__ = config.lang.manager.renderNameConfig;
 
             // Resolve the latch
             latch.resolve();

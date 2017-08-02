@@ -136,5 +136,16 @@ Formatter.formatNano = function(nano, decimals) {
     return value + ' ' + SIZE_NOTATIONS[factor];
 };
 
+/**
+ * Capitalize the first letter in the given string.
+ *
+ * @param {string} str The string to capitalize the first letter of.
+ *
+ * @return {string} Capitalized string.
+ */
+Formatter.capitalizeFirst = function(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 // Export the class
 module.exports = Formatter;

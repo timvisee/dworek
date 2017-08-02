@@ -27,6 +27,7 @@ var Core = require('../../../Core');
 var GameModel = require('../../model/game/GameModel');
 var UserManager = require('../user/UserManager');
 var FactoryManager = require('../factory/FactoryManager');
+var LangManager = require('../../lang/LangManager');
 var ShopManager = require('../shop/ShopManager');
 var CallbackLatch = require('../../util/CallbackLatch');
 
@@ -62,6 +63,12 @@ var Game = function(game) {
      * @type {ShopManager}
      */
     this.shopManager = new ShopManager(this);
+
+    /**
+     * Language manager instance.
+     * @type {LangManager}
+     */
+    this.langManager = new LangManager(this);
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -566,6 +573,32 @@ Game.prototype.getTeamMoney = function(teamFilter, callback) {
  * @param {String} name Display name of the team.
  * @param {Number} money Amount of money the team has.
  */
+
+/**
+ * Get the language manager.
+ *
+ * @return {LangManager} Language manager instance for this game.
+ */
+Game.prototype.getLangManager = function() {
+    return this.langManager;
+};
+
+/**
+ * This routes the call to the rendering function the language manager for this game.
+ *
+ * Render the text/name for the given node/key in the current language.
+ * This encapsulates the text in a span element, to allow dynamic language updates on the page.
+ * The result string with the text and span element is returned as a string.
+ *
+ * If no known text is found for the given node, the node itself is returned,
+ * encapsulated between curly brackets.
+ *
+ * @param {string} node The node or key for the language text.
+ * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
+ */
+Game.prototype.renderNameConfig = function(node, options) {
+    return this.getLangManager().renderNameConfig(node, options);
+};
 
 /**
  * Get the game as a string.

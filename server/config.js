@@ -38,6 +38,7 @@ config.session = {};
 config.validation = {};
 config.game = {};
 config.sentry = {};
+config.lang = {};
 
 
 /******************************************************************************
@@ -415,6 +416,42 @@ config.sentry.enable = false;
  */
 config.sentry.dsn = 'https://********:********@sentry.io/000000';
 
+
+/******************************************************************************
+ * Language configuration.                                                    *
+ ******************************************************************************/
+
+/**
+ * The default language values to use.
+ *
+ * @type {object}
+ */
+config.lang.defaults = {
+    app: {
+        name: 'Dworek'
+    },
+    currency: {
+        name: 'dollar',
+        names: 'dollars',
+        sign: '$'
+    },
+    factory: {
+        name: 'lab',
+        names: 'labs'
+    },
+    shop: {
+        name: 'dealer',
+        names: 'dealers'
+    },
+    in: {
+        name: 'ingredient',
+        names: 'ingredients'
+    },
+    out: {
+        name: 'drug',
+        names: 'drugs'
+    }
+};
 
 // Export the configuration
 module.exports = config;
