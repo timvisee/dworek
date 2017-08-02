@@ -181,7 +181,7 @@ function renderNameConfig(node, options) {
         options = {};
 
     // Merge the options
-    options = merge(RENDER_NAME_CONFIG_OPTIONS_DEFAULTS, options);
+    options = merge(merge({}, RENDER_NAME_CONFIG_OPTIONS_DEFAULTS), options);
 
     // Trim the node string
     node = node.trim();

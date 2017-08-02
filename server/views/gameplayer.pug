@@ -35,7 +35,7 @@ block content
 
                 br
                 label.select(for='field-team') Team
-                if teams.teams.length == 0
+                if teams.teams.length === 0
                     select(name='field-team', id='field-team', data-native-menu='false', disabled='disabled')
                 else
                     select(name='field-team', id='field-team', data-native-menu='false')

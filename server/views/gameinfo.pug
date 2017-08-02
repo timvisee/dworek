@@ -21,16 +21,16 @@ block content
                     td= game.teams.teamCount
                 tr: td Players
                     td= game.users.usersCount.players
-                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted == 1 ? '' : 's'}
+                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted === 1 ? '' : 's'}
                 tr: td Spectators
                     td= game.users.usersCount.spectators
-                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted == 1 ? '' : 's'}
+                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted === 1 ? '' : 's'}
                 tr: td Special
                     td= game.users.usersCount.specials
-                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted == 1 ? '' : 's'}
+                        span.gray  of #{game.users.usersCount.totalAccepted} player#{game.users.usersCount.totalAccepted === 1 ? '' : 's'}
                 tr: td Requested
                     td= game.users.usersCount.requested
-                        span.gray  user#{game.users.usersCount.requested == 1 ? '' : 's'}
+                        span.gray  user#{game.users.usersCount.requested === 1 ? '' : 's'}
 
         .card-action
             .row.between-xs: .col-xs-12: .box

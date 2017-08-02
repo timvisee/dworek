@@ -59,7 +59,7 @@ LangManager.prototype.renderNameConfig = function(node, options) {
 
     // Merge the options
     // TODO: Is this merge correct, and not leaving references behind?
-    options = _.merge(RENDER_NAME_CONFIG_OPTIONS_DEFAULTS, options);
+    options = _.merge({}, RENDER_NAME_CONFIG_OPTIONS_DEFAULTS, options);
 
     // Trim the node string
     node = node.trim();
