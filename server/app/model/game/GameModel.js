@@ -28,7 +28,6 @@ var Core = require('../../../Core');
 var GameDatabase = require('./GameDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
-var UserModel = require('../user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
@@ -112,6 +111,12 @@ var GameModel = function(id) {
                      * @return {string} Stage number as a string.
                      */
                     to: (stage) => stage.toString()
+                }
+            },
+            lang_object: {
+                redis: {
+                    from: ConversionFunctions.objectFromRedis,
+                    to: ConversionFunctions.objectToRedis
                 }
             },
             create_date: {
@@ -274,6 +279,33 @@ GameModel.prototype.getStage = function(callback) {
  */
 GameModel.prototype.setStage = function(stage, callback) {
     this.setField('stage', stage, callback);
+};
+
+/**
+ * Get the language object for this game if it has any.
+ *
+ * @param {GameTeamModel~getLangObjectCallback} callback Called with the language object or when an error occurred.
+ */
+GameModel.prototype.getLangObject = function(callback) {
+    this.getField('lang_object', callback);
+};
+
+/**
+ * Called with the language object if there is any or when an error occurred.
+ *
+ * @callback GameModel~getLangObjectCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Object|null} Language object if there is any, null otherwise.
+ */
+
+/**
+ * Set the language object for this game.
+ *
+ * @param {Object|null} langObject Game language object, or null.
+ * @param {GameTeamModel~setFieldsCallback} callback Called on success or when an error occurred.
+ */
+GameModel.prototype.setLangObject = function(langObject, callback) {
+    this.setField('lang_object', langObject, callback);
 };
 
 /**

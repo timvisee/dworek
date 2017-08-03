@@ -58,7 +58,7 @@ GameDatabase.addGame = function(user, name, callback) {
     }
 
     // Make sure the user is valid
-    if(user == null) {
+    if(user === null) {
         callback(new Error('Unable to create game, invalid user instance.'));
         return;
     }
@@ -66,14 +66,12 @@ GameDatabase.addGame = function(user, name, callback) {
     // Format the game name
     name = Validator.formatGameName(name);
 
-    // Create a callback latch
-    var latch = new CallbackLatch();
-
     // Create the object to insert
     var insertObject = {
         user_id: user.getId(),
         name,
         stage: 0,
+        lang_object: null,
         create_date: new Date()
     };
 

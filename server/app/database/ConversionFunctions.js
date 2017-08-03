@@ -23,6 +23,22 @@
 // Export the module
 module.exports = {
 
+    /**(
+     * Deserialize an object from a string.
+     *
+     * @param {String} objString Object string.
+     * @return {Object|null} Object.
+     */
+    deserializeObject: (objString) => objString !== null ? JSON.parse(objString) : null,
+
+    /**
+     * Serialize an object to a string.
+     *
+     * @param {Object} obj Object.
+     * @return {String} Object as a string.
+     */
+    serializeObject: (obj) => obj !== null ? JSON.stringify(obj) : null,
+
     /**
      * Deserialize a Date from a string.
      *
@@ -38,6 +54,22 @@ module.exports = {
      * @return {String} Date as a string.
      */
     serializeDate: (date) => date !== null ? date.toISOString() : null,
+
+    /**
+     * Convert a serialized Redis object to an object.
+     *
+     * @param {String} objString Serialized object.
+     * @return {Object} Object.
+     */
+    objectFromRedis: this.deserializeObject,
+
+    /**
+     * Convert an object to a serialized Redis object.
+     *
+     * @param {Object} object Object.
+     * @return {String} Serialized object.
+     */
+    objectToRedis: this.serializeObject,
 
     /**
      * Convert a serialized Redis date to a Date.

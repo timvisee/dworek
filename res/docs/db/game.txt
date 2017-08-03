@@ -5,4 +5,5 @@ _id : ID                Game ID.
 user_id : ID            User ID of the user that created this game.
 name : String           Game name.
 stage : Integer         Game stage, which can be 0, 1 or 2. For not started, active and finished.
+lang_object : Object    Object with language values.
 create_date : Date      The date and time this game was created on.
