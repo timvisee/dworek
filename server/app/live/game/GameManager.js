@@ -877,7 +877,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             }
 
             // Make sure the game user exists
-            if(gameUser == null) {
+            if(gameUser === null) {
                 latch.resolve();
                 return;
             }
@@ -986,7 +986,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     }
 
                     // Make sure the user has a team
-                    if(team == null) {
+                    if(team === null) {
                         // Resolve the latch and return
                         latch.resolve();
                         return;
@@ -1004,7 +1004,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Set the cost
-                        _.set(gameData, 'factory.cost', cost != 0 ? cost : 0);
+                        _.set(gameData, 'factory.cost', cost !== 0 ? cost : 0);
 
                         // Resolve the latch
                         latch.resolve();
@@ -1158,7 +1158,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             }
 
             // Make sure the game user is valid
-            if (gameUser == null) {
+            if (gameUser === null) {
                 latch.resolve();
                 return;
             }
@@ -1177,7 +1177,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                 gameData.strength.value = userStrength;
 
                 // Get the game config
-                if(gameStage == 1) {
+                if(gameStage === 1) {
                     game.getConfig(function (err, gameConfig) {
                         // Call back errors
                         if (err !== null) {
@@ -1213,7 +1213,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             }
 
             // Make sure the game isn't null
-            if(liveGame == null) {
+            if(liveGame === null) {
                 latch.resolve();
                 return;
             }
@@ -1242,7 +1242,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     }
 
                     // The game user may not be null
-                    if (gameUser == null) {
+                    if (gameUser === null) {
                         latch.resolve();
                         return;
                     }
@@ -1263,13 +1263,13 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         // Loop through the list of teams, and define whether the team is ally for the user
                         for(var i = 0; i < gameData.standings.length; i++) {
                             // The team is never an ally if the user's team is null
-                            if(team == null) {
+                            if(team === null) {
                                 gameData.standings[i].ally = false;
                                 continue;
                             }
 
                             // Determine whether this team is ally, and set the ally status
-                            var isAlly = gameData.standings[i].id == team.getIdHex();
+                            var isAlly = gameData.standings[i].id === team.getIdHex();
                             gameData.standings[i].ally = isAlly;
 
                             // Set the money of the ally team
@@ -1278,7 +1278,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Get the pings that are applicable for this team, and set the pings field in the game data object
-                        if(gameStage == 1) {
+                        if(gameStage === 1) {
                             // Get the pings
                             const pings = gameConfig.ping.getPings(allyTeamMoney);
 

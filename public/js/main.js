@@ -1144,7 +1144,7 @@ function renderNameConfig(node, options) {
     }
 
     // Use the global language object if no language value has been found yet
-    if(text === undefined && langAppObject !== null)
+    if(text === undefined || langAppObject === null)
         text = Object.byString(langAppObject, node);
 
     // Capitalize the first character if set
@@ -1232,12 +1232,18 @@ function updateNameConfigs(gameId) {
             return;
         }
 
-        // Get the language text
-        var newText = renderNameConfig(node, {
-            game: gameId,
+        // Build the name config options object
+        var nameConfigOptions = {
             capitalizeFirst: capitalizeFirst,
             encapsulate: false
-        });
+        };
+
+        // Set the game property
+        if(gameId !== false && gameId !== true && gameId !== undefined && gameId !== null)
+            nameConfigOptions.game = gameId;
+
+        // Get the language text
+        var newText = renderNameConfig(node, nameConfigOptions);
 
         // Update the element content if it changed
         if($(this).text() !== newText)
@@ -4967,7 +4973,7 @@ function updateGameDataVisuals() {
         if(showFactoryBuild && factoryBuildCardElement.length == 0) {
             gameActionsList.prepend('<div class="nd2-card wow card-factory-build">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Build a ' + __('factory.name', { capitalizeFirst: true, game: gameId }) + '</h3>' +
+                '        <h3 class="card-primary-title">Build a ' + __('factory.name', { game: gameId }) + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
                 '        <p>Build a ' + __('factory.name', { game: gameId }) + ' at your current location to expand your fleet and start producing more ' + __('out.name', { game: gameId }) + '.</p>' +

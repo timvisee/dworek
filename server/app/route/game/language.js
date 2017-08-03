@@ -25,6 +25,7 @@ var _ = require('lodash');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var CallbackLatch = require('../../util/CallbackLatch');
 const Core = require("../../../Core");
+const PacketType = require("../../realtime/PacketType");
 
 // Export the module
 module.exports = {
@@ -269,7 +270,14 @@ module.exports = {
                 // Update the language object
                 liveGame.getGameLangManager().setGameLangObject(gameLangObject);
 
-                // TODO: Send an update to all game users, to update the game language
+                // Send a language update to each user
+                liveGame.userManager.users.forEach(function(liveUser) {
+                    // Send the language update
+                    Core.realTime.packetProcessor.sendPacketUser(PacketType.GAME_LANG_OBJECT_UPDATE, {
+                        game: game.getIdHex(),
+                        langObject: gameLangObject
+                    }, liveUser);
+                });
 
                 // Resolve the latch
                 latch.resolve();
