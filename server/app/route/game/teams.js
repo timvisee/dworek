@@ -192,7 +192,7 @@ module.exports = {
                 return;
 
             // Render the game page
-            LayoutRenderer.render(req, res, next, 'gameteam', gameName, {
+            LayoutRenderer.render(req, res, next, 'game/team/index', gameName, {
                 page: {
                     leftButton: 'back'
                 },

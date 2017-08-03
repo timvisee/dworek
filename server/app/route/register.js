@@ -53,7 +53,7 @@ router.get('/', function(req, res, next) {
         pageVars.next = req.param('next');
 
     // Show the registration page
-    LayoutRenderer.render(req, res, next, 'register', 'Registration', pageVars);
+    LayoutRenderer.render(req, res, next, 'account/register', 'Registration', pageVars);
 });
 
 // Register index
@@ -233,7 +233,7 @@ router.post('/', function(req, res, next) {
                     }
 
                     // Show registration success page
-                    LayoutRenderer.render(req, res, next, 'register', 'Success', pageVars);
+                    LayoutRenderer.render(req, res, next, 'account/register', 'Success', pageVars);
                 });
             });
         });

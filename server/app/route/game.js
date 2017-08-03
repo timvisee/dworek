@@ -215,7 +215,7 @@ router.get('/:game', function(req, res, next) {
     latch.then(function() {
         // Render the game page
         //noinspection JSCheckFunctionSignatures
-        LayoutRenderer.render(req, res, next, 'game', gameObject.name, {
+        LayoutRenderer.render(req, res, next, 'game/index', gameObject.name, {
             game: gameObject,
             user: userObject
         });

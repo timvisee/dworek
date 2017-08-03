@@ -53,7 +53,7 @@ router.get('/', function(req, res, next) {
         pageVars.next = req.param('next');
 
     // Show the login page
-    LayoutRenderer.render(req, res, next, 'login', 'Login', pageVars);
+    LayoutRenderer.render(req, res, next, 'account/login', 'Login', pageVars);
 });
 
 // Login index

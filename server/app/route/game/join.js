@@ -138,7 +138,7 @@ module.exports = {
             // Render the page when we're done
             latch.then(function() {
                 // Render the game page
-                LayoutRenderer.render(req, res, next, 'gamejoin', 'Requested', {
+                LayoutRenderer.render(req, res, next, 'game/join', 'Requested', {
                     page: {
                         leftButton: 'none',
                         rightButton: 'none'

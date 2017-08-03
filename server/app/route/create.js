@@ -51,12 +51,12 @@ router.get('/', function(req, res, next) {
 
         // Make sure the user is an administrator
         if(!isAdmin) {
-            LayoutRenderer.render(req, res, next, 'nopermission', 'Oeps!');
+            LayoutRenderer.render(req, res, next, 'permission/nopermission', 'Oeps!');
             return;
         }
 
         // Show the game creation page
-        LayoutRenderer.render(req, res, next, 'gamecreate', 'Create game', {
+        LayoutRenderer.render(req, res, next, 'game/create', 'Create game', {
             page: {
                 leftButton: 'back'
             },
@@ -87,7 +87,7 @@ router.post('/', function(req, res, next) {
 
         // Make sure the user is an administrator
         if(!isAdmin) {
-            LayoutRenderer.render(req, res, next, 'nopermission', 'Oeps!');
+            LayoutRenderer.render(req, res, next, 'permission/nopermission', 'Oeps!');
             return;
         }
 
@@ -120,7 +120,7 @@ router.post('/', function(req, res, next) {
             }
 
             // Show the game creation page
-            LayoutRenderer.render(req, res, next, 'gamecreate', 'Game created', {
+            LayoutRenderer.render(req, res, next, 'game/create', 'Game created', {
                 page: {
                     leftButton: 'back'
                 },

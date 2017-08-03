@@ -326,7 +326,7 @@ module.exports = {
                         latch.then(function() {
                             // Render the game page if we didn't call back yet
                             if(!calledBack)
-                                LayoutRenderer.render(req, res, next, 'factory', factoryObject.name, {
+                                LayoutRenderer.render(req, res, next, 'game/factory/index', factoryObject.name, {
                                     page: {
                                         leftButton: 'back'
                                     },

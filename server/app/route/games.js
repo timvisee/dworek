@@ -95,7 +95,7 @@ router.get('/', function(req, res, next) {
 
     // Render the games page
     latch.then(function() {
-        LayoutRenderer.render(req, res, next, 'gamelist', 'Games', options);
+        LayoutRenderer.render(req, res, next, 'game/list', 'Games', options);
     });
 });
 
@@ -147,7 +147,7 @@ function renderGameList(req, res, next, stage, limit, category, pageTitle) {
         }
 
         // Render the games page
-        LayoutRenderer.render(req, res, next, 'gamelist', pageTitle, {
+        LayoutRenderer.render(req, res, next, 'game/list', pageTitle, {
             page: {
                 leftButton: 'back'
             },

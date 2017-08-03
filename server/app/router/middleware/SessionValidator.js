@@ -54,7 +54,7 @@ SessionValidator.route = function(req, res, next) {
      * This renders the page that shows the client he's required to login.
      */
     req.showRequireLoginPage = function() {
-        LayoutRenderer.render(req, res, next, 'requirelogin', 'Whoops!', {
+        LayoutRenderer.render(req, res, next, 'permission/requirelogin', 'Whoops!', {
             next: encodeURIComponent(req.originalUrl)
         });
     };
