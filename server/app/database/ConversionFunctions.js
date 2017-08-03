@@ -21,9 +21,9 @@
  ******************************************************************************/
 
 // Export the module
-module.exports = {
+var ConversionFunctions = {
 
-    /**(
+    /**
      * Deserialize an object from a string.
      *
      * @param {String} objString Object string.
@@ -54,36 +54,39 @@ module.exports = {
      * @return {String} Date as a string.
      */
     serializeDate: (date) => date !== null ? date.toISOString() : null,
-
-    /**
-     * Convert a serialized Redis object to an object.
-     *
-     * @param {String} objString Serialized object.
-     * @return {Object} Object.
-     */
-    objectFromRedis: this.deserializeObject,
-
-    /**
-     * Convert an object to a serialized Redis object.
-     *
-     * @param {Object} object Object.
-     * @return {String} Serialized object.
-     */
-    objectToRedis: this.serializeObject,
-
-    /**
-     * Convert a serialized Redis date to a Date.
-     *
-     * @param {String} date Serialized date.
-     * @return {Date} Date.
-     */
-    dateFromRedis: this.deserializeDate,
-
-    /**
-     * Convert a Date to a serialized Redis date.
-     *
-     * @param {Date} date Date.
-     * @return {String} Serialized date.
-     */
-    dateToRedis: this.serializeDate
 };
+
+/**
+ * Convert a serialized Redis object to an object.
+ *
+ * @param {String} objString Serialized object.
+ * @return {Object} Object.
+ */
+ConversionFunctions.objectFromRedis = ConversionFunctions.deserializeObject;
+
+/**
+ * Convert an object to a serialized Redis object.
+ *
+ * @param {Object} object Object.
+ * @return {String} Serialized object.
+ */
+ConversionFunctions.objectToRedis = ConversionFunctions.serializeObject;
+
+/**
+ * Convert a serialized Redis date to a Date.
+ *
+ * @param {String} date Serialized date.
+ * @return {Date} Date.
+ */
+ConversionFunctions.dateFromRedis = ConversionFunctions.deserializeDate;
+
+/**
+ * Convert a Date to a serialized Redis date.
+ *
+ * @param {Date} date Date.
+ * @return {String} Serialized date.
+ */
+ConversionFunctions.dateToRedis = ConversionFunctions.serializeDate;
+
+// Export the module
+module.exports = ConversionFunctions;

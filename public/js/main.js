@@ -1134,8 +1134,14 @@ function renderNameConfig(node, options) {
     var text = undefined;
 
     // Get the game language object if there is any
-    if(options.game !== null && options.game !== undefined && hasGameLangObject(options.game))
-        text = Object.byString(getGameLangObject(options.game), node);
+    if(options.game !== null && options.game !== undefined && hasGameLangObject(options.game)) {
+        // Get the game lang object
+        const gameLangObject = getGameLangObject(options.game);
+
+        // Get the string if the language object is valid
+        if(gameLangObject !== null && gameLangObject !== undefined)
+            text = Object.byString(gameLangObject, node);
+    }
 
     // Use the global language object if no language value has been found yet
     if(text === undefined && langAppObject !== null)

@@ -58,7 +58,7 @@ GameLangManager.prototype.getGameLangObject = function() {
  */
 GameLangManager.prototype.setGameLangObject = function(gameLangObject) {
     // Parse the object
-    if(gameLangObject === undefined || (_.isEmpty(gameLangObject)))
+    if(gameLangObject === undefined || _.isEmpty(gameLangObject))
         gameLangObject = null;
 
     // Set the property

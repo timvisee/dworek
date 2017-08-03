@@ -68,7 +68,7 @@ var Game = function(game) {
      * Language manager instance.
      * @type {GameLangManager}
      */
-    this.gameLangManager = new GameLangManager(this);
+    this.gameLangManager = new GameLangManager();
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -208,6 +208,27 @@ Game.prototype.load = function(callback) {
             calledBack = true;
             return;
         }
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Store a reference to self
+    const self = this;
+
+    // Load the language object
+    latch.add();
+    this.getGameModel().getLangObject(function(err, gameLangObject) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the language object
+        self.gameLangManager.setGameLangObject(gameLangObject);
 
         // Resolve the latch
         latch.resolve();

@@ -103,7 +103,7 @@ GameManager.prototype.getGame = function(gameId, callback) {
             }
 
             // Make sure the stage is valid
-            if(stage == 0) {
+            if(stage === 0) {
                 callback(null, null);
                 return;
             }
