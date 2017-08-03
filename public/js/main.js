@@ -365,7 +365,7 @@ var Dworek = {
 			// Start error monitoring with Sentry
 			// TODO: Make this configurable
 			// TODO: Don't hardcode the DSN (url)
-			Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install();
+			//Raven.config('https://4343f576e97b4c41ba6264fbab90ab73@sentry.io/172946').install();
 
             // TODO: Supply some user (session) context
 		},
