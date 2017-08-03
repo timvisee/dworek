@@ -20,8 +20,11 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
+
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var CallbackLatch = require('../../util/CallbackLatch');
+const Core = require("../../../Core");
 
 // Export the module
 module.exports = {
@@ -37,6 +40,7 @@ module.exports = {
 
         // Route the pages
         router.get('/:game/language', self.get);
+        router.post('/:game/language', self.post);
     },
 
     /**
@@ -138,14 +142,149 @@ module.exports = {
             }
 
             // Render the game management page
-            LayoutRenderer.render(req, res, next, 'game/language', gameObject.name, {
+            LayoutRenderer.render(req, res, next, 'game/language', 'Language', {
                 page: {
                     leftButton: 'back'
                 },
                 game: gameObject,
                 lang: {
-                    game: gameLangObject
+                    getGameValue: function(node) {
+                        if(_.has(gameLangObject, node))
+                            return _.get(gameLangObject, node);
+                        return '';
+                    },
+                    getGlobalValue: function(node) {
+                        // Get the language text, and return it
+                        var text = Core.langManager.__(node, {
+                            capitalizeFirst: false,
+                            encapsulate: false
+                        });
+                        return text !== undefined ? text : '';
+                    }
                 }
+            });
+        });
+    },
+
+    /**
+     * Post page.
+     *
+     * @param req Express request object.
+     * @param res Express response object.
+     * @param next Express next callback.
+     */
+    post: (req, res, next) => {
+        // Make sure the user has a valid session
+        if(!req.requireValidSession())
+            return;
+
+        // Get the game and user
+        const game = req.game;
+        const user = req.session.user;
+
+        // Call back if the game is invalid
+        if(game === undefined) {
+            next(new Error('Invalid game.'));
+            return;
+        }
+
+        // Determine whether the user has permission to manage this game
+        game.hasManagePermission(user, function(err, hasPermission) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    next(err);
+                calledBack = true;
+                return;
+            }
+
+            // Make sure the user has permission to manage the game
+            if(!hasPermission) {
+                LayoutRenderer.render(req, res, next, 'permission/nopermission', 'Whoops!');
+                return;
+            }
+
+            // Create a list of language nodes to handle
+            const langNodes = [
+                'currency.name',
+                'currency.names',
+                'currency.sign',
+                'factory.name',
+                'factory.names',
+                'shop.name',
+                'shop.names',
+                'in.name',
+                'in.names',
+                'out.name',
+                'out.names',
+            ];
+
+            // Create a new game language object
+            var gameLangObject = {};
+
+            // Loop through the nodes, and get their values from the POST request
+            langNodes.forEach(function(node) {
+                // Get the entered value
+                var value = req.body['field-' + node.replace('.', '-')];
+
+                // Add the value to the object if it isn't undefined and/or empty
+                if(value !== undefined && _.isString(value) && value.length > 0)
+                    _.set(gameLangObject, node, value.trim());
+            });
+
+            // Reset the object to null if it's still empty
+            if(_.isEmpty(gameLangObject))
+                gameLangObject = null;
+
+            // Create a callback latch
+            var latch = new CallbackLatch();
+            var calledBack = false;
+
+            // Update the language
+            latch.add();
+            game.setLangObject(gameLangObject, function(err) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Get the live game
+            latch.add();
+            Core.gameManager.getGame(game, function(err, liveGame) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Update the language object
+                liveGame.getGameLangManager().setGameLangObject(gameLangObject);
+
+                // TODO: Send an update to all game users, to update the game language
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Render the game management page
+            latch.then(function() {
+                // Render the result page
+                LayoutRenderer.render(req, res, next, 'game/language', 'Language', {
+                    game: {
+                        id: game.getIdHex(),
+                    },
+                    hideBackButton: true,
+                    success: true
+                });
             });
         });
     }

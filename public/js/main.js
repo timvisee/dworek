@@ -154,7 +154,7 @@ Object.byString = function(o, s) {
 
     // Return the selected value
     return o;
-}
+};
 
 // Define the Date#now function if it isn't available
 if(!Date.now)

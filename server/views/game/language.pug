@@ -4,32 +4,74 @@ block content
     unless success
         p.
             Enter the custom language values below.#[br]
+            #[br]
             Leave a field blank to use the default value.
 
         br
         form(method='POST', action='/game/' + game.id + '/language#')
 
+            label(for='field-currency-name') Currency name singular:
+            input(type='text', name='field-currency-name', id='field-currency-name', value=lang.getGameValue('currency.name'), data-clear-btn='true', placeholder=lang.getGlobalValue('currency.name'))
+
+            label(for='field-currency-names') Currency name plural:
+            input(type='text', name='field-currency-names', id='field-currency-names', value=lang.getGameValue('currency.names'), data-clear-btn='true', placeholder=lang.getGlobalValue('currency.names'))
+
+            label(for='field-currency-sign') Currency sign:
+            input(type='text', name='field-currency-sign', id='field-currency-sign', value=lang.getGameValue('currency.sign'), data-clear-btn='true', placeholder=lang.getGlobalValue('currency.sign'))
+
+            br
+
             label(for='field-factory-name') Factory singular:
-            input(type='text', name='field-factory-name', id='field-factory-name', value='', data-clear-btn='true', placeholder='lab')
+            input(type='text', name='field-factory-name', id='field-factory-name', value=lang.getGameValue('factory.name'), data-clear-btn='true', placeholder=lang.getGlobalValue('factory.name'))
 
             label(for='field-factory-names') Factory plural:
-            input(type='text', name='field-factory-names', id='field-factory-names', value='', data-clear-btn='true', placeholder='labs')
+            input(type='text', name='field-factory-names', id='field-factory-names', value=lang.getGameValue('factory.names'), data-clear-btn='true', placeholder=lang.getGlobalValue('factory.names'))
+
+            br
+
+            label(for='field-shop-name') Shop singular:
+            input(type='text', name='field-shop-name', id='field-shop-name', value=lang.getGameValue('shop.name'), data-clear-btn='true', placeholder=lang.getGlobalValue('shop.name'))
+
+            label(for='field-shop-names') Shop plural:
+            input(type='text', name='field-shop-names', id='field-shop-names', value=lang.getGameValue('shop.names'), data-clear-btn='true', placeholder=lang.getGlobalValue('shop.names'))
+
+            br
+
+            label(for='field-in-name') Input singular:
+            input(type='text', name='field-in-name', id='field-in-name', value=lang.getGameValue('in.name'), data-clear-btn='true', placeholder=lang.getGlobalValue('in.name'))
+
+            label(for='field-in-names') Input plural:
+            input(type='text', name='field-in-names', id='field-in-names', value=lang.getGameValue('in.names'), data-clear-btn='true', placeholder=lang.getGlobalValue('in.names'))
+
+            br
+
+            label(for='field-out-name') Output singular:
+            input(type='text', name='field-out-name', id='field-out-name', value=lang.getGameValue('out.name'), data-clear-btn='true', placeholder=lang.getGlobalValue('out.name'))
+
+            label(for='field-out-names') Output plural:
+            input(type='text', name='field-out-names', id='field-out-names', value=lang.getGameValue('out.names'), data-clear-btn='true', placeholder=lang.getGlobalValue('out.names'))
 
             br
             .button-list
-                button.ui-btn.ui-btn-raised.clr-primary(type='submit') Update
+                button.ui-btn.ui-btn-raised.clr-primary(type='submit')
+                    i.zmdi.zmdi-edit
+                    | &nbsp;&nbsp;Change
+                a.ui-btn.wow.fadeIn(href='#', data-rel='back', data-direction='reverse')
+                    i.zmdi.zmdi-arrow-back
+                    | &nbsp;&nbsp;Go back
 
     else
         //- Print the success message
-        p: +format(message)
+        p.
+            The language values have been changed successfully.#[br]
+            #[br]
+            All players should now see the updated names.
 
-        //- Show the dashboard/continue buttons
         br
-        if next === undefined
-            a.ui-btn.ui-btn-raised.clr-primary(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
-
-        else
-            .button-list
-                a.ui-btn.ui-btn-raised.clr-primary(href=next, data-icon='arrow-right', title='Continue', data-ajax='false') Continue
-                a.ui-btn(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
-
+        .button-list
+            a.ui-btn.ui-btn-raised.clr-primary(href='/game/' + game.id, title='Go back to the game')
+                i.zmdi.zmdi-home
+                | &nbsp;&nbsp;Game overview
+            a.ui-btn(href='/game/' + game.id + '/manage', title='Go to the game management')
+                i.zmdi.zmdi-edit
+                | &nbsp;&nbsp;Game management

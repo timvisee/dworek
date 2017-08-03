@@ -56,3 +56,16 @@ block content
                 a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-broadcast(href='#', data-transition='slide', data-rel='popup')
                     i.zmdi.zmdi-mail-send
                     | &nbsp;&nbsp;Broadcast message
+
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Language
+
+        .card-supporting-text.has-action.has-title
+            p Change the language of various elements in this game, to give it a different style.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary(href='/game/' + game.id + '/language', title='Visit the language manager')
+                    i.zmdi.zmdi-comment-text
+                    | &nbsp;&nbsp;Language manager
