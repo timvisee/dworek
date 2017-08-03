@@ -19,12 +19,12 @@ block content
 
             .card-supporting-text.has-action.has-title
                 table.table-list.ui-responsive
-                    tr: td.game-label-input!= __('in.names', { capitalizeFirst: true })
+                    tr: td.game-label-input!= __('in.names', { capitalizeFirst: true, game: game.id })
                         td
                             span.factory-in= factory.in
                             | &nbsp;
                             span.factory-production-in(style="color: gray;") − ? / tick
-                    tr: td.game-label-output!= __('out.names', { capitalizeFirst: true })
+                    tr: td.game-label-output!= __('out.names', { capitalizeFirst: true, game: game.id })
                         td
                             span.factory-out= factory.out
                             | &nbsp;
@@ -49,14 +49,14 @@ block content
                         td.factory-creator= factory.creatorName
 
     div.tab-factory-attack(data-role='nd2tab', data-tab='attack')
-        span.tab-factory-attack-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name')}.
+        span.tab-factory-attack-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name', { game: game.id })}.
 
         .nd2-card.wow.fadeInUp.card-factory-attack
             .card-title.has-supporting-text
                 h3.card-primary-title Attack
 
             .card-supporting-text.has-action.has-title
-                p The !{__('factory.name')} isn't strong enough to withstand enemy attacks. Attack the !{__('factory.name')} to take it over.
+                p The !{__('factory.name', { game: game.id })} isn't strong enough to withstand enemy attacks. Attack the !{__('factory.name', { game: game.id })} to take it over.
                 div(align="center")
                     table.table-list.ui-responsive
                         tr: td Conquer value
@@ -69,7 +69,7 @@ block content
                         | &nbsp;&nbsp;Attack
 
     div.tab-factory-transfer(data-role='nd2tab', data-tab='transfer')
-        span.tab-factory-transfer-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name')}.
+        span.tab-factory-transfer-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name', { game: game.id })}.
 
         .nd2-card.wow.fadeInUp.card-factory-transfer
             .card-title.has-supporting-text
@@ -88,7 +88,7 @@ block content
                         | &nbsp;&nbsp;Withdraw
 
     div.tab-factory-defence(data-role='nd2tab', data-tab='defence')
-        span.tab-factory-defence-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name')}.
+        span.tab-factory-defence-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name', { game: game.id })}.
 
         .nd2-card.wow.fadeInUp.card-factory-defence
             .card-title.has-supporting-text
@@ -107,7 +107,7 @@ block content
                         i No upgrades available...<br>
 
     div.tab-factory-level(data-role='nd2tab', data-tab='level')
-        span.tab-factory-level-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name')}.
+        span.tab-factory-level-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name', { game: game.id })}.
 
         .nd2-card.wow.fadeInUp.card-factory-level
             .card-title.has-supporting-text

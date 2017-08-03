@@ -117,12 +117,12 @@ block content
                     tr: td Money
                         td
                             span.game-balance-money ?
-                            span(style="color: gray;")  !{__('currency.names')}
-                    tr: td!= __('in.names', { capitalizeFirst: true })
+                            span(style="color: gray;")  !{__('currency.names', { game: game.id })}
+                    tr: td!= __('in.names', { capitalizeFirst: true, game: game.id })
                         td
                             span.game-balance-in ?
                             span(style="color: gray;")  units
-                    tr: td!= __('out.names', { capitalizeFirst: true })
+                    tr: td!= __('out.names', { capitalizeFirst: true, game: game.id })
                         td
                             span.game-balance-out ?
                             span(style="color: gray;")  units
@@ -132,7 +132,7 @@ block content
                 h3.card-primary-title Upgrade strength
 
             .card-supporting-text.has-action.has-title
-                p Upgrading your strength makes it easier to attack enemy !{__('factory.names')}.
+                p Upgrading your strength makes it easier to attack enemy !{__('factory.names', { game: game.id })}.
                 div(align='center')
                     table.table-list.ui-responsive
                         tr: td Strength
@@ -148,7 +148,7 @@ block content
                 h3.card-primary-title Ping
 
             .card-supporting-text.has-action.has-title
-                p Execute a ping to scan for a nearby enemy !{__('factory.name')}.
+                p Execute a ping to scan for a nearby enemy !{__('factory.name', { game: game.id })}.
 
             .card-action
                 .row.between-xs: .col-xs-12: .box.ping-button-list

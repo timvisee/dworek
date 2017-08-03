@@ -68,7 +68,9 @@ router.get('/:game', function(req, res, next) {
     }
 
     // Create a game and user object
-    var gameObject = {};
+    var gameObject = {
+        id: game.getIdHex()
+    };
     var userObject = {};
 
     // Create a callback latch for the games properties
