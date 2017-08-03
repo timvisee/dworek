@@ -380,7 +380,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
 
             // Send a notification to the user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
-                message: 'You became a ' + liveGame.__('shop.name') + '.<br><br>' +
+                message: 'You became a ' + liveGame.__('shop.name', { game: liveGame.getIdHex() }) + '.<br><br>' +
                 'You and other players are now able to buy/sell goods when they\'re nearby you.<br><br>' +
                 'Watch out: you\'re now visible on the map for everyone, also for enemy players.',
                 error: false,

@@ -2297,7 +2297,7 @@ function showDialog(options, callback) {
 
         // Create the button
         var button = $('<a>', {
-            text: action.text
+            html: action.text
         }).buttonMarkup({
             inline: false,
             shadow: false
@@ -4739,7 +4739,7 @@ function buildFactory() {
 
     // Show a dialog message
     showDialog({
-        title: 'Build ' + __('factory.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() }),
+        title: 'Build ' + __('factory.name', { game: Dworek.utils.getGameId() }),
         message: dialogMessage,
         actions: [
             {
