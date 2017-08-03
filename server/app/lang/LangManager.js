@@ -84,8 +84,8 @@ LangManager.prototype.renderNameConfig = function(node, options) {
 
     // Loop through the language objects to fetch the language value
     options.langObjects.forEach(function(langObject) {
-        // Return early if we already found something
-        if(text !== undefined)
+        // Return early if we already found something or if this object is null, undefined or empty
+        if(text !== undefined || langObject === undefined || langObject === null || _.isEmpty(langObject))
             return;
 
         // Try to find the value in the given language object

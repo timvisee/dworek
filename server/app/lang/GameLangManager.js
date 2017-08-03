@@ -25,10 +25,20 @@ var _ = require('lodash');
 const Core = require("../../Core");
 
 /**
+ * @param {Object|undefined} [gameLangObject] Game language object, or nothing.
+ *
  * @class
  * @constructor
  */
-var GameLangManager = function() {};
+var GameLangManager = function(gameLangObject) {
+    /**
+     * Game specific language object.
+     * This object must be updated manually to ensure a custom language object is used.
+     *
+     * @type {Object}
+     */
+    this.gameLangObject = (gameLangObject !== undefined && gameLangObject !== null && _.isObject(gameLangObject)) ? gameLangObject : null;
+};
 
 /**
  * Get the game specific language object.
@@ -37,10 +47,22 @@ var GameLangManager = function() {};
  * @returns {Object} Game specific language object.
  */
 GameLangManager.prototype.getGameLangObject = function() {
-    // TODO: Return the game language object here!
+    return this.gameLangObject;
+};
 
-    // This below is a temporary placeholder
-    return Core.langManager.getDefaultLangObject();
+/**
+ * Set the game specific language object.
+ * This shouldn't contain the global application wide language object properties.
+ *
+ * @param {Object|undefined} [gameLangObject] Game specific language object, or nothing.
+ */
+GameLangManager.prototype.setGameLangObject = function(gameLangObject) {
+    // Parse the object
+    if(gameLangObject === undefined || (_.isEmpty(gameLangObject)))
+        gameLangObject = null;
+
+    // Set the property
+    this.gameLangObject = gameLangObject;
 };
 
 /**
