@@ -45,6 +45,7 @@ var FactoryModelManager = require('./app/model/factory/FactoryModelManager');
 var RealTime = require('./app/realtime/RealTime');
 var PortUtils = require('./app/util/PortUtils');
 var EventLoopMonitor = require('./app/latency/EventLoopMonitor');
+var LangManager = require('./app/lang/LangManager');
 
 /**
  * Constructor.
@@ -72,7 +73,7 @@ var App = function(init) {
     this._webPort = null;
 
     // Initialize
-    if(init != undefined && init)
+    if(init !== undefined && init)
         this.init();
 };
 
@@ -89,6 +90,9 @@ App.prototype.init = function(callback) {
 
     // Initialize sentry monitoring
     this._initSentryMonitoring();
+
+    // Initialize the application wide language manager
+    this._initLangManager();
 
     // Store the current instance
     const self = this;
@@ -213,6 +217,17 @@ App.prototype._initSentryMonitoring = function() {
 
     } else
         console.log('Not enabling Sentry error monitoring, disabled in config.');
+};
+
+/**
+ * Initialize, set up and enable the application wide language manager, with the default language values.
+ *
+ * @private
+ */
+App.prototype._initLangManager = function() {
+    // Initialize the language manager
+    console.log('Initializing global language manager...');
+    Core.langManager = new LangManager();
 };
 
 /**

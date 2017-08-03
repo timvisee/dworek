@@ -42,6 +42,15 @@ const RENDER_NAME_CONFIG_OPTIONS_DEFAULTS = {
 var LangManager = function() {};
 
 /**
+ * Get the default application wide language object.
+ *
+ * @returns {Object} Default languages object.
+ */
+LangManager.prototype.getDefaultLangObject = function() {
+    return config.lang.defaults;
+};
+
+/**
  * Render the text/name for the given node/key in the current language.
  * This encapsulates the text in a span element, to allow dynamic language updates on the page.
  * The result string with the text and span element is returned as a string.
@@ -61,15 +70,27 @@ LangManager.prototype.renderNameConfig = function(node, options) {
     // TODO: Is this merge correct, and not leaving references behind?
     options = _.merge({}, RENDER_NAME_CONFIG_OPTIONS_DEFAULTS, options);
 
+    // Parse the language objects option
+    if(_.isObject(options.langObjects) && !_.isArray(options.langObjects))
+        options.langObjects = [options.langObjects];
+    else if(options.langObjects === undefined || options.langObjects === null || (_.isEmpty(options.langObjects)))
+        options.langObjects = [this.getDefaultLangObject()];
+
     // Trim the node string
     node = node.trim();
 
-    // TODO: GET THE NameConfig OBJECT HERE!
-
     // Get the language text value
     var text = undefined;
-    // TODO: Get the actual language value for the game
-    // var text = _.get(NameConfig, node, undefined);
+
+    // Loop through the language objects to fetch the language value
+    options.langObjects.forEach(function(langObject) {
+        // Return early if we already found something
+        if(text !== undefined)
+            return;
+
+        // Try to find the value in the given language object
+        text = _.get(langObject, node, undefined);
+    });
 
     // Get the default value if nothing was found for the given node
     if(text === undefined)
@@ -91,12 +112,16 @@ LangManager.prototype.renderNameConfig = function(node, options) {
     return '<span class="lang lang-' + textClass + '">' + text + '</span>';
 };
 
+// Alias for renderNameConfig
+LangManager.prototype.__= LangManager.prototype.renderNameConfig;
+
 /**
  * An object to define name config rendering properties.
  *
  * @typedef {Object} RenderNameConfigOptions
  *
  * @param {boolean=false} [capitalizeFirst] Capitalize the first letter of the text.
+ * @param {Object[]} [langObjects] Objects to get language values from. The lower the index of the object, the higher the priority.
  */
 
 // Export the class

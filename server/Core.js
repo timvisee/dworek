@@ -36,6 +36,13 @@ var Core = function() {};
 Core.model = {};
 
 /**
+ * Language manager.
+ *
+ * @type {LangManager}
+ */
+Core.langManager = null;
+
+/**
  * User model manager.
  *
  * @type {UserModelManager|null} User model manager, or null if it isn't instantiated yet.

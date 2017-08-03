@@ -70,9 +70,9 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
             url: req.originalUrl
         },
         lang: {
-            manager: null,
+            manager: Core.langManager,
         },
-        __: (node) => '{' + node + '}',
+        __: Core.langManager.__
     };
 
     // Create a callback latch
@@ -176,7 +176,7 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
             }
 
             // Set the language manager and render function
-            config.lang.manager = liveGame.getLangManager();
+            config.lang.manager = liveGame.getGameLangManager();
             config.__ = config.lang.manager.renderNameConfig;
 
             // Resolve the latch

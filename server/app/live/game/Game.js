@@ -27,7 +27,7 @@ var Core = require('../../../Core');
 var GameModel = require('../../model/game/GameModel');
 var UserManager = require('../user/UserManager');
 var FactoryManager = require('../factory/FactoryManager');
-var LangManager = require('../../lang/LangManager');
+var GameLangManager = require('../../lang/GameLangManager');
 var ShopManager = require('../shop/ShopManager');
 var CallbackLatch = require('../../util/CallbackLatch');
 
@@ -66,9 +66,9 @@ var Game = function(game) {
 
     /**
      * Language manager instance.
-     * @type {LangManager}
+     * @type {GameLangManager}
      */
-    this.langManager = new LangManager(this);
+    this.gameLangManager = new GameLangManager(this);
 
     // Get and set the game ID
     if(game instanceof GameModel)
@@ -577,10 +577,10 @@ Game.prototype.getTeamMoney = function(teamFilter, callback) {
 /**
  * Get the language manager.
  *
- * @return {LangManager} Language manager instance for this game.
+ * @return {GameLangManager} Language manager instance for this game.
  */
-Game.prototype.getLangManager = function() {
-    return this.langManager;
+Game.prototype.getGameLangManager = function() {
+    return this.gameLangManager;
 };
 
 /**
@@ -597,7 +597,7 @@ Game.prototype.getLangManager = function() {
  * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
  */
 Game.prototype.renderNameConfig = function(node, options) {
-    return this.getLangManager().renderNameConfig(node, options);
+    return this.getGameLangManager().renderNameConfig(node, options);
 };
 
 /**
