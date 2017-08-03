@@ -375,4 +375,34 @@ module.exports = {
      * - status: object with all status properties
      */
     APP_STATUS_UPDATE: 34,
+
+    /**
+     * Application language object.
+     *
+     * Data:
+     * - langObject: object with the language values
+     */
+    APP_LANG_OBJECT_UPDATE: 35,
+
+    /**
+     * Request the application language object.
+     */
+    APP_LANG_OBJECT_REQUEST: 36,
+
+    /**
+     * Game language object.
+     *
+     * Data:
+     * - game: ID of the game this language object is for
+     * - langObject: object with the language values for this game
+     */
+    GAME_LANG_OBJECT_UPDATE: 37,
+
+    /**
+     * Request the game language object.
+     *
+     * Data:
+     * - game: ID of the game to request the language data for
+     */
+    GAME_LANG_OBJECT_REQUEST: 38,
 };

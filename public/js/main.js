@@ -61,7 +61,11 @@ const PacketType = {
     FACTORY_DESTROYED: 31,
     PING_BUY: 32,
     APP_STATUS_REQUEST: 33,
-    APP_STATUS_UPDATE: 34
+    APP_STATUS_UPDATE: 34,
+    APP_LANG_OBJECT_UPDATE: 35,
+    APP_LANG_OBJECT_REQUEST: 36,
+    GAME_LANG_OBJECT_UPDATE: 37,
+    GAME_LANG_OBJECT_REQUEST: 38
 };
 
 /**
@@ -104,20 +108,20 @@ const NameConfig = {
         sign: '$'
     },
     factory: {
-        name: 'lab',
-        names: 'labs'
+        name: 'factory',
+        names: 'factories'
     },
     shop: {
-        name: 'dealer',
-        names: 'dealers'
+        name: 'shop',
+        names: 'shops'
     },
     in: {
         name: 'ingredient',
         names: 'ingredients'
     },
     out: {
-        name: 'drug',
-        names: 'drugs'
+        name: 'product',
+        names: 'products'
     }
 };
 
@@ -152,83 +156,11 @@ Object.byString = function(o, s) {
     return o;
 }
 
-/**
- * Default render name config options object.
- *
- * @type {RenderNameConfigOptions}
- */
-const RENDER_NAME_CONFIG_OPTIONS_DEFAULTS = {
-    capitalizeFirst: false
-};
-
-/**
- * Render the text/name for the given node/key in the current language.
- * This encapsulates the text in a span element, to allow dynamic langauge
- * updates on the page.
- * The result string with the text and span element is returned as a string.
- *
- * If no known text is found for the given node, the node itself is returned,
- * encapsulated between curly brackets.
- *
- * @param {string} node The node or key for the languages text.
- * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
- *
- * @return {string} The text value.
- */
-function renderNameConfig(node, options) {
-    // Set the options to their defaults if unset
-    if(options === undefined || options === null)
-        options = {};
-
-    // Merge the options
-    options = merge(merge({}, RENDER_NAME_CONFIG_OPTIONS_DEFAULTS), options);
-
-    // Trim the node string
-    node = node.trim();
-
-    // Get the language text value
-    var text = Object.byString(NameConfig, node);
-
-    // Capitalize the first character if set
-    if(options.capitalizeFirst && text.length > 0)
-        text = capitalizeFirst(text);
-
-    // Set the text to the node itself if it's still undefined,
-    // because the node was invalid
-    if(text.length === 0)
-        text = '{' + node + '}';
-
-    // Replace the dots in the node string with hyphens to make it class compatible
-    const textClass = text.replace('.', '-');
-
-    // Encapsulate and return the string in the span element
-    return '<span class="lang lang-' + textClass + '">' + text + '</span>';
-}
-
-/**
- * Render the text/name for the given node/key in the current language.
- * This encapsulates the text in a span element, to allow dynamic langauge
- * updates on the page.
- * The result string with the text and span element is returned as a string.
- *
- * If no known text is found for the given node, the node itself is returned,
- * encapsulated between curly brackets.
- *
- * @param {string} node The node or key for the languages text.
- * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
- *
- * @return {string} The text value.
- */
-const __ = renderNameConfig;
-
-/**
- * An object to define name config rendering properties.
- *
- * @typedef {Object} RenderNameConfigOptions
- * 
- * @param {boolean=false} [capitalizeFirst] Capitalize the first letter of the
- * text.
- */
+// Define the Date#now function if it isn't available
+if(!Date.now)
+    Date.now = function() {
+        return new Date().getTime();
+    };
 
 /**
  * Default real time packet room type.
@@ -559,6 +491,26 @@ var Dworek = {
 
                 // Start the authentication process
                 self.startAuthentication(true, false);
+
+                // Request the application language update if this is the first
+                // connection
+                if(self._firstConnection) {
+                    // Show a status message
+                    console.log('Requesting language object for the global application');
+
+                    // Request
+                    Dworek.realtime.packetProcessor.sendPacket(PacketType.APP_LANG_OBJECT_REQUEST, {});
+
+                    // Check whether we're on a game page
+                    if(Dworek.utils.isGamePage()) {
+                        // Get the ID of the current active game
+                        var gameId = Dworek.utils.getGameId();
+
+                        // Request the language object for the game if it isn't available yet
+                        // on the client
+                        requestGameLangObjectIfNotAvailable(gameId);
+                    }
+                }
 
                 // Check whether the user was disconnected for a long time
                 if(Dworek.state.lastConnected >= 0) {
@@ -1046,11 +998,298 @@ var Dworek = {
     }
 };
 
-// Define the Date#now function if it isn't available
-if(!Date.now)
-    Date.now = function() {
-        return new Date().getTime();
-    };
+/**
+ * The language object for the global appliation.
+ * @type {Object}
+ */
+var langAppObject = null;
+
+/**
+ * The language objects for each game.
+ * Each key of this object is the ID of the game, in lowercase.
+ * The value holds the actual game language object.
+ * @type {Object}
+ */
+var langGameObjects = {};
+
+/**
+ * Get the language object for the given game.
+ *
+ * @param {string} gameId ID of the game.
+ * @return {Object|undefined} Language object for the game,
+ * or null if there isn't any.
+ */
+function getGameLangObject(gameId) {
+    // Parse the game ID
+    gameId = gameId.trim().toLowerCase();
+
+    // Make sure there's something to return
+    if(!hasGameLangObject(gameId))
+        return undefined;
+
+    // Return
+    return langGameObjects[gameId];
+}
+
+/**
+ * Set the language object for the given game.
+ *
+ * @param {string} gameId ID of the game.
+ * @param {Object} gameLangObject The game language object.
+ */
+function setGameLangObject(gameId, gameLangObject) {
+    // Parse the game ID
+    gameId = gameId.trim().toLowerCase();
+
+    // Set the language object
+    langGameObjects[gameId] = gameLangObject;
+}
+
+/**
+ * Check whether we've the language object for the given game.
+ *
+ * @param {string} gameId ID of the game.
+ * @return {bool} True if we have the language object, false if not.
+ */
+function hasGameLangObject(gameId) {
+    // Parse the game ID
+    gameId = gameId.trim().toLowerCase();
+
+    // Check and return the result
+    return langGameObjects.hasOwnProperty(gameId);
+}
+
+/**
+ * Request the language object for the given game from the server.
+ * It might take a while before the language is received for the given game.
+ *
+ * @param {stirng} gameId The ID of the game to request the language
+ * object for.
+ */
+function requestGameLangObject(gameId) {
+    // Make sure we're connected
+    if(!Dworek.realtime._connected)
+        return;
+
+    // Show a status message
+    console.log('Requesting language object for the game: ' + gameId);
+
+    // Request the language data
+    Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_LANG_OBJECT_REQUEST, {
+        game: gameId
+    });
+}
+
+/**
+ * Request the langauge object for the given game, if it isn't currently 
+ * available on the client.
+ * It might take a while before the language is received for the given game.
+ *
+ * @param {stirng} gameId The ID of the game to request the language
+ * object for.
+ */
+function requestGameLangObjectIfNotAvailable(gameId) {
+    // Check whether the data exists, request it if not
+    if(!hasGameLangObject(gameId))
+        requestGameLangObject(gameId);
+}
+
+/**
+ * Default render name config options object.
+ *
+ * @type {RenderNameConfigOptions}
+ */
+const RENDER_NAME_CONFIG_OPTIONS_DEFAULTS = {
+    encapsulate: true,
+    capitalizeFirst: false,
+    game: null
+};
+
+/**
+ * Render the text/name for the given node/key in the current language.
+ * This encapsulates the text in a span element, to allow dynamic langauge
+ * updates on the page.
+ * The result string with the text and span element is returned as a string.
+ *
+ * If no known text is found for the given node, the node itself is returned,
+ * encapsulated between curly brackets.
+ *
+ * @param {string} node The node or key for the languages text.
+ * @param {RenderNameConfigOptions|undefined|null} [options] Options object.
+ *
+ * @return {string} The text value.
+ */
+function renderNameConfig(node, options) {
+    // Set the options to their defaults if unset
+    if(options === undefined || options === null)
+        options = {};
+
+    // Merge the options
+    options = merge(merge({}, RENDER_NAME_CONFIG_OPTIONS_DEFAULTS), options);
+
+    // Trim the node string
+    node = node.trim();
+
+    // Define a variable for the language value
+    var text = undefined;
+
+    // Get the game language object if there is any
+    if(options.game !== null && options.game !== undefined && hasGameLangObject(options.game))
+        text = Object.byString(getGameLangObject(options.game), node);
+
+    // Use the global language object if no language value has been found yet
+    if(text === undefined && langAppObject !== null)
+        text = Object.byString(langAppObject, node);
+
+    // Capitalize the first character if set
+    if(text !== undefined && options.capitalizeFirst && text.length > 0)
+        text = capitalizeFirst(text);
+
+    // Set the text to the node itself if it's still undefined,
+    // because the node was invalid
+    if(text === undefined || text.length === 0)
+        text = '{' + node + '}';
+
+    // Replace the dots in the node string with hyphens to make it class compatible
+    const textClass = text.replace('.', '-');
+
+    // Encapsulate
+    if(options.encapsulate) {
+        // Build the span class
+        var spanClass = 'lang lang-node-' + textClass;
+
+        // Append the game ID
+        if(options.game !== null && options.game !== undefined && options.game.trim().length > 0)
+            spanClass += ' lang-game-' + options.game.trim().toLowerCase();
+
+        // Set whether to capitalize the first character
+        if(options.capitalizeFirst)
+            spanClass += ' lang-capitalize-first';
+
+        // Encapsulate in the span tag
+        text = '<span class="' + spanClass + '">' + text + '</span>';
+    }
+
+    // Return the text
+    return text;
+}
+
+// Alias for renderNameConfig
+const __ = renderNameConfig;
+
+/**
+ * This function will dynamically update every language value loaded on the
+ * client. This function is called when a new language update has been
+ * received for the global application, or a game.
+ *
+ * @param {string|boolean} gameId Game ID constraint. The game ID of an ID to
+ * update the values for it. True to update all game language related values,
+ * false to update no game related language values.
+ */
+function updateNameConfigs(gameId) {
+    // Build the find selector
+    var findSelector = 'span.lang';
+
+    // Append the game constraint if set
+    if(gameId !== null && gameId !== undefined) {
+        if(gameId === false)
+            findSelector += '[class!*=\'lang-game-\']';
+        else if(gameId !== null && gameId !== undefined && gameId !== true && gameId !== false)
+            findSelector += '.lang-game-' + gameId.trim().toLowerCase();
+    }
+
+    // Find the elements
+    $(document).find(findSelector).each(function() {
+        // Check whether to capitalize the first letter
+        const capitalizeFirst = $(this).hasClass('lang-capitalize-first');
+
+        // Get the node and the game ID if it has any
+        var node = null;
+        var gameId = null;
+        $.each($(this).attr('class').split(' '), function() {
+            // Return early if the game ID was found
+            if(node !== null && gameId !== null)
+                return;
+
+            // Check whether this class entry starts with a node identifier
+            if(this.startsWith('lang-node-'))
+                node = this.substring('lang-node-'.length).replace('-', '.');
+
+            // Check whether this class entry starts with a game identifier
+            if(this.startsWith('lang-game-'))
+                gameId = this.substring('lang-game-'.length).trim().toLowerCase();
+        });
+
+        // Return if no node was found
+        if(node === null) {
+            console.log('Skipping dynamic language value update, original language node not found');
+            return;
+        }
+
+        // Get the language text
+        var newText = renderNameConfig(node, {
+            game: gameId,
+            capitalizeFirst: capitalizeFirst,
+            encapsulate: false
+        });
+
+        // Update the element content if it changed
+        if($(this).text() !== newText)
+            $(this).text(newText);
+    });
+}
+
+/**
+ * An object to define name config rendering properties.
+ *
+ * @typedef {Object} RenderNameConfigOptions
+ * 
+ * @param {string} [game] ID of the game to render this language value for.
+ * @param {boolean} [encapsulate=true] True to encapsulate the value in a span
+ * element, false to keep it clean.
+ * @param {boolean=false} [capitalizeFirst] Capitalize the first letter of the
+ * text.
+ */
+
+// Register the global language object update handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_LANG_OBJECT_UPDATE, function(packet) {
+	// Make sure the required fields are available
+    if(!packet.hasOwnProperty('langObject')) {
+		throw new Error('Received malformed packet, missing language object in global language update packet');
+		return;
+	}
+
+    // Set the language object
+    langAppObject = packet.langObject;
+
+    // Dynamically update all language values on the loaded page
+    updateNameConfigs(true);
+});
+
+// Register the game language object update handler
+Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LANG_OBJECT_UPDATE, function(packet) {
+	// Make sure the required fields are available
+    if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('langObject')) {
+		throw new Error('Received malformed packet, missing game ID or language object in game language update packet');
+		return;
+	}
+
+    // Get the game language object
+    var gameId = packet.game;
+    var gameLangObject = packet.langObject;
+
+    // Make sure the game ID isn't empty
+    if(gameId === undefined || gameId === null || gameId.trim().length === 0) {
+		throw new Error('Received malformed packet, invalid game ID in game language update packet');
+		return;
+	}
+
+    // Set the game language object
+    setGameLangObject(gameId, gameLangObject);
+
+    // Dynamically update all game language values on the loaded page
+    updateNameConfigs(gameId);
+});
 
 // Wait for initialization
 $(function() {
@@ -1713,6 +1952,16 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
 $(document).bind("pageshow", function() {
     // Update the active game
     updateActiveGame();
+
+    // Check whether we're on a game page
+    if(Dworek.utils.isGamePage()) {
+        // Get the ID of the current active game
+        var gameId = Dworek.utils.getGameId();
+
+        // Request the language object for the game if it isn't available yet
+        // on the client
+        requestGameLangObjectIfNotAvailable(gameId);
+    }
 });
 
 /**

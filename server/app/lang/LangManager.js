@@ -32,6 +32,7 @@ var config = require('../../config');
  * @type {RenderNameConfigOptions}
  */
 const RENDER_NAME_CONFIG_OPTIONS_DEFAULTS = {
+    encapsulate: true,
     capitalizeFirst: false
 };
 
@@ -105,11 +106,25 @@ LangManager.prototype.renderNameConfig = function(node, options) {
     if(text === undefined || text.length === 0)
         text = '{' + node + '}';
 
-    // Replace the dots in the node string with hyphens to make it class compatible
-    const textClass = text.replace('.', '-');
+    // Encapsulate
+    if(options.encapsulate) {
+        // Build the span class
+        var spanClass = 'lang lang-node-' + node.replace('.', '-');
 
-    // Encapsulate and return the string in the span element
-    return '<span class="lang lang-' + textClass + '">' + text + '</span>';
+        // Append the game ID
+        if(!_.isEmpty(options.game))
+            spanClass += ' lang-game-' + options.game.trim().toLowerCase();
+
+        // Set whether to capitalize the first character
+        if(options.capitalizeFirst)
+            spanClass += ' lang-capitalize-first';
+
+        // Encapsulate in the span tag
+        text = '<span class="' + spanClass + '">' + text + '</span>';
+    }
+
+    // Return the text
+    return text;
 };
 
 // Alias for renderNameConfig
@@ -120,7 +135,9 @@ LangManager.prototype.__= LangManager.prototype.renderNameConfig;
  *
  * @typedef {Object} RenderNameConfigOptions
  *
+ * @param {string} [game] ID of the game to render this language value for.
  * @param {boolean=false} [capitalizeFirst] Capitalize the first letter of the text.
+ * @param {boolean} [encapsulate=true] True to encapsulate the value in a span element, false to keep it clean.
  * @param {Object[]} [langObjects] Objects to get language values from. The lower the index of the object, the higher the priority.
  */
 
