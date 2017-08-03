@@ -3713,7 +3713,7 @@ function doLocationFallback() {
  */
 function setGpsState(state) {
     // Make sure the state changes
-    if(Dworek.state.geoState == state)
+    if(Dworek.state.geoState === state)
         return false;
 
     // Set the state
@@ -3733,6 +3733,7 @@ var map = null;
 
 /**
  * Current player marker instance.
+ */
 var playerMarker = null;
 
 /**
@@ -3788,7 +3789,7 @@ function setFollowPlayer(state, options) {
     };
 
     // Parse the options variable
-    if(options == undefined)
+    if(options === undefined)
         options = {};
 
     // Merge the options object with the defaults
@@ -3812,11 +3813,11 @@ function setFollowPlayer(state, options) {
     }
 
     // Set the button state depending on the follow player state
-    if(mapFollowPlayerButton != null)
+    if(mapFollowPlayerButton !== null)
         mapFollowPlayerButton.state(state ? 'follow-player' : 'no-follow-player');
 
     // Show a notification if the state changed
-    if(options.showNotification && state != oldState)
+    if(options.showNotification && state !== oldState)
         showNotification((state ? 'Started' : 'Stopped') + ' following you');
 }
 
@@ -3843,7 +3844,7 @@ function setFollowEverything(state, options) {
     };
 
     // Parse the options variable
-    if(options == undefined)
+    if(options === undefined)
         options = {};
 
     // Merge the options object with the defaults
@@ -3867,11 +3868,11 @@ function setFollowEverything(state, options) {
     }
 
     // Set the button state depending on the follow everything state
-    if(mapFollowEverythingButton != null)
+    if(mapFollowEverythingButton !== null)
         mapFollowEverythingButton.state(state ? 'follow-everything' : 'no-follow-everything');
 
     // Show a notification if the state changed
-    if(options.showNotification && state != oldState)
+    if(options.showNotification && state !== oldState)
         showNotification((state ? 'Started' : 'Stopped') + ' following everything');
 }
 
@@ -3882,15 +3883,15 @@ function setFollowEverything(state, options) {
  */
 function focusPlayer(zoom) {
     // Parse the zoom parameter
-    if(zoom == undefined)
+    if(zoom === undefined)
         zoom = false;
 
     // Make sure the map is created
-    if(map == null)
+    if(map === null)
         return;
 
     // Make sure a player marker is available, focus on everything if not
-    if(playerMarker == null) {
+    if(playerMarker === null) {
         focusEverything();
         return;
     }
@@ -3942,7 +3943,7 @@ function initMap(element) {
     if(element === undefined || element === null)
         element = getActivePage();
 
-    // TODO: Only initialize/update if the map tab is s hown (if the page has tabs)
+    // TODO: Only initialize/update if the map tab is shown (if the page has tabs)
 
     // Get the map container
     var mapContainer = element.find('#map-container');
@@ -3963,11 +3964,11 @@ function initMap(element) {
 
         // Use the last known player location when possible
         var latlng = [52.0705, 4.3007];
-        if(Dworek.state.geoPlayerPosition != null)
+        if(Dworek.state.geoPlayerPosition !== null)
             latlng = [Dworek.state.geoPlayerPosition.coords.latitude, Dworek.state.geoPlayerPosition.coords.longitude];
 
         // Create a map if none has been created yet
-        if(map == null) {
+        if(map === null) {
             // Show a status message
             console.log('Initializing the map.');
 
@@ -4177,18 +4178,18 @@ function updatePlayerPosition(position) {
  */
 function updatePlayerMarker() {
     // Return if the user doesn't have the right roles
-    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special))
+    if(Dworek.state.activeGameRoles === null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special))
         return;
 
     // Set the last known location
     const position = Dworek.state.geoPlayerPosition;
 
     // Update the player markers if the map is created
-    if(map != null) {
+    if(map !== null) {
         // Create a player marker if we don't have one yet
-        if(playerMarker == null) {
+        if(playerMarker === null) {
             // Make sure a player position is known
-            if(position == null)
+            if(position === null)
                 return;
 
             // Create the player marker
@@ -4232,7 +4233,7 @@ function updatePlayerMarker() {
 
         } else {
             // Update the position if it's known
-            if(position != null) {
+            if(position !== null) {
                 // Update the position and range
                 playerMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
                 playerMarker.rangeCircle.setLatLng([position.coords.latitude, position.coords.longitude]);
