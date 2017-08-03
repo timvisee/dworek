@@ -23,14 +23,14 @@
 var express = require('express');
 var router = express.Router();
 
-var config = require('../../config');
+var config = require('../../../config');
 
-var Core = require('../../Core');
-var Validator = require('../validator/Validator');
-var IpUtils = require('../util/IpUtils');
-var LayoutRenderer = require('../layout/LayoutRenderer');
-var SessionValidator = require('../router/middleware/SessionValidator');
-var GameDatabase = require('../model/game/GameDatabase');
+var Core = require('../../../Core');
+var Validator = require('../../validator/Validator');
+var IpUtils = require('../../util/IpUtils');
+var LayoutRenderer = require('../../layout/LayoutRenderer');
+var SessionValidator = require('../../router/middleware/SessionValidator');
+var GameDatabase = require('../../model/game/GameDatabase');
 
 // Create index
 router.get('/', function(req, res, next) {

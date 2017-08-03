@@ -22,9 +22,9 @@
 
 var crypto = require('crypto');
 
-var Core = require('../../../Core');
-var LayoutRenderer = require('../../layout/LayoutRenderer');
-var CallbackLatch = require('../../util/CallbackLatch');
+var Core = require('../../../../Core');
+var LayoutRenderer = require('../../../layout/LayoutRenderer');
+var CallbackLatch = require('../../../util/CallbackLatch');
 
 // Export the module
 module.exports = {
@@ -39,13 +39,13 @@ module.exports = {
         const self = module.exports;
 
         // Route the pages
-        router.get('/:game/players', self.get);
+        router.get('/:game/player', self.get);
 
         // Route the list pages
-        router.get('/:game/players/requested', (req, res, next) => self.listPage(req, res, next, 'requested'));
-        router.get('/:game/players/players', (req, res, next) => self.listPage(req, res, next, 'players'));
-        router.get('/:game/players/specials', (req, res, next) => self.listPage(req, res, next, 'specials'));
-        router.get('/:game/players/spectators', (req, res, next) => self.listPage(req, res, next, 'spectators'));
+        router.get('/:game/player/requested', (req, res, next) => self.listPage(req, res, next, 'requested'));
+        router.get('/:game/player/player', (req, res, next) => self.listPage(req, res, next, 'players'));
+        router.get('/:game/player/specials', (req, res, next) => self.listPage(req, res, next, 'specials'));
+        router.get('/:game/player/spectators', (req, res, next) => self.listPage(req, res, next, 'spectators'));
     },
 
     /**

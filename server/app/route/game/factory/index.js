@@ -20,9 +20,9 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var Core = require('../../../Core');
-var LayoutRenderer = require('../../layout/LayoutRenderer');
-var CallbackLatch = require('../../util/CallbackLatch');
+var Core = require('../../../../Core');
+var LayoutRenderer = require('../../../layout/LayoutRenderer');
+var CallbackLatch = require('../../../util/CallbackLatch');
 
 // Export a function to attach the game info page
 module.exports = {

@@ -25,14 +25,14 @@ var router = express.Router();
 var _ = require("lodash");
 
 var ajax = require('./ajax/index');
-var login = require('./login');
-var logout = require('./logout');
-var register = require('./register');
+var login = require('./account/login');
+var logout = require('./account/logout');
+var register = require('./account/register');
 var games = require('./games');
-var game = require('./game');
+var game = require('./game/index');
 var about = require('./about');
 var status = require('./status');
-var create = require('./create');
+var create = require('./game/create');
 
 var appInfo = require('../../appInfo');
 var Core = require('../../Core');

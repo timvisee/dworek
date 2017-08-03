@@ -23,23 +23,23 @@
 var express = require('express');
 var router = express.Router();
 
-var config = require('../../config');
+var config = require('../../../config');
 
-var pageJoin = require('./game/join');
-var pageInfo = require('./game/info');
-var pagePlayers = require('./game/players');
-var pageTeams = require('./game/teams');
-var pageManage = require('./game/manage');
-var pageLang = require('./game/language');
-var pageFactory = require('./game/factory');
+var pageJoin = require('./join');
+var pageInfo = require('./info');
+var pagePlayers = require('./player/index');
+var pageTeams = require('./team/index');
+var pageManage = require('./manage');
+var pageLang = require('./language');
+var pageFactory = require('./factory/index');
 
-var Core = require('../../Core');
-var CallbackLatch = require('../util/CallbackLatch');
-var LayoutRenderer = require('../layout/LayoutRenderer');
-var GameParam = require('../router/middleware/GameParam');
-var Validator = require('../validator/Validator');
-var GameUserDatabase = require('../model/gameuser/GameUserDatabase');
-var GameTeamDatabase = require('../model/gameteam/GameTeamDatabase');
+var Core = require('../../../Core');
+var CallbackLatch = require('../../util/CallbackLatch');
+var LayoutRenderer = require('../../layout/LayoutRenderer');
+var GameParam = require('../../router/middleware/GameParam');
+var Validator = require('../../validator/Validator');
+var GameUserDatabase = require('../../model/gameuser/GameUserDatabase');
+var GameTeamDatabase = require('../../model/gameteam/GameTeamDatabase');
 
 // Games overview, redirect back to the front page
 router.get('/', (req, res) => res.redirect('/'));

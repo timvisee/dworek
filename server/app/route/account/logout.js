@@ -23,9 +23,9 @@
 var express = require('express');
 var router = express.Router();
 
-var config = require('../../config');
+var config = require('../../../config');
 
-var SessionValidator = require('../router/middleware/SessionValidator');
+var SessionValidator = require('../../router/middleware/SessionValidator');
 
 // Logout index
 router.get('/', function(req, res, next) {

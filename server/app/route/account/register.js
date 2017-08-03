@@ -24,14 +24,14 @@ var express = require('express');
 var router = express.Router();
 var _ = require("lodash");
 
-var config = require('../../config');
-var Core = require('../../Core');
-var Validator = require('../validator/Validator');
-var UserDatabase = require('../model/user/UserDatabase');
-var CallbackLatch = require('../util/CallbackLatch');
-var IpUtils = require('../util/IpUtils');
-var LayoutRenderer = require('../layout/LayoutRenderer');
-var SessionValidator = require('../router/middleware/SessionValidator');
+var config = require('../../../config');
+var Core = require('../../../Core');
+var Validator = require('../../validator/Validator');
+var UserDatabase = require('../../model/user/UserDatabase');
+var CallbackLatch = require('../../util/CallbackLatch');
+var IpUtils = require('../../util/IpUtils');
+var LayoutRenderer = require('../../layout/LayoutRenderer');
+var SessionValidator = require('../../router/middleware/SessionValidator');
 
 // Register index
 router.get('/', function(req, res, next) {
