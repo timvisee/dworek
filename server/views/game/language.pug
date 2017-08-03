@@ -1,0 +1,35 @@
+extends ../base/page
+
+block content
+    unless success
+        p.
+            Enter the custom language values below.#[br]
+            Leave a field blank to use the default value.
+
+        br
+        form(method='POST', action='/game/' + game.id + '/language#')
+
+            label(for='field-factory-name') Factory singular:
+            input(type='text', name='field-factory-name', id='field-factory-name', value='', data-clear-btn='true', placeholder='lab')
+
+            label(for='field-factory-names') Factory plural:
+            input(type='text', name='field-factory-names', id='field-factory-names', value='', data-clear-btn='true', placeholder='labs')
+
+            br
+            .button-list
+                button.ui-btn.ui-btn-raised.clr-primary(type='submit') Update
+
+    else
+        //- Print the success message
+        p: +format(message)
+
+        //- Show the dashboard/continue buttons
+        br
+        if next === undefined
+            a.ui-btn.ui-btn-raised.clr-primary(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
+
+        else
+            .button-list
+                a.ui-btn.ui-btn-raised.clr-primary(href=next, data-icon='arrow-right', title='Continue', data-ajax='false') Continue
+                a.ui-btn(href='/', data-icon='home', title='Go to your dashboard', data-ajax='false') Dashboard
+

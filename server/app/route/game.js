@@ -30,6 +30,7 @@ var pageInfo = require('./game/info');
 var pagePlayers = require('./game/players');
 var pageTeams = require('./game/teams');
 var pageManage = require('./game/manage');
+var pageLang = require('./game/language');
 var pageFactory = require('./game/factory');
 
 var Core = require('../../Core');
@@ -236,6 +237,9 @@ pageTeams.route(router);
 
 // Route the game management page
 pageManage.route(router);
+
+// Route the game language page
+pageLang.route(router);
 
 // Route the factory page
 pageFactory.route(router);
