@@ -23,7 +23,6 @@
 var express = require('express');
 var router = express.Router();
 
-var appInfo = require('../../appInfo');
 var Core = require('../../Core');
 var LayoutRenderer = require('../layout/LayoutRenderer');
 var CallbackLatch = require('../util/CallbackLatch');

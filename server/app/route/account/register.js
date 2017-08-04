@@ -28,7 +28,6 @@ var config = require('../../../config');
 var Core = require('../../../Core');
 var Validator = require('../../validator/Validator');
 var UserDatabase = require('../../model/user/UserDatabase');
-var CallbackLatch = require('../../util/CallbackLatch');
 var IpUtils = require('../../util/IpUtils');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var SessionValidator = require('../../router/middleware/SessionValidator');

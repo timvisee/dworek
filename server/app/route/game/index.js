@@ -37,9 +37,6 @@ var Core = require('../../../Core');
 var CallbackLatch = require('../../util/CallbackLatch');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var GameParam = require('../../router/middleware/GameParam');
-var Validator = require('../../validator/Validator');
-var GameUserDatabase = require('../../model/gameuser/GameUserDatabase');
-var GameTeamDatabase = require('../../model/gameteam/GameTeamDatabase');
 
 // Games overview, redirect back to the front page
 router.get('/', (req, res) => res.redirect('/'));
