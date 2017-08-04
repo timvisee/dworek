@@ -1156,13 +1156,10 @@ function renderNameConfig(node, options) {
     if(text === undefined || text.length === 0)
         text = '{' + node + '}';
 
-    // Replace the dots in the node string with hyphens to make it class compatible
-    const textClass = text.replace('.', '-');
-
     // Encapsulate
     if(options.encapsulate) {
         // Build the span class
-        var spanClass = 'lang lang-node-' + textClass;
+        var spanClass = 'lang lang-node-' + node.replace('.', '-');
 
         // Append the game ID
         if(options.game !== null && options.game !== undefined && options.game.trim().length > 0)
@@ -5105,7 +5102,7 @@ function updateGameDataVisuals() {
                 '                    </a>' +
                 '                    <a href="#" id= "' + sellButtonId + '" class="ui-btn waves-effect waves-button">' +
                 '                        <i class="zmdi zmdi-arrow-right"></i>&nbsp;' +
-                '                        Sell ' + __('out.name', { game: gameId }) + '' +
+                '                        Sell ' + __('out.names', { game: gameId }) + '' +
                 '                    </a>' +
                 '                </div>' +
                 '            </div>' +
