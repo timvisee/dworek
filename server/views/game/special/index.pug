@@ -85,7 +85,7 @@ block content
                     //- Label with the avatar
                     label(for='field-selector-player-user-' + entry.id)
                         img.ui-thumbnail.ui-thumbnail-square(src=entry.avatarUrl)
-                        | #{entry.firstName} #{entry.lastName}
+                        | #{entry.firstName} #{entry.lastName} (#{entry.teamName})
             else
                 p: i No players available...
 

@@ -149,6 +149,60 @@ module.exports = {
                         userLatch.resolve();
                     });
 
+                    // Get the team name of the user
+                    userLatch.add();
+                    Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Return if no game user was found
+                        if(gameUser === undefined || gameUser === null) {
+                            userObject.teamName = '?';
+                            userLatch.resolve();
+                            return;
+                        }
+
+                        // Get the team
+                        gameUser.getTeam(function(err, team) {
+                            // Call back errors
+                            if(err !== null) {
+                                if(!calledBack)
+                                    next(err);
+                                calledBack = true;
+                                return;
+                            }
+
+                            // Return if no team was found
+                            if(team === undefined || team === null) {
+                                userObject.teamName = '?';
+                                userLatch.resolve();
+                                return;
+                            }
+
+                            // Get the name of the team
+                            team.getName(function(err, name) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        next(err);
+                                    calledBack = true;
+                                    return;
+                                }
+
+                                // Add the team name to the user object
+                                userObject.teamName = name;
+
+                                // Resolve the user latch
+                                userLatch.resolve();
+                            });
+                        });
+                    });
+
                     // Get the avatar URL of the user
                     latch.add();
                     user.getAvatarUrl(function(err, avatarUrl) {
