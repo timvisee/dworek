@@ -7165,3 +7165,40 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
     // Store the app status
     appStatus = status;
 });
+
+// Set up the toggleable collapsibles
+$(document).bind("pageinit", function() {
+    // Get the currently active page
+    const activePage = getActivePage();
+
+    // Find toggleable collapsibles
+    activePage.find('.collapsible-toggle').each(function() {
+        // Set the checkbox instance
+        const checkbox = $(this);
+
+        // Get the corresponding collapsible element
+        const collapsibleElement = activePage.find(
+            checkbox.data('collapsible-toggle') + ':lt(1)'
+        );
+
+        // Show or hide the collapsible accordingly
+        if(checkbox.val() === 'true')
+            collapsibleElement.show();
+        else
+            collapsibleElement.hide();
+
+        // Update the state when the checkbox state is changed
+        checkbox.change(function() {
+            // Show or hide the collapsible
+            if(checkbox.val() === 'true') {
+                // Expand the collapsible
+                collapsibleElement.collapsible('expand');
+
+                // Slide down the collapsible to make it visible
+                collapsibleElement.slideDown();
+
+            } else
+                collapsibleElement.slideUp();
+        });
+    });
+});
