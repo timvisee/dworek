@@ -388,7 +388,7 @@ module.exports = {
 
                 // Get the avatar URL of the user
                 latch.add();
-                user.getMail(function(err, mail) {
+                user.getAvatarUrl(function(err, avatarUrl) {
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
@@ -397,11 +397,8 @@ module.exports = {
                         return;
                     }
 
-                    // Create an MD5 of the mail address
-                    var mailHash = crypto.createHash('md5').update(mail).digest('hex');
-
-                    // Set the mail address, and define the avatar URL
-                    userObject.avatarUrl = 'https://www.gravatar.com/avatar/' + mailHash + '?s=64&d=mm';
+                    // Set the avatar URL
+                    userObject.avatarUrl = avatarUrl;
 
                     // Resolve the latch
                     latch.resolve();

@@ -23,6 +23,7 @@
 var Core = require('../../../../Core');
 var LayoutRenderer = require('../../../layout/LayoutRenderer');
 var CallbackLatch = require('../../../util/CallbackLatch');
+const crypto = require("crypto");
 
 // Export a function to attach the game info page
 module.exports = {
@@ -76,19 +77,173 @@ module.exports = {
                 return;
             }
 
+            // Create a game object
+            var gameObject = {
+                id: game.getIdHex(),
+                users: [],
+                teams: []
+            };
 
-            // TODO: Render the special actions page here!
+            // Create a callback latch
+            var latch = new CallbackLatch();
+            var calledBack = false;
 
-            LayoutRenderer.render(req, res, next, 'game/special/index', 'Custom action', {
-                page: {
-                    leftButton: 'back'
-                },
-                game: {
-                    id: game.getIdHex()
+            // Get the game players
+            latch.add();
+            Core.model.gameUserModelManager.getGameUsers(game, {
+                players: true
+            }, function(err, users) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
+                    return;
                 }
+
+                // Loop through each user
+                latch.add(users.length);
+                users.forEach(function(user) {
+                    // Create an user object
+                    var userObject = {
+                        id: user.getIdHex()
+                    };
+
+                    // Create a user latch for fetching user data
+                    var userLatch = new CallbackLatch();
+
+                    // Get the first name of the user
+                    // TODO: Move all these name queries in a single query
+                    userLatch.add();
+                    user.getFirstName(function(err, firstName) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Add the name to the user object
+                        userObject.firstName = firstName;
+
+                        // Resolve the user latch
+                        userLatch.resolve();
+                    });
+
+                    // Get the last name of the user
+                    userLatch.add();
+                    user.getLastName(function(err, lastName) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Add the name to the user object
+                        userObject.lastName = lastName;
+
+                        // Resolve the user latch
+                        userLatch.resolve();
+                    });
+
+                    // Get the avatar URL of the user
+                    latch.add();
+                    user.getAvatarUrl(function(err, avatarUrl) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Set the URL
+                        userObject.avatarUrl = avatarUrl;
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+
+                    // Put the data in the object when we're done fetching the names
+                    userLatch.then(function() {
+                        // Put the user object in the game object
+                        gameObject.users.push(userObject);
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+                });
+
+                // Resolve the latch
+                latch.resolve();
             });
 
+            // Get the teams
+            latch.add();
+            Core.model.gameTeamModelManager.getGameTeams(game, function(err, teams) {
+                // Call back errors
+                if(err !== null) {
+                    if(!calledBack)
+                        next(err);
+                    calledBack = true;
+                    return;
+                }
 
+                // Loop through each team
+                latch.add(teams.length);
+                teams.forEach(function(team) {
+                    // Create an team object
+                    var teamObject = {
+                        id: team.getIdHex()
+                    };
+
+                    // Create a team latch for fetching team data
+                    var teamLatch = new CallbackLatch();
+
+                    // Get the name of the team
+                    teamLatch.add();
+                    team.getName(function(err, name) {
+                        // Call back errors
+                        if(err !== null) {
+                            if(!calledBack)
+                                next(err);
+                            calledBack = true;
+                            return;
+                        }
+
+                        // Add the name to the team object
+                        teamObject.name = name;
+
+                        // Resolve the team latch
+                        teamLatch.resolve();
+                    });
+
+                    // Put the data in the object when we're done fetching the names
+                    teamLatch.then(function() {
+                        // Put the team object in the game object
+                        gameObject.teams.push(teamObject);
+
+                        // Resolve the latch
+                        latch.resolve();
+                    });
+                });
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Render the page when we're ready
+            latch.then(function() {
+                LayoutRenderer.render(req, res, next, 'game/special/index', 'Custom action', {
+                    page: {
+                        leftButton: 'back'
+                    },
+                    game: gameObject
+                });
+            });
         });
     },
 

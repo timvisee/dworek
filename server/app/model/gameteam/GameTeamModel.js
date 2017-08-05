@@ -20,13 +20,9 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var util = require('util');
-
 var Core = require('../../../Core');
 var GameTeamDatabase = require('./GameTeamDatabase');
 var BaseModel = require('../../database/BaseModel');
-var ConversionFunctions = require('../../database/ConversionFunctions');
-var UserModel = require('../user/UserModel');
 
 /**
  * GameTeamModel class.

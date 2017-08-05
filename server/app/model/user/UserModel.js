@@ -27,6 +27,7 @@ var UserDatabase = require('./UserDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
 var CallbackLatch = require('../../util/CallbackLatch');
+const crypto = require("crypto");
 
 /**
  * UserModel class.
@@ -520,6 +521,36 @@ UserModel.prototype.getDisplayName = function(callback) {
  * @callback UserModel~getDisplayNameCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {string=} Display name.
+ */
+
+/**
+ * Get the avatar URL.
+ *
+ * @param {UserModel~getAvatarUrlCallback} callback Called with the result, or when an error occurred.
+ */
+UserModel.prototype.getAvatarUrl = function(callback) {
+    // Get the users mail address
+    this.getMail(function(err, mail) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Create an MD5 of the mail address
+        const mailHash = crypto.createHash('md5').update(mail).digest('hex');
+
+        // Call back the URL
+        callback(null, 'https://www.gravatar.com/avatar/' + mailHash + '?s=64&d=mm');
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback UserModel~getAvatarUrlCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {string=} Avatar URL.
  */
 
 // Export the user class

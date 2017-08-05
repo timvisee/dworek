@@ -75,7 +75,19 @@ block content
 
     div#container-selector-player(data-role='collapsible', data-inset='false')
         h4 Player selection
-        p TODO: Show a player list
+
+        //- Users list
+        .user-list
+            if game.users.length > 0
+                each entry in game.users
+                    input(type='checkbox', name='field-selector-player-user-' + entry.id, id='field-selector-player-user-' + entry.id)
+
+                    //- Label with the avatar
+                    label(for='field-selector-player-user-' + entry.id)
+                        img.ui-thumbnail.ui-thumbnail-square(src=entry.avatarUrl)
+                        | #{entry.firstName} #{entry.lastName}
+            else
+                p: i No players available...
 
     br
     br
@@ -87,7 +99,15 @@ block content
 
     div#container-selector-team(data-role='collapsible', data-inset='false')
         h4 Team selection
-        p TODO: Show a team list
+
+        //- Users list
+        .user-list
+            if game.teams.length > 0
+                each entry in game.teams
+                    input(type='checkbox', name='field-selector-team-team-' + entry.id, id='field-selector-team-team-' + entry.id)
+                    label(for='field-selector-team-team-' + entry.id)= entry.name
+            else
+                p: i No teams available...
 
     br
     br
@@ -112,7 +132,7 @@ block content
     br
     br
 
-    label(for='field-selector-limit-players-enable') Player limit:
+    label(for='field-selector-player-limit-enable') Player limit:
     select#field-selector-player-limit-enable.collapsible-toggle(name='field-selector-player-limit-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-player-limit')
         option(value='false') NO
         option(value='true') YES
@@ -180,4 +200,3 @@ block content
         a.ui-btn.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
             i.zmdi.zmdi-undo.ui-pull-left
             | &nbsp;&nbsp;Cancel
-
