@@ -65,7 +65,8 @@ const PacketType = {
     APP_LANG_OBJECT_UPDATE: 35,
     APP_LANG_OBJECT_REQUEST: 36,
     GAME_LANG_OBJECT_UPDATE: 37,
-    GAME_LANG_OBJECT_REQUEST: 38
+    GAME_LANG_OBJECT_REQUEST: 38,
+    CUSTOM_ACTION_EXECUTE: 39
 };
 
 /**
@@ -7202,3 +7203,194 @@ $(document).bind("pageinit", function() {
         });
     });
 });
+
+// Configure logic on the custom actions page
+$(document).bind("pageinit", function() {
+
+    // Get the currently active page
+    const activePage = getActivePage();
+
+    // Make sure the execute button is available on this page
+    const executeButton = activePage.find('a.action-custom-action-execute');
+
+    // Return early if this isn't a custom action page
+    if(executeButton.length <= 0)
+        return;
+
+    // Execute the action when the button is pressed
+    executeButton.click(function() {
+        // Disable the execution button
+        executeButton.addClass('ui-disabled');
+
+        // Show the dialog box
+        showDialog({
+            title: 'Execute custom action',
+            message: 'Are you sure you want to execute this custom action? This operation can\'t be undone.',
+            actions: [
+                {
+                    text: 'Yes, execute',
+                    icon: 'zmdi zmdi-flare',
+                    state: 'primary',
+                    action: function() {
+                        // Get the custom action properties
+                        const properties = getCustomActionProperties(activePage);
+
+                        // Send a packet with the properties
+                        Dworek.realtime.packetProcessor.sendPacket(PacketType.CUSTOM_ACTION_EXECUTE, {
+                            game: Dworek.utils.getGameId(),
+                            properties: properties
+                        });
+                    }
+                },
+                {
+                    text: 'No, cancel',
+                    icon: 'zmdi zmdi-undo',
+                    state: 'warning'
+                }
+            ]
+
+        }, function() {
+            // Set a timeout, then enable the button again
+            setTimeout(function() {
+                // Enable the execution button again
+                executeButton.removeClass('ui-disabled');
+            }, 1500);
+        });
+    });
+});
+
+/**
+ * Create and get an object with all the properties of the custom action
+ * configured on the current page.
+ *
+ * @param page Page element the properties are on.
+ *
+ * @return {Object} Object with all properties.
+ */
+function getCustomActionProperties(page) {
+    // Create the base object
+    var properties = {
+        filters: {},
+        units: {
+            in: false,
+            out: false,
+            money: false
+        },
+        amounts: {
+            type: null,
+            amount: 0
+        },
+        message: {
+            type: 'dynamic'
+        }
+    };
+
+    // Player range properties
+    if(page.find('#field-selector-player-range-enable').val() === 'true') {
+        properties.filters.playerRange = {
+            limit: parseInt(page.find('#field-selector-player-range-limit').val()),
+            order: page.find('#field-selector-player-range-order').val(),
+            orderBy: page.find('#field-selector-player-range-order-by').val()
+        };
+    }
+
+    // Team range properties
+    if(page.find('#field-selector-team-range-enable').val() === 'true') {
+        properties.filters.teamRange = {
+            limit: parseInt(page.find('#field-selector-team-range-limit').val()),
+            order: page.find('#field-selector-team-range-order').val(),
+            orderBy: page.find('#field-selector-team-range-order-by').val()
+        };
+    }
+
+    // Specific player properties
+    if(page.find('#field-selector-player-enable').val() === 'true') {
+        // Build the object
+        properties.filters.specificPlayers = {
+            players: []
+        };
+
+        // Find the checkboxes and loop through them
+        page.find('input.field-selector-player-user').each(function() {
+            // Return early if the checkbox isn't checked
+            if(!$(this).is(':checked'))
+                return;
+
+            // Define the checkbox prefix
+            const CHECKBOX_PREFIX = 'field-selector-player-user-';
+
+            // Get the ID
+            const userId = $(this).attr('id');
+
+            // The ID must start with the known prefix, return early if it doesn't
+            if(!userId.startsWith(CHECKBOX_PREFIX))
+                return;
+
+            // Get the ID, parse it and push it into the array
+            properties.filters.specificPlayers.players.push(
+                userId.substring(CHECKBOX_PREFIX.length).trim().toLowerCase()
+            );
+        });
+    }
+
+    // Specific team properties
+    if(page.find('#field-selector-team-enable').val() === 'true') {
+        // Build the object
+        properties.filters.specificTeams = {
+            teams: []
+        };
+
+        // Find the checkboxes and loop through them
+        page.find('input.field-selector-team-team').each(function() {
+            // Return early if the checkbox isn't checked
+            if(!$(this).is(':checked'))
+                return;
+
+            // Define the checkbox prefix
+            const CHECKBOX_PREFIX = 'field-selector-team-team-';
+
+            // Get the ID
+            const teamId = $(this).attr('id');
+
+            // The ID must start with the known prefix, return early if it doesn't
+            if(!teamId.startsWith(CHECKBOX_PREFIX))
+                return;
+
+            // Get the ID, parse it and push it into the array
+            properties.filters.specificTeams.teams.push(
+                teamId.substring(CHECKBOX_PREFIX.length).trim().toLowerCase()
+            );
+        });
+    }
+
+    // Range limit properties
+    if(page.find('#field-selector-range-enable').val() === 'true') {
+        properties.filters.range = {
+            range: parseInt(page.find('#field-selector-range-range').val()),
+            side: page.find('#field-selector-range-side').val()
+        };
+    }
+
+    // Player limit properties
+    if(page.find('#field-selector-player-limit-enable').val() === 'true') {
+        properties.filters.playerLimit = {
+            limit: parseInt(page.find('#field-selector-player-limit-limit').val())
+        };
+    }
+
+    // Set the units
+    properties.units.in = page.find('#field-unit-in').is(':checked');
+    properties.units.out = page.find('#field-unit-out').is(':checked');
+    properties.units.money = page.find('#field-unit-money').is(':checked');
+
+    // Set the amounts
+    properties.amounts.type = page.find('#field-amount-type').val();
+    properties.amounts.amount = parseInt(page.find('#field-amount-amount').val());
+
+    // Set the message
+    properties.message.type = page.find('#field-message-type').val();
+    properties.message.customMessage = page.find('#field-message-custom').val();
+
+    // Return the properties object
+    return properties;
+}

@@ -405,4 +405,13 @@ module.exports = {
      * - game: ID of the game to request the language data for
      */
     GAME_LANG_OBJECT_REQUEST: 38,
+
+    /**
+     * Execute a custom action with the given properties.
+     *
+     * Data:
+     * - game: ID of the game to request the language data for
+     * - properties: Object with custom action properties
+     */
+    CUSTOM_ACTION_EXECUTE: 39,
 };

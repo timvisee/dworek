@@ -20,8 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var crypto = require('crypto');
-
 var Core = require('../../../../Core');
 var LayoutRenderer = require('../../../layout/LayoutRenderer');
 var CallbackLatch = require('../../../util/CallbackLatch');
@@ -74,11 +72,6 @@ module.exports = {
             users: {
                 category: null
             }
-        };
-
-        // Create a teams object
-        var teamsObject = {
-            teams: []
         };
 
         // Create a callback latch for the games properties

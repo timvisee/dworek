@@ -21,8 +21,8 @@ block content
     div#container-selector-player-range(data-role='collapsible', data-inset='false')
         h4 Players range properties
         //- TODO: Set the maximum to the number of players in this game
-        label(for='field-selector-players-range-limit') Amount of players:
-        input#field-selector-players-range-limit(type='range', name='field-selector-player-range-limit', value='3', min='1', max='25', data-highlight='true')
+        label(for='field-selector-player-range-limit') Amount of players:
+        input#field-selector-player-range-limit(type='range', name='field-selector-player-range-limit', value='3', min='1', max='25', data-highlight='true')
 
         label(for='field-selector-player-range-order') Order:
         select#field-selector-player-range-order(name='field-selector-player-range-order', selected='selected')
@@ -80,7 +80,7 @@ block content
         .user-list
             if game.users.length > 0
                 each entry in game.users
-                    input(type='checkbox', name='field-selector-player-user-' + entry.id, id='field-selector-player-user-' + entry.id)
+                    input.field-selector-player-user(type='checkbox', name='field-selector-player-user-' + entry.id, id='field-selector-player-user-' + entry.id)
 
                     //- Label with the avatar
                     label(for='field-selector-player-user-' + entry.id)
@@ -104,7 +104,7 @@ block content
         .user-list
             if game.teams.length > 0
                 each entry in game.teams
-                    input(type='checkbox', name='field-selector-team-team-' + entry.id, id='field-selector-team-team-' + entry.id)
+                    input.field-selector-team-team(type='checkbox', name='field-selector-team-team-' + entry.id, id='field-selector-team-team-' + entry.id)
                     label(for='field-selector-team-team-' + entry.id)= entry.name
             else
                 p: i No teams available...
@@ -121,13 +121,13 @@ block content
         h4 Range properties
         p The range around your current position.
 
+        label(for='field-selector-range-range') Range meters:
+        input#field-selector-range-range(type='range', name='field-selector-range-range', value='100', min='1', max='5000', data-highlight='true')
+
         label(for='field-selector-range-side') Side:
         select#field-selector-range-side(name='field-selector-range-side', selected='selected')
-            option(value='false') Players inside the range
-            option(value='true') Players outside the range
-
-        label(for='field-selector-range-meters') Range meters:
-        input#field-selector-range-meters(type='range', name='field-selector-range-meters', value='100', min='1', max='5000', data-highlight='true')
+            option(value='inside') Players inside the range
+            option(value='outside') Players outside the range
 
     br
     br
@@ -172,8 +172,8 @@ block content
         option(value='percentage') Percentage
 
     //- TODO: Show a slider here!
-    label(for='field-amount-value') Amount value:
-    input#field-amount-value(name='field-amount-value', value='0')
+    label(for='field-amount-amount') Amount value:
+    input#field-amount-amount(name='field-amount-amount', value='0')
 
     br
     hr
@@ -194,7 +194,7 @@ block content
     hr
 
     .button-list
-        a.ui-btn.ui-btn-raised.clr-primary.wow.fadeIn(title='Execute', data-ajax='false')
+        a.ui-btn.ui-btn-raised.clr-primary.action-custom-action-execute.wow.fadeIn(title='Execute', data-ajax='false')
             i.zmdi.zmdi-flare.ui-pull-left
             | &nbsp;&nbsp;Execute
         a.ui-btn.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')

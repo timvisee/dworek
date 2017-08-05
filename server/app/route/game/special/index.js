@@ -23,7 +23,6 @@
 var Core = require('../../../../Core');
 var LayoutRenderer = require('../../../layout/LayoutRenderer');
 var CallbackLatch = require('../../../util/CallbackLatch');
-const crypto = require("crypto");
 
 // Export a function to attach the game info page
 module.exports = {
