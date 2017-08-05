@@ -1,0 +1,99 @@
+extends ../../base/page
+
+block content
+    h1.header.wow.fadeInUp Player selectors
+    p Select players to be affected by this action.
+
+    label(for='field-selector-top-players-enable') Top players selector:
+    select(name='field-selector-top-players-enable', id='field-selector-top-players-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    br
+    br
+
+    label(for='field-selector-top-teams-enable') Top teams selector:
+    select(name='field-selector-top-teams-enable', id='field-selector-top-teams-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    br
+    br
+
+    label(for='field-selector-player-enable') Player selector:
+    select(name='field-selector-player-enable', id='field-selector-player-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    br
+    br
+
+    label(for='field-selector-team-enable') Team selector:
+    select(name='field-selector-team-enable', id='field-selector-team-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    br
+    br
+
+    label(for='field-selector-range-enable') Limit range:
+    select(name='field-selector-range-enable', id='field-selector-range-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    label(for='field-selector-range-side') Side:
+    select(name='field-selector-range-side', id='field-selector-range-side', selected='selected')
+        option(value='false') Inside
+        option(value='true') Outside
+
+    label(for='field-selector-range-meters') Range meters:
+    input(type='text', id='field-selector-range-meters', name='field-selector-range-meters', value='100')
+
+    br
+    br
+
+    label(for='field-selector-limit-players-enable') Limit players:
+    select(name='field-selector-limit-players-enable', id='field-selector-limit-players-enable', data-role='flipswitch', selected='selected')
+        option(value='false') NO
+        option(value='true') YES
+
+    label(for='field-selector-limit-players-limit') Player limit:
+    input(type='text', id='field-selector-limit-players-limit', name='field-selector-limit-players-limit', value='5')
+
+    hr
+
+    h1.header.wow.fadeInUp Units
+    p Select the units to affect with this action.
+
+    input(type='checkbox', id='field-unit-in', name='field-unit-in')
+    label(for='field-unit-in')!= __('in.names', { capitalizeFirst: true, game: game.id })
+
+    input(type='checkbox', id='field-unit-out', name='field-unit-out')
+    label(for='field-unit-out')!= __('out.names', { capitalizeFirst: true, game: game.id })
+
+    input(type='checkbox', id='field-unit-money', name='field-unit-money')
+    label(for='field-unit-money') Money
+
+    hr
+
+    h1.header.wow.fadeInUp Amounts
+    p Configure the amount being affected by this action.
+
+    label(for='field-amount-type') Amount type:
+    select(id='field-amount-type', name='field-amount-type')
+        option(value='fixed') Fixed
+        option(value='percentage') Percentage
+
+    label(for='field-amount-value') Amount value:
+    input(type='text', id='field-amount-value', name='field-amount-value', value='0')
+
+    br
+
+    .button-list
+        a.ui-btn.ui-btn-raised.clr-primary.wow.fadeIn(title='Execute', data-ajax='false')
+            i.zmdi.zmdi-flare.ui-pull-left
+            | &nbsp;&nbsp;Execute
+        a.ui-btn.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+            i.zmdi.zmdi-undo.ui-pull-left
+            | &nbsp;&nbsp;Cancel
+

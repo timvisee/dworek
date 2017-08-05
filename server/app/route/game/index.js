@@ -23,8 +23,6 @@
 var express = require('express');
 var router = express.Router();
 
-var config = require('../../../config');
-
 var pageJoin = require('./join');
 var pageInfo = require('./info');
 var pagePlayers = require('./player/index');
@@ -32,8 +30,8 @@ var pageTeams = require('./team/index');
 var pageManage = require('./manage');
 var pageLang = require('./language');
 var pageFactory = require('./factory/index');
+var pageSpecial = require('./special/index');
 
-var Core = require('../../../Core');
 var CallbackLatch = require('../../util/CallbackLatch');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var GameParam = require('../../router/middleware/GameParam');
@@ -240,6 +238,9 @@ pageLang.route(router);
 
 // Route the factory page
 pageFactory.route(router);
+
+// Route the special page
+pageSpecial.route(router);
 
 // Export the module
 module.exports = router;

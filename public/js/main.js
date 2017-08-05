@@ -168,7 +168,7 @@ if(!Date.now)
  */
 const PACKET_ROOM_DEFAULT = 'default';
 
-/**
+/**torm
  * Dworek client application.
  * @type {Object}
  */
