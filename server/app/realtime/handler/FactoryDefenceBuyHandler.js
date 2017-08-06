@@ -24,7 +24,6 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -51,7 +50,7 @@ var FactoryDefenceBuyHandler = function(init) {
  */
 FactoryDefenceBuyHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -137,13 +136,13 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                 }
 
                 Core.gameManager.getGame(game, function(err, liveGame) {
-                    if(err !== null || liveGame == null) {
+                    if(err !== null || liveGame === null) {
                         callbackError();
                         return;
                     }
 
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
-                        if(err !== null || liveFactory == null) {
+                        if(err !== null || liveFactory === null) {
                             callbackError();
                             return;
                         }
@@ -185,7 +184,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                                 var selectedDefence = defences[index];
 
                                 // Compare the price and defence
-                                if(selectedDefence.cost != cost || selectedDefence.defence != defence) {
+                                if(selectedDefence.cost !== cost || selectedDefence.defence !== defence) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
                                         message: 'Failed to buy defence, prices have changed.',

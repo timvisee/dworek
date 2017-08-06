@@ -151,14 +151,14 @@ block content
     h1.header.wow.fadeInUp Units
     p Define what units this action has effect on.
 
+    input#field-unit-money(type='checkbox', name='field-unit-money')
+    label(for='field-unit-money') Money
+
     input#field-unit-in(type='checkbox', name='field-unit-in')
     label(for='field-unit-in')!= __('in.names', { capitalizeFirst: true, game: game.id })
 
     input#field-unit-out(type='checkbox', name='field-unit-out')
     label(for='field-unit-out')!= __('out.names', { capitalizeFirst: true, game: game.id })
-
-    input#field-unit-money(type='checkbox', name='field-unit-money')
-    label(for='field-unit-money') Money
 
     br
     hr
@@ -166,14 +166,20 @@ block content
     h1.header.wow.fadeInUp Amounts
     p Define what happens to the selected units.
 
+    label(for='field-amount-method') Add/subtract/set:
+    select#field-amount-method(name='field-amount-method')
+        option(value='add') Add
+        option(value='subtract', selected) Subtract
+        option(value='set') Set to
+
     label(for='field-amount-type') Amount type:
     select#field-amount-type(name='field-amount-type')
-        option(value='fixed') Fixed
+        option(value='fixed') Specific amount
         option(value='percentage') Percentage
 
     //- TODO: Show a slider here!
     label(for='field-amount-amount') Amount value:
-    input#field-amount-amount(name='field-amount-amount', value='0')
+    input#field-amount-amount(name='field-amount-amount', value='1')
 
     br
     hr

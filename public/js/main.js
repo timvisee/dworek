@@ -66,7 +66,7 @@ const PacketType = {
     APP_LANG_OBJECT_REQUEST: 36,
     GAME_LANG_OBJECT_UPDATE: 37,
     GAME_LANG_OBJECT_REQUEST: 38,
-    CUSTOM_ACTION_EXECUTE: 39
+    SPECIAL_CUSTOM_ACTION_EXECUTE: 39
 };
 
 /**
@@ -7225,7 +7225,7 @@ $(document).bind("pageinit", function() {
         // Show the dialog box
         showDialog({
             title: 'Execute custom action',
-            message: 'Are you sure you want to execute this custom action? This operation can\'t be undone.',
+            message: 'Are you sure you want to execute this custom action?<br><br>This operation can\'t be undone.',
             actions: [
                 {
                     text: 'Yes, execute',
@@ -7236,7 +7236,7 @@ $(document).bind("pageinit", function() {
                         const properties = getCustomActionProperties(activePage);
 
                         // Send a packet with the properties
-                        Dworek.realtime.packetProcessor.sendPacket(PacketType.CUSTOM_ACTION_EXECUTE, {
+                        Dworek.realtime.packetProcessor.sendPacket(PacketType.SPECIAL_CUSTOM_ACTION_EXECUTE, {
                             game: Dworek.utils.getGameId(),
                             properties: properties
                         });
@@ -7384,6 +7384,7 @@ function getCustomActionProperties(page) {
     properties.units.money = page.find('#field-unit-money').is(':checked');
 
     // Set the amounts
+    properties.amounts.method = page.find('#field-amount-method').val();
     properties.amounts.type = page.find('#field-amount-type').val();
     properties.amounts.amount = parseInt(page.find('#field-amount-amount').val());
 

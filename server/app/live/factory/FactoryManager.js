@@ -179,7 +179,7 @@ FactoryManager.prototype.getLoadedFactory = function(factoryId) {
     // Loop through the list of factories
     this.factories.forEach(function(entry) {
         // Skip if we already found a factory
-        if(result != null)
+        if(result !== null)
             return;
 
         // Check whether the factory ID equals the factory
@@ -198,7 +198,7 @@ FactoryManager.prototype.getLoadedFactory = function(factoryId) {
  * @return {boolean} True if the factory is currently loaded, false if not.
  */
 FactoryManager.prototype.isFactoryLoaded = function(factoryId) {
-    return this.getLoadedFactory(factoryId) != null;
+    return this.getLoadedFactory(factoryId) !== null;
 };
 
 /**
@@ -226,7 +226,7 @@ FactoryManager.prototype.load = function(callback) {
     const gameModel = this.game.getGameModel();
 
     // Load all factories for this game
-    Core.model.factoryModelManager.getFactories(gameModel, null, function(err, factories) {
+    Core.model.factoryModelManager.getFactories(gameModel, null, null, function(err, factories) {
         // Call back errors
         if(err !== null) {
             if(_.isFunction(callback))
@@ -356,7 +356,7 @@ FactoryManager.prototype.getVisibleFactories = function(user, callback) {
             }
 
             // Make sure a live user is found
-            if(liveUser == null) {
+            if(liveUser === null) {
                 latch.resolve();
                 return;
             }

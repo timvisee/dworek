@@ -1219,7 +1219,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
             }
 
             // Get the amount of money each team has
-            liveGame.getTeamMoney(undefined, function (err, standings) {
+            liveGame.getTeamMoney(undefined, function(err, standings) {
                 // Call back errors
                 if (err !== null) {
                     if (!calledBack)

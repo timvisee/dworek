@@ -168,7 +168,7 @@ User.prototype.getTeam = function(callback) {
         }
 
         // Make sure the user isn't null
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -203,7 +203,7 @@ User.prototype.hasTeam = function(callback) {
         }
 
         // Check whether the user has a team, call back the result
-        callback(null, team != null);
+        callback(null, team !== null);
     });
 };
 
@@ -224,7 +224,7 @@ User.prototype.hasTeam = function(callback) {
  */
 User.prototype.isTeam = function(otherTeam, callback) {
     // Call back if the other team is null
-    if(otherTeam == null) {
+    if(otherTeam === null) {
         callback(null, false);
         return;
     }
@@ -238,7 +238,7 @@ User.prototype.isTeam = function(otherTeam, callback) {
         }
 
         // Call back false if the team is unknown
-        if(team == null) {
+        if(team === null) {
             callback(null, false);
             return;
         }
@@ -344,7 +344,7 @@ User.prototype.getStrength = function(callback) {
         }
 
         // Make sure a game user is known
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, 0);
             return;
         }
@@ -389,7 +389,7 @@ User.prototype.getLocation = function() {
  */
 User.prototype.getLocationAge = function() {
     // Make sure a location time is set
-    if(this._locationTime == null)
+    if(this._locationTime === null)
         return null;
 
     // Calculate and return the age
@@ -445,7 +445,7 @@ User.prototype.updateLocation = function(location, socket, callback) {
     const self = this;
 
     // Set the location
-    if(location != undefined)
+    if(location !== undefined)
         this.setLocation(location);
 
     // Get the live game
@@ -577,7 +577,7 @@ User.prototype.getMoney = function(callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -611,7 +611,7 @@ User.prototype.setMoney = function(money, callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -644,7 +644,7 @@ User.prototype.addMoney = function(amount, callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -677,7 +677,7 @@ User.prototype.subtractMoney = function(amount, callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -709,7 +709,7 @@ User.prototype.getIn = function(callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -743,7 +743,7 @@ User.prototype.setIn = function(goods, callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -775,7 +775,7 @@ User.prototype.getOut = function(callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -809,7 +809,7 @@ User.prototype.setOut = function(goods, callback) {
         }
 
         // Make sure the game user is valid
-        if(gameUser == null) {
+        if(gameUser === null) {
             callback(null, null);
             return;
         }
@@ -834,7 +834,7 @@ User.prototype.setOut = function(goods, callback) {
  */
 User.prototype.isVisibleFor = function(other, callback) {
     // Make sure a valid user is given
-    if(other == null) {
+    if(other === null) {
         callback(null, false);
         return;
     }
@@ -859,7 +859,7 @@ User.prototype.isVisibleFor = function(other, callback) {
     const gameModel = liveGame.getGameModel();
 
     // Make sure the game model is valid
-    if(gameModel == null) {
+    if(gameModel === null) {
         callback(null, false);
         return;
     }
@@ -927,7 +927,7 @@ User.prototype.isVisibleFor = function(other, callback) {
             }
 
             // Call back if the team is null
-            if(result == null) {
+            if(result === null) {
                 if(!calledBack)
                     callback(null, false);
                 calledBack = true;
@@ -953,7 +953,7 @@ User.prototype.isVisibleFor = function(other, callback) {
             }
 
             // Call back if the team is null
-            if(result == null) {
+            if(result === null) {
                 if(!calledBack)
                     callback(null, false);
                 calledBack = true;

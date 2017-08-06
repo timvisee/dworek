@@ -132,6 +132,7 @@ UserManager.prototype.getUser = function(userId, callback) {
  * Null will be returned if no user is loaded for the given user ID.
  *
  * @param {UserModel|ObjectId|string} userId User instance or the user ID to get the user for.
+ * @return {User|null} The loaded user, or null if not available.
  */
 UserManager.prototype.getLoadedUser = function(userId) {
     // Get the user ID as an ObjectId
@@ -148,7 +149,7 @@ UserManager.prototype.getLoadedUser = function(userId) {
     // Loop through the list of users
     this.users.forEach(function(entry) {
         // Skip if we already found a user
-        if(result != null)
+        if(result !== null)
             return;
 
         // Check whether the user ID equals the user
@@ -167,7 +168,7 @@ UserManager.prototype.getLoadedUser = function(userId) {
  * @return {boolean} True if the user is currently loaded, false if not.
  */
 UserManager.prototype.isUserLoaded = function(userId) {
-    return this.getLoadedUser(userId) != null;
+    return this.getLoadedUser(userId) !== null;
 };
 
 /**

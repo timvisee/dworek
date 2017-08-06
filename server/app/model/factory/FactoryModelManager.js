@@ -28,9 +28,7 @@ var config = require('../../../config');
 var Core = require('../../../Core');
 var CallbackLatch = require('../../util/CallbackLatch');
 var RedisUtils = require('../../redis/RedisUtils');
-var Validator = require('../../validator/Validator');
 var FactoryDatabase = require('./FactoryDatabase');
-var HashUtils = require('../../hash/HashUtils');
 var ModelInstanceManager = require('../ModelInstanceManager');
 var FactoryModel = require('./FactoryModel');
 
@@ -162,10 +160,10 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
  *
  * @param {GameModel} [game] Game to get the factories for.
  * @param {UserModel} [user] User to get the factories for.
+ * @param {GameTeamModel} [team] Team to get the factories for.
  * @param {FactoryModelManager~getFactoriesCallback} callback Called with the result or when an error occurred.
  */
-// TODO: Add Redis caching to this function?
-FactoryModelManager.prototype.getFactories = function(game, user, callback) {
+FactoryModelManager.prototype.getFactories = function(game, user, team, callback) {
     // Create the query object
     var queryObject = {};
 
@@ -174,13 +172,16 @@ FactoryModelManager.prototype.getFactories = function(game, user, callback) {
         queryObject.game_id = game.getId();
     if(user !== null)
         queryObject.user_id = user.getId();
+    if(team !== null)
+        queryObject.team_id = team.getId();
 
     // Create a callback latch
     var latch = new CallbackLatch();
 
     // Determine the Redis cache key
-    var redisCacheKey = REDIS_KEY_ROOT + ':' + (game !== null ? game.getIdHex() : '0' ) +
-        ':' + (user !== null ? user.getIdHex() : '0' ) + ':getFactories';
+    var redisCacheKey = REDIS_KEY_ROOT + ':' + (game !== null ? game.getIdHex() : '0') +
+        ':' + (user !== null ? user.getIdHex() : '0') +
+        ':' + (team !== null ? team.getIdHex() : '0') + ':getFactories';
 
     // Store this instance
     const self = this;
