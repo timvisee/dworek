@@ -840,7 +840,7 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                 // Create a list of valid sorting orders
                 const ORDER_OPTIONS = [ 'asc', 'desc' ];
                 const PLAYER_ORDER_BY_OPTIONS = [ 'money' , 'in', 'out', 'strength', 'random' ];
-                const TEAM_ORDER_BY_OPTIONS = [ 'money', 'factory', 'in', 'out', 'strength', 'random'];
+                const TEAM_ORDER_BY_OPTIONS = [ 'money', 'factory', 'in', 'out', 'strength', 'defence', 'random'];
 
                 // Check whether a player range is specified
                 if(_.has(properties, 'filters.playerRange.limit') && _.isInteger(properties.filters.playerRange.limit)
@@ -1020,6 +1020,10 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
 
                                 case 'strength':
                                     getter = team.getTeamStrength;
+                                    break;
+
+                                case 'defence':
+                                    getter = team.getTeamDefence;
                                     break;
 
                                 case 'random:':
