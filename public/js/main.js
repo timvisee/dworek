@@ -7261,6 +7261,25 @@ $(document).bind("pageshow", function() {
 
         return false;
     });
+
+    // Get the field amount type element
+    var fieldAmountTypeElement = activePage.find('select#field-amount-type');
+    var fieldAmountValueLabel = activePage.find('label[for=field-amount-amount]');
+    var fieldAmountValueElement = activePage.find('input#field-amount-amount');
+
+    // Update the amount label and slider
+    var updateAmountValue = function() {
+        // Check whether the current mode is percentage
+        var percentage = fieldAmountTypeElement.val() === 'percentage';
+
+        // Update the labels and the max
+        fieldAmountValueLabel.text(percentage ? 'Percentage:' : 'Specific amount:');
+        fieldAmountValueElement.prop('max', percentage ? 500 : 10000000).slider('refresh');
+    };
+
+    // Update on change, and update once now
+    fieldAmountTypeElement.change(updateAmountValue);
+    updateAmountValue();
 });
 
 /**

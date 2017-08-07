@@ -20,8 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var util = require('util');
-
 var gameConfig = require('../../../gameConfig');
 
 var Core = require('../../../Core');

@@ -22,7 +22,7 @@ block content
         h4 Player ordering properties
         //- TODO: Set the maximum to the number of players in this game
         label(for='field-selector-player-range-limit') Amount of players:
-        input#field-selector-player-range-limit(type='range', name='field-selector-player-range-limit', value='3', min='1', max='25', data-highlight='true')
+        input#field-selector-player-range-limit(type='range', name='field-selector-player-range-limit', value=Math.min(3, game.users.length), min='1', max=game.users.length, data-highlight='true')
 
         label(for='field-selector-player-range-order') Order:
         select#field-selector-player-range-order(name='field-selector-player-range-order', selected='selected')
@@ -49,7 +49,7 @@ block content
 
         //- TODO: Set the maximum to the number of teams in this game
         label(for='field-selector-team-range-limit') Amount of teams:
-        input#field-selector-team-range-limit(type='range', name='field-selector-team-range-limit', value='1', min='1', max='5', data-highlight='true')
+        input#field-selector-team-range-limit(type='range', name='field-selector-team-range-limit', value='1', min='1', max=game.teams.length, data-highlight='true')
 
         label(for='field-selector-team-range-order') Order:
         select#field-selector-team-range-order(name='field-selector-team-range-order', selected='selected')
@@ -115,7 +115,7 @@ block content
         p The range around your current position.
 
         label(for='field-selector-range-range') Range meters:
-        input#field-selector-range-range(type='range', name='field-selector-range-range', value='100', min='1', max='5000', data-highlight='true')
+        input#field-selector-range-range(type='range', name='field-selector-range-range', value='100', min='1', max='10000', data-highlight='true')
 
         label(for='field-selector-range-side') Side:
         select#field-selector-range-side(name='field-selector-range-side', selected='selected')
@@ -164,11 +164,14 @@ block content
     label(for='field-amount-type') Amount type:
     select#field-amount-type(name='field-amount-type')
         option(value='fixed') Specific amount
-        option(value='percentage') Percentage
+        option(value='percentage', selected) Percentage
 
     //- TODO: Show a slider here!
+    //label(for='field-amount-amount') Amount value:
+    //input#field-amount-amount(name='field-amount-amount', value='1')
+
     label(for='field-amount-amount') Amount value:
-    input#field-amount-amount(name='field-amount-amount', value='1')
+    input#field-amount-amount(type='range', name='field-amount-amount', value='20', min='1', max='500', data-highlight='true')
 
     br
     hr
