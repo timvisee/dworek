@@ -4,6 +4,8 @@ block content
     p.
         This page allows a fully custom action to be executed.#[br]
         #[br]
+        By default all players are affected, enable and configure filters to limit the number of affected players.#[br]
+        #[br]
         An action affects money, !{__('in.names', { game: game.id })} and/or !{__('out.names', { game: game.id })} of
         players as configured below.
 
@@ -14,10 +16,10 @@ block content
     p Use filters to define which players are affected.
 
     input#field-selector-player-range-enable.collapsible-toggle(type='checkbox', name='field-selector-player-range-enable', data-collapsible-toggle='#container-selector-player-range')
-    label(for='field-selector-player-range-enable') Use player range filter
+    label(for='field-selector-player-range-enable') Use ordered players filter
 
     div#container-selector-player-range(data-role='collapsible', data-inset='false')
-        h4 Players range properties
+        h4 Player ordering properties
         //- TODO: Set the maximum to the number of players in this game
         label(for='field-selector-player-range-limit') Amount of players:
         input#field-selector-player-range-limit(type='range', name='field-selector-player-range-limit', value='3', min='1', max='25', data-highlight='true')
@@ -39,10 +41,12 @@ block content
     br
 
     input#field-selector-team-range-enable.collapsible-toggle(type='checkbox', name='field-selector-team-range-enable', data-collapsible-toggle='#container-selector-team-range')
-    label(for='field-selector-team-range-enable') Use team range filter
+    label(for='field-selector-team-range-enable') Use ordered teams filter
 
     div#container-selector-team-range(data-role='collapsible', data-inset='false')
-        h4 Team range properties
+        h4 Team ordering properties
+        p Players not in one of these teams are dropped.
+
         //- TODO: Set the maximum to the number of teams in this game
         label(for='field-selector-team-range-limit') Amount of teams:
         input#field-selector-team-range-limit(type='range', name='field-selector-team-range-limit', value='1', min='1', max='5', data-highlight='true')
@@ -65,7 +69,7 @@ block content
     br
 
     input#field-selector-player-enable.collapsible-toggle(type='checkbox', name='field-selector-player-enable', data-collapsible-toggle='#container-selector-player')
-    label(for='field-selector-player-enable') Use specific player filter
+    label(for='field-selector-player-enable') Use specific players filter
 
     div#container-selector-player(data-role='collapsible', data-inset='false')
         h4 Player selection
@@ -86,10 +90,11 @@ block content
     br
 
     input#field-selector-team-enable.collapsible-toggle(type='checkbox', name='field-selector-team-enable', data-collapsible-toggle='#container-selector-team')
-    label(for='field-selector-team-enable') Use specific team filter
+    label(for='field-selector-team-enable') Use specific teams filter
 
     div#container-selector-team(data-role='collapsible', data-inset='false')
         h4 Team selection
+        p Players not in one of these teams are dropped.
 
         //- Users list
         .user-list
