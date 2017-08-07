@@ -102,11 +102,11 @@ GameManager.prototype.getGame = function(gameId, callback) {
                 return;
             }
 
-            // Make sure the stage is valid
-            if(stage === 0) {
-                callback(null, null);
-                return;
-            }
+            // // Make sure the stage is valid
+            // if(stage === 0) {
+            //     callback(null, null);
+            //     return;
+            // }
 
             // Create a game instance for this model
             const loadGame = new Game(game);
@@ -156,7 +156,7 @@ GameManager.prototype.getLoadedGame = function(gameId) {
     // Loop through the list of games
     this.games.forEach(function(entry) {
         // Skip if we already found a game
-        if(result != null)
+        if(result !== null)
             return;
 
         // Check whether the game ID equals the game
@@ -175,7 +175,7 @@ GameManager.prototype.getLoadedGame = function(gameId) {
  * @return {boolean} True if the game is currently loaded, false if not.
  */
 GameManager.prototype.isGameLoaded = function(gameId) {
-    return this.getLoadedGame(gameId) != null;
+    return this.getLoadedGame(gameId) !== null;
 };
 
 /**
@@ -407,7 +407,7 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
         gameConstraint = gameConstraint.getId();
     else if(_.isString(gameConstraint) && ObjectId.isValid(gameConstraint))
         gameConstraint = new ObjectId(gameConstraint);
-    else if(gameConstraint != undefined && !(gameConstraint instanceof ObjectId)) {
+    else if(gameConstraint !== undefined && !(gameConstraint instanceof ObjectId)) {
         callback(new Error('Invalid game instance'));
         return;
     }
@@ -417,7 +417,7 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
         userConstraint = userConstraint.getId();
     else if(_.isString(userConstraint) && ObjectId.isValid(userConstraint))
         userConstraint = new ObjectId(userConstraint);
-    else if(userConstraint != undefined && !(userConstraint instanceof ObjectId)) {
+    else if(userConstraint !== undefined && !(userConstraint instanceof ObjectId)) {
         callback(new Error('Invalid user instance'));
         return;
     }
@@ -444,13 +444,13 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
     // Loop through the games
     this.games.forEach(function(liveGame) {
         // Check whether a game constraint is set
-        if(gameConstraint != undefined && !liveGame.getId().equals(gameConstraint))
+        if(gameConstraint !== undefined && !liveGame.getId().equals(gameConstraint))
             return;
 
         // Loop through the game users
         liveGame.userManager.users.forEach(function(liveUser) {
             // Check whether a game constraint is set
-            if (userConstraint != undefined && !liveUser.getId().equals(userConstraint))
+            if (userConstraint !== undefined && !liveUser.getId().equals(userConstraint))
                 return;
 
             // Add the live game and user as entry
@@ -552,7 +552,7 @@ GameManager.prototype.broadcastLocationData = function(scheduleTime, gameConstra
 
                             // Get the shop instance for this user if there is any, and determine whether the user is a shop
                             const liveShop = visible && liveGame.shopManager.getShopByUser(otherLiveUser);
-                            const isShop = liveShop != null;
+                            const isShop = liveShop !== null;
 
                             // Create a data object for the user
                             var userObject = {
