@@ -1,200 +1,225 @@
 extends ../../base/page
 
 block content
-    p.
-        This page allows a fully custom action to be executed.#[br]
-        #[br]
-        By default all players are affected, enable and configure filters to limit the number of affected players.#[br]
-        #[br]
-        An action affects money, !{__('in.names', { game: game.id })} and/or !{__('out.names', { game: game.id })} of
-        players as configured below.
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Aura of expense
 
-    br
-    hr
+        .card-supporting-text.has-action.has-title
+            p Make the closest players lose 30% of their money.
 
-    h1.header Player filters
-    p Use filters to define which players are affected.
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-expense-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-expense-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest 2 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-expense-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest 3 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-expense-4(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Farthest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-expense-5(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Farthest 2 players
 
-    input#field-selector-player-range-enable.collapsible-toggle(type='checkbox', name='field-selector-player-range-enable', data-collapsible-toggle='#container-selector-player-range')
-    label(for='field-selector-player-range-enable') Use ordered players filter
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Aura of luck
 
-    div#container-selector-player-range(data-role='collapsible', data-inset='false')
-        h4 Player ordering properties
-        //- TODO: Set the maximum to the number of players in this game
-        label(for='field-selector-player-range-limit') Amount of players:
-        input#field-selector-player-range-limit(type='range', name='field-selector-player-range-limit', value=Math.min(3, game.users.length), min='1', max=game.users.length, data-highlight='true')
+        .card-supporting-text.has-action.has-title
+            p.
+                The money, !{__('in.names', { game: game.id })} and !{__('out.names', { game: game.id })} of the closest
+                players is increased by 10%.
 
-        label(for='field-selector-player-range-order') Order:
-        select#field-selector-player-range-order(name='field-selector-player-range-order', selected='selected')
-            option(value='desc') Highest first
-            option(value='asc') Lowest first
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-luck-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-luck-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest 2 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-luck-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest 3 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-luck-4(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Farthest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-luck-5(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Farthest 2 players
 
-        label(for='field-selector-player-range-order-by') Order by:
-        select#field-selector-player-range-order-by(name='field-selector-player-range-order-by', selected='selected')
-            option(value='money') Money
-            option(value='in')!= __('in.names', { capitalizeFirst: true, game: game.id })
-            option(value='out')!= __('out.names', { capitalizeFirst: true, game: game.id })
-            option(value='strength') Strength
-            option(value='distance') Distance from you
-            option(value='random') Random
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Aura of Golden Age
 
-    br
+        .card-supporting-text.has-action.has-title
+            p Players receive !{__('currency.sign', { game: game.id })}5000.
 
-    input#field-selector-team-range-enable.collapsible-toggle(type='checkbox', name='field-selector-team-range-enable', data-collapsible-toggle='#container-selector-team-range')
-    label(for='field-selector-team-range-enable') Use ordered teams filter
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-goldenage-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Closest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-goldenage-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Farthest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-goldenage-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Players within 100 meters
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-goldenage-4(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Players within 500 meters
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-goldenage-5(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Players within 2 km
 
-    div#container-selector-team-range(data-role='collapsible', data-inset='false')
-        h4 Team ordering properties
-        p Players not in one of these teams are dropped.
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Aura of psychopathy
 
-        //- TODO: Set the maximum to the number of teams in this game
-        label(for='field-selector-team-range-limit') Amount of teams:
-        input#field-selector-team-range-limit(type='range', name='field-selector-team-range-limit', value='1', min='1', max=game.teams.length, data-highlight='true')
+        .card-supporting-text.has-action.has-title
+            p The closest player is affected by the following action.
 
-        label(for='field-selector-team-range-order') Order:
-        select#field-selector-team-range-order(name='field-selector-team-range-order', selected='selected')
-            option(value='desc') Highest first
-            option(value='asc') Lowest first
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('in.names', { game: game.id })} to 0
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('in.names', { game: game.id })} -75%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('out.names', { game: game.id })} to 0
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-4(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('out.names', { game: game.id })} -45%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-5(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Money -30%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-aura-psycho-6(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;All -20%
 
-        label(for='field-selector-team-range-order-by') Order by:
-        select#field-selector-team-range-order-by(name='field-selector-team-range-order-by', selected='selected')
-            option(value='money') Money
-            option(value='factory')!= __('factory.name', { capitalizeFirst: true, game: game.id }) + ' count'
-            option(value='in')!= 'Cumulative ' + __('in.names', { game: game.id })
-            option(value='out')!= 'Cumulative ' + __('out.names', { game: game.id })
-            option(value='strength') Cumulative player strength
-            option(value='defence') Cumulative !{__('factory.name', { game: game.id })} defence
-            option(value='random') Random
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Nerf richest player
 
-    br
+        .card-supporting-text.has-action.has-title
+            p Nerf the current richest player by decreasing it's units.
 
-    input#field-selector-player-enable.collapsible-toggle(type='checkbox', name='field-selector-player-enable', data-collapsible-toggle='#container-selector-player')
-    label(for='field-selector-player-enable') Use specific players filter
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-player-richest-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('in.names', { cappitalizeFirst: true, game: game.id })} -50%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-player-richest-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('out.names', { cappitalizeFirst: true, game: game.id })} -50%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-player-richest-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Money -50%
 
-    div#container-selector-player(data-role='collapsible', data-inset='false')
-        h4 Player selection
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Nerf richest team
 
-        //- Users list
-        .user-list
-            if game.users.length > 0
-                each entry in game.users
-                    input.field-selector-player-user(type='checkbox', name='field-selector-player-user-' + entry.id, id='field-selector-player-user-' + entry.id)
+        .card-supporting-text.has-action.has-title
+            p Nerf the players in the current richest team by decreasing their units.
 
-                    //- Label with the avatar
-                    label(for='field-selector-player-user-' + entry.id)
-                        img.ui-thumbnail.ui-thumbnail-square(src=entry.avatarUrl)
-                        | #{entry.firstName} #{entry.lastName} (#{entry.teamName})
-            else
-                p: i No players available...
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-team-richest-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Money -35%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-team-richest-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('out.names', { cappitalizeFirst: true, game: game.id })} -35%
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-nerf-team-richest-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;!{__('in.names', { cappitalizeFirst: true, game: game.id })} to 0
 
-    br
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Boost poorest players
 
-    input#field-selector-team-enable.collapsible-toggle(type='checkbox', name='field-selector-team-enable', data-collapsible-toggle='#container-selector-team')
-    label(for='field-selector-team-enable') Use specific teams filter
+        .card-supporting-text.has-action.has-title
+            p Boost the poorest players by increasing their money by 200%.
 
-    div#container-selector-team(data-role='collapsible', data-inset='false')
-        h4 Team selection
-        p Players not in one of these teams are dropped.
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-player-poorest-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest player
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-player-poorest-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest 2 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-player-poorest-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest 3 players
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-player-poorest-4(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest 4 players
 
-        //- Users list
-        .user-list
-            if game.teams.length > 0
-                each entry in game.teams
-                    input.field-selector-team-team(type='checkbox', name='field-selector-team-team-' + entry.id, id='field-selector-team-team-' + entry.id)
-                    label(for='field-selector-team-team-' + entry.id)= entry.name
-            else
-                p: i No teams available...
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Boost poorest teams
 
-    br
+        .card-supporting-text.has-action.has-title
+            p Boost the players in the poorest teams by increasing their money by 100%, and by increasing their !{__('in.names', { game: game.id })} by 40%.
 
-    input#field-selector-range-enable.collapsible-toggle(type='checkbox', name='field-selector-range-enable', data-collapsible-toggle='#container-selector-range')
-    label(for='field-selector-range-enable') Use range limit filter
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-team-poorest-1(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest team
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-team-poorest-2(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest 2 teams
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.action-boost-team-poorest-3(href='#', data-transition='slide')
+                    i.zmdi.zmdi-flare
+                    | &nbsp;&nbsp;Poorest 3 teams
 
-    div#container-selector-range(data-role='collapsible', data-inset='false')
-        h4 Range properties
-        p The range around your current position.
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Custom action
 
-        label(for='field-selector-range-range') Range meters:
-        input#field-selector-range-range(type='range', name='field-selector-range-range', value='100', min='1', max='10000', data-highlight='true')
+        .card-supporting-text.has-action.has-title
+            p Define your own custom action.
 
-        label(for='field-selector-range-side') Side:
-        select#field-selector-range-side(name='field-selector-range-side', selected='selected')
-            option(value='inside') Players inside the range
-            option(value='outside') Players outside the range
-
-    br
-
-    input#field-selector-player-limit-enable.collapsible-toggle(type='checkbox', name='field-selector-player-limit-enable', data-collapsible-toggle='#container-selector-player-limit')
-    label(for='field-selector-player-limit-enable') Use player limit filter
-
-    div#container-selector-player-limit(data-role='collapsible', data-inset='false')
-        h4 Player limit properties
-
-        //- TODO: Set the maximum to the number of players in this game
-        label(for='field-selector-player-limit-limit') Player limit:
-        input#field-selector-player-limit-limit(type='range', name='field-selector-player-limit-limit', value='3', min='1', max='25', data-highlight='true')
-
-    br
-    hr
-
-    h1.header Units
-    p Define what units this action has effect on.
-
-    input#field-unit-money(type='checkbox', name='field-unit-money')
-    label(for='field-unit-money') Money
-
-    input#field-unit-in(type='checkbox', name='field-unit-in')
-    label(for='field-unit-in')!= __('in.names', { capitalizeFirst: true, game: game.id })
-
-    input#field-unit-out(type='checkbox', name='field-unit-out')
-    label(for='field-unit-out')!= __('out.names', { capitalizeFirst: true, game: game.id })
-
-    br
-    hr
-
-    h1.header Amounts
-    p Define what happens to the selected units.
-
-    label(for='field-amount-method') Add/subtract/set:
-    select#field-amount-method(name='field-amount-method')
-        option(value='add') Add
-        option(value='subtract', selected) Subtract
-        option(value='set') Set to
-
-    label(for='field-amount-type') Amount type:
-    select#field-amount-type(name='field-amount-type')
-        option(value='fixed') Specific amount
-        option(value='percentage', selected) Percentage
-
-    //- TODO: Show a slider here!
-    //label(for='field-amount-amount') Amount value:
-    //input#field-amount-amount(name='field-amount-amount', value='1')
-
-    label(for='field-amount-amount') Amount value:
-    input#field-amount-amount(type='range', name='field-amount-amount', value='20', min='1', max='500', data-highlight='true')
-
-    br
-    hr
-
-    h1.header Message
-    p Define the message shown to affected players.
-
-    label(for='field-message-type') Message type:
-    select#field-message-type(name='field-message-type')
-        option(value='dynamic') Dynamic (automatic)
-        option(value='custom') Custom
-        option(value='none') None
-
-    label(for='field-message-custom') Custom message:
-    textarea#field-message-custom(name='field-message-custom')
-
-    br
-    hr
-
-    .button-list
-        a.ui-btn.ui-btn-raised.clr-primary.action-custom-action-execute(title='Execute')
-            i.zmdi.zmdi-flare.ui-pull-left
-            | &nbsp;&nbsp;Execute
-        a.ui-btn(href='#', data-rel='back', data-direction='reverse')
-            i.zmdi.zmdi-undo.ui-pull-left
-            | &nbsp;&nbsp;Cancel
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary(href='/game/' + game.id + '/special/custom', data-transition='slide')
+                    i.zmdi.zmdi-edit
+                    | &nbsp;&nbsp;Custom action

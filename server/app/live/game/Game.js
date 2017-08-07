@@ -1217,7 +1217,7 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                             }
 
                             // Make sure the amount is valid
-                            if(!_.isInteger(changeAmount) || changeAmount <= 0) {
+                            if(!_.isInteger(changeAmount) || (changeMethod !== 'set' && changeAmount <= 0)) {
                                 if(!calledBack)
                                     callback(new Error('Invalid change amount'));
                                 calledBack = true;
@@ -1352,7 +1352,7 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
  * @param {string} amounts.method Algorithmic method. ('add', 'subtract', 'set')
  * @param {string} amounts.type Type of unit amount processing by this action. ('fixed', 'percentage')
  * @param {int} amounts.amount Amount.
- * @param {string} [message.method='dynamic'] Message type to show. ('dynamic', 'custom', 'none')
+ * @param {string} [message.type='dynamic'] Message type to show. ('dynamic', 'custom', 'none')
  * @param {string} [message.customMessage] A custom message to show when the message type is set to 'custom'.
  */
 

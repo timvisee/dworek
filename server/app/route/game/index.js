@@ -239,7 +239,7 @@ pageLang.route(router);
 // Route the factory page
 pageFactory.route(router);
 
-// Route the special page
+// Route the special pages
 pageSpecial.route(router);
 
 // Export the module

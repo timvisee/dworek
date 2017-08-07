@@ -7286,6 +7286,625 @@ $(document).bind("pageshow", function() {
     updateAmountValue();
 });
 
+// Configure logic on the custom actions page
+$(document).bind("pageshow", function() {
+    // Get the currently active page
+    var activePage = getActivePage();
+
+    // Return early if this isn't a custom action page
+    if(activePage.find('a.action-aura-expense-1').length <= 0)
+        return;
+
+    // A helper function to send a special action
+    // Callback: err, hasSent
+    var sendSpecialAction = function(properties, showConfirmation, callback) {
+        // Ask for confirmation
+        if(showConfirmation === undefined || showConfirmation === null || showConfirmation)
+            showDialog({
+                title: 'Execute special action',
+                message: 'Are you sure you want to execute this special action?<br><br>This operation can\'t be undone.',
+                actions: [
+                    {
+                        text: 'Yes, execute',
+                        icon: 'zmdi zmdi-flare',
+                        state: 'primary',
+                        value: true,
+                        action: function() {
+                            // Send a packet with the properties
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.SPECIAL_CUSTOM_ACTION_EXECUTE, {
+                                game: Dworek.utils.getGameId(),
+                                properties: properties
+                            });
+                        }
+                    },
+                    {
+                        text: 'No, cancel',
+                        icon: 'zmdi zmdi-undo',
+                        state: 'warning'
+                    }
+                ]
+            }, function(result) {
+                // Call the callback
+                if(callback !== undefined)
+                    callback(null, result === true);
+            });
+
+        else {
+            // Send a packet with the properties
+            Dworek.realtime.packetProcessor.sendPacket(PacketType.SPECIAL_CUSTOM_ACTION_EXECUTE, {
+                game: Dworek.utils.getGameId(),
+                properties: properties
+            });
+
+            // Call the callback
+            if(callback !== undefined)
+                callback(null, true);
+        }
+
+        return false;
+    };
+
+    // Set up the aura of expense
+    var actionAuraExpense = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'distance'
+            }
+        },
+        units: {
+            money: true,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 30
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by an aura of expense!\n\nYou\'ve lost some money.'
+        }
+    };
+
+    // Link the expense aura buttons
+    activePage.find('a.action-aura-expense-1').click(function() {
+        actionAuraExpense.filters.playerRange.limit = 1;
+        actionAuraExpense.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraExpense);
+        return false;
+    });
+    activePage.find('a.action-aura-expense-2').click(function() {
+        actionAuraExpense.filters.playerRange.limit = 2;
+        actionAuraExpense.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraExpense);
+        return false;
+    });
+    activePage.find('a.action-aura-expense-3').click(function() {
+        actionAuraExpense.filters.playerRange.limit = 3;
+        actionAuraExpense.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraExpense);
+        return false;
+    });
+    activePage.find('a.action-aura-expense-4').click(function() {
+        actionAuraExpense.filters.playerRange.limit = 1;
+        actionAuraExpense.filters.playerRange.order = 'desc';
+        sendSpecialAction(actionAuraExpense);
+        return false;
+    });
+    activePage.find('a.action-aura-expense-5').click(function() {
+        actionAuraExpense.filters.playerRange.limit = 2;
+        actionAuraExpense.filters.playerRange.order = 'desc';
+        sendSpecialAction(actionAuraExpense);
+        return false;
+    });
+
+    // Set up the aura of luck
+    var actionAuraLuck = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'distance'
+            }
+        },
+        units: {
+            money: true,
+            in: true,
+            out: true
+        },
+        amounts: {
+            method: 'add',
+            type: 'percentage',
+            amount: 10
+        },
+        message: {
+            type: 'custom',
+//            customMessage: 'You\'ve been affected by an aura of luck!\n\n' +
+//                'Your money, ' + __('in.names', { game: Dworek.utils.getGameId() }) +
+//                ' and ' + __('out.names', { game: Dworek.utils.getGameId() }) +
+//                ' have been increased by 10%.'
+            customMessage: 'You\'ve been affected by an aura of luck!\n\n' +
+                'You\'ve lost 10% of all your inventory items..'
+        }
+    };
+
+    // Link the luck aura buttons
+    activePage.find('a.action-aura-luck-1').click(function() {
+        actionAuraLuck.filters.playerRange.limit = 1;
+        actionAuraLuck.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraLuck);
+        return false;
+    });
+    activePage.find('a.action-aura-luck-2').click(function() {
+        actionAuraLuck.filters.playerRange.limit = 2;
+        actionAuraLuck.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraLuck);
+        return false;
+    });
+    activePage.find('a.action-aura-luck-3').click(function() {
+        actionAuraLuck.filters.playerRange.limit = 3;
+        actionAuraLuck.filters.playerRange.order = 'asc';
+        sendSpecialAction(actionAuraLuck);
+        return false;
+    });
+    activePage.find('a.action-aura-luck-4').click(function() {
+        actionAuraLuck.filters.playerRange.limit = 1;
+        actionAuraLuck.filters.playerRange.order = 'desc';
+        sendSpecialAction(actionAuraLuck);
+        return false;
+    });
+    activePage.find('a.action-aura-luck-5').click(function() {
+        actionAuraLuck.filters.playerRange.limit = 2;
+        actionAuraLuck.filters.playerRange.order = 'desc';
+        sendSpecialAction(actionAuraLuck);
+        return false;
+    });
+
+    // Set up the aura of golden age
+    var actionAuraGoldenAge = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'distance'
+            }
+        },
+        units: {
+            money: true,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'add',
+            type: 'fixed',
+            amount: 5000
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by an aura of Golden Age!\n\nYou received some money!'
+//            customMessage: 'You\'ve been affected by an aura of Golden Age!\n\nYou received ' + __('currency.sign', { game: Dworek.utils.getGameId() }) + '5000.'
+        }
+    };
+
+    // Link the golden age aura buttons
+    activePage.find('a.action-aura-goldenage-1').click(function() {
+        actionAuraGoldenAge.filters.playerRange = {
+            limit: 1,
+            order: 'asc',
+            orderBy: 'distance',
+        };
+        actionAuraGoldenAge.filters.range = {};
+        sendSpecialAction(actionAuraGoldenAge);
+        return false;
+    });
+    activePage.find('a.action-aura-goldenage-2').click(function() {
+        actionAuraGoldenAge.filters.playerRange = {
+            limit: 1,
+            order: 'desc',
+            orderBy: 'distance',
+        };
+        actionAuraGoldenAge.filters.range = {};
+        sendSpecialAction(actionAuraGoldenAge);
+        return false;
+    });
+    activePage.find('a.action-aura-goldenage-3').click(function() {
+        actionAuraGoldenAge.filters.playerRange = {};
+        actionAuraGoldenAge.filters.range = {
+            range: 100,
+            side: 'inside'
+        };
+        sendSpecialAction(actionAuraGoldenAge);
+        return false;
+    });
+    activePage.find('a.action-aura-goldenage-4').click(function() {
+        actionAuraGoldenAge.filters.playerRange = {};
+        actionAuraGoldenAge.filters.range = {
+            range: 500,
+            side: 'inside'
+        };
+        sendSpecialAction(actionAuraGoldenAge);
+        return false;
+    });
+    activePage.find('a.action-aura-goldenage-5').click(function() {
+        actionAuraGoldenAge.filters.playerRange = {};
+        actionAuraGoldenAge.filters.range = {
+            range: 2000,
+            side: 'inside'
+        };
+        sendSpecialAction(actionAuraGoldenAge);
+        return false;
+    });
+
+    // Set up the aura of psychopathy
+    var actionAuraPsycho = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'distance'
+            }
+        },
+        units: {
+            money: true,
+            in: true,
+            out: true
+        },
+        amounts: {
+            method: 'add',
+            type: 'percentage',
+            amount: 10
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by an aura of psychopathy!\n\n' +
+                'Some of your inventory units seem to have been changed.'
+//            customMessage: 'You\'ve been affected by an aura of psychopathy!\n\n' +
+//                'Your money, ' + __('in.names', { game: Dworek.utils.getGameId() }) +
+//                ' and ' + __('out.names', { game: Dworek.utils.getGameId() }) + 
+//                ' have been increased by 10%.'
+        }
+    };
+
+    // Link the psychopathy aura buttons
+    activePage.find('a.action-aura-psycho-1').click(function() {
+        actionAuraPsycho.units = {
+            money: false,
+            in: true,
+            out: false
+        };
+        actionAuraPsycho.amounts = {
+            method: 'set',
+            type: 'fixed',
+            amount: 0
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-2').click(function() {
+        actionAuraPsycho.units = {
+            money: false,
+            in: true,
+            out: false
+        };
+        actionAuraPsycho.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 75
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-3').click(function() {
+        actionAuraPsycho.units = {
+            money: false,
+            in: false,
+            out: true
+        };
+        actionAuraPsycho.amounts = {
+            method: 'set',
+            type: 'fixed',
+            amount: 0
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-4').click(function() {
+        actionAuraPsycho.units = {
+            money: false,
+            in: false,
+            out: true
+        };
+        actionAuraPsycho.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 75
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-5').click(function() {
+        actionAuraPsycho.units = {
+            money: true,
+            in: false,
+            out: false
+        };
+        actionAuraPsycho.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 30
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-6').click(function() {
+        actionAuraPsycho.units = {
+            money: true,
+            in: true,
+            out: true
+        };
+        actionAuraPsycho.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 20
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+
+    // Set up the nerf for the richest player
+    var actionNerfPlayerRichest = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'desc',
+                orderBy: 'money'
+            }
+        },
+        units: {
+            money: false,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 50
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by a special force!\n\n' +
+                'You\'ve lost some of your items in inventory items.'
+        }
+    };
+
+    // Link the nerf player richest buttons
+    activePage.find('a.action-nerf-player-richest-1').click(function() {
+        actionNerfPlayerRichest.units = {
+            money: false,
+            in: true,
+            out: false
+        };
+        sendSpecialAction(actionNerfPlayerRichest);
+        return false;
+    });
+    activePage.find('a.action-nerf-player-richest-2').click(function() {
+        actionNerfPlayerRichest.units = {
+            money: false,
+            in: false,
+            out: true
+        };
+        sendSpecialAction(actionNerfPlayerRichest);
+        return false;
+    });
+    activePage.find('a.action-nerf-player-richest-3').click(function() {
+        actionNerfPlayerRichest.units = {
+            money: true,
+            in: false,
+            out: false
+        };
+        sendSpecialAction(actionNerfPlayerRichest);
+        return false;
+    });
+
+    // Set up the nerf for the poorest team
+    var actionNerfTeamRichest = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'desc',
+                orderBy: 'money'
+            }
+        },
+        units: {
+            money: false,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 50
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by a special force!\n\n' +
+                'You\'ve lost some of your items in inventory items.'
+        }
+    };
+
+    // Link the nerf team richest buttons
+    activePage.find('a.action-nerf-team-richest-1').click(function() {
+        actionNerfTeamRichest.filters.units = {
+            money: true,
+            in: false,
+            out: false
+        };
+        actionNerfTeamRichest.filters.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 35
+        };
+        sendSpecialAction(actionNerfTeamRichest);
+        return false;
+    });
+    activePage.find('a.action-nerf-team-richest-2').click(function() {
+        actionNerfTeamRichest.filters.units = {
+            money: false,
+            in: false,
+            out: true
+        };
+        actionNerfTeamRichest.filters.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 35
+        };
+        sendSpecialAction(actionNerfTeamRichest);
+        return false;
+    });
+    activePage.find('a.action-nerf-team-richest-3').click(function() {
+        actionNerfTeamRichest.filters.units = {
+            money: false,
+            in: true,
+            out: false
+        };
+        actionNerfTeamRichest.filters.amounts = {
+            method: 'set',
+            type: 'fixed',
+            amount: 0
+        };
+        sendSpecialAction(actionNerfTeamRichest);
+        return false;
+    });
+
+    // Set up the boost for the poorest players
+    var actionBoostPlayerPoorest = {
+        filters: {
+            playerRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'money'
+            }
+        },
+        units: {
+            money: true,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'add',
+            type: 'percentage',
+            amount: 200
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by a special force!\n\n' +
+                'Your money has mysteriously tripled!'
+        }
+    };
+
+    // Link the boost poorest player buttons
+    activePage.find('a.action-boost-player-poorest-1').click(function() {
+        actionBoostPlayerPoorest.filters.playerRange.limit = 1;
+        sendSpecialAction(actionBoostPlayerPoorest);
+        return false;
+    });
+    activePage.find('a.action-boost-player-poorest-2').click(function() {
+        actionBoostPlayerPoorest.filters.playerRange.limit = 2;
+        sendSpecialAction(actionBoostPlayerPoorest);
+        return false;
+    });
+    activePage.find('a.action-boost-player-poorest-3').click(function() {
+        actionBoostPlayerPoorest.filters.playerRange.limit = 3;
+        sendSpecialAction(actionBoostPlayerPoorest);
+        return false;
+    });
+    activePage.find('a.action-boost-player-poorest-4').click(function() {
+        actionBoostPlayerPoorest.filters.playerRange.limit = 4;
+        sendSpecialAction(actionBoostPlayerPoorest);
+        return false;
+    });
+
+    // Set up the boost for the poorest teams
+    var actionBoostTeamPoorest = {
+        filters: {
+            teamRange: {
+                limit: 1,
+                order: 'asc',
+                orderBy: 'money'
+            }
+        },
+        units: {
+            money: true,
+            in: false,
+            out: false
+        },
+        amounts: {
+            method: 'add',
+            type: 'percentage',
+            amount: 100
+        },
+        message: {
+            type: 'custom',
+            customMessage: 'You\'ve been affected by a special force!\n\n' +
+                'Your money has mysteriously doubled, ' +
+                'and you\'ve found some additional inventory units.'
+//            customMessage: 'You\'ve been affected by a special force!\n\n' +
+//                'Your money has mysteriously doubled, ' +
+//                'and you\'ve found some additional ' + __('in.names', { game: Dworek.utils.getGameId() }) + '.'
+        }
+    };
+
+    // Link the boost poorest team buttons
+    activePage.find('a.action-boost-team-poorest-1').click(function() {
+        actionBoostTeamPoorest.filters.teamRange.limit = 1;
+        actionBoostTeamPoorest.units.money = true;
+        actionBoostTeamPoorest.units.in = false;
+        actionBoostTeamPoorest.amounts.amount = 100;
+        sendSpecialAction(actionBoostTeamPoorest, function(err, hasSent) {
+            if(err === null && hasSent) {
+                actionBoostTeamPoorest.units.money = false;
+                actionBoostTeamPoorest.units.in = true;
+                actionBoostTeamPoorest.amounts.amount = 40;
+                sendSpecialAction(actionBoostTeamPoorest, false);
+            }
+        });
+        return false;
+    });
+    activePage.find('a.action-boost-team-poorest-2').click(function() {
+        actionBoostTeamPoorest.filters.teamRange.limit = 2;
+        actionBoostTeamPoorest.units.money = true;
+        actionBoostTeamPoorest.units.in = false;
+        actionBoostTeamPoorest.amounts.amount = 100;
+        sendSpecialAction(actionBoostTeamPoorest, function(err, hasSent) {
+            if(err === null && hasSent) {
+                actionBoostTeamPoorest.units.money = false;
+                actionBoostTeamPoorest.units.in = true;
+                actionBoostTeamPoorest.amounts.amount = 40;
+                sendSpecialAction(actionBoostTeamPoorest, false);
+            }
+        });
+        return false;
+    });
+    activePage.find('a.action-boost-team-poorest-3').click(function() {
+        actionBoostTeamPoorest.filters.teamRange.limit = 3;
+        actionBoostTeamPoorest.units.money = true;
+        actionBoostTeamPoorest.units.in = false;
+        actionBoostTeamPoorest.amounts.amount = 100;
+        sendSpecialAction(actionBoostTeamPoorest, function(err, hasSent) {
+            if(err === null && hasSent) {
+                actionBoostTeamPoorest.units.money = false;
+                actionBoostTeamPoorest.units.in = true;
+                actionBoostTeamPoorest.amounts.amount = 40;
+                sendSpecialAction(actionBoostTeamPoorest, false);
+            }
+        });
+        return false;
+    });
+});
+
 /**
  * Create and get an object with all the properties of the custom action
  * configured on the current page.
