@@ -10,7 +10,7 @@ block content
     br
     hr
 
-    h1.header.wow.fadeInUp Player filters
+    h1.header Player filters
     p Use filters to define which players are affected.
 
     label(for='field-selector-player-range-enable') Player range:
@@ -150,7 +150,7 @@ block content
     br
     hr
 
-    h1.header.wow.fadeInUp Units
+    h1.header Units
     p Define what units this action has effect on.
 
     input#field-unit-money(type='checkbox', name='field-unit-money')
@@ -165,7 +165,7 @@ block content
     br
     hr
 
-    h1.header.wow.fadeInUp Amounts
+    h1.header Amounts
     p Define what happens to the selected units.
 
     label(for='field-amount-method') Add/subtract/set:
@@ -186,7 +186,7 @@ block content
     br
     hr
 
-    h1.header.wow.fadeInUp Message
+    h1.header Message
     p Define the message shown to affected players.
 
     label(for='field-message-type') Message type:
@@ -202,9 +202,9 @@ block content
     hr
 
     .button-list
-        a.ui-btn.ui-btn-raised.clr-primary.action-custom-action-execute.wow.fadeIn(title='Execute', data-ajax='false')
+        a.ui-btn.ui-btn-raised.clr-primary.action-custom-action-execute(title='Execute')
             i.zmdi.zmdi-flare.ui-pull-left
             | &nbsp;&nbsp;Execute
-        a.ui-btn.wow.fadeIn(href='#', data-rel='back', data-direction='reverse', data-wow-delay='0.4s')
+        a.ui-btn(href='#', data-rel='back', data-direction='reverse')
             i.zmdi.zmdi-undo.ui-pull-left
             | &nbsp;&nbsp;Cancel

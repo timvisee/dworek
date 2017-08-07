@@ -7206,7 +7206,6 @@ $(document).bind("pageinit", function() {
 
 // Configure logic on the custom actions page
 $(document).bind("pageinit", function() {
-
     // Get the currently active page
     const activePage = getActivePage();
 
@@ -7256,6 +7255,8 @@ $(document).bind("pageinit", function() {
                 executeButton.removeClass('ui-disabled');
             }, 1500);
         });
+
+        return false;
     });
 });
 
