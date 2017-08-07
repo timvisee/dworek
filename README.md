@@ -6,6 +6,8 @@
 Create virtual drug labs in real-world locations with your cartel.
 Conquer labs owned by other cartels to become the drug production MVP.
 
+[[Usage Guide]](/res/docs/guide/guide.md)
+
 ## Builds
 |Service|Build Status|Public Status|
 |---:|:---|:---|
