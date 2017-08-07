@@ -42,14 +42,14 @@ appInfo.APP_NAME = 'Dworek';
  *
  * @constant {string}
  */
-appInfo.VERSION_NAME = '0.0.3';
+appInfo.VERSION_NAME = '0.0.4';
 
 /**
  * Application version code.
  *
  * @constant {int}
  */
-appInfo.VERSION_CODE = 3;
+appInfo.VERSION_CODE = 4;
 
 
 // Export the configuration
