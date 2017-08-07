@@ -7267,14 +7267,34 @@ $(document).bind("pageshow", function() {
     });
 
     // Get the field amount type element
+    var fieldAmountMethodElement = activePage.find('select#field-amount-method');
     var fieldAmountTypeElement = activePage.find('select#field-amount-type');
     var fieldAmountValueLabel = activePage.find('label[for=field-amount-amount]');
     var fieldAmountValueElement = activePage.find('input#field-amount-amount');
 
     // Update the amount label and slider
     var updateAmountValue = function() {
-        // Check whether the current mode is percentage
+        var isSetTo = fieldAmountMethodElement.val() === 'set';
         var percentage = fieldAmountTypeElement.val() === 'percentage';
+
+        // Set the minimum value
+        fieldAmountValueElement.prop('min', isSetTo ? 0 : 1);
+
+        // Update the enabled/disabled state
+        if(isSetTo) {
+            // Change the method to specific
+            fieldAmountTypeElement.val('fixed');
+            percentage = false;
+
+            // Disable the amount type
+            fieldAmountTypeElement.addClass('ui-disabled');
+
+        } else
+            // Enable the amount type
+            fieldAmountTypeElement.removeClass('ui-disabled');
+
+        // Disable the typeelement accordingly
+        fieldAmountTypeElement.prop('disabled', isSetTo);
 
         // Update the labels and the max
         fieldAmountValueLabel.text(percentage ? 'Percentage:' : 'Specific amount:');
@@ -7282,6 +7302,7 @@ $(document).bind("pageshow", function() {
     };
 
     // Update on change, and update once now
+    fieldAmountMethodElement.change(updateAmountValue);
     fieldAmountTypeElement.change(updateAmountValue);
     updateAmountValue();
 });
