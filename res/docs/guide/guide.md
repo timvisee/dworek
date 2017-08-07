@@ -12,7 +12,7 @@ The latter is used in this guide._
 
 The goal is simple:
 
-> Create virtual drug labs in real-world locations with your cartel.
+> Create virtual drug labs in real-world locations with your cartel.  
 > Conquer labs owned by other cartels to become the drug production MVP.
 
 To win, earn as much money as possible.
@@ -198,10 +198,11 @@ This conquer value is affected by the defence level of the lab, and the players 
 
 The calculation for this value works as follows:
 ```
-0
-- lab defence value
-- cumulative strength value of friendly players in range
-+ cumulative strength value of enemy players in range
+0 - A - B + C = conquer value
+    |   |   |
+    |   |   +-- C: cumulative strength value of enemy players in range
+    |   +-- B: cumulative strength value of friendly players in range
+    +-- A: lab defence value
 ```
 
 This results in:
