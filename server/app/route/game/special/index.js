@@ -37,7 +37,7 @@ module.exports = {
         const self = module.exports;
 
         // Route the pages
-        router.get('/:game/special', self.get);
+        router.get('/:game/special/custom', self.get);
     },
 
     /**

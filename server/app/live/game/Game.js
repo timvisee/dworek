@@ -839,7 +839,7 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
 
                 // Create a list of valid sorting orders
                 const ORDER_OPTIONS = [ 'asc', 'desc' ];
-                const PLAYER_ORDER_BY_OPTIONS = [ 'money' , 'in', 'out', 'strength', 'random' ];
+                const PLAYER_ORDER_BY_OPTIONS = [ 'money' , 'in', 'out', 'strength', 'distance', 'random' ];
                 const TEAM_ORDER_BY_OPTIONS = [ 'money', 'factory', 'in', 'out', 'strength', 'defence', 'random'];
 
                 // Check whether a player range is specified
@@ -886,6 +886,9 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                             value: 0
                         };
 
+                        // Define whether the operation is cancelled
+                        var isCancelled = false;
+
                         // Select the getter function to use for the value
                         var getter = null;
                         switch(properties.filters.playerRange.orderBy) {
@@ -905,6 +908,14 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                                 getter = player.getStrength;
                                 break;
 
+                            case 'distance':
+                                // Make sure the user has a location
+                                if(!player.hasLocation())
+                                    isCancelled = true;
+                                else
+                                    getter = (callback) => callback(null, player.getLocation().getDistanceTo(location));
+                                break;
+
                             case 'random':
                             default:
                                 getter = (callback) => callback(null, Math.random());
@@ -912,23 +923,25 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                         }
 
                         // Get the actual value
-                        sortLatch.add();
-                        getter.call(player, function(err, value) {
-                            // Call back errors
-                            if(err !== null) {
-                                if(!calledBack)
-                                    callback(err);
-                                calledBack = true;
-                                return;
-                            }
+                        if(!isCancelled) {
+                            sortLatch.add();
+                            getter.call(player, function(err, value) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        callback(err);
+                                    calledBack = true;
+                                    return;
+                                }
 
-                            // Set the value and add the object to the list
-                            playerObject.value = value;
-                            playerSort.push(playerObject);
+                                // Set the value and add the object to the list
+                                playerObject.value = value;
+                                playerSort.push(playerObject);
 
-                            // Resolve the sorting latch
-                            sortLatch.resolve();
-                        });
+                                // Resolve the sorting latch
+                                sortLatch.resolve();
+                            });
+                        }
                     });
 
                     // Sort the values

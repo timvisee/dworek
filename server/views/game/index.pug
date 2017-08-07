@@ -127,6 +127,19 @@ block content
                             span.game-balance-out ?
                             span(style="color: gray;")  units
 
+        //- Show a proper card if the user hasn't joined this game
+        if game.userState.special || user.isHost || user.isAdmin
+            .nd2-card.wow.fadeInUp
+                .card-title.has-supporting-text
+                    h3.card-primary-title Special actions
+
+                .card-supporting-text.has-action.has-title.
+                    Execute special actions to affect the inventory of players.
+
+                .card-action
+                    .row.between-xs: .col-xs-12: .box
+                        a.ui-btn.ui-btn-inline.waves-effect.waves-button.waves-effect.waves-button(href=page.url + '/special/custom', data-transition='slide') Custom
+
         .nd2-card.wow.fadeInUp.card-player-strength
             .card-title.has-supporting-text
                 h3.card-primary-title Upgrade strength
