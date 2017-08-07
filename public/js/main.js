@@ -7168,7 +7168,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.APP_STATUS_UPDATE, fu
 });
 
 // Set up the toggleable collapsibles
-$(document).bind("pageinit", function() {
+$(document).bind("pageshow", function() {
     // Get the currently active page
     const activePage = getActivePage();
 
@@ -7205,16 +7205,19 @@ $(document).bind("pageinit", function() {
 });
 
 // Configure logic on the custom actions page
-$(document).bind("pageinit", function() {
+$(document).bind("pageshow", function() {
     // Get the currently active page
-    const activePage = getActivePage();
+    var activePage = getActivePage();
 
     // Make sure the execute button is available on this page
-    const executeButton = activePage.find('a.action-custom-action-execute');
+    var executeButton = activePage.find('a.action-custom-action-execute');
 
     // Return early if this isn't a custom action page
     if(executeButton.length <= 0)
         return;
+
+    // Unbind all click events
+    executeButton.unbind('click');
 
     // Execute the action when the button is pressed
     executeButton.click(function() {
