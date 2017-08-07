@@ -7,12 +7,15 @@ This guide briefly describes how Dworek, and it's game mechanics work.
 _Note: This game can be played in different formats with different language configurations.  
 For example, it may be played with ingredients, sweet factories and candy.  
 Or with a configuration like ingredients, labs and drugs.
-In this guide ingredients, labs and drugs are used._
+The latter is used in this guide._
+
+
+The goal is simple:
 
 > Create virtual drug labs in real-world locations with your cartel.
 > Conquer labs owned by other cartels to become the drug production MVP.
 
-The goal is simple, earn as much money as possible.
+To win, earn as much money as possible.
 
 ##### Format
 This game is played in the real world where every player has it's own mobile device.
@@ -349,6 +352,7 @@ The list of standings is updated in real time.
 
 
 # Information for administrators
+Note: The following part is still a work in progress.
 
 ## Games
 Multiple games can be played.
