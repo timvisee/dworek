@@ -3992,7 +3992,11 @@ function initMap(element) {
 
             // Set up the tile layers
             L.tileLayer('https://api.mapbox.com/styles/v1/timvisee/cirawmn8f001ch4m27llnb45d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGltdmlzZWUiLCJhIjoiY2lyZXY5cDhzMDAxM2lsbTNicGViaTZkYyJ9.RqbUkoWLWeh_WZoyoxxt-Q', {
-                attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>'
+                attribution: 'Hosted by <a href="https://timvisee.com/" target="_blank">timvisee.com</a>',
+                useCache: true,
+                saveToCache: true,
+                useOnlyCache: false,
+                cacheMaxAge: 2 * 7 * 24 * 60 * 60 * 1000
             }).addTo(map);
 
             // Revert the view or stop following if the map is dragged by the user
