@@ -13,10 +13,8 @@ block content
     h1.header Player filters
     p Use filters to define which players are affected.
 
-    label(for='field-selector-player-range-enable') Player range:
-    select#field-selector-player-range-enable.collapsible-toggle(name='field-selector-player-range-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-player-range')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-player-range-enable.collapsible-toggle(type='checkbox', name='field-selector-player-range-enable', data-collapsible-toggle='#container-selector-player-range')
+    label(for='field-selector-player-range-enable') Use player range filter
 
     div#container-selector-player-range(data-role='collapsible', data-inset='false')
         h4 Players range properties
@@ -39,12 +37,9 @@ block content
             option(value='random') Random
 
     br
-    br
 
-    label(for='field-selector-team-range-enable') Team range:
-    select#field-selector-team-range-enable.collapsible-toggle(name='field-selector-team-range-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-team-range')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-team-range-enable.collapsible-toggle(type='checkbox', name='field-selector-team-range-enable', data-collapsible-toggle='#container-selector-team-range')
+    label(for='field-selector-team-range-enable') Use team range filter
 
     div#container-selector-team-range(data-role='collapsible', data-inset='false')
         h4 Team range properties
@@ -68,12 +63,9 @@ block content
             option(value='random') Random
 
     br
-    br
 
-    label(for='field-selector-player-enable') Specific players:
-    select#field-selector-player-enable.collapsible-toggle(name='field-selector-player-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-player')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-player-enable.collapsible-toggle(type='checkbox', name='field-selector-player-enable', data-collapsible-toggle='#container-selector-player')
+    label(for='field-selector-player-enable') Use specific player filter
 
     div#container-selector-player(data-role='collapsible', data-inset='false')
         h4 Player selection
@@ -92,12 +84,9 @@ block content
                 p: i No players available...
 
     br
-    br
 
-    label(for='field-selector-team-enable') Specific teams:
-    select#field-selector-team-enable.collapsible-toggle(name='field-selector-team-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-team')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-team-enable.collapsible-toggle(type='checkbox', name='field-selector-team-enable', data-collapsible-toggle='#container-selector-team')
+    label(for='field-selector-team-enable') Use specific team filter
 
     div#container-selector-team(data-role='collapsible', data-inset='false')
         h4 Team selection
@@ -112,12 +101,9 @@ block content
                 p: i No teams available...
 
     br
-    br
 
-    label(for='field-selector-range-enable') Range limit:
-    select#field-selector-range-enable.collapsible-toggle(name='field-selector-range-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-range')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-range-enable.collapsible-toggle(type='checkbox', name='field-selector-range-enable', data-collapsible-toggle='#container-selector-range')
+    label(for='field-selector-range-enable') Use range limit filter
 
     div#container-selector-range(data-role='collapsible', data-inset='false')
         h4 Range properties
@@ -132,12 +118,9 @@ block content
             option(value='outside') Players outside the range
 
     br
-    br
 
-    label(for='field-selector-player-limit-enable') Player limit:
-    select#field-selector-player-limit-enable.collapsible-toggle(name='field-selector-player-limit-enable', data-role='flipswitch', selected='selected', data-collapsible-toggle='#container-selector-player-limit')
-        option(value='false') NO
-        option(value='true') YES
+    input#field-selector-player-limit-enable.collapsible-toggle(type='checkbox', name='field-selector-player-limit-enable', data-collapsible-toggle='#container-selector-player-limit')
+    label(for='field-selector-player-limit-enable') Use player limit filter
 
     div#container-selector-player-limit(data-role='collapsible', data-inset='false')
         h4 Player limit properties
@@ -145,7 +128,6 @@ block content
         //- TODO: Set the maximum to the number of players in this game
         label(for='field-selector-player-limit-limit') Player limit:
         input#field-selector-player-limit-limit(type='range', name='field-selector-player-limit-limit', value='3', min='1', max='25', data-highlight='true')
-    br
 
     br
     hr

@@ -7183,7 +7183,7 @@ $(document).bind("pageinit", function() {
         );
 
         // Show or hide the collapsible accordingly
-        if(checkbox.val() === 'true')
+        if(checkbox.is(':checked'))
             collapsibleElement.show();
         else
             collapsibleElement.hide();
@@ -7191,7 +7191,7 @@ $(document).bind("pageinit", function() {
         // Update the state when the checkbox state is changed
         checkbox.change(function() {
             // Show or hide the collapsible
-            if(checkbox.val() === 'true') {
+            if(checkbox.is(':checked')) {
                 // Expand the collapsible
                 collapsibleElement.collapsible('expand');
 
