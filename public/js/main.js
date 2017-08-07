@@ -7377,7 +7377,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'subtract',
@@ -7434,7 +7435,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: true,
-            out: true
+            out: true,
+            strength: false
         },
         amounts: {
             method: 'add',
@@ -7496,7 +7498,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'add',
@@ -7571,7 +7574,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: true,
-            out: true
+            out: true,
+            strength: false
         },
         amounts: {
             method: 'add',
@@ -7594,7 +7598,8 @@ $(document).bind("pageshow", function() {
         actionAuraPsycho.units = {
             money: false,
             in: true,
-            out: false
+            out: false,
+            strength: false
         };
         actionAuraPsycho.amounts = {
             method: 'set',
@@ -7608,7 +7613,8 @@ $(document).bind("pageshow", function() {
         actionAuraPsycho.units = {
             money: false,
             in: true,
-            out: false
+            out: false,
+            strength: false
         };
         actionAuraPsycho.amounts = {
             method: 'subtract',
@@ -7622,7 +7628,8 @@ $(document).bind("pageshow", function() {
         actionAuraPsycho.units = {
             money: false,
             in: false,
-            out: true
+            out: true,
+            strength: false
         };
         actionAuraPsycho.amounts = {
             method: 'set',
@@ -7636,7 +7643,8 @@ $(document).bind("pageshow", function() {
         actionAuraPsycho.units = {
             money: false,
             in: false,
-            out: true
+            out: true,
+            strength: false
         };
         actionAuraPsycho.amounts = {
             method: 'subtract',
@@ -7650,7 +7658,8 @@ $(document).bind("pageshow", function() {
         actionAuraPsycho.units = {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         };
         actionAuraPsycho.amounts = {
             method: 'subtract',
@@ -7662,9 +7671,25 @@ $(document).bind("pageshow", function() {
     });
     activePage.find('a.action-aura-psycho-6').click(function() {
         actionAuraPsycho.units = {
+            money: false,
+            in: false,
+            out: false,
+            strength: true
+        };
+        actionAuraPsycho.amounts = {
+            method: 'subtract',
+            type: 'percentage',
+            amount: 40
+        };
+        sendSpecialAction(actionAuraPsycho);
+        return false;
+    });
+    activePage.find('a.action-aura-psycho-7').click(function() {
+        actionAuraPsycho.units = {
             money: true,
             in: true,
-            out: true
+            out: true,
+            strength: true
         };
         actionAuraPsycho.amounts = {
             method: 'subtract',
@@ -7687,7 +7712,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: false,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'subtract',
@@ -7706,7 +7732,8 @@ $(document).bind("pageshow", function() {
         actionNerfPlayerRichest.units = {
             money: false,
             in: true,
-            out: false
+            out: false,
+            strength: false
         };
         sendSpecialAction(actionNerfPlayerRichest);
         return false;
@@ -7715,7 +7742,8 @@ $(document).bind("pageshow", function() {
         actionNerfPlayerRichest.units = {
             money: false,
             in: false,
-            out: true
+            out: true,
+            strength: false
         };
         sendSpecialAction(actionNerfPlayerRichest);
         return false;
@@ -7724,7 +7752,8 @@ $(document).bind("pageshow", function() {
         actionNerfPlayerRichest.units = {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         };
         sendSpecialAction(actionNerfPlayerRichest);
         return false;
@@ -7742,7 +7771,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: false,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'subtract',
@@ -7761,7 +7791,8 @@ $(document).bind("pageshow", function() {
         actionNerfTeamRichest.filters.units = {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         };
         actionNerfTeamRichest.filters.amounts = {
             method: 'subtract',
@@ -7775,7 +7806,8 @@ $(document).bind("pageshow", function() {
         actionNerfTeamRichest.filters.units = {
             money: false,
             in: false,
-            out: true
+            out: true,
+            strength: false
         };
         actionNerfTeamRichest.filters.amounts = {
             method: 'subtract',
@@ -7789,7 +7821,8 @@ $(document).bind("pageshow", function() {
         actionNerfTeamRichest.filters.units = {
             money: false,
             in: true,
-            out: false
+            out: false,
+            strength: false
         };
         actionNerfTeamRichest.filters.amounts = {
             method: 'set',
@@ -7812,7 +7845,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'add',
@@ -7860,7 +7894,8 @@ $(document).bind("pageshow", function() {
         units: {
             money: true,
             in: false,
-            out: false
+            out: false,
+            strength: false
         },
         amounts: {
             method: 'add',
@@ -7941,7 +7976,8 @@ function getCustomActionProperties(page) {
         units: {
             in: false,
             out: false,
-            money: false
+            money: false,
+            strength: false
         },
         amounts: {
             type: null,
@@ -8046,9 +8082,10 @@ function getCustomActionProperties(page) {
     }
 
     // Set the units
+    properties.units.money = page.find('#field-unit-money').is(':checked');
     properties.units.in = page.find('#field-unit-in').is(':checked');
     properties.units.out = page.find('#field-unit-out').is(':checked');
-    properties.units.money = page.find('#field-unit-money').is(':checked');
+    properties.units.strength = page.find('#field-unit-strength').is(':checked');
 
     // Set the amounts
     properties.amounts.method = page.find('#field-amount-method').val();

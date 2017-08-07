@@ -643,12 +643,12 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
         }
 
         // Show an error if no unit was selected
-        if(!properties.units.in && !properties.units.out && !properties.units.money) {
+        if(!properties.units.in && !properties.units.out && !properties.units.money && !properties.units.strength) {
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
                 error: false,
                 message: 'Unable to execute the special custom action.<br><br>' +
                 'Please select the units to be affected by this special action.<br><br>' +
-                'Choose from money, ' + game.__('in.names') + ' and/or ' + game.__('out.names') + '.',
+                'Choose from money, ' + game.__('in.names') + ', ' + game.__('out.names') + ' and/or strength.',
                 dialog: true,
                 toast: false
             }, user);
@@ -1260,6 +1260,12 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                                     affectLatch.add();
                                     game._processPlayerUnitChange(player, player.getOut, player.setOut, changeMethod, changeType, changeAmount, unitChangeCallback);
                                 }
+
+                                // Process the strength units
+                                if(properties.units.strength) {
+                                    affectLatch.add();
+                                    game._processPlayerUnitChange(player, player.getStrength, player.setStrength, changeMethod, changeType, changeAmount, unitChangeCallback);
+                                }
                             });
 
                             // Continue when the values have been changed
@@ -1346,9 +1352,10 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
  * @param {int} [filters.range.range] The range the players must be inside or outside of.
  * @param {string} [filters.range.side] The side of the range the players must be inside or outside of. ('inside', 'outside')
  * @param {int} [filters.playerLimit.limit] Maximum player limit if there is any limit.
+ * @param {boolean} units.money True to modify the money units of players.
  * @param {boolean} units.in True to modify the in units of players.
  * @param {boolean} units.out True to modify the out units of players.
- * @param {boolean} units.money True to modify the money units of players.
+ * @param {boolean} units.strength True to modify the strength units of players.
  * @param {string} amounts.method Algorithmic method. ('add', 'subtract', 'set')
  * @param {string} amounts.type Type of unit amount processing by this action. ('fixed', 'percentage')
  * @param {int} amounts.amount Amount.
