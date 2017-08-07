@@ -214,7 +214,8 @@ This results in:
 
 You have to work as a team to attack or defend, or else you'll be overwhelmed by an enemy group.
 
-When the conquer value is above zero, a big _Attack_ button shows up at the labs page.
+When the conquer value is above zero, the _Attack_ tab shows up on the page of the factory.
+On this _Attack_ tab the button _Attack_ can be clicked to attack the lab.
 
 So, keep a close eye on this value with your team.
 You want to keep this value as low as possible at all times, below zero!
@@ -232,7 +233,8 @@ To defend:
 - Buy player strength
 - Buy more defence for the lab
 
-When a lab can be attacked because it's conquer value is above 0, a big _Attack_ button appears. 
+When a lab can be attacked because it's conquer value is above 0, the tab _Attack_ appears on the factory page.
+This _Attack_ tab has a button to execute the attack on the lab.
 When this attack button is clicked, the lab is immediately taken over by that team.
 
 When a lab is taken over, the level of the lab is decreased by 1.
