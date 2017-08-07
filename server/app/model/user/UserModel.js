@@ -360,7 +360,7 @@ UserModel.prototype.setCreateDate = function(createDate, callback) {
  * @param {UserModel~isAdminCallback} callback Called with the result or when an error occurred.
  */
 UserModel.prototype.isAdmin = function(callback) {
-    this.getField('is_admin', callback);
+    this.getField('is_admin', (err, isAdmin) => callback(err, isAdmin === true));
 };
 
 /**
@@ -377,7 +377,7 @@ UserModel.prototype.isAdmin = function(callback) {
  * @param {UserModel~isProCallback} callback Called with the result or when an error occurred.
  */
 UserModel.prototype.isPro = function(callback) {
-    this.getField('is_pro', callback);
+    this.getField('is_pro', (err, isPro) => callback(err, isPro === true));
 };
 
 /**

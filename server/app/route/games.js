@@ -33,6 +33,9 @@ router.get('/', function(req, res, next) {
     if(!req.requireValidSession())
         return;
 
+    // Get the user
+    const user = req.session.user;
+
     // Create a callback latch
     var latch = new CallbackLatch();
     var calledBack = false;
@@ -47,6 +50,9 @@ router.get('/', function(req, res, next) {
             openCount: 0,
             activeCount: 0,
             finishedCount: 0
+        },
+        user: {
+            isAdmin: false
         }
     };
 
@@ -87,6 +93,24 @@ router.get('/', function(req, res, next) {
             return;
         } else
             options.games.finishedCount = gameCount;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Determine whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set whether the user is administrator
+        options.user.isAdmin = isAdmin;
 
         // Resolve the latch
         latch.resolve();
@@ -137,24 +161,66 @@ router.get('/finished', function(req, res, next) {
  * @param {string} pageTitle Page title.
  */
 function renderGameList(req, res, next, stage, limit, category, pageTitle) {
-    // Get a list of game objects
-    getGameList(stage, limit, function(err, games) {
+    // Get the user of the current session
+    const user = req.session.user;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Create a page options object
+    var options = {
+        page: {
+            leftButton: 'back'
+        },
+        games: {
+            category: category,
+            games: []
+        },
+        user: {
+            isAdmin: false
+        }
+    };
+
+    // Determine whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
         // Call back errors
         if(err !== null) {
-            next(err);
+            if(!calledBack)
+                next(err);
+            calledBack = true;
             return;
         }
 
-        // Render the games page
-        LayoutRenderer.render(req, res, next, 'game/list', pageTitle, {
-            page: {
-                leftButton: 'back'
-            },
-            games: {
-                category: category,
-                games: games
-            }
-        });
+        // Set whether the user is administrator
+        options.user.isAdmin = isAdmin;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get a list of game objects
+    latch.add();
+    getGameList(stage, limit, function(err, games) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the games
+        options.games.games = games;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Complete the latch and render the page
+    latch.then(function() {
+        LayoutRenderer.render(req, res, next, 'game/list', pageTitle, options);
     });
 }
 

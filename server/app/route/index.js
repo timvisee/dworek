@@ -32,7 +32,6 @@ var games = require('./games');
 var game = require('./game/index');
 var about = require('./about');
 var status = require('./status');
-var create = require('./game/create');
 
 var appInfo = require('../../appInfo');
 var Core = require('../../Core');
@@ -55,6 +54,9 @@ router.get('/', function(req, res, next) {
         return;
     }
 
+    // Get the user of the current session
+    const user = req.session.user;
+
     // Create a callback latch
     var latch = new CallbackLatch();
     var calledBack = false;
@@ -66,6 +68,9 @@ router.get('/', function(req, res, next) {
                 open: [],
                 active: []
             }
+        },
+        user: {
+            isAdmin: false
         }
     };
 
@@ -91,6 +96,24 @@ router.get('/', function(req, res, next) {
             calledBack = true;
         } else
             options.games.games.active = games;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Determine whether the user is administrator
+    latch.add();
+    user.isAdmin(function(err, isAdmin) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                next(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set whether the user is administrator
+        options.user.isAdmin = isAdmin;
 
         // Resolve the latch
         latch.resolve();
@@ -125,9 +148,6 @@ router.use('/about', about);
 
 // Status page
 router.use('/status', status);
-
-// Game creation page
-router.use('/create', create);
 
 /**
  * Get the game list.

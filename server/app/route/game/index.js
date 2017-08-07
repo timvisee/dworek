@@ -23,6 +23,7 @@
 var express = require('express');
 var router = express.Router();
 
+var pageCreate = require('./create');
 var pageJoin = require('./join');
 var pageInfo = require('./info');
 var pagePlayers = require('./player/index');
@@ -35,6 +36,9 @@ var pageSpecial = require('./special/index');
 var CallbackLatch = require('../../util/CallbackLatch');
 var LayoutRenderer = require('../../layout/LayoutRenderer');
 var GameParam = require('../../router/middleware/GameParam');
+
+// Games overview, redirect back to the front page
+router.use('/create', pageCreate);
 
 // Games overview, redirect back to the front page
 router.get('/', (req, res) => res.redirect('/'));
@@ -217,6 +221,9 @@ router.get('/:game', function(req, res, next) {
         });
     });
 });
+
+// Game creation page
+pageCreate.route(router);
 
 // Route the game join page
 pageJoin.route(router);
