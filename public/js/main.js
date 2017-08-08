@@ -8374,12 +8374,10 @@ function hasLocationPermission(callback) {
         // Try to figure out permissions by requesting the current location
         navigator.geolocation.getCurrentPosition(function() {
             // We have permission, call back
-            alert('TEST: alt-granted');
             if(callback !== undefined)
                 callback(null, true);
 
         }, function(status) {
-            alert('TEST: alt-error');
             // Check if permission was denied, call back the result
             if(callback !== undefined)
                 callback(null, status.code !== status.PERMISSION_DENIED);
@@ -8399,23 +8397,16 @@ function hasLocationPermission(callback) {
                 case 'granted':
                     if(callback !== undefined)
                         callback(null, true);
-                    alert('TEST: granted');
                     return;
 
                 default:
-                    alert('TEST: default ' + status.stage);
                 case 'prompt':
-                    alert('TEST: prompt');
-
-                    alert('Agent: ' + navigator.userAgent);
-
                     // Fall back to the old method for Firefox mobile in this case
                     if((isFirefox && isAndroid) || isFennec) {
-                        alert('TEST: falling back');
+                        console.warn('Falling back to old location permission check method, due to a Firefox mobile related issue...');
                         oldMethod();
                         return;
-                    } else
-                        alert('Not falling back: ' + isFirefox + ':' + isAndroid + ':' + isFennec);
+                    }
 
                     // Call back
                     if(callback !== undefined)
@@ -8423,7 +8414,6 @@ function hasLocationPermission(callback) {
                     return;
 
                 case 'denied':
-                    alert('TEST: denied');
                     if(callback !== undefined)
                         callback('Permission for location services has been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
                     return;
@@ -8431,6 +8421,10 @@ function hasLocationPermission(callback) {
         });
         return;
     }
+
+    // Fall back on the old method
+    console.warn('Falling back to old location permission check method, permission API not supported...');
+    oldMethod();
 }
 
 /**
