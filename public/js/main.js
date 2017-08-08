@@ -2256,7 +2256,7 @@ function showDialog(options, callback) {
             console.error('Notification permission check error: ' + err);
 
         // Return if we don't have permission or if we already called back
-        if(!permission || calledBack)
+        if(!permission || calledBack || !isFirefox())
             return;
 
         // Build and show the native notification
@@ -8362,11 +8362,6 @@ function hasLocationPermission(callback) {
         return;
     }
 
-    // Check whether we're running Firefox or Android
-    var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
-    var isFennec = navigator.userAgent.toLowerCase().indexOf("fennec") > -1;
-
     // Old method
     var oldMethod = function() {
         // TODO: Maybe not use this, because this immediatly asks for permission on the page?
@@ -8401,7 +8396,7 @@ function hasLocationPermission(callback) {
                 default:
                 case 'prompt':
                     // Fall back to the old method for Firefox mobile in this case
-                    if((isFirefox && isAndroid) || isFennec) {
+                    if((isFirefox() && isAndroid()) || isFennec()) {
                         console.warn('Falling back to old location permission check method, due to a Firefox mobile related issue...');
                         oldMethod();
                         return;
@@ -8541,9 +8536,10 @@ function requestNotificationPermission(callback) {
                     callback(null, true);
 
                 // Show a demo demo notification
-                new Notification('Dworek', {
-                    body: 'Notifications are now enabled!'
-                });
+                if(isFirefox())
+                    new Notification('Dworek', {
+                        body: 'Notifications are now enabled!'
+                    });
                 return;
 
             case 'default':
@@ -8596,4 +8592,31 @@ function requestVibrationPermission(callback) {
 
     // Then call back
     callback(null, true);
+}
+
+/**
+ * Check whether we're running Firefox.
+ *
+ * @return {boolean} True if Firefox, false if not.
+ */
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+}
+
+/**
+ * Check whether we're running Android.
+ *
+ * @return {boolean} True if Android, false if not.
+ */
+function isAndroid() {
+    return navigator.userAgent.toLowerCase().indexOf('android') > -1;
+}
+
+/**
+ * Check whether we're running Fennec.
+ *
+ * @return {boolean} True if Fennec, false if not.
+ */
+function isFennec() {
+    return navigator.userAgent.toLowerCase().indexOf('fennec') > -1;
 }
