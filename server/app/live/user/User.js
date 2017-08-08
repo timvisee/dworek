@@ -897,7 +897,7 @@ User.prototype.isVisibleFor = function(other, callback) {
         }
 
         // Check whether this user is a shop
-        if(self.getGame().shopManager.isShopUser(self)) {
+        if(self.getGame().shopManager.isShopUser(self, true, false)) {
             callback(null, true);
             return;
         }

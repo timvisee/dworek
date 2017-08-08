@@ -478,8 +478,11 @@ ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
  * Check whether the given user is a shop user, or is scheduled to become a shop.
  *
  * @param {User} user User to check for.
+ * @param {boolean} current True to count current players, false if not.
+ * @param {boolean} scheduled True to count scheduled players, false if not.
+ * @return {boolean} True if this user is a shop, false if not.
  */
-ShopManager.prototype.isShopUser = function(user) {
+ShopManager.prototype.isShopUser = function(user, current, scheduled) {
     // Determine whether we found the user
     var found = false;
 
@@ -495,14 +498,16 @@ ShopManager.prototype.isShopUser = function(user) {
     };
 
     // Loop through the list of shops
-    this.shops.forEach(processingFunction);
+    if(current)
+        this.shops.forEach(processingFunction);
 
     // Return true if we found something
     if(found)
         return true;
 
     // Loop through the list of scheduled shops
-    this._scheduledShops.forEach(processingFunction);
+    if(scheduled)
+        this._scheduledShops.forEach(processingFunction);
 
     // Return the result
     return found;
@@ -594,8 +599,8 @@ ShopManager.prototype.findNewShopUsers = function(teamId, callback) {
                     return;
                 }
 
-                // Make sure this user isn't a shop already
-                if(self.isShopUser(liveUser)) {
+                // Make sure this user isn't a shop already (or scheduled)
+                if(self.isShopUser(liveUser, true, true)) {
                     latch.resolve();
                     return;
                 }
