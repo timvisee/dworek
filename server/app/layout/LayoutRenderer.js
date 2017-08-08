@@ -203,8 +203,14 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
         // Merge the layout configuration objects
         config = MergeUtils.merge(config, options, true);
 
+        // TODO: Remove after debugging
+        console.time('render-pug');
+
         // Render the page
         res.render(pugName, config);
+
+        // TODO: Remove after debugging
+        console.timeEnd('render-pug');
     });
 };
 
