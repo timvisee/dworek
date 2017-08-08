@@ -86,6 +86,8 @@ GameManager.prototype.getGame = function(gameId, callback) {
     // Store this instance
     const self = this;
 
+    console.log('##### LOADING GAME: ' + gameId);
+
     // Get the game for the given ID
     Core.model.gameModelManager.getGameById(gameId, function(err, game) {
         // Call back errors
@@ -93,6 +95,8 @@ GameManager.prototype.getGame = function(gameId, callback) {
             callback(err);
             return;
         }
+
+        console.log('##### LOADED GAME: ' + gameId);
 
         // Make sure the stage of this game is active
         game.getStage(function(err, stage) {
