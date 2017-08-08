@@ -28,6 +28,7 @@ var Core = require('../../../Core');
 var User = require('./User');
 var UserModel = require('../../model/user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
+var MutexLoader = require('../../util/MutexLoader');
 
 /**
  * UserManager class.
@@ -50,6 +51,13 @@ var UserManager = function(game) {
      * @type {Array} Array of users.
      */
     this.users = [];
+
+    /**
+     * Mutex loader.
+     * @type {MutexLoader}
+     * @private
+     */
+    this._mutexLoader = new MutexLoader();
 };
 
 /**
@@ -76,47 +84,8 @@ UserManager.prototype.getUser = function(userId, callback) {
         return;
     }
 
-    // Store this instance
-    const self = this;
-
-    // Get the user for the given ID
-    Core.model.userModelManager.isValidUserId(userId, function(err, valid) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Make sure the user is valid
-        if(!valid) {
-            callback(null, null);
-            return;
-        }
-
-        // Make sure the stage of this user is active
-        self.game.getGameModel().getStage(function(err, stage) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            // Make sure the stage is valid
-            if(stage != 1) {
-                callback(null, null);
-                return;
-            }
-
-            // Create a user instance for this model
-            var newUser = new User(userId, self.game);
-
-            // Add the user to the list of loaded users
-            self.users.push(newUser);
-
-            // Call back the user
-            callback(null, newUser);
-        });
-    });
+    // Load the game
+    this.loadUser(userId, callback);
 };
 
 /**
@@ -125,6 +94,78 @@ UserManager.prototype.getUser = function(userId, callback) {
  * @callback UserController~getUserCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {User|null=} User instance, null if the user isn't active or if the user is invalid.
+ */
+
+/**
+ * Load a specific user.
+ *
+ * @param {UserModel|ObjectId|string} userId User instance of user ID of the user to load.
+ * @param {UserManager~loadUserCallback} callback Called on success or when an error occurred.
+ */
+UserManager.prototype.loadUser = function(userId, callback) {
+    // Get the user ID as an ObjectId
+    if(userId instanceof UserModel)
+        userId = userId.getId();
+    else if(!(userId instanceof ObjectId) && ObjectId.isValid(userId))
+        userId = new ObjectId(userId);
+    else if(!(userId instanceof ObjectId)) {
+        callback(new Error('Invalid user ID'));
+        return;
+    }
+
+    // Keep a reference to this
+    const self = this;
+
+    // Load the user through the mutex loader
+    this._mutexLoader.load(userId.toString(), function(callback) {
+        // Get the user for the given ID
+        Core.model.userModelManager.isValidUserId(userId, function(err, valid) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Make sure the user is valid
+            if(!valid) {
+                callback(null, null);
+                return;
+            }
+
+            // // Make sure the stage of this user is active
+            // self.game.getGameModel().getStage(function(err, stage) {
+            //     // Call back errors
+            //     if(err !== null) {
+            //         callback(err);
+            //         return;
+            //     }
+            //
+            //     // Make sure the stage is valid
+            //     if(stage !== 1) {
+            //         callback(null, null);
+            //         return;
+            //     }
+
+                // Create a user instance for this model
+                var newUser = new User(userId, self.game);
+
+                // Add the user to the list of loaded users
+                self.users.push(newUser);
+
+                // Call back the user
+                callback(null, newUser);
+            // });
+        });
+
+    }, callback);
+};
+
+/**
+ * Called on success or when an error occurred.
+ *
+ * @callback UserManager~loadUserCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {User=} Loaded user instance.
  */
 
 /**
@@ -214,12 +255,8 @@ UserManager.prototype.load = function(callback) {
 
         // Loop through the list of users
         users.forEach(function(user) {
-            // Create a user instance
-            const userInstance = new User(user, self.game);
-
-            // Load the user instance
             latch.add();
-            userInstance.load(function(err) {
+            self.loadUser(user, function(err, liveUser) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -228,9 +265,6 @@ UserManager.prototype.load = function(callback) {
                     calledBack = true;
                     return;
                 }
-
-                // Add the user instance to the list
-                self.users.push(userInstance);
 
                 // Resolve the latch
                 latch.resolve();

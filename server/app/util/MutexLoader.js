@@ -50,12 +50,8 @@ MutexLoader.prototype.load = function(id, load, callback) {
     this._addLoading(id, callback);
 
     // Return if we're already loading
-    if(isLoading) {
-        console.log('##### ALREADY LOADING, WAITING ON MUTEX');
+    if(isLoading)
         return;
-    }
-
-    console.log('##### STARTING LOAD');
 
     // Store a reference to this
     const self = this;

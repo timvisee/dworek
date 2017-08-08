@@ -91,57 +91,8 @@ GameManager.prototype.getGame = function(gameId, callback) {
         return;
     }
 
-    // Store this instance
-    const self = this;
-
-    // Load the game through the mutex loader
-    this._mutexLoader.load(gameId.toString(), function(callback) {
-
-        console.log('##### LOADING GAME: ' + gameId);
-
-        // Get the game for the given ID
-        Core.model.gameModelManager.getGameById(gameId, function(err, game) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            console.log('##### LOADED GAME: ' + gameId);
-
-            // Make sure the stage of this game is active
-            game.getStage(function(err, stage) {
-                // Call back errors
-                if(err !== null) {
-                    callback(err);
-                    return;
-                }
-
-                // // Make sure the stage is valid
-                // if(stage === 0) {
-                //     callback(null, null);
-                //     return;
-                // }
-
-                // Create a game instance for this model
-                const loadGame = new Game(game);
-                loadGame.load(function(err) {
-                    // Call back errors
-                    if(err !== null) {
-                        callback(err);
-                        return;
-                    }
-
-                    // Add the game to the list of loaded games
-                    self.games.push(loadGame);
-
-                    // Call back the game
-                    callback(null, loadGame);
-                });
-            });
-        });
-
-    }, callback);
+    // Load the game
+    this.loadGame(gameId, callback);
 };
 
 /**
@@ -296,41 +247,44 @@ GameManager.prototype.loadGame = function(gameId, callback) {
         return;
     }
 
-    // Show a status message
-    console.log('Loading live game... (id: ' + gameId.toString() + ')');
-
-    // Unload the game if it's already loaded
-    this.unloadGame(gameId);
-
-    // Create a new game instance
-    const newGame = new Game(gameId);
-
     // Store this instance
     const self = this;
 
-    // Load the game
-    newGame.load(function(err) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
+    // Load the game through the mutex loader
+    this._mutexLoader.load(gameId.toString(), function(callback) {
+        // Show a status message
+        console.log('Loading live game... (id: ' + gameId.toString() + ')');
 
-        // Add the game to the games list
-        self.games.push(newGame);
+        // Unload the game if it's already loaded
+        self.unloadGame(gameId);
 
-        // Get the name of the game, and print a status message
-        newGame.getGameModel().getName(function(err, name) {
-            // Handle errors
-            if(err !== null)
-                console.error('Failed to fetch game name, ignoring.');
-            else
-                console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
+        // Create a new game instance
+        const newGame = new Game(gameId);
 
-            // Call back
-            callback(null, newGame);
+        // Load the game
+        newGame.load(function(err) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Add the game to the games list
+            self.games.push(newGame);
+
+            // Get the name of the game, and print a status message
+            newGame.getGameModel().getName(function(err, name) {
+                // Handle errors
+                if(err !== null)
+                    console.error('Failed to fetch game name, ignoring.');
+                else
+                    console.log('Live game loaded successfully. (name: ' + name + ', id: ' + gameId.toString() + ')');
+
+                // Call back
+                callback(null, newGame);
+            });
         });
-    });
+    }, callback);
 };
 
 /**

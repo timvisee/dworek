@@ -28,6 +28,7 @@ var Core = require('../../../Core');
 var Factory = require('./Factory');
 var FactoryModel = require('../../model/factory/FactoryModel');
 var CallbackLatch = require('../../util/CallbackLatch');
+var MutexLoader = require('../../util/MutexLoader');
 
 /**
  * FactoryManager class.
@@ -50,6 +51,13 @@ var FactoryManager = function(game) {
      * @type {Array} Array of factories.
      */
     this.factories = [];
+
+    /**
+     * Mutex loader.
+     * @type {MutexLoader}
+     * @private
+     */
+    this._mutexLoader = new MutexLoader();
 };
 
 /**
@@ -77,16 +85,7 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
     }
 
     // Load the factory if it's valid for this game
-    this.loadFactory(factoryId, function(err, liveFactory) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Call back the live factory
-        callback(null, liveFactory);
-    });
+    this.loadFactory(factoryId, callback);
 };
 
 /**
@@ -107,47 +106,51 @@ FactoryManager.prototype.loadFactory = function(factoryId, callback) {
     // Store this instance
     const self = this;
 
-    // Make sure the factory ID is valid
-    Core.model.factoryModelManager.isValidFactoryId(factoryId, function(err, valid) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
-
-        // Make sure the factory is valid
-        if(!valid) {
-            callback(null, null);
-            return;
-        }
-
-        // Create a factory model instance
-        const factoryModel = Core.model.factoryModelManager._instanceManager.create(factoryId);
-
-        // Make sure the factory is part of the current game
-        factoryModel.getGame(function(err, result) {
+    // Load the game through the mutex loader
+    this._mutexLoader.load(factoryId.toString(), function(callback) {
+        // Make sure the factory ID is valid
+        Core.model.factoryModelManager.isValidFactoryId(factoryId, function(err, valid) {
             // Call back errors
             if(err !== null) {
                 callback(err);
                 return;
             }
 
-            // Make sure the factory is part of this game
-            if(!self.getGame().getId().equals(result.getId())) {
+            // Make sure the factory is valid
+            if(!valid) {
                 callback(null, null);
                 return;
             }
 
-            // Create a factory instance for this model
-            var newFactory = new Factory(factoryModel, self.game);
+            // Create a factory model instance
+            const factoryModel = Core.model.factoryModelManager._instanceManager.create(factoryId);
 
-            // Add the factory to the list of loaded factories
-            self.factories.push(newFactory);
+            // Make sure the factory is part of the current game
+            factoryModel.getGame(function(err, result) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
 
-            // Call back the factory
-            callback(null, newFactory);
+                // Make sure the factory is part of this game
+                if(!self.getGame().getId().equals(result.getId())) {
+                    callback(null, null);
+                    return;
+                }
+
+                // Create a factory instance for this model
+                var newFactory = new Factory(factoryModel, self.game);
+
+                // Add the factory to the list of loaded factories
+                self.factories.push(newFactory);
+
+                // Call back the factory
+                callback(null, newFactory);
+            });
         });
-    });
+
+    }, callback);
 };
 
 /**
@@ -242,12 +245,8 @@ FactoryManager.prototype.load = function(callback) {
 
         // Loop through the list of factories
         factories.forEach(function(factory) {
-            // Create a factory instance
-            const factoryInstance = new Factory(factory, self.game);
-
-            // Load the factory instance
             latch.add();
-            factoryInstance.load(function(err) {
+            self.loadFactory(factory, function(err, liveFactory) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)
@@ -256,9 +255,6 @@ FactoryManager.prototype.load = function(callback) {
                     calledBack = true;
                     return;
                 }
-
-                // Add the factory instance to the list
-                self.factories.push(factoryInstance);
 
                 // Resolve the latch
                 latch.resolve();
