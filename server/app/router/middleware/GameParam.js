@@ -43,9 +43,6 @@ GameParam.attach = function(router) {
         // Get the game ID
         var gameId = req.params.game;
 
-        // TODO: Remove after debugging
-        console.time('parsegameparam');
-
         // Validate the game ID
         Core.model.gameModelManager.getGameById(gameId, function(err, game) {
             // Call back errors
@@ -59,9 +56,6 @@ GameParam.attach = function(router) {
                 req.game = game;
             else
                 req.game = undefined;
-
-            // TODO: Remove after debugging
-            console.timeEnd('parsegameparam');
 
             // Move to the next
             next();

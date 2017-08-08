@@ -68,12 +68,6 @@ Router.prototype.init = function(callback) {
     // Get the public path
     const publicPath = PathLibrary.getPublicPath();
 
-    Core.expressApp.use(function(req, res, next) {
-        // TODO: Remove after debugging
-        console.time('routing');
-        next();
-    });
-
     // Configure the favicon
     // TODO: Configure static all favicons here, instead of the default one
     Core.expressApp.use(favicon(path.join(publicPath, 'favicon.ico')));
