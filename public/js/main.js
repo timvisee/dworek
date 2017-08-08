@@ -2260,8 +2260,8 @@ function showDialog(options, callback) {
             return;
 
         // Build and show the native notification
-        nativeNotification = new Notification('Dworek message', {
-            body: options.message
+        nativeNotification = new Notification('Dworek', {
+            body: 'Popup: ' + options.title
         });
     });
 
