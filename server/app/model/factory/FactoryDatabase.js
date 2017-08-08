@@ -59,7 +59,7 @@ FactoryDatabase.addFactory = function (name, game, team, user, location, callbac
     }
 
     // Make sure the game and user are valid
-    if(game == null || team == null || user == null) {
+    if(game === null || team === null || user === null) {
         callback(new Error('Unable to create factory, invalid game, team or user instance.'));
         return;
     }

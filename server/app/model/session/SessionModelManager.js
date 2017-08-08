@@ -76,7 +76,7 @@ SessionModelManager.prototype.createSession = function(user, ip, callback) {
     // Generate a session token
     TokenGenerator.generateToken(config.security.tokenLength, function(err, token) {
         // Handle errors
-        if(err != null) {
+        if(err !== null) {
             // Call back with the error
             callback(err);
             return;
@@ -85,7 +85,7 @@ SessionModelManager.prototype.createSession = function(user, ip, callback) {
         // Add the session to the database
         SessionDatabase.addSession(user, token, ip, function(err, sessionId) {
             // Handle errors
-            if(err != null) {
+            if(err !== null) {
                 callback(err, null);
                 return;
             }
@@ -138,7 +138,7 @@ SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callbac
             // TODO: Compare the API of the session with the current requesting API (must be equal).
 
             // Make sure any is returned, if not return false through the callback
-            if(data.length == 0) {
+            if(data.length === 0) {
                 callback(null, null);
                 cacheResult(0);
                 return;
@@ -173,7 +173,7 @@ SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callbac
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, id) {
             // Handle errors
-            if(err != undefined) {
+            if(err !== undefined) {
                 // Print the error to the console
                 console.warn('Redis error: ' + err);
 
@@ -183,9 +183,9 @@ SessionModelManager.prototype.getSessionByTokenIfValid = function(token, callbac
             }
 
             // If the value isn't null, return it
-            if(id != null) {
+            if(id !== null) {
                 // Callback with null if the value is zero
-                if(id == 0) {
+                if(id === 0) {
                     callback(null, null);
                     return;
                 }
@@ -240,7 +240,7 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
             // TODO: Compare the API of the session with the current requesting API (must be equal).
 
             // Make sure any is returned, if not return false through the callback
-            if(data.length == 0) {
+            if(data.length === 0) {
                 callback(null, null);
                 cacheResult(0);
                 return;
@@ -272,7 +272,7 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, userId) {
             // Handle errors
-            if(err != undefined) {
+            if(err !== undefined) {
                 // Print the error to the console
                 console.warn('Redis error: ' + err);
 
@@ -282,9 +282,9 @@ SessionModelManager.prototype.getSessionUserByTokenIfValid = function(token, cal
             }
 
             // If the value isn't null, return it
-            if(userId != null) {
+            if(userId !== null) {
                 // Callback with null if the value is zero
-                if(userId == 0) {
+                if(userId === 0) {
                     callback(null, null);
                     return;
                 }
@@ -342,7 +342,7 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
             // TODO: Make sure the API application of this token is enabled
 
             // Make sure any is returned, if not return false through the callback
-            if(data.length == 0) {
+            if(data.length === 0) {
                 callback(null, false);
                 cacheResult(false);
                 return;
@@ -371,7 +371,7 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
         // Try to fetch the validity data from cache
         redis.get(cacheKey, function(err, value) {
             // Handle errors
-            if(err != undefined) {
+            if(err !== undefined) {
                 // Print the error to the console
                 console.warn('Redis error: ' + err);
 
@@ -381,8 +381,8 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
             }
 
             // If the value isn't null, return it
-            if(value != null) {
-                callback(null, value == '1');
+            if(value !== null) {
+                callback(null, value === '1');
                 return;
             }
 
@@ -409,7 +409,7 @@ SessionModelManager.prototype.isAllowedSessionToken = function(token) {
 
     // Check the token characters
     // TODO: Make TOKEN_REGEX variable static in TokenGenerator class to support this
-    return token.match(TokenGenerator.TOKEN_REGEX) != null;
+    return token.match(TokenGenerator.TOKEN_REGEX) !== null;
 };
 
 /**
@@ -420,7 +420,7 @@ SessionModelManager.prototype.isAllowedSessionToken = function(token) {
  */
 SessionModelManager.prototype.getUserSessions = function(user, callback) {
     // Make sure the user is valid
-    if(user == null) {
+    if(user === null) {
         // Call back with an error, and return
         callback(new Error('Invalid user instance.'));
         return;
@@ -434,7 +434,7 @@ SessionModelManager.prototype.getUserSessions = function(user, callback) {
     // TODO: Make additional fields configurable!
     SessionDatabase.layerFetchFieldsFromDatabase({user_id: user.getId()}, {_id: true, token: true, create_date: true, expire_date: true, api_app_id: true}, function(err, data) {
         // Make sure any is returned, if not return false through the callback
-        if(data.length == 0) {
+        if(data.length === 0) {
             callback(null, null);
             //cacheResult(0);
             return;

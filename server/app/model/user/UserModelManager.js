@@ -71,9 +71,6 @@ UserModelManager.prototype.isValidUserId = function(id, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // Convert the ID to an ObjectID
     if(!(id instanceof ObjectId))
         id = new ObjectId(id);
@@ -101,7 +98,7 @@ UserModelManager.prototype.isValidUserId = function(id, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -109,12 +106,9 @@ UserModelManager.prototype.isValidUserId = function(id, callback) {
 
             // The user is valid, create an instance and call back
             //noinspection JSCheckFunctionSignatures
-            callback(null, self._instanceManager.create(id));
+            callback(null, result === '1');
         });
     }
-
-    // Create a variable to store whether a user exists with the given ID
-    var hasUser = false;
 
     // Fetch the result from MongoDB when we're done with Redis
     latch.then(function() {
@@ -128,7 +122,7 @@ UserModelManager.prototype.isValidUserId = function(id, callback) {
             }
 
             // Determine whether a user exists for this ID
-            hasUser = data.length > 0;
+            const hasUser = data.length > 0;
 
             // Call back with the result
             callback(null, hasUser);
@@ -185,7 +179,7 @@ UserModelManager.prototype.getUserByMail = function(mail, callback) {
         }
 
         // Make sure any is returned, if not return false through the callback
-        if(data.length == 0) {
+        if(data.length === 0) {
             callback(null, null);
             return;
         }
@@ -295,13 +289,13 @@ UserModelManager.prototype.getUserByCredentials = function(mail, password, callb
         password_hash: true
     }, function(err, data) {
         // Handle errors
-        if(err != null) {
+        if(err !== null) {
             callback(err, null);
             return;
         }
 
         // Make sure any is returned, if not return false through the callback
-        if(data.length == 0) {
+        if(data.length === 0) {
             callback(null, null);
             return;
         }
@@ -315,7 +309,7 @@ UserModelManager.prototype.getUserByCredentials = function(mail, password, callb
         // Compare the password hash to the password
         HashUtils.compare(password, passwordHash, function(err, matched) {
             // Handle errors
-            if(err != null) {
+            if(err !== null) {
                 callback(err, null);
                 return;
             }

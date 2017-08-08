@@ -295,19 +295,25 @@ FactoryManager.prototype.unload = function() {
  * @return {boolean} True if any factory was unloaded, false if not.
  */
 FactoryManager.prototype.unloadFactory = function(factory) {
-    // Find the factory
-    const index = this.factories.indexOf(factory);
+    // Remove a reference to this
+    const self = this;
 
-    // Make sure it was found
-    if(index < 0)
-        return false;
+    var unloadedAny = false;
 
-    // Unload the factory
-    factory.unload();
+    // Loop through the list of factories, unload each with the same ID
+    this.factories.forEach(function(entry, i) {
+        // Return if the entry doesn't have the same ID
+        if(!entry.getId().equals(factory.getId()))
+            return;
 
-    // Remove the factory from the list and return
-    this.factories.splice(index, 1);
-    return true;
+        // Set the unloaded flag
+        unloadedAny = true;
+
+        // Splice the list to remove it
+        self.factories.splice(i, 1);
+    });
+
+    return unloadedAny;
 };
 
 /**

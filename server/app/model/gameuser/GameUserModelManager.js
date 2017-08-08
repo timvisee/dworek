@@ -73,9 +73,6 @@ GameUserModelManager.prototype.isValidId = function(id, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // Convert the ID to an ObjectID
     if(!(id instanceof ObjectId))
         id = new ObjectId(id);
@@ -103,7 +100,7 @@ GameUserModelManager.prototype.isValidId = function(id, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -111,12 +108,9 @@ GameUserModelManager.prototype.isValidId = function(id, callback) {
 
             // The game is valid, create an instance and call back
             //noinspection JSCheckFunctionSignatures
-            callback(null, self._instanceManager.create(id));
+            callback(null, result === '1');
         });
     }
-
-    // Create a variable to store whether a game exists with the given ID
-    var hasGame = false;
 
     // Query the database and check whether the game is valid
     GameUserDatabase.layerFetchFieldsFromDatabase({_id: id}, {_id: true}, function(err, data) {
@@ -127,16 +121,16 @@ GameUserModelManager.prototype.isValidId = function(id, callback) {
             return;
         }
 
-        // Determine whether a game exists for this ID
-        hasGame = data.length > 0;
+        // Determine whether a game user exists for this ID
+        const hasGameUser = data.length > 0;
 
         // Call back with the result
-        callback(null, hasGame);
+        callback(null, hasGameUser);
 
         // Store the result in Redis if ready
         if(RedisUtils.isReady()) {
             // Store the results
-            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
+            RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGameUser ? 1 : 0, function(err) {
                 // Show a warning on error
                 if(err !== null && err !== undefined) {
                     console.error('A Redis error occurred when storing Game User ID validity, ignoring.')
@@ -833,7 +827,7 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result === '' || result == 0) {
+            if(result === undefined || result === null || result === '' || result === 0) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;

@@ -70,9 +70,6 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // Convert the ID to an ObjectID
     if(!(id instanceof ObjectId))
         id = new ObjectId(id);
@@ -100,7 +97,7 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result === 0) {
+            if(result === undefined || result === null) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -108,12 +105,9 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
 
             // The factory is valid, create an instance and call back
             //noinspection JSCheckFunctionSignatures
-            callback(null, self._instanceManager.create(id));
+            callback(null, result === '1');
         });
     }
-
-    // Create a variable to store whether a factory exists with the given ID
-    var hasFactory = false;
 
     // Fetch the result from MongoDB when we're done with Redis
     latch.then(function() {
@@ -127,7 +121,7 @@ FactoryModelManager.prototype.isValidFactoryId = function(id, callback) {
             }
 
             // Determine whether a factory exists for this ID
-            hasFactory = data.length > 0;
+            const hasFactory = data.length > 0;
 
             // Call back with the result
             callback(null, hasFactory);

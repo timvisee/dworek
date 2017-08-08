@@ -112,7 +112,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
     // Get the live game instance
     Core.gameManager.getGame(rawGame, function(err, liveGame) {
         // Call back errors
-        if(err !== null || liveGame == null) {
+        if(err !== null || liveGame === null) {
             callbackError();
             return;
         }
@@ -128,7 +128,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
         latch.add();
         liveGame.factoryManager.getFactory(rawFactory, function(err, result) {
             // Call back errors
-            if(err !== null || result == null) {
+            if(err !== null || result === null) {
                 callbackError();
                 return;
             }
@@ -144,7 +144,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
         latch.add();
         liveGame.getUser(user, function(err, result) {
             // Call back errors
-            if(err !== null || result == null) {
+            if(err !== null || result === null) {
                 callbackError();
                 return;
             }
@@ -165,7 +165,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
             latch.add();
             liveUser.getTeam(function(err, userTeam) {
                 // Call back errors
-                if(err !== null || userTeam == null) {
+                if(err !== null || userTeam === null) {
                     callbackError();
                     return;
                 }
@@ -173,7 +173,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
                 // Make sure the factory has a different team
                 liveFactory.isTeam(userTeam, function(err, isTeam) {
                     // Call back errors
-                    if(err !== null || userTeam == null) {
+                    if(err !== null || userTeam === null) {
                         callbackError();
                         return;
                     }

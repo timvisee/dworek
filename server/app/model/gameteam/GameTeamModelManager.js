@@ -69,9 +69,6 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
     // Create a callback latch
     var latch = new CallbackLatch();
 
-    // Store the current instance
-    const self = this;
-
     // Convert the ID to an ObjectID
     if(!(id instanceof ObjectId))
         id = new ObjectId(id);
@@ -99,7 +96,7 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
             }
 
             // Resolve the latch if the result is undefined, null or zero
-            if(result === undefined || result === null || result == 0) {
+            if(result === undefined || result === null) {
                 // Resolve the latch and return
                 latch.resolve();
                 return;
@@ -107,12 +104,9 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
 
             // The game is valid, create an instance and call back
             //noinspection JSCheckFunctionSignatures
-            callback(null, self._instanceManager.create(id));
+            callback(null, result === '1');
         });
     }
-
-    // Create a variable to store whether a game exists with the given ID
-    var hasGame = false;
 
     // Fetch the result from MongoDB when we're done with Redis
     latch.then(function() {
@@ -125,16 +119,16 @@ GameTeamModelManager.prototype.isValidId = function(id, callback) {
                 return;
             }
 
-            // Determine whether a game exists for this ID
-            hasGame = data.length > 0;
+            // Determine whether a game team exists for this ID
+            const hasGameTeam = data.length > 0;
 
             // Call back with the result
-            callback(null, hasGame);
+            callback(null, hasGameTeam);
 
             // Store the result in Redis if ready
             if(RedisUtils.isReady()) {
                 // Store the results
-                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGame ? 1 : 0, function(err) {
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, hasGameTeam ? 1 : 0, function(err) {
                     // Show a warning on error
                     if(err !== null && err !== undefined) {
                         console.error('A Redis error occurred when storing Game Team ID validity, ignoring.')
