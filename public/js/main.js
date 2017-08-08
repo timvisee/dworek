@@ -8363,7 +8363,33 @@ function hasLocationPermission(callback) {
         return;
     }
 
-    // Use the permissions API
+    // Check whether we're running Firefox or Android
+    var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    var isAndroid = navigator.platform.toLowerCase().indexOf("android") > -1;
+
+    // Old method
+    var oldMethod = function() {
+        // TODO: Maybe not use this, because this immediatly asks for permission on the page?
+        // Try to figure out permissions by requesting the current location
+        navigator.geolocation.getCurrentPosition(function() {
+            // We have permission, call back
+            alert('TEST: alt-granted');
+            if(callback !== undefined)
+                callback(null, true);
+
+        }, function(status) {
+            alert('TEST: alt-error');
+            // Check if permission was denied, call back the result
+            if(callback !== undefined)
+                callback(null, status.code !== status.PERMISSION_DENIED);
+
+        }, {
+            enableHighAccuracy: false,
+            timeout: 50,
+        });
+    }
+
+    // Use the permissions API, use the old method for Firefox mobile due to some error
     if(navigator.permissions) {
         navigator.permissions.query({
             name: 'geolocation'
@@ -8379,6 +8405,14 @@ function hasLocationPermission(callback) {
                     alert('TEST: default ' + status.stage);
                 case 'prompt':
                     alert('TEST: prompt');
+
+                    // Fall back to the old method for Firefox mobile in this case
+                    if(isFirefox && isAndroid) {
+                        oldMethod();
+                        return;
+                    }
+
+                    // Call back
                     if(callback !== undefined)
                         callback(null, false);
                     return;
@@ -8392,25 +8426,6 @@ function hasLocationPermission(callback) {
         });
         return;
     }
-
-    // TODO: Maybe not use this, because this immediatly asks for permission on the page?
-    // Try to figure out permissions by requesting the current location
-    navigator.geolocation.getCurrentPosition(function() {
-        // We have permission, call back
-        alert('TEST: alt-granted');
-        if(callback !== undefined)
-            callback(null, true);
-
-    }, function(status) {
-        alert('TEST: alt-error');
-        // Check if permission was denied, call back the result
-        if(callback !== undefined)
-            callback(null, status.code !== status.PERMISSION_DENIED);
-
-    }, {
-        enableHighAccuracy: false,
-        timeout: 50,
-    });
 }
 
 /**
