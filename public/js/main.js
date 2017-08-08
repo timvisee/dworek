@@ -8330,7 +8330,8 @@ function hasRequiredPermissions(callback) {
 function hasLocationPermission(callback) {
     // Call back false if geolocation isn't available
     if(!("geolocation" in navigator)) {
-        callback("Location services are not supported in this browser.", false);
+        if(callback !== undefined)
+            callback("Location services are not supported in this browser.", false);
         return;
     }
 
@@ -8364,11 +8365,13 @@ function hasLocationPermission(callback) {
     // Try to figure out permissions by requesting the current location
     navigator.geolocation.getCurrentPosition(function() {
         // We have permission, call back
-        callback(null, true);
+        if(callback !== undefined)
+            callback(null, true);
 
     }, function(status) {
         // Check if permission was denied, call back the result
-        callback(null, status.code !== status.PERMISSION_DENIED);
+        if(callback !== undefined)
+            callback(null, status.code !== status.PERMISSION_DENIED);
 
     }, {
         enableHighAccuracy: false,
@@ -8384,7 +8387,8 @@ function hasLocationPermission(callback) {
 function requestLocationPermission(callback) {
     // Call back false if geolocation isn't available
     if(!("geolocation" in navigator)) {
-        callback("Location services are not supported in this browser.", false);
+        if(callback !== undefined)
+            callback("Location services are not supported in this browser.", false);
         return;
     }
 
@@ -8485,6 +8489,13 @@ function requestNotificationPermission(callback) {
         switch(permission) {
             default:
             case 'granted':
+                // Show a demo demo notification
+                new Notification('Dworek', {
+                    body: 'Notifications are now enabled!',
+                    silent: false
+                });
+
+                // Call back
                 if(callback !== undefined)
                     callback(null, true);
                 return;
@@ -8517,7 +8528,8 @@ function hasVibrationPermission(callback) {
     }
 
     // We're not sure, just call back false for now
-    callback(null, false);
+    if(callback !== undefined)
+        callback(null, false);
 }
 
 /**
