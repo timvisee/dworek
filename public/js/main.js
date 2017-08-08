@@ -8283,8 +8283,7 @@ $(document).bind("pageshow", function() {
     hasLocationPermission(function(err, permission) {
         // Print errors to the console
         if(err !== null)
-            //console.log('Location permission check error: ' + err);
-            showError('Location permission check error: ' + err);
+            console.log('Location permission check error: ' + err);
 
         // Update the location permission state
         updateLocationPermission(null, permission);
@@ -8534,6 +8533,7 @@ function requestNotificationPermission(callback) {
 
     // Request the permission
     Notification.requestPermission().then(function(permission) {
+        alert('Chrome permission response: ' + permission);
         switch(permission) {
             default:
             case 'granted':
