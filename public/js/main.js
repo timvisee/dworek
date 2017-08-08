@@ -1013,6 +1013,69 @@ var Dworek = {
 };
 
 /**
+ * Check whether we're running Firefox.
+ *
+ * @return {boolean} True if Firefox, false if not.
+ */
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+}
+
+/**
+ * Get the current Firefox version.
+ *
+ * @return {string} Firefox version.
+ */
+function getFirefoxVersion() {
+    // Get the user agent
+    var agent = navigator.userAgent;
+
+    // Get the offset the Firefox identifier is at
+    var offset = verOffset = agent.indexOf('Firefox');
+
+    // Return -1 if the version wasn't found
+    if(offset < 0)
+        return -1;
+
+    // Get the version string
+    return agent.substring(verOffset + 'Firefox'.length + 1);
+}
+
+/**
+ * Get the major Firefox version this browser has.
+ *
+ * @return {int} Major version.
+function getFirefoxVersionMajor() {
+    // Get the full version
+    const ver = getFirefoxVersion();
+
+    // Return if it's -1
+    if(ver < 0)
+        return -1;
+
+    // Parse and return the version
+    return parseInt(ver.split('.')[0]);
+}
+
+/**
+ * Check whether we're running Android.
+ *
+ * @return {boolean} True if Android, false if not.
+ */
+function isAndroid() {
+    return navigator.userAgent.toLowerCase().indexOf('android') > -1;
+}
+
+/**
+ * Check whether we're running Fennec.
+ *
+ * @return {boolean} True if Fennec, false if not.
+ */
+function isFennec() {
+    return navigator.userAgent.toLowerCase().indexOf('fennec') > -1;
+}
+
+/**
  * The language object for the global appliation.
  * @type {Object}
  */
@@ -8591,67 +8654,4 @@ function requestVibrationPermission(callback) {
 
     // Then call back
     callback(null, true);
-}
-
-/**
- * Check whether we're running Firefox.
- *
- * @return {boolean} True if Firefox, false if not.
- */
-function isFirefox() {
-    return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-}
-
-/**
- * Get the current Firefox version.
- *
- * @return {string} Firefox version.
- */
-function getFirefoxVersion() {
-    // Get the user agent
-    var agent = navigator.userAgent;
-
-    // Get the offset the Firefox identifier is at
-    var offset = verOffset = agent.indexOf('Firefox');
-
-    // Return -1 if the version wasn't found
-    if(offset < 0)
-        return -1;
-
-    // Get the version string
-    return agent.substring(verOffset + 'Firefox'.length + 1);
-}
-
-/**
- * Get the major Firefox version this browser has.
- *
- * @return {int} Major version.
-function getFirefoxVersionMajor() {
-    // Get the full version
-    const ver = getFirefoxVersion();
-
-    // Return if it's -1
-    if(ver < 0)
-        return -1;
-
-    // Parse and return the version
-    return parseInt(ver.split('.')[0]);
-}
-
-/**
- * Check whether we're running Android.
- *
- * @return {boolean} True if Android, false if not.
- */
-function isAndroid() {
-    return navigator.userAgent.toLowerCase().indexOf('android') > -1;
-}
-
-/**
- * Check whether we're running Fennec.
- *
- * @return {boolean} True if Fennec, false if not.
- */
-function isFennec() {
-    return navigator.userAgent.toLowerCase().indexOf('fennec') > -1;
 }
