@@ -5082,8 +5082,15 @@ function updateGameDataVisuals() {
         if(showFactoryBuild)
             cardCount++;
 
-        // Get the factory build card element if available
+        // Determine whether to show the special actions card
+        const showSpecialActions = (data.hasOwnProperty('roles') && data.roles.hasOwnProperty('special') && data.roles.special) ||
+            (data.hasOwnProperty('user') && data.user.hasOwnProperty('isAdmin') && data.user.isAdmin);
+        if(showSpecialActions)
+            cardCount++;
+
+        // Get the factory build and special action card element if available
         var factoryBuildCardElement = gameActionsList.find('.card-factory-build');
+        var specialActionsCardElement = gameActionsList.find('.card-special-actions');
 
         // Create the factory build card if it isn't available
         if(showFactoryBuild && factoryBuildCardElement.length == 0) {
@@ -5113,6 +5120,40 @@ function updateGameDataVisuals() {
 
         } else if(!showFactoryBuild && factoryBuildCardElement.length > 0) {
             cardAnimationSlideOut(factoryBuildCardElement);
+            changed = true;
+        }
+
+        // Create the special actions card if it isn't available
+        if(showSpecialActions && specialActionsCardElement.length == 0) {
+            gameActionsList.prepend('<div class="nd2-card wow card-special-actions">' +
+                '    <div class="card-title has-supporting-text">' +
+                '        <h3 class="card-primary-title">Special actions</h3>' +
+                '    </div>' +
+                '    <div class="card-supporting-text has-action has-title">' +
+                '        <p>Execute special actions to affect the inventory of players.</p>' +
+                '    </div>' +
+                '    <div class="card-action">' +
+                '        <div class="row between-xs">' +
+                '            <div class="col-xs-12">' +
+                '                <div class="box">' +
+                '                    <a href="/game/' + Dworek.utils.getGameId() + '/special" class="ui-btn waves-effect waves-button">' +
+                '                        <i class="zmdi zmdi-flare"></i>&nbsp;' +
+                '                        Predefined Actions' +
+                '                    </a>' +
+                '                    <a href="/game/' + Dworek.utils.getGameId() + '/special/custom" class="ui-btn waves-effect waves-button">' +
+                '                        <i class="zmdi zmdi-edit"></i>&nbsp;' +
+                '                        Custom Action' +
+                '                    </a>' +
+                '                </div>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</div>');
+            changed = true;
+            cardAnimationSlideIn(gameActionsList.find('.card-special-actions'));
+
+        } else if(!showFactoryBuild && factoryBuildCardElement.length > 0) {
+            cardAnimationSlideOut(specialActionsCardElement);
             changed = true;
         }
 

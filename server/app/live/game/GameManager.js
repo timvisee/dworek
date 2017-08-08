@@ -759,7 +759,11 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
         shops: [],
         strength: {},
         standings: [],
-        pings: []
+        pings: [],
+        roles: {},
+        user: {
+            isAdmin: false
+        }
     };
 
     // Convert the sockets to an array
@@ -830,6 +834,42 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
             // Set whether the user can build new factories
             _.set(gameData, 'factory.canBuild', userState.player);
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Get the game stage state (roles)
+        latch.add();
+        user.getGameState(game, function(err, roles) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Set the roles
+            gameData.roles = roles;
+
+            // Resolve the latch
+            latch.resolve();
+        });
+
+        // Check whether the user is an administrator
+        latch.add();
+        user.isAdmin(function(err, isAdmin) {
+            // Call back errors
+            if(err !== null) {
+                if(!calledBack)
+                    callback(err);
+                calledBack = true;
+                return;
+            }
+
+            // Check whether the user is an administrator
+            gameData.user.isAdmin = isAdmin;
 
             // Resolve the latch
             latch.resolve();

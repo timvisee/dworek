@@ -390,6 +390,9 @@ or just for specific players.
 As a player you'll always be notified when a special action has affected you.
 Players do not have any way to defend against these actions.
 
+The special actions can be accessed by special users from the _Special actions_ card on the _Actions_ tab of the main
+game page.
+
 
 
 ## Leader board
