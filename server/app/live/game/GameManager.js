@@ -33,6 +33,7 @@ var GameModel = require('../../model/game/GameModel');
 var User = require('../user/User');
 var UserModel = require('../../model/user/UserModel');
 var CallbackLatch = require('../../util/CallbackLatch');
+var MutexLoader = require('../../util/MutexLoader');
 var gameConfig = require('../../../gameConfig');
 
 /**
@@ -48,6 +49,13 @@ var GameManager = function() {
      * @type {Array} Array of games.
      */
     this.games = [];
+
+    /**
+     * Mutex loader.
+     * @type {MutexLoader}
+     * @private
+     */
+    this._mutexLoader = new MutexLoader();
 
     // Set up the location update interval
     setInterval(function() {
@@ -86,49 +94,54 @@ GameManager.prototype.getGame = function(gameId, callback) {
     // Store this instance
     const self = this;
 
-    console.log('##### LOADING GAME: ' + gameId);
+    // Load the game through the mutex loader
+    this._mutexLoader.load(gameId.getIdHex(), function(callback) {
 
-    // Get the game for the given ID
-    Core.model.gameModelManager.getGameById(gameId, function(err, game) {
-        // Call back errors
-        if(err !== null) {
-            callback(err);
-            return;
-        }
+        console.log('##### LOADING GAME: ' + gameId);
 
-        console.log('##### LOADED GAME: ' + gameId);
-
-        // Make sure the stage of this game is active
-        game.getStage(function(err, stage) {
+        // Get the game for the given ID
+        Core.model.gameModelManager.getGameById(gameId, function(err, game) {
             // Call back errors
             if(err !== null) {
                 callback(err);
                 return;
             }
 
-            // // Make sure the stage is valid
-            // if(stage === 0) {
-            //     callback(null, null);
-            //     return;
-            // }
+            console.log('##### LOADED GAME: ' + gameId);
 
-            // Create a game instance for this model
-            const loadGame = new Game(game);
-            loadGame.load(function(err) {
+            // Make sure the stage of this game is active
+            game.getStage(function(err, stage) {
                 // Call back errors
                 if(err !== null) {
                     callback(err);
                     return;
                 }
 
-                // Add the game to the list of loaded games
-                self.games.push(loadGame);
+                // // Make sure the stage is valid
+                // if(stage === 0) {
+                //     callback(null, null);
+                //     return;
+                // }
 
-                // Call back the game
-                callback(null, loadGame);
+                // Create a game instance for this model
+                const loadGame = new Game(game);
+                loadGame.load(function(err) {
+                    // Call back errors
+                    if(err !== null) {
+                        callback(err);
+                        return;
+                    }
+
+                    // Add the game to the list of loaded games
+                    self.games.push(loadGame);
+
+                    // Call back the game
+                    callback(null, loadGame);
+                });
             });
         });
-    });
+
+    }, callback);
 };
 
 /**
