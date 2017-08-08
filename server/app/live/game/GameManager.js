@@ -95,7 +95,7 @@ GameManager.prototype.getGame = function(gameId, callback) {
     const self = this;
 
     // Load the game through the mutex loader
-    this._mutexLoader.load(gameId.getIdHex(), function(callback) {
+    this._mutexLoader.load(gameId.toString(), function(callback) {
 
         console.log('##### LOADING GAME: ' + gameId);
 
