@@ -97,8 +97,7 @@ const Config = {
 
 /**
  * Name configuration for the game.
- * @type {Object}
- */
+ * @type {Object} */
 const NameConfig = {
     app: {
         name: 'Dworek'
@@ -5445,6 +5444,11 @@ function updateGameDataVisuals() {
             list.html('<tr><td><i style="font-weight: normal; color: gray;">Unknown...</i><br>');
             return;
         }
+
+        // Sort the list of standings
+        data.standings.sort(function(a, b) {
+            return b.money - a.money;
+        });
 
         // Build the HTML
         var tableHtml = '';
