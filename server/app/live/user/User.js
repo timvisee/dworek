@@ -912,7 +912,7 @@ User.prototype.isVisibleFor = function(other, callback) {
     // Continue when the roles are fetched
     rolesLatch.then(function() {
         // Return if the user isn't a spectator or player
-        if((!userRoles.player && !userRoles.special && !userRoles.spectator())) {
+        if((!userRoles.player && !userRoles.special && !userRoles.spectator)) {
             if(!calledBack)
                 callback(null, false);
             calledBack = true;
