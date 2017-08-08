@@ -8359,6 +8359,7 @@ function hasLocationPermission(callback) {
     if(!("geolocation" in navigator)) {
         if(callback !== undefined)
             callback("Location services are not supported in this browser.", false);
+        alert('TEST: not supported');
         return;
     }
 
@@ -8371,15 +8372,19 @@ function hasLocationPermission(callback) {
                 case 'granted':
                     if(callback !== undefined)
                         callback(null, true);
+                    alert('TEST: granted');
                     return;
 
-                case 'prompt':
                 default:
+                    alert('TEST: default ' + status.stage);
+                case 'prompt':
+                    alert('TEST: prompt');
                     if(callback !== undefined)
                         callback(null, false);
                     return;
 
                 case 'denied':
+                    alert('TEST: denied');
                     if(callback !== undefined)
                         callback('Permission for location services has been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
                     return;
@@ -8392,10 +8397,12 @@ function hasLocationPermission(callback) {
     // Try to figure out permissions by requesting the current location
     navigator.geolocation.getCurrentPosition(function() {
         // We have permission, call back
+        alert('TEST: alt-granted');
         if(callback !== undefined)
             callback(null, true);
 
     }, function(status) {
+        alert('TEST: alt-error');
         // Check if permission was denied, call back the result
         if(callback !== undefined)
             callback(null, status.code !== status.PERMISSION_DENIED);
@@ -8548,7 +8555,7 @@ function requestNotificationPermission(callback) {
  */
 function hasVibrationPermission(callback) {
     // Return false if not supported
-    if(!navigator.vibrate) {
+    if(!("vibrate" in navigator)) {
         if(callback !== undefined)
             callback('Vibrations are not supported in this browser.', false);
         return;
@@ -8566,7 +8573,7 @@ function hasVibrationPermission(callback) {
  */
 function requestVibrationPermission(callback) {
     // Return false if not supported
-    if(!navigator.vibrate) {
+    if(!("vibrate" in navigator)) {
         if(callback !== undefined)
             callback('Vibrations are not supported in this browser.', false);
         return;

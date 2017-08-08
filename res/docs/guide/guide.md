@@ -82,9 +82,9 @@ Because the game is played in the browser, there are a few important things to n
 ### Browser
 Not all browsers play the game well.
 Therefore it's highly recommended to install one of the following browsers for this game:
-* Firefox bNightly (by Mozilla)
-* Firefox (by Mozilla)
 * Google Chrome (by Google)
+* Firefox Nightly (by Mozilla)
+* Firefox (by Mozilla)
 
 ### Permissions
 Your browser probably asks for permission to let Dworek use your location and things like that.
