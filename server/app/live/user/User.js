@@ -1026,7 +1026,7 @@ User.prototype.isVisibleFor = function(other, callback) {
  * @param {Number} [options.previousOut] Previous amount of out to show in brackets.
  * @param {User~getBalanceTableCallback} callback
  */
-User.prototype.getBalanceTable = function (options, callback) {
+User.prototype.getBalanceTable = function(options, callback) {
     // Parse the options
     if(options === null || options === undefined)
         options = {};
@@ -1103,20 +1103,19 @@ User.prototype.getBalanceTable = function (options, callback) {
     latch.then(function() {
         // Build and call back the table
         if(!calledBack)
-            // TODO: Get the money, in and out names from the game's game configuration
             callback(null,
                     '<table>' +
                     '    <tr>' +
                     '        <td><i>Money:</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + Formatter.formatMoney(userMoney) + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatMoney(options.previousMoney) + ')</span>' : '') + '</td>' +
+                    '        <td>' + Formatter.formatMoney(userMoney) + (options.hasOwnProperty('previousMoney') ? '<span style="color: gray; font-style: italic;"> &#x2190; ' + Formatter.formatMoney(options.previousMoney) + '</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '        <td><i>' + liveGame.__('in.names', { capitalizeFirst: true }) + ':</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + Formatter.formatGoods(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousIn) + ')</span>' : '') + '</td>' +
+                    '        <td><i>' + liveGame.__('in.names', { capitalizeFirst: true, game: liveGame.getIdHex() }) + ':</i>&nbsp;&nbsp;</td>' +
+                    '        <td>' + Formatter.formatGoods(userIn) + (options.hasOwnProperty('previousIn') ? '<span style="color: gray; font-style: italic;"> &#x2190; ' + Formatter.formatGoods(options.previousIn) + '</span>' : '') + '</td>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '        <td><i>' + liveGame.__('out.names', { capitalizeFirst: true }) + ':</i>&nbsp;&nbsp;</td>' +
-                    '        <td>' + Formatter.formatGoods(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> (' + Formatter.formatGoods(options.previousOut) + ')</span>' : '') + '</td>' +
+                    '        <td><i>' + liveGame.__('out.names', { capitalizeFirst: true, game: liveGame.getIdHex() }) + ':</i>&nbsp;&nbsp;</td>' +
+                    '        <td>' + Formatter.formatGoods(userOut) + (options.hasOwnProperty('previousOut') ? '<span style="color: gray; font-style: italic;"> &#x2190; ' + Formatter.formatGoods(options.previousOut) + '</span>' : '') + '</td>' +
                     '    </tr>' +
                     '</table>'
             );

@@ -246,7 +246,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             liveUser.getBalanceTable({
                                                 previousMoney: moneyCurrent,
                                                 previousIn: inCurrent,
-                                            }, function (err, balanceTable) {
+                                            }, function(err, balanceTable) {
                                                 // Call back errors
                                                 if (err !== null)
                                                     callbackError(10);
