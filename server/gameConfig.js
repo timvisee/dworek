@@ -238,7 +238,7 @@ var gameConfig = {
          * @return {Number} Range in meters.
          */
         getRange: function(level) {
-            return 7 + Math.pow(level - 1, 0.3) * 4;
+            return 8.5 + Math.pow(level - 1, 0.3) * 4;
         },
 
         /**

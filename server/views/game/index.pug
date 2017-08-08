@@ -118,14 +118,14 @@ block content
                         td
                             span.game-balance-money ?
                             span(style="color: gray;")  !{__('currency.names', { game: game.id })}
-                    tr: td!= __('in.names', { capitalizeFirst: true, game: game.id })
+                    tr: td Goods
                         td
                             span.game-balance-in ?
-                            span(style="color: gray;")  units
-                    tr: td!= __('out.names', { capitalizeFirst: true, game: game.id })
+                            span(style="color: gray;")  !{__('in.names', { game: game.id })}
+                    tr: td
                         td
                             span.game-balance-out ?
-                            span(style="color: gray;")  units
+                            span(style="color: gray;")  !{__('out.names', { game: game.id })}
 
         //- Show a proper card if the user hasn't joined this game
         if game.userState.special || user.isHost || user.isAdmin
