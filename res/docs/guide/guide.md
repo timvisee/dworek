@@ -3,6 +3,15 @@ This guide briefly describes how Dworek, and it's game mechanics work.
 
 
 
+## Start checkup
+Before you start playing, check the following things:
+- Make sure you have an active network connection.
+- Preferably use a recommended browser, see [[browsers]](#browser).
+- Make sure your browser is up-to-date.
+- Enable all location services (GPS).
+
+
+
 ## Basic concept
 _Note: This game can be played in different formats with different language configurations.  
 For example, it may be played with ingredients, sweet factories and candy.  
@@ -61,6 +70,52 @@ so make sure you sell al your products before the game ends or else it won't be 
 
 The current standings are shown at the bottom of the _Me_ tab on the main game page,
 so you can always see how good your team is currently doing.
+
+
+
+## Device setup
+The Dworek game is played in a browser.
+In a browser everybody is able to enjoy the game without installing anything.
+
+Because the game is played in the browser, there are a few important things to note.
+
+### Browser
+Not all browsers play the game well.
+Therefore it's highly recommended to install one of the following browsers for this game:
+* Firefox bNightly (by Mozilla)
+* Firefox (by Mozilla)
+* Google Chrome (by Google)
+
+### Permissions
+Your browser probably asks for permission to let Dworek use your location and things like that.
+Please accept any permission requests to ensure Dworek works properly.
+
+Different permissions are required in different browsers.
+See the list below for required permissions.
+
+Required permissions:
+- Location services (GPS)
+
+Optional permissions:
+- Notifications
+- Phone vibrations
+
+A notification will come up asking you to accept these permissions when needed.
+
+### Location service
+Dworek requires the use of your devices location.
+For this, you must enable location services on your device.
+
+On Android phones, location services must be set to _High accuracy_.  
+On iPhones, location services must be enabled (with GPS).
+
+After that's done, ensure Dworek has permission from your browser to use your location.
+
+### Network
+For this application an active network connection is required.
+When connection is lost, the application will be frozen until network is available again.
+
+Dworek notifies you when connection is lost, or when you've successfully been reconnected.
 
 
 
