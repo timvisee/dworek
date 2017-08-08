@@ -8366,7 +8366,7 @@ function hasLocationPermission(callback) {
     // Check whether we're running Firefox or Android
     var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
     var isAndroid = navigator.platform.toLowerCase().indexOf("android") > -1;
-    var isFennec = navigator.platform.toLowerCase().indexOf("fennec") > -1;
+    var isFennec = navigator.userAgent.toLowerCase().indexOf("fennec") > -1;
 
     // Old method
     var oldMethod = function() {
@@ -8406,6 +8406,8 @@ function hasLocationPermission(callback) {
                     alert('TEST: default ' + status.stage);
                 case 'prompt':
                     alert('TEST: prompt');
+
+                    alert('Agent: ' + navigator.userAgent);
 
                     // Fall back to the old method for Firefox mobile in this case
                     if((isFirefox && isAndroid) || isFennec) {
