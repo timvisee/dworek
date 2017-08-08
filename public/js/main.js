@@ -8497,7 +8497,7 @@ function hasLocationPermission(callback) {
 
                 case 'denied':
                     if(callback !== undefined)
-                        callback('Permission for location services has been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
+                        callback('Permission for location services has been denied.<br><br>You must manually unblock or allow permission to location services for this website in your browser.', false);
                     return;
             }
         });
@@ -8543,7 +8543,7 @@ function requestLocationPermission(callback) {
         // Check if permission was denied, call back the result
         if(status.code === status.PERMISSION_DENIED) {
             if(callback !== undefined)
-                callback('Permission for location services have been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
+                callback('Permission for location services have been denied.<br><br>You must manually unblock or allow permission to location services for this website in your browser.', false);
             return;
         }
 
