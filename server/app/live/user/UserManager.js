@@ -256,7 +256,7 @@ UserManager.prototype.load = function(callback) {
         // Loop through the list of users
         users.forEach(function(user) {
             latch.add();
-            self.loadUser(user, function(err, liveUser) {
+            self.loadUser(user.getId(), function(err, liveUser) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)

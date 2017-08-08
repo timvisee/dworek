@@ -99,10 +99,20 @@ FactoryManager.prototype.getFactory = function(factoryId, callback) {
 /**
  * Load the factory with the given ID if this factory is valid for the current game.
  *
- * @param {ObjectId|string} factoryId ID of the factory to load.
+ * @param {FactoryModel|ObjectId|string} factoryId ID of the factory to load.
  * @param {FactoryManager~loadFactoryCallback} callback Called back with the loaded factory or when an error occurred.
  */
 FactoryManager.prototype.loadFactory = function(factoryId, callback) {
+    // Get the factory ID as an ObjectId
+    if(factoryId instanceof FactoryModel)
+        factoryId = factoryId.getId();
+    else if(!(factoryId instanceof ObjectId) && ObjectId.isValid(factoryId))
+        factoryId = new ObjectId(factoryId);
+    else if(!(factoryId instanceof ObjectId)) {
+        callback(new Error('Invalid factory ID'));
+        return;
+    }
+
     // Store this instance
     const self = this;
 
@@ -246,7 +256,7 @@ FactoryManager.prototype.load = function(callback) {
         // Loop through the list of factories
         factories.forEach(function(factory) {
             latch.add();
-            self.loadFactory(factory, function(err, liveFactory) {
+            self.loadFactory(factory.getId(), function(err, liveFactory) {
                 // Call back errors
                 if(err !== null) {
                     if(!calledBack)

@@ -104,8 +104,6 @@ module.exports = {
                     return;
                 }
 
-                console.log('FACTORY NOT EXISTS: ' + valid);
-
                 // Make sure the factory is valid
                 if(!valid) {
                     if(!calledBack) {

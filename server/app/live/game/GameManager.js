@@ -202,7 +202,7 @@ GameManager.prototype.load = function(callback) {
         games.forEach(function(game) {
             // Load the game
             latch.add();
-            self.loadGame(game, function(err) {
+            self.loadGame(game.getId(), function(err) {
                 // Handle errors
                 if(err !== null) {
                     if(!calledBack)
