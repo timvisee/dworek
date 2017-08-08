@@ -6514,13 +6514,13 @@ function updateFactoryDataVisuals(firstShow) {
             // Create a suffix label
             var suffix = '';
             if(data.hasOwnProperty('conquerUserCount'))
-                suffix = ' <span style="color: gray;">by ' + data.conquerUserCount + ' user' + (data.conquerUserCount != 1 ? 's' : '') + ' in range</span>';
+                suffix = '<br /><span style="color: gray;">' + data.conquerUserCount + ' user' + (data.conquerUserCount != 1 ? 's' : '') + ' in range</span>';
 
             // Set the label
             if(data.conquerValue < -5)
                 factoryConquerLabel.html('<span style="color: green;">' +  data.conquerValue + '</span>' + suffix);
             else if(data.conquerValue <= 0)
-                factoryConquerLabel.html('<span style="color: orangered;">' +  data.conquerValue + '</span>' + suffix);
+                factoryConquerLabel.html('<span style="color: orangered; font-weight: bold;">' +  data.conquerValue + '</span>' + suffix);
             else {
                 if(Dworek.state.animate)
                     // Animate
