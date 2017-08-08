@@ -6532,14 +6532,14 @@ function updateFactoryDataVisuals(firstShow) {
             if(data.conquerValue < -5)
                 factoryConquerLabel.html('<span style="color: green;">' +  data.conquerValue + '</span>' + suffix);
             else if(data.conquerValue <= 0)
-                factoryConquerLabel.html('<span style="color: orangered; font-weight: bold;">' +  data.conquerValue + '</span>' + suffix);
+                factoryConquerLabel.html('<span style="color: orangered;">' +  data.conquerValue + '</span>' + suffix);
             else {
                 if(Dworek.state.animate)
                     // Animate
-                    factoryConquerLabel.html('<span class="animated infinite rubberBand" style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+                    factoryConquerLabel.html('<span class="animated infinite rubberBand" style="color: red; font-weight: bold; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
                 else
                     // Don't animate
-                    factoryConquerLabel.html('<span style="color: red; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
+                    factoryConquerLabel.html('<span style="color: red; font-weight: bold; display: inline-block;">' +  data.conquerValue + '</span>' + suffix);
             }
         }
     }
