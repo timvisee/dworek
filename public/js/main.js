@@ -2248,6 +2248,23 @@ function showDialog(options, callback) {
     // Create a flag to determine whether we called back
     var calledBack = false;
 
+    // Set up the native notifications
+    var nativeNotification = null;
+    hasNotificationPermission(function(err, permission) {
+        // Show errors
+        if(err !== null)
+            console.error('Notification permission check error: ' + err);
+
+        // Return if we don't have permission or if we already called back
+        if(!permission || calledBack)
+            return;
+
+        // Build and show the native notification
+        nativeNotification = new Notification('Dworek message', {
+            body: options.message
+        });
+    });
+
     // Build the HTML for the popup
     var popupHtml =
         '<div id="' + popupId + '" data-role="popup">' +
@@ -2285,6 +2302,8 @@ function showDialog(options, callback) {
         if(!calledBack) {
             if(callback !== undefined)
                 callback();
+            if(nativeNotification !== null)
+                nativeNotification.close();
             calledBack = true;
         }
 
@@ -2358,6 +2377,8 @@ function showDialog(options, callback) {
             if(!calledBack) {
                 if(callback !== undefined)
                     callback(action.value);
+                if(nativeNotification !== null)
+                    nativeNotification.close();
                 calledBack = true;
             }
         });
@@ -2522,33 +2543,33 @@ function hasNativeNotificationSupport(callback) {
  * @param {boolean} True if native notifications are supported, and can be used. False if not.
  */
 
-/**
- * Show a native notification to the user.
- * Currently only supported by a selected number of browsers.
- *
- * @param {string} message Message to show.
- * @param {boolean} [fallback=true] True to fallback to in-page notifications if native notifications don't work.
- */
-function showNativeNotification(message, fallback) {
-    // Make sure the notifications are supported, and that the user granted permission
-    hasNativeNotificationSupport(function(result) {
-        // Make sure notifications are supported
-        if(result) {
-            // Show the actual notification, and return
-            new Notification(message);
-            return;
-        }
-
-        // Return if no fallback notification should be used
-        if(fallback !== undefined && !fallback)
-            return;
-
-        // Show a fallback notification
-        showNotification(message, {
-            title: 'Message'
-        });
-    });
-}
+///**
+// * Show a native notification to the user.
+// * Currently only supported by a selected number of browsers.
+// *
+// * @param {string} message Message to show.
+// * @param {boolean} [fallback=true] True to fallback to in-page notifications if native notifications don't work.
+// */
+//function showNativeNotification(message, fallback) {
+//    // Make sure the notifications are supported, and that the user granted permission
+//    hasNativeNotificationSupport(function(result) {
+//        // Make sure notifications are supported
+//        if(result) {
+//            // Show the actual notification, and return
+//            new Notification(message);
+//            return;
+//        }
+//
+//        // Return if no fallback notification should be used
+//        if(fallback !== undefined && !fallback)
+//            return;
+//
+//        // Show a fallback notification
+//        showNotification(message, {
+//            title: 'Message'
+//        });
+//    });
+//}
 
 // Nickname randomization
 $(document).bind("pageinit", function() {
