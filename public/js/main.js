@@ -8358,7 +8358,6 @@ function hasLocationPermission(callback) {
     if(!("geolocation" in navigator)) {
         if(callback !== undefined)
             callback("Location services are not supported in this browser.", false);
-        alert('TEST: not supported');
         return;
     }
 
@@ -8396,8 +8395,8 @@ function hasLocationPermission(callback) {
                 default:
                 case 'prompt':
                     // Fall back to the old method for Firefox mobile in this case
-                    if((isFirefox() && isAndroid()) || isFennec()) {
-                        console.warn('Falling back to old location permission check method, due to a Firefox mobile related issue...');
+                    if((isFirefox() && getFirefoxVersionMajor() < 57) || (isFirefox() && isAndroid()) || isFennec()) {
+                        console.warn('Falling back to old location permission check method, due to a Firefox related issue...');
                         oldMethod();
                         return;
                     }
@@ -8601,6 +8600,42 @@ function requestVibrationPermission(callback) {
  */
 function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+}
+
+/**
+ * Get the current Firefox version.
+ *
+ * @return {string} Firefox version.
+ */
+function getFirefoxVersion() {
+    // Get the user agent
+    var agent = navigator.userAgent;
+
+    // Get the offset the Firefox identifier is at
+    var offset = verOffset = agent.indexOf('Firefox');
+
+    // Return -1 if the version wasn't found
+    if(offset < 0)
+        return -1;
+
+    // Get the version string
+    return agent.substring(verOffset + 'Firefox'.length + 1);
+}
+
+/**
+ * Get the major Firefox version this browser has.
+ *
+ * @return {int} Major version.
+function getFirefoxVersionMajor() {
+    // Get the full version
+    const ver = getFirefoxVersion();
+
+    // Return if it's -1
+    if(ver < 0)
+        return -1;
+
+    // Parse and return the version
+    return parseInt(ver.split('.')[0]);
 }
 
 /**
