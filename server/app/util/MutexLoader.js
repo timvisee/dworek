@@ -44,7 +44,7 @@ var MutexLoader = function() {
  */
 MutexLoader.prototype.load = function(id, load, callback) {
     // Check whether we're already loading
-    const isLoading = !this._isLoading(id);
+    const isLoading = this._isLoading(id);
 
     // Add to the loading list
     this._addLoading(id, callback);
