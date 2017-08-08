@@ -380,28 +380,41 @@ var Dworek = {
                 // Start the geo watcher fallback interval
                 Dworek.state.geoWatcherFallback = setInterval(doLocationFallback, Config.location.fallbackTime);
 
-                // Start the position watcher
-                Dworek.state.geoWatcher = navigator.geolocation.watchPosition(function(position) {
-                    // Process the success callback
-                    processLocationSuccess(position, true, true);
+                // Make sure the user has given permission
+                hasRequiredPermissions(function(err, permission) {
+                    // Show errors
+                    if(err !== null)
+                        showError(err);
 
-                    // Clear the current geo watcher fallback
-                    if(Dworek.state.geoWatcherFallback != null) {
-                        clearInterval(Dworek.state.geoWatcherFallback);
-                        Dworek.state.geoWatcherFallback = null;
+                    // Show the permission checkup dialog if we don't have permission
+                    if(!permission) {
+                        showPermissionCheckupDialog();
+                        return;
                     }
 
-                    // Start the geo watcher fallback interval
-                    Dworek.state.geoWatcherFallback = setInterval(doLocationFallback, Config.location.fallbackTime);
+                    // Start the position watcher
+                    Dworek.state.geoWatcher = navigator.geolocation.watchPosition(function(position) {
+                        // Process the success callback
+                        processLocationSuccess(position, true, true);
 
-                }, function(error) {
-                    // Process the error callback
-                    processLocationError(error, false);
+                        // Clear the current geo watcher fallback
+                        if(Dworek.state.geoWatcherFallback != null) {
+                            clearInterval(Dworek.state.geoWatcherFallback);
+                            Dworek.state.geoWatcherFallback = null;
+                        }
 
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 30 * 1000,
-                    maximumAge: 5 * 1000
+                        // Start the geo watcher fallback interval
+                        Dworek.state.geoWatcherFallback = setInterval(doLocationFallback, Config.location.fallbackTime);
+
+                    }, function(error) {
+                        // Process the error callback
+                        processLocationError(error, false);
+
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 30 * 1000,
+                        maximumAge: 5 * 1000
+                    });
                 });
 
             } else if(!sendLocationUpdates && Dworek.state.geoWatcher != null) {
@@ -1351,6 +1364,18 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.AUTH_RESPONSE, functi
 
         // Update the active game page
         updateActiveGame();
+
+        // Make sure the user has given permission if logged in
+        if(packet.loggedIn)
+            hasRequiredPermissions(function(err, permission) {
+                // Show errors
+                if(err !== null)
+                    console.log('Required permission check error: ' + err);
+
+                // Show the permission checkup dialog if we don't have permission
+                if(!permission)
+                    showPermissionCheckupDialog();
+            });
     }
 
     // Request new game data
@@ -2483,11 +2508,11 @@ function hasNativeNotificationSupport(callback) {
         return;
     }
 
-    // Ask the user for permission
-    Notification.requestPermission(function(permission) {
-        if(typeof callback === 'function')
-            callback(permission === 'granted');
-    });
+//    // Ask the user for permission
+//    Notification.requestPermission(function(permission) {
+//        if(typeof callback === 'function')
+//            callback(permission === 'granted');
+//    });
 }
 
 /**
@@ -3285,14 +3310,6 @@ $(document).bind("pageinit", function() {
     // Bind a click event
     deviceStatusButton.unbind('click');
     deviceStatusButton.click(function(e) {
-        // Prevent the default action
-        e.preventDefault();
-
-        // Define the start action
-        const gameStartAction = function() {
-            showNotification('TODO: Game should start!');
-        };
-
         // Create the status dialog body
         var statusBody = '<div align="center" class="table-list">' +
             '<table>' +
@@ -3496,23 +3513,36 @@ $(document).on('offline online', function() {
  * Test the GPS functionality on this device.
  */
 function testGps() {
-    // Show a notification
-    showNotification('Testing GPS...');
+    // Make sure the user has given permission
+    hasRequiredPermissions(function(err, permission) {
+        // Show errors
+        if(err !== null)
+            showError(err);
 
-    // Get the current GPS location
-    navigator.geolocation.getCurrentPosition(function(position) {
-        // Process the location success callback, don't show an notification
-        processLocationSuccess(position, false, true);
+        // Show the permission checkup dialog if we don't have permission
+        if(!permission) {
+            showPermissionCheckupDialog();
+            return;
+        }
 
-        // Show a notification regarding the GPS
-        showNotification('Your GPS is working');
+        // Show a notification
+        showNotification('Testing GPS...');
 
-    }, function(error) {
-        // Process the location error callback
-        processLocationError(error, true);
+        // Get the current GPS location
+        navigator.geolocation.getCurrentPosition(function(position) {
+            // Process the location success callback, don't show an notification
+            processLocationSuccess(position, false, true);
 
-    }, {
-        enableHighAccuracy: true
+            // Show a notification regarding the GPS
+            showNotification('Your GPS is working');
+
+        }, function(error) {
+            // Process the location error callback
+            processLocationError(error, true);
+
+        }, {
+            enableHighAccuracy: true
+        });
     });
 }
 
@@ -8098,4 +8128,414 @@ function getCustomActionProperties(page) {
 
     // Return the properties object
     return properties;
+}
+
+/**
+ * Show the permission checkup dialog, to inform the user some permissions need to be accepted.
+ */
+function showPermissionCheckupDialog() {
+    // Do not show the location checkup dialog on the permissions page
+    if(getActivePage().find('.card-permission-location').length > 0)
+        return;
+
+    // Show a dialog, and ask whether the user is sure
+    showDialog({
+        title: 'Permissions checkup',
+        message: 'You\'re almost set!<br><br>' +
+            'Dworek uses some technologies additional permissions are required for.<br><br>' +
+            'Please continue to ensure your device is ready to be played with.',
+        actions: [
+            {
+                text: 'Continue',
+                state: 'primary',
+                action: function() {
+                    Dworek.utils.navigateToPage('/permissions', true, true, 'flip');
+                }
+            },
+            {
+                text: 'Remind me later',
+                state: 'warning'
+            }
+        ]
+    });
+}
+
+$(document).bind("pageshow", function() {
+    // Get the active page
+    const page = getActivePage();
+
+    // Find the location permissions card
+    var locationPermissionCard = page.find('.card-permission-location');
+
+    // Return if this isn't the permissions page
+    if(locationPermissionCard.length <= 0)
+        return;
+
+    // Find the other permission cards
+    var notificationPermissionCard = page.find('.card-permission-notifications');
+    var vibrationPermissionCard = page.find('.card-permission-vibrations');
+
+    // Keep track of what permissions still need to be asked about
+    var askLocationPermission = true;
+    var askNotificationPermission = true;
+    var askVibrationPermission = true;
+
+    // Function to call after permission states change, this method will send the user back when done
+    var goBackWhenDone = function() {
+        // Return early if we're still asking about permissions
+        if(askLocationPermission || askNotificationPermission || askVibrationPermission)
+            return;
+
+        // We're done, show a dialog
+        showDialog({
+            title: 'Success',
+            message: 'You\'re all set!<br><br>' +
+                'All required permissions have been set up successfully.',
+            actions: [
+                {
+                    text: 'Go back',
+                    state: 'primary'
+                }
+            ]
+        }, function() {
+            // Go one page back, after half a second
+            setTimeout(function() {
+                window.history.back();
+            }, 500);
+        });
+    };
+
+    // Update the state of the location permission
+    var updateLocationPermission = function(err, permission) {
+        // Show errors
+        if(err !== null)
+            showError(err);
+
+        // Hide the location permission box when we have permission
+        if(permission) {
+            locationPermissionCard.slideUp();
+            askLocationPermission = false;
+        }
+
+        // Go back when done
+        goBackWhenDone();
+    };
+
+    // Update the state of the notifications permission
+    var updateNotificationPermission = function(err, permission, hide) {
+        // Show errors
+        if(err !== null)
+            showError(err);
+
+        // Hide the notifications permission box when we have permission or when the box should be hidden
+        if(permission || hide) {
+            notificationPermissionCard.slideUp();
+            askNotificationPermission = false;
+        }
+
+        // Go back when done
+        goBackWhenDone();
+    };
+
+    // Update the state of the vibration permission
+    var updateVibrationPermission = function(err, permission, hide) {
+        // Show errors
+        if(err !== null)
+            showError(err);
+
+        // Hide the vibration permission box when we have permission or when the box should be hidden
+        if(permission || hide) {
+            vibrationPermissionCard.slideUp();
+            askVibrationPermission = false;
+        }
+
+        // Go back when done
+        goBackWhenDone();
+    };
+
+    // Check whether the user has location permissons
+    hasLocationPermission(function(err, permission) {
+        // Print errors to the console
+        if(err !== null)
+            console.log('Location permission check error: ' + err);
+
+        // Update the location permission state
+        updateLocationPermission(null, permission);
+    });
+
+    // Link the location permission request button
+    locationPermissionCard.find('.permission-location-request').click(function() {
+        requestLocationPermission(updateLocationPermission);
+    });
+
+    // Check whether the user has notification permissions
+    hasNotificationPermission(function(err, permission) {
+        // Print errors to the console
+        if(err !== null)
+            console.log('Notifications permission check error: ' + err);
+
+        // Update the location permission state
+        updateNotificationPermission(null, permission, false);
+    });
+
+    // Link the notification permission request button
+    notificationPermissionCard.find('.permission-notifications-request').click(function() {
+        requestNotificationPermission(function(err, permission) {
+            updateNotificationPermission(err, permission, false);
+        });
+    });
+
+    // Link the notification permission ignore button
+    notificationPermissionCard.find('.permission-notifications-ignore').click(function() {
+        updateNotificationPermission(null, false, true);
+    });
+
+    // Check whether the user has vibration permissions
+    hasVibrationPermission(function(err, permission) {
+        // Print errors to the console
+        if(err !== null)
+            console.log('Vibration permission check error: ' + err);
+
+        // Update the location permission state
+        updateVibrationPermission(null, permission, false);
+    });
+
+    // Link the vibration permission request button
+    vibrationPermissionCard.find('.permission-vibrations-request').click(function() {
+        requestVibrationPermission(function(err, permission) {
+            updateVibrationPermission(err, permission, false);
+        });
+    });
+
+    // Link the vibrations permission ignore button
+    vibrationPermissionCard.find('.permission-vibrations-ignore').click(function() {
+        updateVibrationPermission(null, false, true);
+    });
+});
+
+/**
+ * Check whether all required permissions are given.
+ *
+ * @param {function} callback (err, permission)
+ */
+function hasRequiredPermissions(callback) {
+    hasLocationPermission(callback);
+}
+
+/**
+ * Check whether the user has location permissions.
+ *
+ * @param {function} callback (err, permission)
+ */
+function hasLocationPermission(callback) {
+    // Call back false if geolocation isn't available
+    if(!("geolocation" in navigator)) {
+        callback("Location services are not supported in this browser.", false);
+        return;
+    }
+
+    // Use the permissions API
+    if(navigator.permissions) {
+        navigator.permissions.query({
+            name: 'geolocation'
+        }).then(function(status) {
+            switch(status.state) {
+                case 'granted':
+                    if(callback !== undefined)
+                        callback(null, true);
+                    return;
+
+                case 'prompt':
+                default:
+                    if(callback !== undefined)
+                        callback(null, false);
+                    return;
+
+                case 'denied':
+                    if(callback !== undefined)
+                        callback('Permission for location services has been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
+                    return;
+            }
+        });
+        return;
+    }
+
+    // TODO: Maybe not use this, because this immediatly asks for permission on the page?
+    // Try to figure out permissions by requesting the current location
+    navigator.geolocation.getCurrentPosition(function() {
+        // We have permission, call back
+        callback(null, true);
+
+    }, function(status) {
+        // Check if permission was denied, call back the result
+        callback(null, status.code !== status.PERMISSION_DENIED);
+
+    }, {
+        enableHighAccuracy: false,
+        timeout: 50,
+    });
+}
+
+/**
+ * Request for location permissions with a nice popup.
+ *
+ * @param {function} callback (err, permission)
+ */
+function requestLocationPermission(callback) {
+    // Call back false if geolocation isn't available
+    if(!("geolocation" in navigator)) {
+        callback("Location services are not supported in this browser.", false);
+        return;
+    }
+
+    // Show a notification
+    showDialog({
+        title: 'Location permissions',
+        message: 'Please accept the permission request when it comes up.<br><br>If no request comes up within 5 seconds, you need to manually allow location service permissions for this website in your browser.',
+        actions: [
+            {
+                text: 'Ok'
+            }
+        ]
+    });
+
+    // Ask the user for geolocation permissions
+    navigator.geolocation.getCurrentPosition(function() {
+        // We have permission, call back
+        if(callback !== undefined)
+            callback(null, true);
+
+    }, function(status) {
+        // Check if permission was denied, call back the result
+        if(status.code === status.PERMISSION_DENIED) {
+            if(callback !== undefined)
+                callback('Permission for location services have been denied.<br><br>You must manually allow permission to location services for this website in your browser.', false);
+            return;
+        }
+
+        // Call back
+        if(callback !== undefined)
+            callback(null, true);
+
+    }, {
+        enableHighAccuracy: false,
+        timeout: 50,
+    });
+}
+
+/**
+ * Check whether we have notification permissions.
+ *
+ * @param {function} callback (err, permission)
+ */
+function hasNotificationPermission(callback) {
+    // Return false if not supported
+    if(!Notification) {
+        if(callback !== undefined)
+            callback('Notifications are not supported in this browser.', false);
+        return;
+    }
+
+    // Check whether we've permission
+    switch(Notification.permission) {
+        case 'granted':
+            if(callback !== undefined)
+                callback(null, true);
+            return;
+
+        case 'denied':
+            if(callback !== undefined)
+                callback('Permission for notifications has been denied.<br><br>You may manually allow permission to notifications for this website in your browser.', false);
+            return;
+
+        case 'default':
+        default:
+            if(callback !== undefined)
+                callback(null, false);
+            return;
+    }
+}
+
+/**
+ * Request for notification permissions with a nice popup.
+ *
+ * @param {function} callback (err, permission)
+ */
+function requestNotificationPermission(callback) {
+    // Return false if not supported
+    if(!Notification) {
+        if(callback !== undefined)
+            callback('Notifications are not supported in this browser.', false);
+        return;
+    }
+
+    // Show a notification
+    showDialog({
+        title: 'Notification permissions',
+        message: 'Please accept the permission request when it comes up.<br><br>If no request comes up within 5 seconds, you need to manually allow notification permissions for this website in your browser.',
+        actions: [
+            {
+                text: 'Ok'
+            }
+        ]
+    });
+
+    // Request the permission
+    Notification.requestPermission().then(function(permission) {
+        switch(permission) {
+            default:
+            case 'granted':
+                if(callback !== undefined)
+                    callback(null, true);
+                return;
+
+            case 'default':
+                if(callback !== undefined)
+                    callback(null, false);
+                return;
+
+            case 'denied':
+                if(callback !== undefined)
+                    callback('Permission for notifications has been denied.<br><br>You may manually allow permission to notifications for this website in your browser.', false);
+                return;
+        }
+    });
+}
+
+/**
+ * Check whether we have vibration permissions.
+ * If not supported, permission true is returned.
+ *
+ * @param {function} callback (err, permission)
+ */
+function hasVibrationPermission(callback) {
+    // Return false if not supported
+    if(!navigator.vibrate) {
+        if(callback !== undefined)
+            callback('Vibrations are not supported in this browser.', false);
+        return;
+    }
+
+    // We're not sure, just call back false for now
+    callback(null, false);
+}
+
+/**
+ * Request vibration permissions.
+ *
+ * @param {function} callback (err, permission)
+ */
+function requestVibrationPermission(callback) {
+    // Return false if not supported
+    if(!navigator.vibrate) {
+        if(callback !== undefined)
+            callback('Vibrations are not supported in this browser.', false);
+        return;
+    }
+
+    // Vibrate the device
+    navigator.vibrate(500);
+
+    // Then call back
+    callback(null, true);
 }

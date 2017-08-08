@@ -32,6 +32,7 @@ var games = require('./games');
 var game = require('./game/index');
 var about = require('./about');
 var status = require('./status');
+var permissions = require('./permissions');
 
 var appInfo = require('../../appInfo');
 var Core = require('../../Core');
@@ -148,6 +149,9 @@ router.use('/about', about);
 
 // Status page
 router.use('/status', status);
+
+// Permissions checkup page
+router.use('/permissions', permissions);
 
 /**
  * Get the game list.

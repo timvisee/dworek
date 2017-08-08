@@ -1,0 +1,65 @@
+extends base/page
+
+block content
+    .nd2-card.wow.fadeInUp
+        .card-title.has-supporting-text
+            h3.card-primary-title Permissions checkup
+        .card-supporting-text.has-action.has-title
+            p.
+                Dworek uses some technologies special permissions are required for.#[br]
+                #[br]
+                Please give permission for the required technologies in the cards below to make sure your device is ready to use.
+
+    .nd2-card.wow.fadeInUp.card-permission-location
+        .card-title.has-supporting-text
+            h3.card-primary-title(style='color: red;')
+                i.zmdi.zmdi-alert-circle
+                | &nbsp;&nbsp;Location
+
+        .card-supporting-text.has-action.has-title
+            p Your location is required to know where you are in the real world, and to show you on the map.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.permission-location-request(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-lock-open
+                    | &nbsp;&nbsp;Give permission
+
+    .nd2-card.wow.fadeInUp.card-permission-notifications
+        .card-title.has-supporting-text
+            h3.card-primary-title(style='color: darkorange;')
+                i.zmdi.zmdi-alert-circle-o
+                | &nbsp;&nbsp;Notifications
+
+        .card-supporting-text.has-action.has-title
+            p Show notifications in the notification center of your phone for special events.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.permission-notifications-request(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-lock-open
+                    | &nbsp;&nbsp;Give permission
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.permission-notifications-ignore(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-minus
+                    | &nbsp;&nbsp;Ignore
+
+    .nd2-card.wow.fadeInUp.card-permission-vibrations
+        .card-title.has-supporting-text
+            h3.card-primary-title(style='color: darkorange;')
+                i.zmdi.zmdi-alert-circle-o
+                | &nbsp;&nbsp;Vibration
+
+        .card-supporting-text.has-action.has-title
+            p Vibrate your phone to alert you when a notification is received.
+
+        .card-action
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.clr-primary.permission-vibrations-request(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-lock-open
+                    | &nbsp;&nbsp;Give permission
+            .row.between-xs: .col-xs-12: .box
+                a.ui-btn.waves-effect.waves-button.waves-effect.waves-button.permission-vibrations-ignore(href='#', data-transition='slide', data-rel='popup')
+                    i.zmdi.zmdi-minus
+                    | &nbsp;&nbsp;Ignore
+
