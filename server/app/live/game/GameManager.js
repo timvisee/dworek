@@ -945,7 +945,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                 }
 
                 // Get the user's team
-                latch.add();
                 liveUser.getTeam(function(err, team) {
                     // Call back errors
                     if(err !== null) {
@@ -963,7 +962,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     }
 
                     // Get the factory cost
-                    latch.add();
                     liveGame.calculateFactoryCost(team, function(err, cost) {
                         // Call back errors
                         if(err !== null) {
@@ -979,13 +977,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         // Resolve the latch
                         latch.resolve();
                     });
-
-                    // Resolve the latch
-                    latch.resolve();
                 });
-
-                // Resolve the latch
-                latch.resolve();
             });
 
             // Add the factory data
@@ -1001,9 +993,8 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                 // Loop through the factories
                 factories.forEach(function(factory) {
-                    // Create a factory latch
+                    // Add a latch for each factory
                     latch.add();
-                    var factoryLatch = new CallbackLatch();
 
                     // Create a factory object
                     var factoryObject = {
@@ -1011,7 +1002,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                     };
 
                     // Get the factory name
-                    factoryLatch.add();
                     factory.getName(function(err, name) {
                         // Call back errors
                         if(err !== null) {
@@ -1024,12 +1014,6 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         // Set the factory name
                         factoryObject.name = name;
 
-                        // Resolve the factory latch
-                        factoryLatch.resolve();
-                    });
-
-                    // Add the factory data when we're done and resolve the regular latch
-                    factoryLatch.then(function() {
                         // Add the factory object
                         gameData.factories.push(factoryObject);
 
@@ -1061,6 +1045,9 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
                 // Get the shops
                 liveGame.shopManager.shops.forEach(function(liveShop) {
+                    // Add a latch for each shop
+                    latch.add();
+
                     // Call back errors
                     if(err !== null) {
                         if(!calledBack)
@@ -1080,12 +1067,13 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                         }
 
                         // Return if the user isn't in range
-                        if(!inRange)
+                        if(!inRange) {
+                            latch.resolve();
                             return;
+                        }
 
-                        // Get the name of the shop
-                        latch.add();
-                        liveShop.getName(function(err, liveShopName) {
+                        // Get the game user
+                        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
                             // Call back errors
                             if(err !== null) {
                                 if(!calledBack)
@@ -1094,16 +1082,22 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                                 return;
                             }
 
-                            // Get the sell and buy price
-                            var sellPrice;
-                            var buyPrice;
+                            // Return if the game user is invalid
+                            if(gameUser === undefined || gameUser === null) {
+                                latch.resolve();
+                                return;
+                            }
 
-                            // Create a price latch
-                            var priceLatch = new CallbackLatch();
+                            // Create a shop latch
+                            var shopLatch = new CallbackLatch();
 
-                            // Get the sell price
-                            priceLatch.add();
-                            liveShop.getInSellPriceForUser(game, user, function(err, price) {
+                            // Get the shop name, and check whether it's allied
+                            var shopName;
+                            var shopAlly;
+
+                            // Get the name of the shop
+                            shopLatch.add();
+                            liveShop.getName(function(err, liveShopName) {
                                 // Call back errors
                                 if(err !== null) {
                                     if(!calledBack)
@@ -1112,16 +1106,16 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                                     return;
                                 }
 
-                                // Set the prices
-                                sellPrice = price;
+                                // Set the shop name
+                                shopName = liveShopName;
 
-                                // Resolve the latch
-                                priceLatch.resolve();
+                                // Resolve the shop latch
+                                shopLatch.resolve();
                             });
 
-                            // Get the sell price
-                            priceLatch.add();
-                            liveShop.getOutBuyPriceForUser(game, user, function(err, price) {
+                            // Check whether the shop is allied
+                            shopLatch.add();
+                            liveShop.isAllyWith(gameUser, function(err, result) {
                                 // Call back errors
                                 if(err !== null) {
                                     if(!calledBack)
@@ -1130,26 +1124,27 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                                     return;
                                 }
 
-                                // Set the prices
-                                buyPrice = price;
+                                // Set whether the shop is allied
+                                shopAlly = result;
 
                                 // Resolve the latch
-                                priceLatch.resolve();
+                                shopLatch.resolve();
                             });
 
-                            // Set the prices and continue
-                            priceLatch.then(function() {
+                            // Continue after the shop latch
+                            shopLatch.then(function() {
                                 // Set the name in the factory object
                                 gameData.shops.push({
                                     token: liveShop.getToken(),
-                                    name: liveShopName,
-                                    inSellPrice: sellPrice,
-                                    outBuyPrice: buyPrice
+                                    name: shopName,
+                                    ally: shopAlly,
+                                    inSellPrice: liveShop.getInSellPrice(shopAlly),
+                                    outBuyPrice: liveShop.getOutBuyPrice(shopAlly)
                                 });
 
                                 // Resolve the latch
                                 latch.resolve();
-                            });
+                            })
                         });
                     });
                 });

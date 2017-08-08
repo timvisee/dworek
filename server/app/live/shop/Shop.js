@@ -353,31 +353,16 @@ Shop.prototype.getInSellPriceForGameUser = function(otherGameUser, callback) {
     // Keep a reference to self
     const self = this;
 
-    // Get the game user for the shop
-    this._user.getGameUser(function(err, shopGameUser) {
+    // Check whether the game user is ally with the shop
+    self.isAllyWith(otherGameUser, function(err, isAlly) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // If the game user is null, return false
-        if(otherGameUser === undefined || otherGameUser === null) {
-            callback(null, false);
-            return;
-        }
-
-        // Check whether the game user is ally with the shop
-        shopGameUser.isAllyWith(otherGameUser, function(err, isAlly) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            // Get and call back the price
-            callback(null, self.getInSellPrice(isAlly));
-        });
+        // Get and call back the price
+        callback(null, self.getInSellPrice(isAlly));
     });
 };
 
@@ -452,31 +437,16 @@ Shop.prototype.getOutBuyPriceForGameUser = function(otherGameUser, callback) {
     // Keep a reference to self
     const self = this;
 
-    // Get the game user for the shop
-    this._user.getGameUser(function(err, shopGameUser) {
+    // Check whether the game user is ally with the shop
+    self.isAllyWith(otherGameUser, function(err, isAlly) {
         // Call back errors
         if(err !== null) {
             callback(err);
             return;
         }
 
-        // If the game user is null, return false
-        if(otherGameUser === undefined || otherGameUser === null) {
-            callback(null, false);
-            return;
-        }
-
-        // Check whether the game user is ally with the shop
-        shopGameUser.isAllyWith(otherGameUser, function(err, isAlly) {
-            // Call back errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
-
-            // Get and call back the price
-            callback(null, self.getOutBuyPrice(isAlly));
-        });
+        // Get and call back the price
+        callback(null, self.getOutBuyPrice(isAlly));
     });
 };
 
@@ -523,6 +493,52 @@ Shop.prototype.getOutBuyPriceForUser = function(game, user, callback) {
  * @callback Shop~getOutBuyPriceForUserCallback
  * @param {Error|null} Error instance if an error occurred, null if not.
  * @param {Number} The price for this user.
+ */
+
+/**
+ * Check whether this shop is allied with the given game user.
+ *
+ * @param {GameUserModel} otherGameUser The other game user.
+ * @param {Shop~isAllyWithCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.isAllyWith = function(otherGameUser, callback) {
+    // Keep a reference to self
+    const self = this;
+
+    // Get the game user for the shop
+    this._user.getGameUser(function(err, shopGameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // If the game user is null, return false
+        if(otherGameUser === undefined || otherGameUser === null) {
+            callback(null, false);
+            return;
+        }
+
+        // Check whether the game user is ally with the shop
+        shopGameUser.isAllyWith(otherGameUser, function(err, isAlly) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get and call back the price
+            callback(null, isAlly);
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~isAllyWithCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {boolean} True if ally, false if not.
  */
 
 /**

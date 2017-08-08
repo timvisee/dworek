@@ -5196,20 +5196,26 @@ function updateGameDataVisuals() {
             // Create a new card for this shop
             gameActionsList.prepend('<div class="nd2-card wow ' + shopCardSelector + '" data-shop-token="' + shop.token + '">' +
                 '    <div class="card-title has-supporting-text">' +
-                '        <h3 class="card-primary-title">Local ' + __('shop.name', { game: gameId }) + '</h3>' +
+                '        <h3 class="card-primary-title">' + (shop.ally ? 'Allied' : 'Enemy') + ' ' + __('shop.name', { game: gameId }) + '</h3>' +
                 '    </div>' +
                 '    <div class="card-supporting-text has-action has-title">' +
-                '        <p>' + __('shop.name', { game: gameId }) + ' is currently dealing high quality goods around your location.</p>' +
+                '        <p>This ' + __('shop.name', { game: gameId }) + ' is currently dealing high quality goods near your location.</p>' +
                 '        <table class="table-list ui-responsive">' +
                 '            <tr>' +
                 '                <td>Selling</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + __('in.names', { game: gameId }) + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.inSellPrice, true) + ' <span style="color: gray;">/ 1 ' + __('in.name', { game: gameId }) + '</span></td>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <td>Buying</td>' +
-                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + __('out.names', { game: gameId }) + ' unit</span></td>' +
+                '                <td><span style="color: gray;">~</span> ' + formatMoney(shop.outBuyPrice, true) + ' <span style="color: gray;">/ 1 ' + __('out.name', { game: gameId }) + '</span></td>' +
                 '            </tr>' +
                 '        </table>' +
+                '        <p>' +
+                (shop.ally ?
+                    'Allied ' + __('shop.names', { game: gameId }) + ' are really expensive! Buy and sell an enemy ' + __('shop.name', { game: gameId }) + ' to make a lot more money.' :
+                    'These enemy ' + __('shop.names', { game: gameId }) + ' are a lot cheaper than allied ' + __('shop.names', { game: gameId }) + '.'
+                ) +
+                '        </p>' +
                 '    </div>' +
                 '    <div class="card-action">' +
                 '        <div class="row between-xs">' +
