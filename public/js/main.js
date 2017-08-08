@@ -8207,23 +8207,28 @@ $(document).bind("pageshow", function() {
         if(askLocationPermission || askNotificationPermission || askVibrationPermission)
             return;
 
-        // We're done, show a dialog
-        showDialog({
-            title: 'Success',
-            message: 'You\'re all set!<br><br>' +
-                'All required permissions have been set up successfully.',
-            actions: [
-                {
-                    text: 'Go back',
-                    state: 'primary'
-                }
-            ]
-        }, function() {
-            // Go one page back, after half a second
-            setTimeout(function() {
-                window.history.back();
-            }, 500);
-        });
+//        // We're done, show a dialog
+//        showDialog({
+//            title: 'Success',
+//            message: 'You\'re all set!<br><br>' +
+//                'All required permissions have been set up successfully.',
+//            actions: [
+//                {
+//                    text: 'Go back',
+//                    state: 'primary'
+//                }
+//            ]
+//        }, function() {
+//            // Go one page back, after half a second
+//            setTimeout(function() {
+//                window.history.back();
+//            }, 500);
+//        });
+
+        // Go one page back, after half a second
+        setTimeout(function() {
+            window.history.back();
+        }, 500);
     };
 
     // Update the state of the location permission
@@ -8278,7 +8283,8 @@ $(document).bind("pageshow", function() {
     hasLocationPermission(function(err, permission) {
         // Print errors to the console
         if(err !== null)
-            console.log('Location permission check error: ' + err);
+            //console.log('Location permission check error: ' + err);
+            showError('Location permission check error: ' + err);
 
         // Update the location permission state
         updateLocationPermission(null, permission);
