@@ -8533,19 +8533,17 @@ function requestNotificationPermission(callback) {
 
     // Request the permission
     Notification.requestPermission().then(function(permission) {
-        alert('Chrome permission response: ' + permission);
         switch(permission) {
             default:
             case 'granted':
-                // Show a demo demo notification
-                new Notification('Dworek', {
-                    body: 'Notifications are now enabled!',
-                    silent: false
-                });
-
                 // Call back
                 if(callback !== undefined)
                     callback(null, true);
+
+                // Show a demo demo notification
+                new Notification('Dworek', {
+                    body: 'Notifications are now enabled!'
+                });
                 return;
 
             case 'default':
