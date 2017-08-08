@@ -8425,6 +8425,15 @@ $(document).bind("pageshow", function() {
  * @param {function} callback (err, permission)
  */
 function hasRequiredPermissions(callback) {
+    // Don't check location permissions for Firefox <57 due to it not remembering approved permissions
+    // Firefox will ask for permissions when required
+    if(isFirefox() && getFirefoxVersionMajor() < 57) {
+        if(callback !== undefined)
+            callback(null, true);
+        return;
+    }
+
+    // Check for all required permissions
     hasLocationPermission(callback);
 }
 
