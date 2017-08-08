@@ -412,7 +412,7 @@ var Dworek = {
                     }, {
                         enableHighAccuracy: true,
                         timeout: 30 * 1000,
-                        maximumAge: 5 * 1000
+                        maximumAge: 15 * 1000
                     });
                 });
 
@@ -3819,7 +3819,7 @@ function doLocationFallback() {
     }, {
         enableHighAccuracy: true,
         timeout: 10 * 1000,
-        maximumAge: 5 * 1000
+        maximumAge: 10 * 1000
     });
 }
 
@@ -8466,7 +8466,7 @@ function hasLocationPermission(callback) {
 
         }, {
             enableHighAccuracy: false,
-            timeout: 50,
+            timeout: 500,
         });
     }
 
@@ -8553,7 +8553,7 @@ function requestLocationPermission(callback) {
 
     }, {
         enableHighAccuracy: false,
-        timeout: 50,
+        timeout: 500,
     });
 }
 
