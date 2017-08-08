@@ -4,7 +4,8 @@ block tabs
     ul.tabs-bar-factory(data-role='nd2tabs' data-swipe=true)
         - var fadeDelay = 0;
         li.wow.fadeInUp(data-tab='status', data-wow-delay=(fadeDelay += 0.1) + 's') Status
-        li.wow.fadeInUp(data-tab='attack', data-wow-delay=(fadeDelay += 0.1) + 's') Attack
+        li.wow.fadeInUp(data-tab='attack', data-wow-delay=(fadeDelay += 0.1) + 's')
+            .animated.flash.infinite Attack
         li.wow.fadeInUp(data-tab='transfer', data-wow-delay=(fadeDelay += 0.1) + 's') Transfer
         li.wow.fadeInUp(data-tab='defence', data-wow-delay=(fadeDelay += 0.1) + 's') Defence
         li.wow.fadeInUp(data-tab='level', data-wow-delay=(fadeDelay += 0.1) + 's') Level
@@ -59,7 +60,7 @@ block content
                 p The !{__('factory.name', { game: game.id })} isn't strong enough to withstand enemy attacks. Attack the !{__('factory.name', { game: game.id })} to take it over.
                 div(align="center")
                     table.table-list.ui-responsive
-                    tr: td Conquer value#[br]&#x21B3;
+                        tr: td Conquer value#[br]&#x21B3;
                             td.factory-conquer-value= factory.conquerValue
 
             .card-action

@@ -6521,7 +6521,7 @@ function updateFactoryDataVisuals(firstShow) {
     // Set the conquer value label
     if(!visible || data.hasOwnProperty('conquerValue')) {
         if(!visible)
-            factoryConquerLabel.html(hiddenLabel);
+            factoryConquerLabel.html(hiddenLabel + '<br>' + hiddenLabel);
         else {
             // Create a suffix label
             var suffix = '';
