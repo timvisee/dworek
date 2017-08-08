@@ -84,6 +84,9 @@ SessionValidator.route = function(req, res, next) {
         return;
     }
 
+    // TODO: Remove after debugging
+    console.time('validatesession');
+
     // Validate the session, and get the associated user
     Core.model.sessionModelManager.getSessionUserByTokenIfValid(sessionToken, function(err, user) {
         // Call back errors
@@ -109,6 +112,9 @@ SessionValidator.route = function(req, res, next) {
         req.session.valid = loggedIn;
         req.session.token = sessionToken;
         req.session.user = user;
+
+        // TODO: Remove after debugging
+        console.timeEnd('validatesession');
 
         // Continue
         next();

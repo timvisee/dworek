@@ -75,6 +75,12 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
         __: Core.langManager.__
     };
 
+    // TODO: Remove after debugging
+    console.timeEnd('routing');
+
+    // TODO: Remove after debugging
+    console.time('renderinit');
+
     // Create a callback latch
     var latch = new CallbackLatch();
 
@@ -203,8 +209,17 @@ LayoutRenderer.render = function(req, res, next, pugName, pageTitle, options) {
         // Merge the layout configuration objects
         config = MergeUtils.merge(config, options, true);
 
+        // TODO: Remove after debugging
+        console.timeEnd('renderinit');
+
+        // TODO: Remove after debugging
+        console.time('renderstart');
+
         // Render the page
         res.render(pugName, config);
+
+        // TODO: Remove after debugging
+        console.timeEnd('renderstart');
     });
 };
 

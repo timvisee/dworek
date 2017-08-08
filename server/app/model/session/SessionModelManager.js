@@ -315,7 +315,6 @@ SessionModelManager.prototype.isValidSessionToken = function(token, callback) {
     if(!this.isAllowedSessionToken(token)) {
         // Call back
         callback(null, false);
-        console.log('A');
         return;
     }
 
