@@ -827,7 +827,7 @@ User.prototype.setOut = function(goods, callback) {
  */
 
 /**
- * Check whether this user is visible for the given user.
+ * Check whether this user is visible for the given other user.
  *
  * @param {User} other Given user.
  * @param {User~isVisibleForCallback} callback callback(err, isVisible)
@@ -870,7 +870,15 @@ User.prototype.isVisibleFor = function(other, callback) {
     // Store this instance
     const self = this;
 
-    // Get the roles
+    // Create a latch for role fetching
+    var rolesLatch = new CallbackLatch();
+
+    // Get the user, and the other roles
+    var userRoles;
+    var otherRoles;
+
+    // Get the user roles
+    rolesLatch.add();
     userModel.getGameState(gameModel, function(err, roles) {
         // Call back errors
         if(err !== null) {
@@ -880,23 +888,46 @@ User.prototype.isVisibleFor = function(other, callback) {
             return;
         }
 
+        // Set the roles and resolve the latch
+        userRoles = roles;
+        rolesLatch.resolve();
+    });
+
+    // Get the other user roles
+    rolesLatch.add();
+    other.getUserModel().getGameState(gameModel, function(err, roles) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the roles and resolve the latch
+        otherRoles = roles;
+        rolesLatch.resolve();
+    });
+
+    // Continue when the roles are fetched
+    rolesLatch.then(function() {
         // Return if the user isn't a spectator or player
-        if(!roles.player && !roles.spectator) {
+        if((!userRoles.player && !userRoles.special && !userRoles.spectator())) {
             if(!calledBack)
                 callback(null, false);
             calledBack = true;
             return;
         }
 
-        // Return true if the user is a spectator
-        if(roles.spectator) {
+        // Return true if the other user is a spectator
+        if(otherRoles.spectator) {
             if(!calledBack)
                 callback(null, true);
             calledBack = true;
             return;
         }
 
-        // Check whether this user is a shop
+        // Return true if this user is a shop, and is visible to everyone
         if(self.getGame().shopManager.isShopUser(self, true, false)) {
             callback(null, true);
             return;
@@ -912,7 +943,7 @@ User.prototype.isVisibleFor = function(other, callback) {
         var teamLatch = new CallbackLatch();
 
         // Create two variables for the user and other user's team
-        var team = null;
+        var userTeam = null;
         var otherTeam = null;
 
         // Get the user's team
@@ -935,7 +966,7 @@ User.prototype.isVisibleFor = function(other, callback) {
             }
 
             // Set the team
-            team = result;
+            userTeam = result;
 
             // Resolve the team latch
             teamLatch.resolve();
@@ -971,7 +1002,7 @@ User.prototype.isVisibleFor = function(other, callback) {
         teamLatch.then(function() {
             // Determine whether the teams are the same and call back
             if(!calledBack)
-                callback(null, team.getId().equals(otherTeam.getId()));
+                callback(null, userTeam.getId().equals(otherTeam.getId()));
             calledBack = true;
         });
     });
