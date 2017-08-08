@@ -8408,9 +8408,11 @@ function hasLocationPermission(callback) {
 
                     // Fall back to the old method for Firefox mobile in this case
                     if(isFirefox && isAndroid) {
+                        alert('TEST: falling back');
                         oldMethod();
                         return;
-                    }
+                    } else
+                        alert('Not falling back: ' + isFirefox + ':' + isAndroid);
 
                     // Call back
                     if(callback !== undefined)
