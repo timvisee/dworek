@@ -69,7 +69,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function(code) {
+    const callbackError = function() {
         // Only call back once
         if(calledBack)
             return;
@@ -77,7 +77,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Transaction failed, a server error occurred. Code: ' + (code !== undefined ? code : '-1'),
+            message: 'Transaction failed, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -88,7 +88,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('shop') || (!packet.hasOwnProperty('amount') && !packet.hasOwnProperty('all'))) {
         console.log('Received malformed packet');
-        callbackError(1);
+        callbackError();
         return;
     }
 
@@ -133,7 +133,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
             Core.model.gameUserModelManager.getGameUser(liveGame.getGameModel(), user, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError(2);
+                    callbackError();
                     return;
                 }
 
@@ -141,7 +141,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
                     if(err !== null || liveUser === null) {
-                        callbackError(3);
+                        callbackError();
                         return;
                     }
 
@@ -149,7 +149,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                     liveShop.isUserInRange(liveUser, function(err, inRange) {
                         // Call back errors
                         if(err !== null || !inRange) {
-                            callbackError(4);
+                            callbackError();
                             return;
                         }
 
@@ -157,7 +157,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                         liveShop.getInSellPriceForGameUser(gameUser, function(err, price) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError(11);
+                                callbackError();
                                 return;
                             }
 
@@ -165,7 +165,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                             gameUser.getMoney(function(err, moneyCurrent) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError(5);
+                                    callbackError();
                                     return;
                                 }
 
@@ -173,7 +173,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getIn(function(err, inCurrent) {
                                     // Call back errors
                                     if(err !== null) {
-                                        callbackError(6);
+                                        callbackError();
                                         return;
                                     }
 
@@ -203,7 +203,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
                                     // The amount of money may not be below zero
                                     if(moneyAmount < 0) {
-                                        callbackError(7);
+                                        callbackError();
                                         return;
                                     }
 
@@ -221,7 +221,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                     gameUser.subtractMoney(moneyAmount, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError(8);
+                                            callbackError();
                                             return;
                                         }
 
@@ -229,7 +229,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                         gameUser.addIn(inAmount, function(err) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError(9);
+                                                callbackError();
                                                 return;
                                             }
 
@@ -249,7 +249,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             }, function(err, balanceTable) {
                                                 // Call back errors
                                                 if (err !== null)
-                                                    callbackError(10);
+                                                    callbackError();
 
                                                 // Send a notification to the user
                                                 // TODO: Get the in and money name from the name configuration of the current game
