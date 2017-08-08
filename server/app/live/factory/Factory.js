@@ -2180,10 +2180,20 @@ Factory.prototype.attack = function(user, callback) {
                                     ally: isAlly,
                                     enemy: isEnemy
                                 }, otherUser.getUserModel());
+
+                                // Send an game data update
+                                Core.gameManager.sendGameData(self.getGame().getGameModel(), otherUser.getUserModel(), undefined, function(err) {
+                                    // Handle errors
+                                    if(err !== null) {
+                                        console.error('Failed to game data to user, ignoring');
+                                        console.error(err);
+                                    }
+                                });
                             });
                         });
                     });
                 });
+
                 return;
             }
 
