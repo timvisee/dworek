@@ -57,18 +57,26 @@ var Shop = function(user, shopManager) {
     this._shopManager = shopManager;
 
     /**
-     * The price per unit in goods are sold for.
-     * @type {Number}
+     * The price per unit in goods are sold for, for ally and enemy players.
+     * @type {ShopPriceObject}
      * @private
      */
-    this._inSellPrice = null;
+    this._inSellPrice= null;
 
     /**
-     * The price per unit the out goods are bought for.
-     * @type {Number}
+     * The price per unit the out goods are bought for, for ally and enemy players.
+     * @type {ShopPriceObject}
      * @private
      */
     this._outBuyPrice = null;
+
+    /**
+     * Object defining the cost for ally and enemy players.
+     *
+     * @typedef {Object} ShopPriceObject
+     * @param {Number} ally Cost for ally players.
+     * @param {Number} enemy Cost for enemy players.
+     */
 
     /**
      * Shop's effective range.
@@ -321,19 +329,201 @@ Shop.prototype.getTeam = function(callback) {
 
 /**
  * Get the in goods sell price.
- * @return {Number}
+ * @return {ShopCostObject}
  */
-Shop.prototype.getInSellPrice = function() {
+Shop.prototype.getInSellPriceObject = function() {
     return this._inSellPrice;
 };
 
 /**
- * Get the out goods buy price.
+ * Get the in goods sell price.
+ * @param {boolean} ally True if the user is an ally of this shop, false if not.
  * @return {Number}
  */
-Shop.prototype.getOutBuyPrice = function() {
+Shop.prototype.getInSellPrice = function(ally) {
+    return this.getInSellPriceObject()[ally ? 'ally' : 'enemy'];
+};
+
+/**
+ * Get the in goods sell price for the given game user.
+ * @param {GameUserModel} otherGameUser The game user to get the price for.
+ * @param {Shop~getInSellPriceForGameUserCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.getInSellPriceForGameUser = function(otherGameUser, callback) {
+    // Keep a reference to self
+    const self = this;
+
+    // Get the game user for the shop
+    this._user.getGameUser(function(err, shopGameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // If the game user is null, return false
+        if(otherGameUser === undefined || otherGameUser === null) {
+            callback(null, false);
+            return;
+        }
+
+        // Check whether the game user is ally with the shop
+        shopGameUser.isAllyWith(otherGameUser, function(err, isAlly) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get and call back the price
+            callback(null, self.getInSellPrice(isAlly));
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~getInSellPriceForGameUserCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Number} The price for this user.
+ */
+
+/**
+ * Get the in goods sell price for the given user.
+ * @param {GameModel|Game|ObjectId|string} game The game the user is in.
+ * @param {UserModel|User|ObjectId|string} user The user to get the price for.
+ * @param {Shop~getInSellPriceForUserCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.getInSellPriceForUser = function(game, user, callback) {
+    // Keep a reference to this
+    const self = this;
+
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // If the game user is null, return false
+        if(gameUser === undefined || gameUser === null) {
+            callback(null, false);
+            return;
+        }
+
+        // Get the price for this game user
+        self.getInSellPriceForGameUser(gameUser, callback);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~getInSellPriceForUserCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Number} The price for this user.
+ */
+
+/**
+ * Get the out goods buy price.
+ * @return {ShopCostObject}
+ */
+Shop.prototype.getOutBuyPriceObject = function() {
     return this._outBuyPrice;
 };
+
+/**
+ * Get the out goods buy price.
+ * @param {boolean} ally True if the user is an ally of this shop, false if not.
+ * @return {Number}
+ */
+Shop.prototype.getOutBuyPrice = function(ally) {
+    return this.getOutBuyPriceObject()[ally ? 'ally' : 'enemy'];
+};
+
+/**
+ * Get the in goods buy price for the given game user.
+ * @param {GameUserModel} otherGameUser The game user to get the price for.
+ * @param {Shop~getOutBuyPriceForGameUserCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.getOutBuyPriceForGameUser = function(otherGameUser, callback) {
+    // Keep a reference to self
+    const self = this;
+
+    // Get the game user for the shop
+    this._user.getGameUser(function(err, shopGameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // If the game user is null, return false
+        if(otherGameUser === undefined || otherGameUser === null) {
+            callback(null, false);
+            return;
+        }
+
+        // Check whether the game user is ally with the shop
+        shopGameUser.isAllyWith(otherGameUser, function(err, isAlly) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get and call back the price
+            callback(null, self.getOutBuyPrice(isAlly));
+        });
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~getOutBuyPriceForGameUserCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Number} The price for this user.
+ */
+
+/**
+ * Get the out goods sell price for the given user.
+ * @param {GameModel|Game|ObjectId|string} game The game the user is in.
+ * @param {UserModel|User|ObjectId|string} user The user to get the price for.
+ * @param {Shop~getOutBuyPriceForUserCallback} callback Called with the result or when an error occurred.
+ */
+Shop.prototype.getOutBuyPriceForUser = function(game, user, callback) {
+    // Keep a reference to this
+    const self = this;
+
+    // Get the game user
+    Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // If the game user is null, return false
+        if(gameUser === undefined || gameUser === null) {
+            callback(null, false);
+            return;
+        }
+
+        // Get the price for this game user
+        self.getOutBuyPriceForGameUser(gameUser, callback);
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback Shop~getOutBuyPriceForUserCallback
+ * @param {Error|null} Error instance if an error occurred, null if not.
+ * @param {Number} The price for this user.
+ */
 
 /**
  * Get the range of the shop.

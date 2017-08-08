@@ -837,8 +837,7 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
 
         // Get the game user if applicable
         latch.add();
-        Core.model.gameUserModelManager.
-        getGameUser(game, user, function(err, gameUser) {
+        Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
@@ -1095,16 +1094,62 @@ GameManager.prototype.sendGameData = function(game, user, sockets, callback) {
                                 return;
                             }
 
-                            // Set the name in the factory object
-                            gameData.shops.push({
-                                token: liveShop.getToken(),
-                                name: liveShopName,
-                                inSellPrice: liveShop.getInSellPrice(),
-                                outBuyPrice: liveShop.getOutBuyPrice()
+                            // Get the sell and buy price
+                            var sellPrice;
+                            var buyPrice;
+
+                            // Create a price latch
+                            var priceLatch = new CallbackLatch();
+
+                            // Get the sell price
+                            priceLatch.add();
+                            liveShop.getInSellPriceForUser(game, user, function(err, price) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        callback(err);
+                                    calledBack = true;
+                                    return;
+                                }
+
+                                // Set the prices
+                                sellPrice = price;
+
+                                // Resolve the latch
+                                priceLatch.resolve();
                             });
 
-                            // Resolve the latch
-                            latch.resolve();
+                            // Get the sell price
+                            priceLatch.add();
+                            liveShop.getOutBuyPriceForUser(game, user, function(err, price) {
+                                // Call back errors
+                                if(err !== null) {
+                                    if(!calledBack)
+                                        callback(err);
+                                    calledBack = true;
+                                    return;
+                                }
+
+                                // Set the prices
+                                buyPrice = price;
+
+                                // Resolve the latch
+                                priceLatch.resolve();
+                            });
+
+                            // Set the prices and continue
+                            priceLatch.then(function() {
+                                // Set the name in the factory object
+                                gameData.shops.push({
+                                    token: liveShop.getToken(),
+                                    name: liveShopName,
+                                    inSellPrice: sellPrice,
+                                    outBuyPrice: buyPrice
+                                });
+
+                                // Resolve the latch
+                                latch.resolve();
+                            });
                         });
                     });
                 });

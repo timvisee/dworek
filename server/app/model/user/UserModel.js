@@ -20,8 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var util = require('util');
-
 var Core = require('../../../Core');
 var UserDatabase = require('./UserDatabase');
 var BaseModel = require('../../database/BaseModel');

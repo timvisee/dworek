@@ -23,6 +23,7 @@
 var Core = require('../../../Core');
 var GameUserDatabase = require('./GameUserDatabase');
 var BaseModel = require('../../database/BaseModel');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * GameUserModel class.
@@ -803,6 +804,76 @@ GameUserModel.prototype.subtractStrength = function(amount, callback) {
  *
  * @callback GameUserModel~subtractStrengthCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Check whether the given user is ally with the
+ * @param {GameUserModel} otherUser The other user to check against.
+ * @param {GameUserModel~isAllyWithCallback} callback Called with the result or when an error occurred.
+ */
+GameUserModel.prototype.isAllyWith = function(otherUser, callback) {
+    // Make sure the other is valid
+    if(otherUser === undefined || otherUser === null) {
+        callback(new Error('Other user is undefined or null'), false);
+        return;
+    }
+
+    // Get the user's and the other user's team
+    var userTeam;
+    var otherTeam;
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Get the users team
+    latch.add();
+    this.getTeam(function(err, team) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the user team
+        userTeam = team;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Get the users team
+    latch.add();
+    otherUser.getTeam(function(err, team) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+
+        }
+
+        // Set the user team
+        otherTeam = team;
+
+        // Resolve the latch
+        latch.resolve();
+    });
+
+    // Compare the teams when done and call back
+    latch.then(function() {
+        callback(null, userTeam.getId().equals(otherTeam.getId()));
+    });
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameUserModel~isAllyWithCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ * @param {boolean} True if ally, false if not.
  */
 
 // Export the user class

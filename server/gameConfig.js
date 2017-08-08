@@ -158,7 +158,7 @@ var gameConfig = {
          */
         getShopsInTeam: function(playerCount) {
             // Return zero if there are no players in the team
-            if(playerCount == 0)
+            if(playerCount === 0)
                 return 0;
 
             // Determine the preferred number of shops
@@ -188,29 +188,43 @@ var gameConfig = {
         /**
          * Get the price per unit the in goods are sold for.
          * Fetched once when a shop is created.
-         * @type {Number}
+         * @return {Object} ally key with ally cost, enemy key with enemy cost.
          */
         getInSellPrice: function() {
             // Define the minimum and maximum price
             const priceMin = 7.5;
             const priceMax = 11;
+            const allyMultiplier = 1.25;
 
             // Randomize the price
-            return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
+            const price = Math.random() * (priceMax - priceMin) + priceMin;
+
+            // Return the cost object
+            return {
+                ally: +((price * allyMultiplier).toFixed(1)),
+                enemy: +(price.toFixed(1))
+            };
         },
 
         /**
          * Get the price per unit the out goods are bought for.
          * Fetched once when a shop is created.
-         * @type {Number}
+         * @return {Object} ally key with ally cost, enemy key with enemy cost.
          */
         getOutBuyPrice: function() {
             // Define the minimum and maximum price
-            const priceMin = 36;
-            const priceMax = 45;
+            const priceMin = 39;
+            const priceMax = 51;
+            const allyMultiplier = 0.7;
 
             // Randomize the price
-            return +((Math.random() * (priceMax - priceMin) + priceMin).toFixed(1));
+            const price = Math.random() * (priceMax - priceMin) + priceMin;
+
+            // Return the cost object
+            return {
+                ally: +((price * allyMultiplier).toFixed(1)),
+                enemy: +(price.toFixed(1))
+            };
         },
     },
 
