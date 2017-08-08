@@ -8365,7 +8365,7 @@ function hasLocationPermission(callback) {
 
     // Check whether we're running Firefox or Android
     var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    var isAndroid = navigator.platform.toLowerCase().indexOf("android") > -1;
+    var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
     var isFennec = navigator.userAgent.toLowerCase().indexOf("fennec") > -1;
 
     // Old method
