@@ -8601,7 +8601,7 @@ function requestLocationPermission(callback) {
  */
 function hasNotificationPermission(callback) {
     // Return false if not supported
-    if(!Notification) {
+    if(!("Notification" in window)) {
         if(callback !== undefined)
             callback('Notifications are not supported in this browser.', false);
         return;
@@ -8634,7 +8634,7 @@ function hasNotificationPermission(callback) {
  */
 function requestNotificationPermission(callback) {
     // Return false if not supported
-    if(!Notification) {
+    if(!("Notification" in window)) {
         if(callback !== undefined)
             callback('Notifications are not supported in this browser.', false);
         return;
