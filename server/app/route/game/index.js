@@ -31,6 +31,7 @@ var pageTeams = require('./team/index');
 var pageManage = require('./manage');
 var pageLang = require('./language');
 var pageFactory = require('./factory/index');
+var pageFactoryDestroy = require('./factory/destroy');
 var pageSpecial = require('./special/index');
 
 var CallbackLatch = require('../../util/CallbackLatch');
@@ -245,6 +246,9 @@ pageLang.route(router);
 
 // Route the factory page
 pageFactory.route(router);
+
+// Route the factory destroy page
+pageFactoryDestroy.route(router);
 
 // Route the special pages
 pageSpecial.route(router);
