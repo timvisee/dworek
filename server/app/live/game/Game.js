@@ -636,12 +636,6 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
 
     // Continue after we've parsed the user
     userLatch.then(function() {
-        // Make sure the location of the user is known
-        if(!user.hasLocation()) {
-            callback(new Error('The location of this user is yet unknown'));
-            return;
-        }
-
         // Show an error if no unit was selected
         if(!properties.units.in && !properties.units.out && !properties.units.money && !properties.units.strength) {
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
@@ -909,6 +903,21 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                                 break;
 
                             case 'distance':
+                                // The location must be known
+                                if(location === null || location === undefined) {
+                                    // Send a message response to the user
+                                    if(!calledBack)
+                                    Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Unable to execute the special custom action. The server doesn\'t know your current location.<br><br>' +
+                                        'Please ensure that your location services are enabled and functioning.<br><br>' +
+                                        'Please try this again after ' + game.__('app.name', { game: game.getIdHex() }) + ' has found your current location.',
+                                        dialog: true
+                                    }, user);
+                                    calledBack = true;
+                                    return;
+                                }
+
                                 // Make sure the user has a location
                                 if(!player.hasLocation())
                                     isCancelled = true;
@@ -1138,6 +1147,21 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
 
                         // Check whether to filter by range
                         if(_.has(properties, 'filters.range.range') && _.isInteger(properties.filters.range.range)) {
+                            // The location of the user must be known
+                            if(location === null || location === undefined) {
+                                // Send a message response to the user
+                                if(!calledBack)
+                                    Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
+                                        error: true,
+                                        message: 'Unable to execute the special custom action. The server doesn\'t know your current location.<br><br>' +
+                                        'Please ensure that your location services are enabled and functioning.<br><br>' +
+                                        'Please try this again after ' + game.__('app.name', { game: game.getIdHex() }) + ' has found your current location.',
+                                        dialog: true
+                                    }, user);
+                                calledBack = true;
+                                return;
+                            }
+
                             // Make the range positive
                             properties.filters.range.range = Math.abs(properties.filters.range.range);
 
