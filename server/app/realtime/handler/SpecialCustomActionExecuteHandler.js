@@ -207,33 +207,33 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
             // Set the live game instance
             liveGame = result;
 
-            // Get the live user
-            liveGame.getUser(user, function(err, result) {
-                // Handle errors
-                if(err !== null) {
-                    callbackError(err);
-                    return;
-                }
+            // // Get the live user
+            // liveGame.getUser(user, function(err, result) {
+            //     // Handle errors
+            //     if(err !== null) {
+            //         callbackError(err);
+            //         return;
+            //     }
+            //
+            //     // Set the live user instance
+            //     liveUser = result;
+            //
+            //     // Make sure the location of the user is known
+            //     if(!liveUser.hasLocation()) {
+            //         // Send a message response to the user
+            //         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
+            //             error: true,
+            //             message: 'Unable to execute the special custom action. The server doesn\'t know your current location.<br><br>' +
+            //             'Please ensure that your location services are enabled and functioning.<br><br>' +
+            //             'Please try this again after ' + liveGame.__('app.name', { game: game.getIdHex() }) + ' has found your current location.',
+            //             dialog: true
+            //         }, socket);
+            //         return;
+            //     }
+            // });
 
-                // Set the live user instance
-                liveUser = result;
-
-                // Make sure the location of the user is known
-                if(!liveUser.hasLocation()) {
-                    // Send a message response to the user
-                    Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-                        error: true,
-                        message: 'Unable to execute the special custom action. The server doesn\'t know your current location.<br><br>' +
-                        'Please ensure that your location services are enabled and functioning.<br><br>' +
-                        'Please try this again after ' + liveGame.__('app.name', { game: game.getIdHex() }) + ' has found your current location.',
-                        dialog: true
-                    }, socket);
-                    return;
-                }
-
-                // Resolve the latch
-                latch.resolve();
-            });
+            // Resolve the latch
+            latch.resolve();
         });
 
         // Resolve the latch
