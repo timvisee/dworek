@@ -392,7 +392,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                             // TODO: Get the out name from the game's name configuration
                                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                                 error: false,
-                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + __((typeIn ? 'in' : 'out') + '.name'+ (withdrawAmount === 1 ? '' : 's')) + '.<br><br>' + balanceTable,
+                                                message: 'Withdrawn ' + Formatter.formatGoods(withdrawAmount) + ' ' + liveGame.__((typeIn ? 'in' : 'out') + '.name'+ (withdrawAmount === 1 ? '' : 's')) + '.<br><br>' + balanceTable,
                                                 dialog: false,
                                                 toast: true,
                                                 ttl: 10 * 1000
