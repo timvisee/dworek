@@ -852,7 +852,7 @@ GameUserModel.prototype.isAllyWith = function(otherUser, callback) {
             if(!calledBack)
                 callback(err);
             calledBack = true;
-
+            return;
         }
 
         // Set the user team

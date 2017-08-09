@@ -899,6 +899,140 @@ GameUserModelManager.prototype.getGameUser = function(game, user, callback) {
  */
 
 /**
+ * Get the game users in the given team.
+ *
+ * @param {GameTeamModel|ObjectId|string} team The game team instance or ID.
+ * @param {GameUserModelManager~getTeamUserCount} callback Called with the result or when an error occurred.
+ */
+GameUserModelManager.prototype.getTeamGameUsers = function(team, callback) {
+    // Validate the object ID, or get the object ID if a game team is given
+    if(team instanceof GameModel)
+        team = team.getId();
+    else if(team === null || team === undefined || !ObjectId.isValid(team)) {
+        // Call back
+        callback(null);
+        return;
+    }
+
+    // Create a callback latch
+    var latch = new CallbackLatch();
+
+    // Determine the Redis cache key
+    var redisCacheKey = REDIS_KEY_ROOT + ':getTeamGameUsers:' + team.toString();
+
+    // Check whether the team is valid through Redis if ready
+    if(RedisUtils.isReady() && false) {
+        // TODO: Update this caching method!
+        // Fetch the result from Redis
+        latch.add();
+        RedisUtils.getConnection().get(redisCacheKey, function(err, result) {
+            // Show a warning if an error occurred
+            if(err !== null && err !== undefined) {
+                // Print the error to the console
+                console.error('A Redis error occurred while counting team users, falling back to MongoDB.');
+                console.error(new Error(err));
+
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Resolve the latch if the result is undefined, null or zero
+            if(result === undefined || result === null || result === 0) {
+                // Resolve the latch and return
+                latch.resolve();
+                return;
+            }
+
+            // Call back an empty array if the string was empty
+            if(result.trim().length === 0) {
+                callback(null, []);
+                return;
+            }
+
+            // Split the result
+            var gameUserIds = result.split(",");
+
+            // Create an array of users
+            var gameUsers = [];
+
+            // Loop through the user IDs
+            gameUserIds.forEach(function(gameUserId) {
+                // Skip if the ID is nothing
+                if(gameUserId.trim().length === 0)
+                    return;
+
+                // Add the user
+                gameUsers.push(Core.model.gameUserModelManager._instanceManager.create(gameUserId))
+            });
+
+            // Call back the list of teams
+            //noinspection JSCheckFunctionSignatures
+            callback(null, gameUsers);
+        });
+    }
+
+    // Fetch the result from MongoDB when we're done with Redis
+    latch.then(function() {
+        // Create a query object
+        const queryObject = {
+            team_id: team
+        };
+
+        // Query the database
+        GameUserDatabase.layerFetchFieldsFromDatabase(queryObject, {_id: true}, function(err, data) {
+            // Call back errors
+            if(err !== null && err !== undefined) {
+                // Encapsulate the error and call back
+                callback(new Error(err), null);
+                return;
+            }
+
+            // Create a list of user IDs and users
+            var gameUserIds = [];
+            var gameUsers = [];
+
+            // Loop through the result data
+            data.forEach(function(userObject) {
+                // Get the user ID
+                const gameUserId = userObject._id;
+
+                // Add the user ID to the list
+                gameUserIds.push(gameUserId);
+
+                // Create the new user and put it in the list of users
+                gameUsers.push(Core.model.gameUserModelManager._instanceManager.create(gameUserId));
+            });
+
+            // Call back with the list of users
+            callback(null, gameUsers);
+
+            // Store the result in Redis if ready
+            if(RedisUtils.isReady()) {
+                // Combine all user IDs in one string to cache
+                var usersString = gameUserIds.join(',');
+
+                // Store the results
+                RedisUtils.getConnection().setex(redisCacheKey, config.redis.cacheExpire, usersString, function(err) {
+                    // Show a warning on error
+                    if(err !== null && err !== undefined) {
+                        console.error('A Redis error occurred when storing team users, ignoring.');
+                        console.error(new Error(err));
+                    }
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Get the number of users in the given team.
+ *
+ * @callback GameUserModelManager~getTeamUserCount
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {Number=} Number of users in the given team.
+ */
+/**
  * Get the users in the given team.
  *
  * @param {GameTeamModel|ObjectId|string} team The game team instance or ID.

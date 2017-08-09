@@ -235,6 +235,23 @@ GameTeamModel.prototype.getUsers = function(callback) {
  */
 
 /**
+ * Get the game users that are in this team.
+ *
+ * @param {GameTeamModel~getGameUsersCallback} callback Called with the result or when an error occurred.
+ */
+GameTeamModel.prototype.getGameUsers = function(callback) {
+    Core.model.gameUserModelManager.getTeamGameUsers(this.getId(), callback);
+};
+
+/**
+ * Called with the result or when an error occurred.
+ *
+ * @callback GameTeamModel~getGameUsersCallback
+ * @param {Error|null} Error instance if an error occurred, null otherwise.
+ * @param {GameUserModel[]=} An array of game user models that are in the team.
+ */
+
+/**
  * Get the number of users that are in this team.
  *
  * @param {GameTeamModel~getUserCountCallback} callback Called with the result or when an error occurred.
