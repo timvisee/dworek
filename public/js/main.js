@@ -1292,11 +1292,11 @@ function updateNameConfigs(gameId) {
                 return;
 
             // Check whether this class entry starts with a node identifier
-            if(this.startsWith('lang-node-'))
+            if(this.substring(0, 'lang-node-'.length) === 'lang-node-')
                 node = this.substring('lang-node-'.length).replace('-', '.');
 
             // Check whether this class entry starts with a game identifier
-            if(this.startsWith('lang-game-'))
+            if(this.substring(0, 'lang-game-'.length) === 'lang-game-')
                 gameId = this.substring('lang-game-'.length).trim().toLowerCase();
         });
 
@@ -8194,7 +8194,7 @@ function getCustomActionProperties(page) {
             const userId = $(this).attr('id');
 
             // The ID must start with the known prefix, return early if it doesn't
-            if(!userId.startsWith(CHECKBOX_PREFIX))
+            if(!userId.substring(0, CHECKBOX_PREFIX.length) === CHECKBOX_PREFIX)
                 return;
 
             // Get the ID, parse it and push it into the array
@@ -8224,7 +8224,7 @@ function getCustomActionProperties(page) {
             const teamId = $(this).attr('id');
 
             // The ID must start with the known prefix, return early if it doesn't
-            if(!teamId.startsWith(CHECKBOX_PREFIX))
+            if(!teamId.substring(0, CHECKBOX_PREFIX.length) === CHECKBOX_PREFIX)
                 return;
 
             // Get the ID, parse it and push it into the array
