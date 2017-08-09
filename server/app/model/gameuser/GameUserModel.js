@@ -20,6 +20,8 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
+var _ = require('lodash');
+
 var Core = require('../../../Core');
 var GameUserDatabase = require('./GameUserDatabase');
 var BaseModel = require('../../database/BaseModel');
@@ -171,7 +173,7 @@ var GameUserModel = function(id) {
                      * @param {string} bool Boolean as a string.
                      * @return {boolean} Boolean value.
                      */
-                    from: (bool) => bool != '0',
+                    from: (bool) => bool !== '0',
 
                     /**
                      * Convert the boolean value to a string.
@@ -190,7 +192,7 @@ var GameUserModel = function(id) {
                      * @param {string} bool Boolean as a string.
                      * @return {boolean} Boolean value.
                      */
-                    from: (bool) => bool != '0',
+                    from: (bool) => bool !== '0',
 
                     /**
                      * Convert the boolean value to a string.
@@ -208,7 +210,7 @@ var GameUserModel = function(id) {
                         var value = parseInt(raw);
 
                         // Return zero if the value is invalid
-                        if(value == 0 || isNaN(value))
+                        if(value === 0 || isNaN(value))
                             return 0;
 
                         // Return the value
@@ -221,7 +223,7 @@ var GameUserModel = function(id) {
                         var value = parseInt(raw);
 
                         // Return zero if the value is invalid
-                        if(value == 0 || isNaN(value))
+                        if(value === 0 || isNaN(value))
                             return 0;
 
                         // Return the value
@@ -275,9 +277,10 @@ GameUserModel.prototype.getIdHex = function() {
  *
  * @param {String} field Field names.
  * @param {GameUserModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ * @param {Object} options Model options.
  */
-GameUserModel.prototype.getField = function(field, callback) {
-    this._baseModel.getField(field, callback);
+GameUserModel.prototype.getField = function(field, callback, options) {
+    this._baseModel.getField(field, callback, options);
 };
 
 /**
@@ -462,9 +465,10 @@ GameUserModel.prototype.setSpecial = function(isSpecial, callback) {
  * Get the money the user has.
  *
  * @param {GameUserModel~getMoneyCallback} callback Called with result or when an error occurred.
+ * @param {Object} options Model options.
  */
-GameUserModel.prototype.getMoney = function(callback) {
-    this.getField('money', callback);
+GameUserModel.prototype.getMoney = function(callback, options) {
+    this.getField('money', callback, options);
 };
 
 /**
@@ -483,8 +487,8 @@ GameUserModel.prototype.getMoney = function(callback) {
  */
 GameUserModel.prototype.setMoney = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid money amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid money amount: ' + amount));
         return;
     }
 
@@ -500,8 +504,19 @@ GameUserModel.prototype.setMoney = function(amount, callback) {
  */
 GameUserModel.prototype.addMoney = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid money amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid money amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to the money value of a user.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -518,6 +533,8 @@ GameUserModel.prototype.addMoney = function(amount, callback) {
 
         // Set the money
         self.setMoney(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 
@@ -549,9 +566,10 @@ GameUserModel.prototype.subtractMoney = function(amount, callback) {
  * Get the in goods the user has.
  *
  * @param {GameUserModel~getGoodsCallback} callback Called with result or when an error occurred.
+ * @param {Object} options Model options.
  */
-GameUserModel.prototype.getIn = function(callback) {
-    this.getField('in', callback);
+GameUserModel.prototype.getIn = function(callback, options) {
+    this.getField('in', callback, options);
 };
 
 /**
@@ -570,8 +588,8 @@ GameUserModel.prototype.getIn = function(callback) {
  */
 GameUserModel.prototype.setIn = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid in amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid in amount: ' + amount));
         return;
     }
 
@@ -587,8 +605,19 @@ GameUserModel.prototype.setIn = function(amount, callback) {
  */
 GameUserModel.prototype.addIn = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid in amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid in amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to the in units for a user.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -605,6 +634,8 @@ GameUserModel.prototype.addIn = function(amount, callback) {
 
         // Set the in
         self.setIn(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 
@@ -636,9 +667,10 @@ GameUserModel.prototype.subtractIn = function(amount, callback) {
  * Get the out goods the user has.
  *
  * @param {GameUserModel~getGoodsCallback} callback Called with result or when an error occurred.
+ * @param {Object} options Model options.
  */
-GameUserModel.prototype.getOut = function(callback) {
-    this.getField('out', callback);
+GameUserModel.prototype.getOut = function(callback, options) {
+    this.getField('out', callback, options);
 };
 
 /**
@@ -657,8 +689,8 @@ GameUserModel.prototype.getOut = function(callback) {
  */
 GameUserModel.prototype.setOut = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid out amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid out amount: ' + amount));
         return;
     }
 
@@ -674,8 +706,19 @@ GameUserModel.prototype.setOut = function(amount, callback) {
  */
 GameUserModel.prototype.addOut = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid out amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid out amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to the out units for a user.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -692,6 +735,8 @@ GameUserModel.prototype.addOut = function(amount, callback) {
 
         // Set the out
         self.setOut(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 
@@ -723,9 +768,10 @@ GameUserModel.prototype.subtractOut = function(amount, callback) {
  * Get the strength goods the user has.
  *
  * @param {GameUserModel~getGoodsCallback} callback Called with result or when an error occurred.
+ * @param {Object} options Model options.
  */
-GameUserModel.prototype.getStrength = function(callback) {
-    this.getField('strength', callback);
+GameUserModel.prototype.getStrength = function(callback, options) {
+    this.getField('strength', callback, options);
 };
 
 /**
@@ -744,8 +790,8 @@ GameUserModel.prototype.getStrength = function(callback) {
  */
 GameUserModel.prototype.setStrength = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid strength amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid strength amount: ' + amount));
         return;
     }
 
@@ -761,8 +807,19 @@ GameUserModel.prototype.setStrength = function(amount, callback) {
  */
 GameUserModel.prototype.addStrength = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid strength amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isNumber(amount)) {
+        callback(new Error('Invalid strength amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to the strength value of a user.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -779,6 +836,8 @@ GameUserModel.prototype.addStrength = function(amount, callback) {
 
         // Set the goods
         self.setStrength(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 

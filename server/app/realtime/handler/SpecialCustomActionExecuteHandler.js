@@ -87,7 +87,7 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
         // Print the error to the console if anything is given
         if(err !== undefined) {
             console.error('Failed to execute a special custom action on client request:');
-            console.error(err);
+            console.error(err.stack || err);
             throw err;
         }
     };
@@ -126,7 +126,6 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
     // Create a variable for the game and the live user
     var game = null;
     var liveGame = null;
-    var liveUser = null;
     var gameUser = null;
 
     // Define whether the user has permission
@@ -207,6 +206,7 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
             // Set the live game instance
             liveGame = result;
 
+            // XXX: The liveUser variable was removed along with this commented code
             // // Get the live user
             // liveGame.getUser(user, function(err, result) {
             //     // Handle errors

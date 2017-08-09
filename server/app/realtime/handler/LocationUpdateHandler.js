@@ -52,7 +52,7 @@ var LocationUpdateHandler = function(init) {
  */
 LocationUpdateHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -113,7 +113,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
 
     // Parse the coordinate
     const coordinate = Coordinate.parse(rawLocation);
-    if(coordinate == null) {
+    if(coordinate === null) {
         callbackError();
         return;
     }
@@ -121,9 +121,9 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error(err.stack || err);
 
             // Call back an error
             callbackError();
@@ -137,7 +137,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
         latch.add();
         game.getStage(function(err, stage) {
             // Call back errors
-            if(err !== null || stage != 1) {
+            if(err !== null || stage !== 1) {
                 callbackError();
                 return;
             }
@@ -166,7 +166,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
         latch.add();
         Core.gameManager.getGame(game, function(err, result) {
             // Call back errors
-            if(err !== null || result == null) {
+            if(err !== null || result === null) {
                 callbackError();
                 return;
             }
@@ -183,7 +183,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
             // Get the live game
             liveGame.getUser(user, function(err, liveUser) {
                 // Call back errors
-                if(err !== null || liveUser == null) {
+                if(err !== null || liveUser === null) {
                     callbackError();
                     return;
                 }
@@ -192,7 +192,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
                 liveUser.updateLocation(coordinate, socket, function(err) {
                     // Handle errors
                     if(err !== null) {
-                        console.error(err);
+                        console.error(err.stack || err);
                         console.error('Failed to update player location, ignoring');
                     }
                 });
@@ -211,7 +211,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
                     otherLiveUser.updateLocation(undefined, undefined, function(err) {
                         // Handle errors
                         if(err !== null) {
-                            console.error(err);
+                            console.error(err.stack || err);
                             console.error('Failed to update player location, ignoring');
                         }
                     });

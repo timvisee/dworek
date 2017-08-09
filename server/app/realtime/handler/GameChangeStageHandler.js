@@ -51,7 +51,7 @@ var GameChangeStageHandler = function(init) {
  */
 GameChangeStageHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -106,9 +106,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error(err.stack || err);
 
             // Send a message response to the user
             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
@@ -126,9 +126,9 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
         latch.add();
         game.hasManagePermission(user, function(err, hasPermission) {
             // Handle errors
-            if(err !== null || game == null) {
+            if(err !== null || game === null) {
                 // Print the error to the console
-                console.error(err);
+                console.error(err.stack || err);
 
                 // Send a message response to the user
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
@@ -160,7 +160,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             // Handle errors
             if(err !== null) {
                 // Print the error to the console
-                console.error(err);
+                console.error(err.stack || err);
 
                 // Send a message response to the user
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
@@ -172,7 +172,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
             }
 
             // Make sure the game stage will be changed
-            if(stage == result) {
+            if(stage === result) {
                 // Send a message response to the user
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                     error: true,
@@ -240,7 +240,7 @@ GameChangeStageHandler.prototype.handler = function(packet, socket) {
                 };
 
                 // Load/unload the game
-                if(stage == 1)
+                if(stage === 1)
                     // Load the game
                     Core.gameManager.loadGame(game, function(err) {
                         // Handle errors

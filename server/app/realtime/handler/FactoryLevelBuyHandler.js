@@ -24,7 +24,6 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -51,7 +50,7 @@ var FactoryLevelBuyHandler = function(init) {
  */
 FactoryLevelBuyHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -69,7 +68,13 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while buying a level upgrade for a factory');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -88,7 +93,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('cost')) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -113,8 +118,8 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
         // Call back errors
-        if(err !== null) {
-            callbackError();
+        if(!isValidFactory || err !== null) {
+            callbackError(err);
             return;
         }
 
@@ -125,7 +130,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
         factoryModel.getGame(function(err, game) {
             // Call back errors
             if(err !== null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -133,23 +138,23 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
                 // Get the live game instance for the current game
                 Core.gameManager.getGame(game, function(err, liveGame) {
                     // Call back errors
-                    if(err !== null || liveGame == null) {
-                        callbackError();
+                    if(err !== null || liveGame === null) {
+                        callbackError(err);
                         return;
                     }
 
                     // Get the live factory for the factory
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
                         // Call back errors
-                        if(err !== null || liveFactory == null) {
-                            callbackError();
+                        if(err !== null || liveFactory === null) {
+                            callbackError(err);
                             return;
                         }
 
@@ -157,7 +162,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                         liveFactory.canModify(user, function(err, canModify) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -175,12 +180,12 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                             liveFactory.getNextLevelCost(function(err, nextLevelCost) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
                                 // Compare the price and defence
-                                if(nextLevelCost != cost) {
+                                if(nextLevelCost !== cost) {
                                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                         error: true,
                                         message: 'Failed to buy upgrade, prices have changed.',
@@ -193,7 +198,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getMoney(function(err, money) {
                                     // Call back errors
                                     if(err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -211,7 +216,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                     gameUser.subtractMoney(nextLevelCost, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -219,7 +224,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                         factoryModel.getLevel(function(err, level) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError();
+                                                callbackError(err);
                                                 return;
                                             }
 
@@ -227,7 +232,7 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                             factoryModel.setLevel(level + 1, function(err) {
                                                 // Call back errors
                                                 if(err !== null) {
-                                                    callbackError();
+                                                    callbackError(err);
                                                     return;
                                                 }
 
@@ -235,8 +240,8 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                                 liveFactory.broadcastData(function(err) {
                                                     // Call back errors
                                                     if(err !== null) {
-                                                        console.error(err);
-                                                        console.error('Failed to broadcast factory data');
+                                                        console.error(err.stack || err);
+                                                        console.error('Failed to broadcast factory data, ignoring');
                                                     }
                                                 });
 
@@ -248,8 +253,12 @@ FactoryLevelBuyHandler.prototype.handler = function(packet, socket) {
                                                     toast: true
                                                 }, socket);
                                             });
+                                        }, {
+                                            noCache: true
                                         });
                                     });
+                                }, {
+                                    noCache: true
                                 });
                             });
                         });

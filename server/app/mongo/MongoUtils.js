@@ -51,9 +51,9 @@ MongoUtils.connect = function(callback) {
     // Connect to the database
     MongoClient.connect(config.db.url, function(err, db) {
         // Make sure the connection has been successfully established
-        if(err != null) {
+        if(err !== null) {
             console.error("Failed to establish a connection to the database!");
-            console.error(err);
+            console.error(err.stack || err);
             return;
         }
 

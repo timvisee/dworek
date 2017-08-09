@@ -410,9 +410,9 @@ App.prototype._initRedis = function(callback) {
     RedisUtils.connect(function(err, redisClient) {
         // Filter the error
         if(err !== null && err !== undefined) {
-            console.warn("Failed to connect to Redis server on initialization. Redis usage has been disabled.");
-            console.warn("Redis error:");
-            console.warn(err);
+            console.error("Failed to connect to Redis server on initialization. Redis usage has been disabled.");
+            console.error("Redis error:");
+            console.error(err.stack || err);
         }
 
         // Call back

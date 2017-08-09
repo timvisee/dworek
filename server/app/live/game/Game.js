@@ -1321,8 +1321,8 @@ Game.prototype.executeSpecialCustomAction = function(user, properties, callback)
                                 Core.gameManager.sendGameDataToAll(game.getGameModel(), function(err) {
                                     // Notify the user for errors
                                     if(err !== null) {
-                                        console.error('Failed to send game data update to all users');
-                                        console.error(err);
+                                        console.error('Failed to send game data update to all users, ignoring');
+                                        console.error(err.stack || err);
 
                                         // Send a success message to the executor
                                         Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {

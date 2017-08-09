@@ -69,7 +69,13 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while buying out goods from a user');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -88,7 +94,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('shop') || (!packet.hasOwnProperty('amount') && !packet.hasOwnProperty('all'))) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -133,7 +139,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
             Core.model.gameUserModelManager.getGameUser(liveGame.getGameModel(), user, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
@@ -141,7 +147,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
                     if(err !== null || liveUser === null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -149,7 +155,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                     liveShop.isUserInRange(liveUser, function(err, inRange) {
                         // Call back errors
                         if(err !== null || !inRange) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -157,7 +163,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                         liveShop.getOutBuyPriceForGameUser(gameUser, function(err, price) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -165,7 +171,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                             gameUser.getOut(function(err, outCurrent) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -173,7 +179,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getMoney(function(err, moneyCurrent) {
                                     // Call back errors
                                     if(err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -183,10 +189,9 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                     // Check whether we should use the maximum possible amount
                                     if(rawAll === true)
                                         outAmount = outCurrent;
-                                    else {
+                                    else
                                         // Parse the raw amount
                                         outAmount = parseInt(rawOutAmount);
-                                    }
 
                                     // Make sure the amount isn't above the maximum
                                     if(outAmount > outCurrent) {
@@ -200,7 +205,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
 
                                     // Make sure the amount isn't below zero
                                     if(outAmount < 0) {
-                                        callbackError();
+                                        callbackError(new Error('Amount is below zero'));
                                         return;
                                     }
 
@@ -218,7 +223,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                     gameUser.subtractOut(outAmount, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -229,7 +234,7 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                         gameUser.addMoney(moneyAmount, function(err) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError();
+                                                callbackError(err);
                                                 return;
                                             }
 
@@ -237,8 +242,8 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                             Core.gameManager.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
                                                 // Handle errors
                                                 if(err !== null) {
-                                                    console.error(err);
-                                                    console.error('Failed to send game data');
+                                                    console.error(err.stack || err);
+                                                    console.error('Failed to send game data, ignoring');
                                                 }
                                             });
 
@@ -247,9 +252,12 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                                 previousMoney: moneyCurrent,
                                                 previousOut: outCurrent,
                                             }, function(err, balanceTable) {
-                                                // Call back errors
-                                                if (err !== null)
-                                                    callbackError();
+                                                // Handle errors
+                                                if (balanceTable === null || balanceTable === undefined || err !== null) {
+                                                    console.error(err.stack || err);
+                                                    console.error('Failed to send transaction success message, ignoring');
+                                                    return;
+                                                }
 
                                                 // Send a notification to the user
                                                 // TODO: Get the in and money name from the name configuration of the current game
@@ -263,7 +271,11 @@ ShopBuyOutHandler.prototype.handler = function(packet, socket) {
                                             });
                                         });
                                     });
+                                }, {
+                                    noCache: true
                                 });
+                            }, {
+                                noCache: true
                             });
                         });
                     });

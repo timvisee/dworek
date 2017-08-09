@@ -176,8 +176,9 @@ GameManager.prototype.load = function(callback) {
         self.tick(gameConfig.game.tickInterval, function(err) {
             // Report errors
             if(err !== null) {
-                console.error(err);
+                console.error(err.stack || err);
                 console.error('An error occurred while invoking a game tick, ignoring.')
+                // TODO: Push this error to Raven / sentry!
             }
         });
 
@@ -187,8 +188,7 @@ GameManager.prototype.load = function(callback) {
     Core.model.gameModelManager.getGamesWithStage(1, function(err, games) {
         // Call back errors
         if(err !== null) {
-            if(_.isFunction(callback))
-                callback(err);
+            callback(err);
             return;
         }
 
@@ -206,8 +206,7 @@ GameManager.prototype.load = function(callback) {
                 // Handle errors
                 if(err !== null) {
                     if(!calledBack)
-                        if(_.isFunction(callback))
-                            callback(err);
+                        callback(err);
                     calledBack = true;
                     return;
                 }
@@ -219,8 +218,7 @@ GameManager.prototype.load = function(callback) {
 
         // Call back when we're done loading
         latch.then(function() {
-            if(_.isFunction(callback))
-                callback(null);
+            callback(null);
         });
     });
 };
@@ -1470,9 +1468,7 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
                 liveFactory.tick(function(err) {
                     // Call back errors
                     if(err !== null) {
-                        if(!calledBack)
-                            if(_.isFunction(callback))
-                                callback(err);
+                        callback(err);
                         calledBack = true;
                         return;
                     }
@@ -1496,8 +1492,7 @@ GameManager.prototype.tick = function(scheduleTime, callback) {
 
     // Call back when we're done
     latch.then(function() {
-        if(_.isFunction(callback))
-            callback(null);
+        callback(null);
     });
 };
 

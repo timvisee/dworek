@@ -50,7 +50,7 @@ var PlayerStrengthBuyHandler = function(init) {
  */
 PlayerStrengthBuyHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -68,7 +68,13 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while buying strength upgrades for a factory');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -87,7 +93,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('index') || !packet.hasOwnProperty('cost') || !packet.hasOwnProperty('strength')) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -115,7 +121,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Call back errors
         if(err !== null) {
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -123,22 +129,22 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
         Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
             // Call back errors
             if(err !== null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
             Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
-                if(err !== null || liveGame == null) {
-                    callbackError();
+                if(err !== null || liveGame === null) {
+                    callbackError(err);
                     return;
                 }
 
-                //
+                // Get the current strength of the player
                 gameUser.getStrength(function(err, userStrength) {
                     // Call back errors
                     if(err !== null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -146,7 +152,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                     game.getConfig(function(err, gameConfig) {
                         // Call back errors
                         if(err !== null) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -167,7 +173,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                         var selectedStrength = upgrades[index];
 
                         // Compare the price and strength
-                        if(selectedStrength.cost != cost || selectedStrength.strength != strength) {
+                        if(selectedStrength.cost !== cost || selectedStrength.strength !== strength) {
                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                 error: true,
                                 message: 'Failed to buy strength, prices have changed.',
@@ -180,7 +186,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                         gameUser.getMoney(function(err, money) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -197,7 +203,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                             gameUser.subtractMoney(selectedStrength.cost, function(err) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -205,7 +211,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getStrength(function(err, strength) {
                                     // Call back errors
                                     if(err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -213,7 +219,7 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                                     gameUser.setStrength(strength + selectedStrength.strength, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -235,7 +241,8 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                                         liveGame.getUser(user, function(err, liveUser) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError();
+                                                console.error(err.stack || err);
+                                                console.error('Failed to get user, unable to broadcast factory data, ignoring');
                                                 return;
                                             }
 
@@ -250,16 +257,22 @@ PlayerStrengthBuyHandler.prototype.handler = function(packet, socket) {
                                                     // Handle errors
                                                     if(err !== null) {
                                                         console.error('Failed to broadcast factory data to user, ignoring');
-                                                        console.error(err);
+                                                        console.error(err.stack || err);
                                                     }
                                                 });
                                             });
                                         });
                                     });
+                                }, {
+                                    noCache: true
                                 });
                             });
+                        }, {
+                            noCache: true
                         });
                     });
+                }, {
+                    noCache: true
                 });
             });
         });

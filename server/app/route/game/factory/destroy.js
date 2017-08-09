@@ -274,7 +274,7 @@ module.exports = {
                                 // Handle errors
                                 if(err !== null) {
                                     console.error('An error occurred when broadcasting the game data to everybody');
-                                    console.error(err);
+                                    console.error(err.stack || err);
                                 }
                             });
 
@@ -283,7 +283,7 @@ module.exports = {
                                 // Handle errors
                                 if(err !== null) {
                                     console.error('An error occurred when broadcasting the updated location data to everybody');
-                                    console.error(err);
+                                    console.error(err.stack || err);
                                 }
                             });
 

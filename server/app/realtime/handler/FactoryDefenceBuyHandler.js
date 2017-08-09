@@ -68,7 +68,13 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while buying defence upgrades for a user');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -87,7 +93,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('index') || !packet.hasOwnProperty('cost') || !packet.hasOwnProperty('defence')) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -113,8 +119,8 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
 
     // Get the factory
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
-        if(err !== null) {
-            callbackError();
+        if(!isValidFactory || err !== null) {
+            callbackError(err);
             return;
         }
 
@@ -124,33 +130,33 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
         // Get the game
         factoryModel.getGame(function(err, game) {
             if(err !== null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
             // Get the game user
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
                 Core.gameManager.getGame(game, function(err, liveGame) {
                     if(err !== null || liveGame === null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
                         if(err !== null || liveFactory === null) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
                         // Make sure the user has right to modify this factory
                         liveFactory.canModify(user, function(err, canModify) {
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -166,7 +172,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                             // Get the factory defences
                             liveFactory.getDefenceUpgrades(function(err, defences) {
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -196,7 +202,7 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                                 // Make sure the user has enough money
                                 gameUser.getMoney(function(err, money) {
                                     if(err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -212,28 +218,28 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                                     // Subtract the money
                                     gameUser.subtractMoney(selectedDefence.cost, function(err) {
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
                                         // Get the current defence
                                         factoryModel.getDefence(function(err, defence) {
                                             if(err !== null) {
-                                                callbackError();
+                                                callbackError(err);
                                                 return;
                                             }
 
                                             // Set the new defence
                                             factoryModel.setDefence(defence + selectedDefence.defence, function(err) {
                                                 if(err !== null) {
-                                                    callbackError();
+                                                    callbackError(err);
                                                     return;
                                                 }
 
                                                 liveFactory.broadcastData(function(err) {
                                                     if(err !== null) {
-                                                        console.error(err);
-                                                        console.error('Failed to broadcast factory data');
+                                                        console.error(err.stack || err);
+                                                        console.error('Failed to broadcast factory data, ignoring');
                                                     }
                                                 });
 
@@ -245,8 +251,12 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
                                                     toast: true
                                                 }, socket);
                                             });
+                                        }, {
+                                            noCache: true
                                         });
                                     });
+                                }, {
+                                    noCache: true
                                 });
                             });
                         });

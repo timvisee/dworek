@@ -69,7 +69,13 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while selling in goods to a user');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -88,7 +94,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('shop') || (!packet.hasOwnProperty('amount') && !packet.hasOwnProperty('all'))) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -133,7 +139,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
             Core.model.gameUserModelManager.getGameUser(liveGame.getGameModel(), user, function(err, gameUser) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
@@ -141,7 +147,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                 liveGame.getUser(user, function(err, liveUser) {
                     // Call back errors
                     if(err !== null || liveUser === null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -149,7 +155,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                     liveShop.isUserInRange(liveUser, function(err, inRange) {
                         // Call back errors
                         if(err !== null || !inRange) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -157,7 +163,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                         liveShop.getInSellPriceForGameUser(gameUser, function(err, price) {
                             // Call back errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -165,7 +171,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                             gameUser.getMoney(function(err, moneyCurrent) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -173,7 +179,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getIn(function(err, inCurrent) {
                                     // Call back errors
                                     if(err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -184,7 +190,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                     if(rawAll === true)
                                         moneyAmount = Math.round(Math.floor(moneyCurrent / price) * price);
                                     else
-                                    // Parse the raw amount
+                                        // Parse the raw amount
                                         moneyAmount = parseInt(rawMoneyAmount);
 
                                     // Calculate the amount of ingredients to buy and revalidate the amount of money the user spends
@@ -203,7 +209,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
 
                                     // The amount of money may not be below zero
                                     if(moneyAmount < 0) {
-                                        callbackError();
+                                        callbackError(new Error('Money amount below zero'));
                                         return;
                                     }
 
@@ -221,7 +227,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                     gameUser.subtractMoney(moneyAmount, function(err) {
                                         // Call back errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -229,7 +235,7 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                         gameUser.addIn(inAmount, function(err) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError();
+                                                callbackError(err);
                                                 return;
                                             }
 
@@ -237,8 +243,8 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             Core.gameManager.sendGameData(liveGame.getGameModel(), user, undefined, function(err) {
                                                 // Handle errors
                                                 if(err !== null) {
-                                                    console.error(err);
-                                                    console.error('Failed to send game data');
+                                                    console.error(err.stack || err);
+                                                    console.error('Failed to send game data, ignoring');
                                                 }
                                             });
 
@@ -247,9 +253,12 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                                 previousMoney: moneyCurrent,
                                                 previousIn: inCurrent,
                                             }, function(err, balanceTable) {
-                                                // Call back errors
-                                                if (err !== null)
-                                                    callbackError();
+                                                // Handle errors
+                                                if (balanceTable === null || balanceTable === undefined || err !== null) {
+                                                    console.error(err.stack || err);
+                                                    console.error('Failed to send transaction success message, ignoring');
+                                                    return;
+                                                }
 
                                                 // Send a notification to the user
                                                 // TODO: Get the in and money name from the name configuration of the current game
@@ -263,7 +272,11 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
                                             });
                                         });
                                     });
+                                }, {
+                                    noCache: true
                                 });
+                            }, {
+                                noCache: true
                             });
                         });
                     });

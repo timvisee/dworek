@@ -70,7 +70,13 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null && err !== undefined) {
+            console.error('An error occurred while withdrawing goods from a factory');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -89,7 +95,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('factory') || !packet.hasOwnProperty('goodType') || (!packet.hasOwnProperty('amount') && !packet.hasOwnProperty('all'))) {
         console.log('Received malformed packet');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -120,7 +126,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
         // Call back errors
         if(!isValidFactory || err !== null) {
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -131,7 +137,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
         factoryModel.getGame(function(err, game) {
             // Callback errors
             if(err !== null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -139,15 +145,15 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
             Core.model.gameUserModelManager.getGameUser(game, user, function(err, gameUser) {
                 // Callback errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
-                // Get the livev game instance
+                // Get the live game instance
                 Core.gameManager.getGame(game, function(err, liveGame) {
                     // Callback errors
                     if(err !== null || liveGame === null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -155,7 +161,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                     liveGame.factoryManager.getFactory(rawFactory, function(err, liveFactory) {
                         // Callback errors
                         if(err !== null || liveFactory === null) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -163,7 +169,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                         liveFactory.canModify(user, function(err, canModify) {
                             // Callback errors
                             if(err !== null) {
-                                callbackError();
+                                callbackError(err);
                                 return;
                             }
 
@@ -188,10 +194,10 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                             if(typeIn) {
                                 // Get the amount of goods the factory has
                                 latch.add();
-                                factoryModel.getIn(function (err, inAmount) {
+                                factoryModel.getIn(function(err, inAmount) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -200,6 +206,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
                                     // Resolve the latch
                                     latch.resolve();
+                                }, {
+                                    noCache: true
                                 });
 
                                 // Get the amount of goods the user has
@@ -207,7 +215,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getIn(function (err, inAmount) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -216,6 +224,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
                                     // Resolve the latch
                                     latch.resolve();
+                                }, {
+                                    noCache: true
                                 });
                             } else {
                                 // Get the amount of goods the factory has
@@ -223,7 +233,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 factoryModel.getOut(function (err, outAmount) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -232,6 +242,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
                                     // Resolve the latch
                                     latch.resolve();
+                                }, {
+                                    noCache: true
                                 });
 
                                 // Get the amount of goods the user has
@@ -239,7 +251,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                 gameUser.getOut(function (err, outAmount) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -248,21 +260,25 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
                                     // Resolve the latch
                                     latch.resolve();
+                                }, {
+                                    noCache: true
                                 });
                             }
 
                             // Continue when the good amounts are fetched
                             latch.then(function() {
+                                // Reset the latch to it's identity
+                                latch.identity();
+
                                 // Determine the amount to withdraw
                                 var withdrawAmount = 0;
 
                                 // Check whether we should use the maximum amount
                                 if(rawAll === true)
                                     withdrawAmount = factoryGoodsCurrent;
-                                else {
+                                else
                                     // Parse the raw amount
                                     withdrawAmount = parseInt(rawAmount);
-                                }
 
                                 // Make sure the amount isn't above the maximum
                                 if(withdrawAmount > factoryGoodsCurrent) {
@@ -276,7 +292,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
 
                                 // Make sure the amount isn't below zero
                                 if(withdrawAmount < 0) {
-                                    callbackError();
+                                    callbackError(new Error('Withdrawal amount is below zero'));
                                     return;
                                 }
 
@@ -290,9 +306,6 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     return;
                                 }
 
-                                // Reset the latch to it's identity
-                                latch.identity();
-
                                 // Withdraw the correct type of goods from the factory, and deposit them to the user
                                 if(typeIn) {
                                     // Withdraw the in from the factory
@@ -300,7 +313,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     factoryModel.subtractIn(withdrawAmount, function(err) {
                                         // Callback errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -313,7 +326,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     gameUser.addIn(withdrawAmount, function(err) {
                                         // Callback errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -326,7 +339,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     factoryModel.subtractOut(withdrawAmount, function(err) {
                                         // Callback errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -339,7 +352,7 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     gameUser.addOut(withdrawAmount, function(err) {
                                         // Callback errors
                                         if(err !== null) {
-                                            callbackError();
+                                            callbackError(err);
                                             return;
                                         }
 
@@ -354,8 +367,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     Core.gameManager.sendGameData(game, user, undefined, function(err) {
                                         // Handle errors
                                         if(err !== null) {
-                                            console.error(err);
-                                            console.error('Failed to broadcast factory data');
+                                            console.error(err.stack || err);
+                                            console.error('Failed to broadcast game data, ignoring');
                                         }
                                     });
 
@@ -363,8 +376,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     liveFactory.broadcastData(function(err) {
                                         // Handle errors
                                         if(err !== null) {
-                                            console.error(err);
-                                            console.error('Failed to broadcast factory data');
+                                            console.error(err.stack || err);
+                                            console.error('Failed to broadcast factory data, ignoring');
                                         }
                                     });
 
@@ -372,8 +385,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                     liveGame.getUser(user, function(err, liveUser) {
                                         // Handle errors
                                         if(liveUser === null || err !== null) {
-                                            console.error(err);
-                                            console.error('Failed to send transaction success');
+                                            console.error(err.stack || err);
+                                            console.error('Failed to get user, unable to send transaction success message, ignoring');
                                             return;
                                         }
 
@@ -383,8 +396,8 @@ FactoryWithdrawHandler.prototype.handler = function(packet, socket) {
                                         }, function(err, balanceTable) {
                                             // Handle errors
                                             if (balanceTable === null || balanceTable === undefined || err !== null) {
-                                                console.error(err);
-                                                console.error('Failed to send transaction success');
+                                                console.error(err.stack || err);
+                                                console.error('Failed to send transaction success message, ignoring');
                                                 return;
                                             }
 

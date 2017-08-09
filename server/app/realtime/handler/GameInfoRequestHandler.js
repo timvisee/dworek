@@ -100,9 +100,9 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error(err.stack || err);
 
             // Send a message response to the user
             callbackError();
@@ -128,7 +128,7 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
                 if(!calledBack)
                     callbackError();
                 calledBack = true;
-                console.error(err);
+                console.error(err.stack || err);
                 return;
             }
 
@@ -147,7 +147,7 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
                 if(!calledBack)
                     callbackError();
                 calledBack = true;
-                console.error(err);
+                console.error(err.stack || err);
                 return;
             }
 

@@ -20,13 +20,12 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var util = require('util');
+var _ = require("lodash");
 
 var Core = require('../../../Core');
 var FactoryDatabase = require('./FactoryDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
-var CallbackLatch = require('../../util/CallbackLatch');
 var Coordinate = require('../../coordinate/Coordinate');
 
 /**
@@ -297,9 +296,10 @@ FactoryModel.prototype.getIdHex = function() {
  *
  * @param {String} field Field names.
  * @param {FactoryModel~getFieldCallback} callback Called with the result of a model field, or when an error occurred.
+ * @param {Object} options Model options.
  */
-FactoryModel.prototype.getField = function(field, callback) {
-    this._baseModel.getField(field, callback);
+FactoryModel.prototype.getField = function(field, callback, options) {
+    this._baseModel.getField(field, callback, options);
 };
 
 /**
@@ -511,9 +511,10 @@ FactoryModel.prototype.setLocation = function(location, callback) {
  * Get the level of the factory.
  *
  * @param {FactoryModel~getLevelCallback} callback Called with level or when an error occurred.
+ * @param {Object} options Model options.
  */
-FactoryModel.prototype.getLevel = function(callback) {
-    this.getField('level', callback);
+FactoryModel.prototype.getLevel = function(callback, options) {
+    this.getField('level', callback, options);
 };
 
 /**
@@ -531,6 +532,13 @@ FactoryModel.prototype.getLevel = function(callback) {
  * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 FactoryModel.prototype.setLevel = function(level, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(level === null || isNaN(level) || level === Infinity || !_.isInteger(level)) {
+        callback(new Error('Invalid level value: ' + level));
+        return;
+    }
+
+    // Set the field
     this.setField('level', level, callback);
 };
 
@@ -538,9 +546,10 @@ FactoryModel.prototype.setLevel = function(level, callback) {
  * Get the defence value of the factory.
  *
  * @param {FactoryModel~getDefenceCallback} callback Called with defence value or when an error occurred.
+ * @param {Object} options Model options.
  */
-FactoryModel.prototype.getDefence = function(callback) {
-    this.getField('defence', callback);
+FactoryModel.prototype.getDefence = function(callback, options) {
+    this.getField('defence', callback, options);
 };
 
 /**
@@ -558,6 +567,13 @@ FactoryModel.prototype.getDefence = function(callback) {
  * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 FactoryModel.prototype.setDefence = function(defence, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(defence === null || isNaN(defence) || defence === Infinity || !_.isInteger(defence)) {
+        callback(new Error('Invalid defence value: ' + defence));
+        return;
+    }
+
+    // Set the field
     this.setField('defence', defence, callback);
 };
 
@@ -565,9 +581,10 @@ FactoryModel.prototype.setDefence = function(defence, callback) {
  * Get the in of the factory.
  *
  * @param {FactoryModel~getInCallback} callback Called with in or when an error occurred.
+ * @param {Object} options Model options.
  */
-FactoryModel.prototype.getIn = function(callback) {
-    this.getField('in', callback);
+FactoryModel.prototype.getIn = function(callback, options) {
+    this.getField('in', callback, options);
 };
 
 /**
@@ -585,6 +602,13 @@ FactoryModel.prototype.getIn = function(callback) {
  * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 FactoryModel.prototype.setIn = function(value, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(value === null || isNaN(value) || value === Infinity || !_.isInteger(value)) {
+        callback(new Error('Invalid in value: ' + value));
+        return;
+    }
+
+    // Set the field
     this.setField('in', value, callback);
 };
 
@@ -596,8 +620,19 @@ FactoryModel.prototype.setIn = function(value, callback) {
  */
 FactoryModel.prototype.addIn = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid in amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid in amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to in units in a factory.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -614,6 +649,8 @@ FactoryModel.prototype.addIn = function(amount, callback) {
 
         // Set the in
         self.setIn(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 
@@ -645,9 +682,10 @@ FactoryModel.prototype.subtractIn = function(amount, callback) {
  * Get the out of the factory.
  *
  * @param {FactoryModel~getOutCallback} callback Called with in or when an error occurred.
+ * @param {Object} options Model options.
  */
-FactoryModel.prototype.getOut = function(callback) {
-    this.getField('out', callback);
+FactoryModel.prototype.getOut = function(callback, options) {
+    this.getField('out', callback, options);
 };
 
 /**
@@ -665,6 +703,13 @@ FactoryModel.prototype.getOut = function(callback) {
  * @param {FactoryModel~setFieldCallback} callback Called on success, or when an error occurred.
  */
 FactoryModel.prototype.setOut = function(value, callback) {
+    // Make sure the value isn't null, NaN or Infinite
+    if(value === null || isNaN(value) || value === Infinity || !_.isInteger(value)) {
+        callback(new Error('Invalid out value: ' + value));
+        return;
+    }
+
+    // Set the field
     this.setField('out', value, callback);
 };
 
@@ -676,8 +721,19 @@ FactoryModel.prototype.setOut = function(value, callback) {
  */
 FactoryModel.prototype.addOut = function(amount, callback) {
     // Make sure the value isn't null, NaN or Infinite
-    if(amount === null || isNaN(amount) || amount === Infinity) {
-        callback(new Error('Invalid out amount.'));
+    if(amount === null || isNaN(amount) || amount === Infinity || !_.isInteger(amount)) {
+        callback(new Error('Invalid out amount: ' + amount));
+        return;
+    }
+
+    // Show a warning if the amount to add is zero
+    if(amount === 0) {
+        // Print the warning
+        console.warn('WARNING: Adding 0 to out units in a factory.');
+        console.trace();
+
+        // Call back
+        callback(null);
         return;
     }
 
@@ -694,6 +750,8 @@ FactoryModel.prototype.addOut = function(amount, callback) {
 
         // Set the out
         self.setOut(current + amount, callback);
+    }, {
+        noCache: true
     });
 };
 

@@ -226,8 +226,8 @@ Shop.prototype.load = function(callback) {
             Core.gameManager.sendGameData(self.getGame().getGameModel(), self.getUser().getUserModel(), undefined, function(err) {
                 // Handle errors
                 if(err !== null) {
-                    console.error('Failed to send game data to user:');
-                    console.error(err);
+                    console.error('Failed to send game data to user, ignoring');
+                    console.error(err.stack || err);
                 }
             });
         };
@@ -243,7 +243,7 @@ Shop.prototype.load = function(callback) {
                 // Handle errors
                 if(err !== null) {
                     console.error('Failed to find new shop user, failed to fetch user\'s team');
-                    console.error(err);
+                    console.error(err.stack || err);
                     return;
                 }
 
@@ -258,7 +258,7 @@ Shop.prototype.load = function(callback) {
                     // Handle errors
                     if(err !== null) {
                         console.error('Failed to find new shop user');
-                        console.error(err);
+                        console.error(err.stack || err);
                         return;
                     }
 
@@ -267,7 +267,7 @@ Shop.prototype.load = function(callback) {
                         // Handle errors
                         if(err !== null) {
                             console.error('Failed to determine whether to find a new shop.');
-                            console.error(err);
+                            console.error(err.stack || err);
                             return;
                         }
 

@@ -463,7 +463,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                             // Show errors
                                             if(err !== null) {
                                                 console.error('Failed to broadcast location data to user.');
-                                                console.error(err);
+                                                console.error(err.stack || err);
                                             }
                                         });
 
@@ -472,7 +472,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                             // Show errors
                                             if(err !== null) {
                                                 console.error('Failed to broadcast game data to all users.');
-                                                console.error(err);
+                                                console.error(err.stack || err);
                                             }
                                         });
                                     });

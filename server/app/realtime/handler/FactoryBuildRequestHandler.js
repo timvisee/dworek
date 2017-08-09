@@ -94,7 +94,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
         // Print the error to the console if anything is given
         if(err !== undefined) {
             console.error('Failed to build factory on client request:');
-            console.error(err);
+            console.error(err.stack || err);
         }
     };
 
@@ -128,7 +128,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
         // Handle errors
         if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error(err.stack || err);
 
             // Call back an error
             callbackError(err);
@@ -140,7 +140,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
             // Handle errors
             if(err !== null) {
                 // Print the error to the console
-                console.error(err);
+                console.error(err.stack || err);
 
                 // Call back an error
                 callbackError(err);
@@ -385,7 +385,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                                 // Handle errors
                                                                 if(err !== null) {
                                                                     console.error('Failed to fetch user team, ignoring');
-                                                                    console.error(err);
+                                                                    console.error(err.stack || err);
                                                                 }
 
                                                                 // Make sure the user's team is known
@@ -415,7 +415,7 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                                                         // Handle errors
                                                         if (err !== null) {
                                                             console.error('Failed to send game data updates, ignoring');
-                                                            console.error(err);
+                                                            console.error(err.stack || err);
                                                         }
                                                     });
                                                 });
@@ -428,8 +428,6 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
                     });
                 });
             });
-
-
         });
     });
 };

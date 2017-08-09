@@ -226,7 +226,7 @@ ShopManager.prototype.worker = function() {
         liveUser.getGameUser(function(err, gameUser) {
             // Handle errors
             if(err !== null) {
-                console.error(err);
+                console.error(err.stack || err);
                 console.error('Failed to get game user instance');
                 return;
             }
@@ -241,7 +241,7 @@ ShopManager.prototype.worker = function() {
             gameUser.getTeam(function(err, userTeam) {
                 // Handle errors
                 if(err !== null) {
-                    console.error(err);
+                    console.error(err.stack || err);
                     console.error('Failed to get game configuration, ignoring');
                     return;
                 }
@@ -265,7 +265,7 @@ ShopManager.prototype.worker = function() {
                 self.getTeamPreferredShopCountDelta(userTeamId, function(err, delta) {
                     // Handle errors
                     if(err !== null) {
-                        console.error(err);
+                        console.error(err.stack || err);
                         console.error('Failed to calculate preferred shop count delta for a team');
                         return;
                     }
@@ -286,7 +286,7 @@ ShopManager.prototype.worker = function() {
         self.game.getConfig(function(err, gameConfig) {
             // Handle errors
             if(err !== null) {
-                console.error(err);
+                console.error(err.stack || err);
                 console.error('Failed to get game configuration');
                 return;
             }
@@ -309,7 +309,7 @@ ShopManager.prototype.worker = function() {
                     self.findNewShopUser(teamId, function(err, newUser) {
                         // Handle errors
                         if(err !== null) {
-                            console.error(err);
+                            console.error(err.stack || err);
                             console.error('Failed to find new shop user');
                             return;
                         }
@@ -341,7 +341,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
     liveGame.getConfig(function(err, gameConfig) {
         // Handle errors
         if(err !== null) {
-            console.error(err);
+            console.error(err.stack || err);
             console.error('An error occurred while getting game config');
             return;
         }
@@ -392,7 +392,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
             shop.load(function(err) {
                 // Handle errors
                 if(err !== null) {
-                    console.error(err);
+                    console.error(err.stack || err);
                     console.error('An error occurred while loading a shop, ignoring...');
                 }
             });
@@ -401,7 +401,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
             Core.gameManager.sendGameDataToAll(self.game.getGameModel(), function(err) {
                 // Handle errors
                 if(err !== null) {
-                    console.error(err);
+                    console.error(err.stack || err);
                     console.error('An error occurred while sending game data to all users');
                 }
             });

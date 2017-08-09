@@ -333,8 +333,9 @@ User.prototype.unload = function() {};
  * Get the strength of the user.
  *
  * @param {User~getStrengthCallback} callback Called back with the strength or when an error occurred.
+ * @param {Object} options Model options.
  */
-User.prototype.getStrength = function(callback) {
+User.prototype.getStrength = function(callback, options) {
     // Get the game user
     this.getGameUser(function(err, gameUser) {
         // Call back errors
@@ -350,7 +351,7 @@ User.prototype.getStrength = function(callback) {
         }
 
         // Get the user's strength
-        gameUser.getStrength(callback);
+        gameUser.getStrength(callback, options);
     });
 };
 
@@ -566,8 +567,9 @@ User.prototype.updateLocation = function(location, socket, callback) {
  * Get the user's money.
  *
  * @param {User~getMoneyCallback} callback Called with the result or when an error occurred.
+ * @param {Object} options Model options.
  */
-User.prototype.getMoney = function(callback) {
+User.prototype.getMoney = function(callback, options) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
         // Call back errors
@@ -583,7 +585,7 @@ User.prototype.getMoney = function(callback) {
         }
 
         // Get the money
-        gameUser.getMoney(callback);
+        gameUser.getMoney(callback, options);
     });
 };
 
@@ -698,8 +700,9 @@ User.prototype.subtractMoney = function(amount, callback) {
  * Get the user's in.
  *
  * @param {User~getInCallback} callback Called with the result or when an error occurred.
+ * @param {Object} options Model options.
  */
-User.prototype.getIn = function(callback) {
+User.prototype.getIn = function(callback, options) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
         // Call back errors
@@ -715,7 +718,7 @@ User.prototype.getIn = function(callback) {
         }
 
         // Get the goods
-        gameUser.getIn(callback);
+        gameUser.getIn(callback, options);
     });
 };
 
@@ -764,8 +767,9 @@ User.prototype.setIn = function(goods, callback) {
  * Get the user's out.
  *
  * @param {User~getOutCallback} callback Called with the result or when an error occurred.
+ * @param {Object} options Model options.
  */
-User.prototype.getOut = function(callback) {
+User.prototype.getOut = function(callback, options) {
     // Get the game user
     Core.model.gameUserModelManager.getGameUser(this.getGame().getGameModel(), this.getUserModel(), function(err, gameUser) {
         // Call back errors
@@ -781,7 +785,7 @@ User.prototype.getOut = function(callback) {
         }
 
         // Get the goods
-        gameUser.getOut(callback);
+        gameUser.getOut(callback, options);
     });
 };
 
@@ -1058,6 +1062,8 @@ User.prototype.getBalanceTable = function(options, callback) {
 
         // Resolve the latch
         latch.resolve();
+    }, {
+        noCache: true
     });
 
     // Get the user's in
@@ -1076,6 +1082,8 @@ User.prototype.getBalanceTable = function(options, callback) {
 
         // Resolve the latch
         latch.resolve();
+    }, {
+        noCache: true
     });
 
     // Get the user's out
@@ -1094,6 +1102,8 @@ User.prototype.getBalanceTable = function(options, callback) {
 
         // Resolve the latch
         latch.resolve();
+    }, {
+        noCache: true
     });
 
     // Get the live game

@@ -92,9 +92,10 @@ BroadcastMessageHandler.prototype.handler = function(packet, socket) {
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
-        if(err !== null || game == null) {
+        if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error('Failed to get a game by it\'s ID, message broadcast cancelled');
+            console.error(err.stack || err);
 
             // Send a message response to the user
             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
@@ -108,9 +109,9 @@ BroadcastMessageHandler.prototype.handler = function(packet, socket) {
         // Make sure the user has management rights
         game.hasManagePermission(user, function(err, hasPermission) {
             // Handle errors
-            if(err !== null || game == null) {
+            if(err !== null || game === null) {
                 // Print the error to the console
-                console.error(err);
+                console.error(err.stack || err);
 
                 // Send a message response to the user
                 Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {

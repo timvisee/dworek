@@ -870,8 +870,8 @@ Factory.prototype.setInPingMemory = function(liveUser, isPinged, sendLocationUpd
         Core.gameManager.broadcastLocationData(isPinged ? config.game.locationUpdateInterval : null, liveUser.getGame(), liveUser, undefined, function(err) {
             // Show errors
             if(err !== null) {
-                console.error('Failed to broadcast location data to user.');
-                console.error(err);
+                console.error('Failed to broadcast location data to user, ignoring');
+                console.error(err.stack || err);
             }
         });
 
@@ -1092,9 +1092,10 @@ Factory.prototype.getNextLevelCost = function(callback) {
  * Get the defence value for this factory.
  *
  * @param {Factory~getDefenceCallback} callback Called back with the defence value or when an error occurred.
+ * @param {Object} options Model options.
  */
-Factory.prototype.getDefence = function(callback) {
-    this.getFactoryModel().getDefence(callback);
+Factory.prototype.getDefence = function(callback, options) {
+    this.getFactoryModel().getDefence(callback, options);
 };
 
 /**
@@ -1109,9 +1110,10 @@ Factory.prototype.getDefence = function(callback) {
  * Get the level for this factory.
  *
  * @param {Factory~getLevelCallback} callback Called back with the level value or when an error occurred.
+ * @param {Object} options Model options.
  */
-Factory.prototype.getLevel = function(callback) {
-    this.getFactoryModel().getLevel(callback);
+Factory.prototype.getLevel = function(callback, options) {
+    this.getFactoryModel().getLevel(callback, options);
 };
 
 /**
@@ -1361,8 +1363,7 @@ Factory.prototype.tick = function(callback) {
     // Create a variable for the production and value in/out
     var productionIn,
         productionOut,
-        valueIn,
-        valueOut;
+        valueIn;
 
     // Get the production in
     latch.add();
@@ -1416,24 +1417,8 @@ Factory.prototype.tick = function(callback) {
 
         // Resolve the latch
         latch.resolve();
-    });
-
-    // Get the value out
-    latch.add();
-    this.getFactoryModel().getOut(function(err, result) {
-        // Call back errors
-        if(err !== null) {
-            if(!calledBack)
-                callback(err);
-            calledBack = true;
-            return;
-        }
-
-        // Set the value out
-        valueOut = result;
-
-        // Resolve the latch
-        latch.resolve();
+    }, {
+        noCache: true
     });
 
     // Continue
@@ -1447,20 +1432,14 @@ Factory.prototype.tick = function(callback) {
         // Reset the latch to it's identity
         latch.identity();
 
-        // Update the in and out values
+        // Subtract the in value
         latch.add();
-        self.getFactoryModel().setIn(valueIn - productionIn, function(err) {
+        self.getFactoryModel().subtractIn(productionIn, function(err) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
                 calledBack = true;
-                return;
-            }
-
-            // Make sure we've enough in
-            if(valueIn < productionIn) {
-                callback(null);
                 return;
             }
 
@@ -1468,19 +1447,14 @@ Factory.prototype.tick = function(callback) {
             latch.resolve();
         });
 
+        // Add the out value
         latch.add();
-        self.getFactoryModel().setOut(valueOut + productionOut, function(err) {
+        self.getFactoryModel().addOut(productionOut, function(err) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
                     callback(err);
                 calledBack = true;
-                return;
-            }
-
-            // Make sure we've enough in
-            if(valueIn < productionIn) {
-                callback(null);
                 return;
             }
 
@@ -1489,7 +1463,9 @@ Factory.prototype.tick = function(callback) {
         });
 
         // Broadcast the location data when we're done, an call back
-        latch.then(self.broadcastData(callback));
+        latch.then(function() {
+            self.broadcastData(callback);
+        });
     });
 };
 
@@ -2152,7 +2128,7 @@ Factory.prototype.attack = function(user, callback) {
                                 // Handle errors
                                 if(err !== null) {
                                     console.error('Failed to fetch user team, ignoring');
-                                    console.error(err);
+                                    console.error(err.stack || err);
                                 }
 
                                 // Make sure the user's team is known
@@ -2186,7 +2162,7 @@ Factory.prototype.attack = function(user, callback) {
                                     // Handle errors
                                     if(err !== null) {
                                         console.error('Failed to game data to user, ignoring');
-                                        console.error(err);
+                                        console.error(err.stack || err);
                                     }
                                 });
                             });
@@ -2427,7 +2403,7 @@ Factory.prototype.attack = function(user, callback) {
                                     // Handle errors
                                     if(err !== null) {
                                         console.error('Failed to fetch user team, ignoring');
-                                        console.error(err);
+                                        console.error(err.stack || err);
                                     }
 
                                     // Make sure the user's team is known
@@ -2464,7 +2440,7 @@ Factory.prototype.attack = function(user, callback) {
                             // Handle errors
                             if(err !== null) {
                                 console.error('Failed to broadcast factory data to users, ignoring');
-                                console.error(err);
+                                console.error(err.stack || err);
                             }
                         });
 
@@ -2473,7 +2449,7 @@ Factory.prototype.attack = function(user, callback) {
                             // Handle errors
                             if(err !== null) {
                                 console.error('Failed to broadcast updated location data to users, ignoring');
-                                console.error(err);
+                                console.error(err.stack || err);
                             }
                         });
 
@@ -2514,7 +2490,7 @@ Factory.prototype.destroy = function(callback) {
         // Unload this factory and remove it from the manager
         self.getGame().factoryManager.unloadFactory(self);
 
-        // TODO: Send an update to all clients because this factory has been destroyed. Clients should move from that page.
+        // TODO: Send an update to all clients because this factory has been destroyed. Clients should move from that page. Watch out, already done in some places!
 
         // We're done, call back
         callback(null);

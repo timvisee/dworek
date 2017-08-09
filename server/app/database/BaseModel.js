@@ -20,7 +20,6 @@
  * program. If not, see <http://opensource.org/licenses/MIT/>.                *
  ******************************************************************************/
 
-var util = require('util');
 var async = require('async');
 var _ = require('lodash');
 
@@ -84,10 +83,22 @@ var BaseModel = function(instance, modelConfig) {
  *
  * @param {String} field Field name.
  * @param {BaseModel~getFieldCallback} callback Called when the result is fetched, or when an error occurred.
+ * @param {Object} [options] Options object (noCache).
  */
-BaseModel.prototype.getField = function(field, callback) {
+BaseModel.prototype.getField = function(field, callback, options) {
+    // A call back must be given
+    if(!_.isFunction(callback))
+        throw new Error('A callback must be given');
+
+    // Determine whether to use cache
+    var useCache = true;
+    if(options !== undefined && _.has(options, 'noCache'))
+        useCache = !options.noCache;
+
     // Get the fields from cache
-    var value = this.cacheGetField(field);
+    var value;
+    if(useCache)
+        value = this.cacheGetField(field);
 
     // Call back the value if it isn't undefined
     if(value !== undefined) {
@@ -98,41 +109,27 @@ BaseModel.prototype.getField = function(field, callback) {
     // Store the current instance
     const self = this;
 
-    // Create an array of cache tasks
-    var cacheTasks = [];
-
     // Create a callback latch
     var latch = new CallbackLatch();
 
     // Try to fetch the field from Redis if ready
-    if(RedisUtils.isReady()) {
+    if(useCache && RedisUtils.isReady()) {
         // Add a latch and get the field
         latch.add();
-        this.redisGetField(field, function(err, value) {
+        self.redisGetField(field, function(err, value) {
             // Show a console warning if an error occurred
             if(err !== null) {
-                console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
-                console.warn(err);
+                console.error('A Redis error occurred while fetching model data, falling back to MongoDB.');
+                console.error(err.stack || err);
 
-            } else {
+            } else if(value !== null) {
                 // Call back the value if it isn't undefined, and if no error occurred
-                if(value !== null) {
-                    // Call back
-                    callback(null, value);
+                // Set the fields in cache
+                self.cacheSetField(field, value);
 
-                    // Create a task to cache the value in the local object cache
-                    cacheTasks.push(function(completeTask) {
-                        // Set the fields in cache
-                        self.cacheSetField(field, value);
-
-                        // Complete the task
-                        completeTask();
-                    });
-
-                    // Run the cache tasks asynchronously and return
-                    async.parallel(cacheTasks);
-                    return;
-                }
+                // Call back
+                callback(null, value);
+                return;
             }
 
             // We're done, resolve the latch
@@ -142,47 +139,39 @@ BaseModel.prototype.getField = function(field, callback) {
 
     // Get the field from MongoDB when ready
     latch.then(function() {
+        // Reset the latch back to it's identity
+        latch.identity();
+
         // Try to fetch the field from Mongo
         self.mongoGetField(field, function(err, value) {
             // Call back errors
             if(err !== null) {
                 // Call back
                 callback(err);
-
-                // Run the cache tasks asynchronously and return
-                async.parallel(cacheTasks);
                 return;
             }
 
-            // Call back the value
-            callback(null, value);
-
             // Add a task to cache the values in Redis if ready
             if(RedisUtils.isReady()) {
-                cacheTasks.push(function(completeTask) {
-                    self.redisSetField(field, value, function(err) {
-                        if(err !== null) {
-                            console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                            console.warn(err);
-                        }
+                latch.add();
+                self.redisSetField(field, value, function(err) {
+                    if(err !== null) {
+                        console.error('A Redis error occurred while caching model data, which will be ignored.');
+                        console.error(err.stack || err);
+                    }
 
-                        // Complete the task
-                        completeTask();
-                    });
+                    // Resolve the latch
+                    latch.resolve();
                 });
             }
 
-            // Add a task to cache the values in the local object cache
-            cacheTasks.push(function(completeTask) {
-                // Cache the value
-                self.cacheSetField(field, value);
+            // Cache the value
+            self.cacheSetField(field, value);
 
-                // Complete the task
-                completeTask();
+            // Call back the value
+            latch.then(function() {
+                callback(null, value);
             });
-
-            // Run the cache tasks asynchronously
-            async.parallel(cacheTasks);
         });
     });
 };
@@ -200,10 +189,22 @@ BaseModel.prototype.getField = function(field, callback) {
  *
  * @param {Array|String} fields Array of field names or a single field name.
  * @param {BaseModel~getFieldsCallback} callback Called when the result is fetched, or when an error occurred.
+ * @param {Object} [options] Options object (noCache).
  */
-BaseModel.prototype.getFields = function(fields, callback) {
+BaseModel.prototype.getFields = function(fields, callback, options) {
+    // A call back must be given
+    if(!_.isFunction(callback))
+        throw new Error('A callback must be given');
+
+    // Check whether we can use cache
+    var useCache = true;
+    if(options !== undefined && _.has(options, 'noCache'))
+        useCache = !options.noCache;
+
     // Get the fields from local cache and put it in the results object
-    var results = this.cacheGetField(fields);
+    var results;
+    if(useCache)
+        results = this.cacheGetFields(fields);
 
     // Create an array of fields that still need to be fetched
     var fieldQueue = [];
@@ -216,7 +217,7 @@ BaseModel.prototype.getFields = function(fields, callback) {
 
         // Add the field to the array if it's undefined
         if(results[field] === undefined)
-            fieldQueue = field;
+            fieldQueue.push(field);
     }
 
     // Call back if the field queue is empty, since we successfully fetched all data
@@ -225,9 +226,6 @@ BaseModel.prototype.getFields = function(fields, callback) {
         return;
     }
 
-    // Create an array of cache tasks
-    var cacheTasks = [];
-
     // Store the current instance
     const self = this;
 
@@ -235,13 +233,13 @@ BaseModel.prototype.getFields = function(fields, callback) {
     var latch = new CallbackLatch();
 
     // Try to fetch the fields from Redis if ready
-    if(RedisUtils.isReady()) {
+    if(useCache && RedisUtils.isReady()) {
         latch.add();
-        this.redisGetFields(fieldQueue, function(err, values) {
+        self.redisGetFields(fieldQueue, function(err, values) {
             // Show a console warning if an error occurred
-            if(err !== undefined) {
-                console.warn('A Redis error occurred while fetching model data, falling back to MongoDB.');
-                console.warn(err);
+            if(err !== null) {
+                console.error('A Redis error occurred while fetching model data, falling back to MongoDB.');
+                console.error(err.stack || err);
 
             } else {
                 // Process the fetched fields. Put the values in the results object, and update the fieldQueue array
@@ -255,31 +253,22 @@ BaseModel.prototype.getFields = function(fields, callback) {
                         continue;
 
                     // Put the field in the results if it's fetched
-                    if(values[field] !== null)
+                    if(values[field] !== null && values[field] !== undefined)
                         results[field] = values[field];
 
                     else
-                    // Push the field in the fieldQueue array if it wasn't fetched
+                        // Push the field in the fieldQueue array if it wasn't fetched
                         fieldQueue.push(field);
                 }
 
-                // Create a task to cache the values in the local object cache
-                cacheTasks.push(function(completeTask) {
-                    // Set the fields in cache
-                    self.cacheSetFields(values);
-
-                    // Complete the task
-                    completeTask();
-                });
+                // Set the fields in cache
+                self.cacheSetFields(values);
             }
 
             // Call back if the field queue is empty, since we successfully fetched all data
             if(fieldQueue.length === 0) {
                 // Call back
                 callback(null, results);
-
-                // Run the cache tasks asynchronously and return
-                async.parallel(cacheTasks);
                 return;
             }
 
@@ -290,14 +279,14 @@ BaseModel.prototype.getFields = function(fields, callback) {
 
     // Try to fetch the field from Mongo when ready
     latch.then(function() {
+        // Reset the latch to it's identity
+        latch.identity();
+
         // Try to fetch the field from Mongo
         self.mongoGetFields(fieldQueue, function(err, values) {
             // Call back errors
             if(err !== null) {
                 callback(err);
-
-                // Run the cache tasks asynchronously and return
-                async.parallel(cacheTasks);
                 return;
             }
 
@@ -311,36 +300,28 @@ BaseModel.prototype.getFields = function(fields, callback) {
                 results[field] = values[field];
             }
 
-            // Call back the results
-            callback(null, results);
-
             // Create a cache task to cache the values in Redis if ready
             if(RedisUtils.isReady()) {
-                cacheTasks.push(function(completeTask) {
-                    self.redisSetFields(values, function(err) {
-                        // Show a warning if an error occurred
-                        if(err !== null) {
-                            console.warn('A Redis error occurred while caching model data, which will be ignored.');
-                            console.warn(err);
-                        }
+                latch.add();
+                self.redisSetFields(values, function(err) {
+                    // Show a warning if an error occurred
+                    if(err !== null) {
+                        console.error('A Redis error occurred while caching model data, which will be ignored.');
+                        console.error(err.stack || err);
+                    }
 
-                        // Complete the task
-                        completeTask();
-                    });
+                    // Resolve the latch
+                    latch.resolve();
                 });
             }
 
-            // Create a cache task to cache the values in the local object cache
-            cacheTasks.push(function(completeTask) {
-                // Set the fields in cache
-                self.cacheSetFields(values);
+            // Set the fields in cache
+            self.cacheSetFields(values);
 
-                // Complete the task
-                completeTask();
+            // Call back the results
+            latch.then(function() {
+                callback(null, results);
             });
-
-            // Invoke the cache tasks asynchronously
-            async.parallel(cacheTasks);
         });
     });
 };
@@ -361,6 +342,18 @@ BaseModel.prototype.getFields = function(fields, callback) {
  * @param {BaseModel~setFieldCallback} [callback] Called when the field is set, or when an error occurred.
  */
 BaseModel.prototype.setField = function(field, value, callback) {
+    // A call back must be given
+    if(!_.isFunction(callback)) {
+        console.error('ERROR: A callback must be given!');
+        console.trace();
+
+        // Set a placeholder callback
+        callback = function(err) {
+            if(err !== null)
+                console.error(err.stack || err);
+        };
+    }
+
     // Create a callback latch to set the fields
     var latch = new CallbackLatch();
 
@@ -372,10 +365,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
     this.mongoSetField(field, value, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            if(callback !== undefined)
-                callback(err);
-            else
-                throw err;
+            callback(err);
             return;
         }
 
@@ -386,7 +376,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
     // Set the field in Redis if ready
     if(RedisUtils.isReady()) {
         latch.add();
-        this.redisSetField(field, value, function(err) {
+        self.redisSetField(field, value, function(err) {
             // Resolve the latch on success
             if(err === null) {
                 latch.resolve();
@@ -394,8 +384,8 @@ BaseModel.prototype.setField = function(field, value, callback) {
             }
 
             // Show a warning
-            console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
-            console.warn(err);
+            console.error('A Redis error occurred while setting model data, flushing fields as fallback.');
+            console.error(err.stack || err);
 
             // Flush the field as fallback
             self.redisFlush(field, function(err) {
@@ -405,10 +395,7 @@ BaseModel.prototype.setField = function(field, value, callback) {
                     console.warn('Fallback flushing fields failed.');
 
                     // Call back the error
-                    if(callback !== undefined)
-                        callback(err);
-                    else
-                        throw err;
+                    callback(err);
                     return;
                 }
 
@@ -418,12 +405,13 @@ BaseModel.prototype.setField = function(field, value, callback) {
         });
     }
 
-    // Call back if the latch is fully resolved
-    if(callback !== undefined)
-        latch.then(() => callback(null));
-
     // Set the field in the local object cache
-    this.cacheSetField(field, value);
+    self.cacheSetField(field, value);
+
+    // Call back if the latch is fully resolved
+    latch.then(function() {
+        callback(null);
+    });
 };
 
 /**
@@ -440,6 +428,18 @@ BaseModel.prototype.setField = function(field, value, callback) {
  * @param {BaseModel~setFieldsCallback} [callback] Called when the fields are set, or when an error occurred.
  */
 BaseModel.prototype.setFields = function(fields, callback) {
+    // A call back must be given
+    if(!_.isFunction(callback)) {
+        console.error('ERROR: A callback must be given!');
+        console.trace();
+
+        // Set a placeholder callback
+        callback = function(err) {
+            if(err !== null)
+                console.error(err.stack || err);
+        };
+    }
+
     // Create a callback latch to set the fields
     var latch = new CallbackLatch();
 
@@ -451,10 +451,7 @@ BaseModel.prototype.setFields = function(fields, callback) {
     this.mongoSetFields(fields, function(err) {
         // Call back if an error occurred
         if(err !== null) {
-            if(callback !== undefined)
-                callback(err);
-            else
-                throw err;
+            callback(err);
             return;
         }
 
@@ -465,7 +462,7 @@ BaseModel.prototype.setFields = function(fields, callback) {
     // Set the fields in Redis if ready
     if(RedisUtils.isReady()) {
         latch.add();
-        this.redisSetFields(fields, function(err) {
+        self.redisSetFields(fields, function(err) {
             // Resolve the latch on success
             if(err === null) {
                 latch.resolve();
@@ -473,8 +470,8 @@ BaseModel.prototype.setFields = function(fields, callback) {
             }
 
             // Show a warning
-            console.warn('A Redis error occurred while setting model data, flushing fields as fallback.');
-            console.warn(err);
+            console.error('A Redis error occurred while setting model data, flushing fields as fallback.');
+            console.error(err.stack || err);
 
             // Flush the field as fallback
             self.redisFlush(Object.keys(fields), function(err) {
@@ -497,12 +494,13 @@ BaseModel.prototype.setFields = function(fields, callback) {
         });
     }
 
-    // Call back if the latch is fully resolved
-    if(callback !== undefined)
-        latch.then(() => callback(null));
-
     // Set the field in the local object cache
-    this.cacheSetFields(fields);
+    self.cacheSetFields(fields);
+
+    // Call back if the latch is fully resolved
+    latch.then(function() {
+        callback(null);
+    });
 };
 
 /**
@@ -554,8 +552,8 @@ BaseModel.prototype.hasField = function(field, callback) {
             // Show a warning if an error occurred
             if(err !== null) {
                 // Show the warning
-                console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
-                console.warn(err);
+                console.error('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+                console.error(err.stack || err);
 
             } else if(result === true) {
                 // Call back if the result is true
@@ -630,8 +628,8 @@ BaseModel.prototype.hasFields = function(fields, callback) {
             // Show a warning if an error occurred
             if(err !== null) {
                 // Show the warning
-                console.warn('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
-                console.warn(err);
+                console.error('A Redis error occurred while checking if a model field is cached, falling back to MongoDB.');
+                console.error(err.stack || err);
 
             } else if(result === true) {
                 // Call back if the result is true
@@ -692,8 +690,8 @@ BaseModel.prototype.hasFields = function(fields, callback) {
                     self.redisHasField(field, function(err, exists) {
                         // Show a warning if Redis failed
                         if(err !== null) {
-                            console.warn('A Redis error occurred while checking if a model field exists, falling back.');
-                            console.warn(err);
+                            console.error('A Redis error occurred while checking if a model field exists, falling back.');
+                            console.error(err.stack || err);
 
                         } else {
                             // Process the result if the result is false
@@ -990,6 +988,10 @@ BaseModel.prototype.mongoSetField = function(field, value, callback) {
  * @param {BaseModel~mongoSetFieldsCallback} [callback] Called when the values are set, or when an error occurred.
  */
 BaseModel.prototype.mongoSetFields = function(fields, callback) {
+    // A call back must be given
+    if(!_.isFunction(callback))
+        throw new Error('A callback must be given');
+
     // Get the MongoDB connection instance
     const mongo = MongoUtils.getConnection();
 
@@ -1026,8 +1028,7 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     // Call back if the object doesn't contain any keys
     if(Object.keys(data).length === 0) {
         // Call back
-        if(callback !== undefined)
-            callback(null);
+        callback(new Error('Trying to set fields in MongoDb, but no fields are given'));
         return;
     }
 
@@ -1042,24 +1043,30 @@ BaseModel.prototype.mongoSetFields = function(fields, callback) {
     };
 
     // Fetch the field from MongoDB
-    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err) {
+    mongo.collection(this._modelConfig.mongo.collection).updateOne(queryObject, updateObject, function(err, result) {
         // Call back errors
         if(err !== null) {
-            // Encapsulate the error
-            const error = new Error(err);
+            // Call back the error
+            callback(new Error(err));
+            return;
+        }
 
-            // Call back or throw the error
-            if(callback !== undefined)
-                callback(error);
-            else
-                throw error;
+        // Make sure the result object is valid
+        if(!_.isObject(result) || !_.has(result, 'result') || result.result.ok !== 1) {
+            console.error(result);
+            callback(new Error('Failed to update fields in MongoDb, result object is invalid'));
+            return;
+        }
 
+        // The result must be one, as one row must be updated
+        if(result.result.nModified !== 1) {
+            // Call back the error
+            callback(new Error('No rows were updated in MongoDb'));
             return;
         }
 
         // Call back with success
-        if(callback !== undefined)
-            callback(null);
+        callback(null);
     });
 };
 
@@ -1357,10 +1364,6 @@ BaseModel.prototype.cacheGetFields = function(fields) {
  * @param {*} value Field value.
  */
 BaseModel.prototype.cacheSetField = function(field, value) {
-    // Return when internal cache is disabled
-    if(!config.cache.enable)
-        return;
-
     // Set the field through the bulk function
     this.cacheSetFields({
         [field]: value

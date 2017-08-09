@@ -110,7 +110,7 @@ GameLangObjectRequestHandler.prototype.handler = function(packet, socket) {
         // Handle errors
         if(err !== null || game === null) {
             // Print the error to the console
-            console.error(err);
+            console.error(err.stack || err);
 
             // Call back an error
             callbackError();
@@ -122,7 +122,7 @@ GameLangObjectRequestHandler.prototype.handler = function(packet, socket) {
             // Handle errors
             if(err !== null || game === null) {
                 // Print the error to the console
-                console.error(err);
+                console.error(err.stack || err);
 
                 // Call back an error
                 callbackError();
