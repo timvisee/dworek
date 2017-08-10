@@ -1768,7 +1768,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
 
     // Function to navigate to the game overview
     const navigateToGameOverview = function() {
-        Dworek.utils.navigateToPage('/game/' + gameId, false, false, 'flip');
+        Dworek.utils.navigateToPage('/game/' + gameId, false, true, 'flip');
     };
 
     // Show specific messages when this is a broadcast
@@ -4088,16 +4088,28 @@ function initMap(element) {
     // Check whether there's a map container on the new page
     if(mapContainer.length > 0) {
         // Make sure any map is available inside the container
-        if(mapContainer.find("div.leaflet-map-pane").length <= 0) {
+        if(mapContainer.find("#map div.leaflet-map-pane").length <= 0) {
             // Reset the map instance, to cause it to be created again
+            console.log('Destroying the old map container...');
+            $('#map').html('');
+            $('#map-container').empty();
             map = null;
+
+            // Reset the existing markers
+            playerMarker = null;
+            playersMarkers = [];
+            factoryMarkers = [];
+
+            // Build the new map container
+            console.log('Building the new map container...');
+            element.find('#map-container').append('<div id="map"></div>');
         }
+
+        // Request the map data
+        requestMapData(undefined, false);
 
         // Update the map size
         updateMapSize(true, true);
-
-        // Request the map data
-        requestMapData();
 
         // Use the last known player location when possible
         var latlng = [52.0705, 4.3007];
@@ -4121,7 +4133,7 @@ function initMap(element) {
             }
 
             // Create the map
-            map = L.map('map-container', mapOptions).setView(latlng, 18);
+            map = L.map('map', mapOptions).setView(latlng, 18);
 
             // Set up the tile layers
             L.tileLayer('https://api.mapbox.com/styles/v1/timvisee/cirawmn8f001ch4m27llnb45d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGltdmlzZWUiLCJhIjoiY2lyZXY5cDhzMDAxM2lsbTNicGViaTZkYyJ9.RqbUkoWLWeh_WZoyoxxt-Q', {
@@ -4224,6 +4236,11 @@ function initMap(element) {
 
         // Invalidate the map size, because the container size might be changed
         map.invalidateSize();
+
+        // Request the map data to update the map after two seconds
+        setTimeout(function() {
+            requestMapData(undefined, false);
+        }, 1500);
     }
 }
 
@@ -4236,7 +4253,7 @@ function initMap(element) {
 function updateMapSize(invalidateSize, updateDiv) {
     // Update the map container size
     if(updateDiv)
-        $('#map-container').height($(window).height() - getActivePage().find('.ui-header').height());
+        $('#map').height($(window).height() - getActivePage().find('.ui-header').height());
 
     // Make sure we've a map we know about
     if(map == null)
@@ -4271,11 +4288,14 @@ $(window).resize(function() {
  * Refresh the location data for the map.
  *
  * @param {string} [game] ID of the game to request the location data for, or null to use the current game.
+ * @param {boolean} [notify=true] True to notify, false if not.
  */
-function requestMapData(game) {
+function requestMapData(game, notify) {
     // Parse the game parameter
     if(game == undefined)
         game = Dworek.state.activeGame;
+    if(notify == undefined)
+        notify = true;
 
     // Don't request if we aren't authenticated yet
     if(!Dworek.state.loggedIn)
@@ -4286,7 +4306,8 @@ function requestMapData(game) {
         return;
 
     // Show a status message
-    showNotification('Refreshing map...');
+    if(notify)
+        showNotification('Refreshing map...');
 
     // Request the map data
     Dworek.realtime.packetProcessor.sendPacket(PacketType.GAME_LOCATIONS_REQUEST, {
