@@ -1866,7 +1866,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
             ]
         }, navigateToGameOverview);
 
-    } else if(showBroadcast) {
+    } else if(isBroadcast) {
         // Show a notification
         showNotification('A ' + __('factory.name', { game: gameId }) + ' has been destroyed by <b>' + userName + '</b>');
     }
