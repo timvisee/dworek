@@ -994,7 +994,7 @@ GameUserModel.prototype.getLiveUser = function(callback) {
                     callback(null, liveUser);
                 });
             });
-        })
+        });
     });
 };
 

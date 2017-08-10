@@ -3692,7 +3692,7 @@ function processLocationSuccess(position, notification, alsoUpdateLocal) {
     }
 
     // Update the player position
-    if(alsoUpdateLocal)
+    if(alsoUpdateLocal && position !== null && position !== undefined)
         updatePlayerPosition(position);
 
     // Return true if the GPS state changed
@@ -4321,7 +4321,7 @@ function requestMapData(game, notify) {
  */
 function updatePlayerPosition(position) {
     // Return if the user doesn't have the right roles
-    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special))
+    if(Dworek.state.activeGameRoles == null || !(Dworek.state.activeGameRoles.player || Dworek.state.activeGameRoles.special) || position === null || position === undefined)
         return;
 
     // Set the last known location
