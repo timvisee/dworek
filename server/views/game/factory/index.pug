@@ -49,6 +49,19 @@ block content
                     tr: td Creator
                         td.factory-creator= factory.creatorName
 
+        .nd2-card.wow.fadeInUp.card-factory-destroy
+            .card-title.has-supporting-text
+                h3.card-primary-title Destroy !{__('factory.name', { game: game.id })}
+
+            .card-supporting-text.has-action.has-title
+                p Destroy this !{__('factory.name', { game: game.id })} so it can be built up somewhere else.
+
+            .card-action
+                .row.between-xs: .col-xs-12: .box
+                    a.ui-btn.waves-effect.waves-button.action-factory-destroy(href='#', data-transition='slide', data-rel='popup')
+                        i.zmdi.zmdi-fire
+                        | &nbsp;&nbsp;Destroy
+
     div.tab-factory-attack(data-role='nd2tab', data-tab='attack')
         span.tab-factory-attack-none(style="font-style: italic; color: gray; display: none;"): center You aren't close enough to the !{__('factory.name', { game: game.id })}.
 

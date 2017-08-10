@@ -935,5 +935,54 @@ GameUserModel.prototype.isAllyWith = function(otherUser, callback) {
  * @param {boolean} True if ally, false if not.
  */
 
+/**
+ * Get the live user instance for this game user.
+ *
+ * @param {function} callback callback(err, liveUser) The game user might be null if it's currently not loaded.
+ */
+GameUserModel.prototype.getLiveUser = function(callback) {
+    // Store this instance
+    const self = this;
+
+    // Get the game
+    this.getGame(function(err, game) {
+        // Call back errors
+        if(err !== null) {
+            callback(err);
+            return;
+        }
+
+        // Get the live game this factory is in
+        Core.gameManager.getGame(game, function(err, liveGame) {
+            // Call back errors
+            if(err !== null) {
+                callback(err);
+                return;
+            }
+
+            // Get the user
+            self.getUser(function(err, user) {
+                // Call back errors
+                if(err !== null) {
+                    callback(err);
+                    return;
+                }
+
+                // Get the live user
+                liveGame.userManager.getUser(user, function(err, liveUser) {
+                    // Call back errors
+                    if(err !== null) {
+                        callback(err);
+                        return;
+                    }
+
+                    // Call back the live user
+                    callback(null, liveUser);
+                });
+            });
+        })
+    });
+};
+
 // Export the user class
 module.exports = GameUserModel;

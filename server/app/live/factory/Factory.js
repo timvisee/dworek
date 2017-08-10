@@ -242,7 +242,7 @@ Factory.prototype.sendData = function(user, sockets, callback) {
 
     // Get the game user
     latch.add();
-    this.getGame().getUser(user, function(err, liveUser) {
+    liveGame.getUser(user, function(err, liveUser) {
         // Call back errors
         if(err !== null) {
             if(!calledBack)
@@ -267,6 +267,24 @@ Factory.prototype.sendData = function(user, sockets, callback) {
             // Resolve the latch
             latch.resolve();
         });
+    });
+
+    // Check whether the user has management permissions
+    latch.add();
+    game.hasManagePermission(user, function(err, canManage) {
+        // Call back errors
+        if(err !== null) {
+            if(!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the can manage flag in the factory data
+        factoryData.canManage = canManage;
+
+        // Resolve the latch
+        latch.resolve();
     });
 
     // Continue when we're done
@@ -2149,6 +2167,7 @@ Factory.prototype.attack = function(user, callback) {
                                 // Send a capture update
                                 Core.realTime.packetProcessor.sendPacketUser(PacketType.FACTORY_DESTROYED, {
                                     factory: self.getId(),
+                                    broadcast: true,
                                     factoryName,
                                     self: isSelf,
                                     userName,

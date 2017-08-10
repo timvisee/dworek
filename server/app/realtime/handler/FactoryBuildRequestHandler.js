@@ -290,14 +290,26 @@ FactoryBuildRequestHandler.prototype.handler = function(packet, socket) {
 
                                     // Continue when the latch is complete
                                     interspaceLatch.then(function() {
-                                        // Subtract the money
-                                        liveUser.subtractMoney(factoryCost, function(err, callback) {
-                                            // Call back errors
-                                            if(err !== null) {
-                                                callbackError(err);
-                                                return;
-                                            }
+                                        // Create a cost latch
+                                        var costLatch = new CallbackLatch();
 
+                                        // Process the cost
+                                        if(factoryCost > 0) {
+                                            costLatch.add();
+                                            liveUser.subtractMoney(factoryCost, function(err) {
+                                                // Call back errors
+                                                if(err !== null) {
+                                                    callbackError(err);
+                                                    return;
+                                                }
+
+                                                // Resolve the latch
+                                                costLatch.resolve();
+                                            });
+                                        }
+
+                                        // Continue
+                                        costLatch.then(function() {
                                             // Add the factory
                                             FactoryDatabase.addFactory(factoryName, game, team, user, factoryLocation, function (err, factoryModel) {
                                                 // Call back errors

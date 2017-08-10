@@ -27,6 +27,7 @@ var FactoryDatabase = require('./FactoryDatabase');
 var BaseModel = require('../../database/BaseModel');
 var ConversionFunctions = require('../../database/ConversionFunctions');
 var Coordinate = require('../../coordinate/Coordinate');
+var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * FactoryModel class.
@@ -776,6 +777,204 @@ FactoryModel.prototype.subtractOut = function(amount, callback) {
  * Called back on success or when an error occurred.
  *
  * @callback FactoryModel~subtractOutCallback
+ * @param {Error|null} Error instance if an error occurred, null on success.
+ */
+
+/**
+ * Spread the contents of this factory, the in and the out units, over all players in the owning team.
+ *
+ * @param {boolean} clearFactory True to set the contents of the factory to zero, false to skip this step.
+ * @param {FactoryModel~spreadContentsCallback} callback Called back on success, or when an error occurred.
+ */
+FactoryModel.prototype.spreadContents = function(clearFactory, callback) {
+    // Create a latch for the process
+    const latch = new CallbackLatch();
+    var calledBack = false;
+
+    // Keep a reference to this
+    const self = this;
+
+    // Get the current factory contents, and the users to give it to
+    var contentsIn = 0;
+    var contentsOut = 0;
+
+    // Get the in contents
+    latch.add();
+    self.getIn(function (err, amount) {
+        // Call back errors
+        if (err !== null) {
+            if (!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the amount
+        contentsIn = amount;
+
+        // Resolve the latch
+        latch.resolve();
+    }, {
+        noCache: true
+    });
+
+    // Get the out contents
+    latch.add();
+    self.getOut(function(err, amount) {
+        // Call back errors
+        if (err !== null) {
+            if (!calledBack)
+                callback(err);
+            calledBack = true;
+            return;
+        }
+
+        // Set the amount
+        contentsOut = amount;
+
+        // Resolve the latch
+        latch.resolve();
+    }, {
+        noCache: true
+    });
+
+    // Continue when the current contents have been fetched
+    latch.then(function() {
+        // Reset the latch to it's identity
+        latch.identity();
+
+        // Check whether to clear the factory
+        if(clearFactory) {
+            // Reset the factory in contents
+            latch.add();
+            self.setIn(0, function(err) {
+                // Call back errors
+                if (err !== null) {
+                    if (!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+
+            // Reset the factory out contents
+            latch.add();
+            self.setOut(0, function(err) {
+                // Call back errors
+                if (err !== null) {
+                    if (!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Resolve the latch
+                latch.resolve();
+            });
+        }
+
+        // Continue when the contents have been set
+        latch.then(function() {
+            // Get the team that owns this factory
+            self.getTeam(function(err, team) {
+                // Call back errors
+                if (err !== null) {
+                    if (!calledBack)
+                        callback(err);
+                    calledBack = true;
+                    return;
+                }
+
+                // Get the users in this team
+                team.getGameUsers(function(err, gameUsers) {
+                    // Call back errors
+                    if (err !== null) {
+                        if (!calledBack)
+                            callback(err);
+                        calledBack = true;
+                        return;
+                    }
+
+                    // Count the users
+                    const userCount = gameUsers.length;
+
+                    // Create a contents spread latch
+                    var spreadLatch = new CallbackLatch();
+
+                    // Spread the goods over all team players
+                    if(userCount > 0) {
+                        // Determine how much to give everyone
+                        const partIn = Math.ceil(contentsIn / userCount);
+                        const partOut = Math.ceil(contentsOut / userCount);
+
+                        // Loop through the users and give the units
+                        gameUsers.forEach(function(gameUser) {
+                            // Determine how much to give
+                            const giveIn = Math.min(partIn, contentsIn);
+                            const giveOut = Math.min(partOut, contentsOut);
+
+                            // Return if both are zero
+                            if (giveIn <= 0 && giveOut <= 0)
+                                return;
+
+                            // Subtract the values
+                            contentsIn -= giveIn;
+                            contentsOut -= giveOut;
+
+                            // Add the units to the user
+                            if(giveIn > 0) {
+                                spreadLatch.add();
+                                gameUser.addIn(giveIn, function (err) {
+                                    // Call back errors
+                                    if (err !== null) {
+                                        if (!calledBack)
+                                            callback(err);
+                                        calledBack = true;
+                                        return;
+                                    }
+
+                                    // Resolve the latch
+                                    spreadLatch.resolve();
+                                });
+                            }
+
+                            // Add the units to the user
+                            if(giveOut > 0) {
+                                spreadLatch.add();
+                                gameUser.addOut(giveOut, function (err) {
+                                    // Call back errors
+                                    if (err !== null) {
+                                        if (!calledBack)
+                                            callback(err);
+                                        calledBack = true;
+                                        return;
+                                    }
+
+                                    // Resolve the latch
+                                    spreadLatch.resolve();
+                                });
+                            }
+                        });
+                    }
+
+                    // Resolve the content latch when the transfers are done
+                    spreadLatch.then(function () {
+                        // We're done, call back
+                        callback(null);
+                    });
+                });
+            });
+        });
+    });
+};
+
+/**
+ * Called back on success or when an error occurred.
+ *
+ * @callback FactoryModel~spreadContentsCallback
  * @param {Error|null} Error instance if an error occurred, null on success.
  */
 

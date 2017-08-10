@@ -68,7 +68,13 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error
+        if(err !== null) {
+            console.error('Failed to load factory data, an error occurred:');
+            console.error(err.stack || err);
+        }
+
         // Only call back once
         if(calledBack)
             return;
@@ -86,7 +92,7 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
 
     // Make sure a session is given
     if(!packet.hasOwnProperty('factory')) {
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -111,7 +117,7 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, valid) {
         // Call back errors
         if(err !== null || !valid) {
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -122,31 +128,35 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
         factoryModel.getGame(function(err, game) {
             // Call back errors
             if(err !== null || !valid) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
             // Get the live game
             Core.gameManager.getGame(game, function(err, liveGame) {
                 // Call back errors
-                if(err !== null || liveGame == null) {
-                    callbackError();
+                if(err !== null || liveGame === null) {
+                    callbackError(err);
                     return;
                 }
 
                 // Get the live factory
                 liveGame.factoryManager.getFactory(factoryModel, function(err, liveFactory) {
                     // Call back errors
-                    if(err !== null || liveFactory == null) {
-                        callbackError();
+                    if(err !== null) {
+                        callbackError(err);
                         return;
                     }
+
+                    // Just return if the factory doesn't exist anymore
+                    if(liveFactory === null)
+                        return;
 
                     // Send the factory data to the user
                     liveFactory.sendData(user, socket, function(err) {
                         // Call back errors
                         if(err !== null)
-                            callbackError();
+                            callbackError(err);
                     });
                 });
             });

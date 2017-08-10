@@ -66,7 +66,8 @@ const PacketType = {
     APP_LANG_OBJECT_REQUEST: 36,
     GAME_LANG_OBJECT_UPDATE: 37,
     GAME_LANG_OBJECT_REQUEST: 38,
-    SPECIAL_CUSTOM_ACTION_EXECUTE: 39
+    SPECIAL_CUSTOM_ACTION_EXECUTE: 39,
+    FACTORY_DESTROY: 40
 };
 
 /**
@@ -1753,6 +1754,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_CAPTURED, fun
 Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, function(packet) {
     // Get all properties
     const factoryId = packet.factory;
+    const isBroadcast = packet.broadcast;
     const factoryName = packet.factoryName;
     const isSelf = packet.self;
     const userName = packet.userName;
@@ -1769,29 +1771,14 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
         Dworek.utils.navigateToPage('/game/' + gameId, false, false, 'flip');
     };
 
-    // Show a message if it's the user itself
-    if(isSelf) {
-        // Show a dialog
-        showDialog({
-            title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
-            message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + __('factory.name', { game: gameId }) + '!',
-            actions: [
-                {
-                    text: 'Game overview',
-                    state: 'primary'
-                }
-            ]
-        }, navigateToGameOverview);
-        return;
-    }
-
-    // Show a message to allies
-    if(isAlly) {
-        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+    // Show specific messages when this is a broadcast
+    if(isBroadcast) {
+        // Show a message if it's the user itself
+        if(isSelf) {
             // Show a dialog
             showDialog({
                 title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
-                message: '<b>' + userName + '</b> destroyed this ' + __('factory.name', { game: gameId }) + ' and it is now owned by our team.',
+                message: 'You\'ve successfully destroyed the <b>' + factoryName + '</b> ' + __('factory.name', { game: gameId }) + '!',
                 actions: [
                     {
                         text: 'Game overview',
@@ -1799,46 +1786,78 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
                     }
                 ]
             }, navigateToGameOverview);
-
-        } else {
-            // Show a notification
-            showNotification('<b>' + userName + '</b> destroyed an enemy ' + __('factory.name', { game: gameId }), {
-                vibrate: true
-            });
+            return;
         }
-        return;
-    }
 
-    // Show a message to enemies
-    if(isEnemy) {
-        if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
-            // Show a dialog
-            showDialog({
-                title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
-                message: 'This ' + __('factory.name', { game: gameId }) + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
-                actions: [
-                    {
-                        text: 'Game overview',
-                        state: 'primary'
-                    }
-                ]
-            }, navigateToGameOverview);
+        // Show a message to allies
+        if(isAlly) {
+            if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+                // Show a dialog
+                showDialog({
+                    title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
+                    message: '<b>' + userName + '</b> destroyed this ' + __('factory.name', { game: gameId }) + ' and it is now owned by our team.',
+                    actions: [
+                        {
+                            text: 'Game overview',
+                            state: 'primary'
+                        }
+                    ]
+                }, navigateToGameOverview);
 
-        } else {
-            // Show a notification
-            showNotification('<b>' + userName + '</b> destroyed one of our ' + __('factory.name', { game: gameId }) + 's', {
-                vibrate: true
-            });
+            } else {
+                // Show a notification
+                showNotification('<b>' + userName + '</b> destroyed an enemy ' + __('factory.name', { game: gameId }), {
+                    vibrate: true
+                });
+            }
+            return;
         }
-        return;
+
+        // Show a message to enemies
+        if(isEnemy) {
+            if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+                // Show a dialog
+                showDialog({
+                    title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
+                    message: 'This ' + __('factory.name', { game: gameId }) + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+                    actions: [
+                        {
+                            text: 'Game overview',
+                            state: 'primary'
+                        }
+                    ]
+                }, navigateToGameOverview);
+
+            } else {
+                // Show a notification
+                showNotification('<b>' + userName + '</b> destroyed one of our ' + __('factory.name', { game: gameId }) + 's', {
+                    vibrate: true
+                });
+            }
+            return;
+        }
     }
 
     // Show a global message
     if(Dworek.utils.isFactoryPage() && Dworek.utils.getFactoryId() == factoryId) {
+        // Define the message
+        var message = 'This ' + __('factory.name', { game: gameId }) + ' has been destroyed';
+
+        // Add some user info
+        if(userName !== undefined && userName !== null) {
+            message += 'by <b>' + userName + '</b>';
+
+            // Add some team info
+            if(teamName !== undefined && teamName !== null)
+               message += ' in the <b>' + teamName + '</b> team';
+        }
+
+        message += '.';
+
         // Show a dialog
         showDialog({
             title: __('factory.name', { capitalizeFirst: true, game: gameId }) + ' destroyed',
-            message: 'This ' + __('factory.name', { game: gameId }) + ' has been destroyed by <b>' + userName + '</b> in the <b>' + teamName + '</b> team.',
+            message: message,
             actions: [
                 {
                     text: 'Game overview',
@@ -1847,7 +1866,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.FACTORY_DESTROYED, fu
             ]
         }, navigateToGameOverview);
 
-    } else {
+    } else if(showBroadcast) {
         // Show a notification
         showNotification('A ' + __('factory.name', { game: gameId }) + ' has been destroyed by <b>' + userName + '</b>');
     }
@@ -6071,10 +6090,17 @@ function updateFactoryDataVisuals(firstShow) {
     // Determine whether the user can modify this lab
     const canModify = visible && data.hasOwnProperty('inRange') && data.hasOwnProperty('ally') && data.inRange && data.ally;
 
+    // Check whether this user has management permission
+    const hasManagementPermission = data.hasOwnProperty('canManage') && data.canManage;
+
+    // Determine whether the user can destroy the factory
+    const canDestroy = (data.hasOwnProperty('ally') && data.ally) || hasManagementPermission;
+
     // Select the cards
     var attackCard = activePage.find('.card-factory-attack');
     var attackTab = activePage.find('.tabs-bar-factory li[data-tab=attack]');
     var attackTabNone = activePage.find('.tab-factory-attack-none');
+    var destroyCard = activePage.find('.card-factory-destroy');
     var transferCard = activePage.find('.card-factory-transfer');
     var transferTab = activePage.find('.tabs-bar-factory li[data-tab=transfer]');
     var transferTabNone = activePage.find('.tab-factory-transfer-none');
@@ -6087,6 +6113,87 @@ function updateFactoryDataVisuals(firstShow) {
 
     // Get the game ID
     const gameId = Dworek.utils.getGameId();
+
+    // Determine whether to show the destroy card
+    if(canDestroy) {
+        // Slide down the card
+        if(Dworek.state.animate)
+            destroyCard.slideDown();
+        else
+            destroyCard.show();
+
+        // Get the destroy button
+        const destroyButton = destroyCard.find('.action-factory-destroy');
+
+        // Rebind the click event
+        destroyButton.unbind('click');
+        destroyButton.click(function(e) {
+            // Prevent the default action
+            e.preventDefault();
+
+            // Get the factory name
+            const langFactory = __('factory.name', { game: gameId });
+
+            // Define the message to show
+            var message = '';
+
+            // Show a warning for administrators not owning this factory
+            if(hasManagementPermission && !canModify)
+                message += '<b style="color: red;">You can destroy this ' + langFactory + ' because you have game administration rights. This ' + langFactory + ' is owned by a different team. Use this ability with care.</b><br /><hr />';
+
+            // Define the base
+            message += 'You\'re about to destroy this ' + langFactory + '.<br /><br />';
+
+            // Add the checkbox
+            if(data.inRange || hasManagementPermission)
+                message += '<label for="factory-destroy-keep-contents">' + (hasManagementPermission ? 'Give ' + langFactory + ' contents to team' : 'Keep ' + langFactory + ' contents (team)')  + '</label>' +
+                    '<input type="checkbox" id="factory-destroy-keep-contents" name="factory-destroy-keep-contents" checked /><br />';
+            else
+                message += '<b>You\'re not in range, all ' + __('in.names', { game: gameId }) + ' and ' + __('out.names', { game: gameId }) +
+                        ' will be lost!</b><br /><br />';
+
+            // Add the confirmation
+            message += 'Would you like to destroy this factory?';
+
+            // Check whether the user is in-range
+            showDialog({
+                title: 'Destroy ' + __('factory.name', { game: gameId }),
+                message: message,
+                actions: [
+                    {
+                        text: 'Destroy',
+                        icon: 'zmdi zmdi-fire',
+                        state: 'primary',
+                        action: function() {
+                            // Determine whether to keep contents
+                            var keepContents = data.inRange;
+
+                            // Get the checkbox value, the user may choose to keep contents
+                            if(data.inRange || hasManagementPermission)
+                                keepContents = $('#factory-destroy-keep-contents').is(':checked');
+
+                            // Send the factory destroy packet
+                            Dworek.realtime.packetProcessor.sendPacket(PacketType.FACTORY_DESTROY, {
+                                factory: factoryId,
+                                keepContents: keepContents
+                            });
+                        }
+                    },
+                    {
+                        icon: 'zmdi zmdi-undo',
+                        text: 'Cancel'
+                    }
+                ]
+            });
+        });
+
+    } else {
+        // Slide up the card
+        if(Dworek.state.animate)
+            destroyCard.slideUp();
+        else
+            destroyCard.hide();
+    }
 
     // Update the upgrade buttons
     if(canModify) {

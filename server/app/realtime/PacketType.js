@@ -344,6 +344,7 @@ module.exports = {
      *
      * Data:
      * - factory: ID of the factory to attack.
+     * - broadcast: True to broadcast this message to all relevant players, false to only show it to players viewing the factory.
      * - factoryName: Name of the factory.
      * - self: True if the user that this packet was send to destroyed the factory.
      * - userName: Name of the user that destroyed the factory.
@@ -414,4 +415,15 @@ module.exports = {
      * - properties: Object with custom action properties
      */
     SPECIAL_CUSTOM_ACTION_EXECUTE: 39,
+
+    /**
+     * Request to destroy the given factory.
+     * This packet is sent from a client to the server.
+     *
+     * Data:
+     * - factory: ID of the factory to destroy.
+     * - keepContents: True to keep the contents of the factory and to spread it across the owning team,
+     *                 false to also destroy the contents.
+     */
+    FACTORY_DESTROY: 40,
 };
