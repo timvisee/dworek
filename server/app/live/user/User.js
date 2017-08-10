@@ -371,7 +371,7 @@ User.prototype.getStrength = function(callback, options) {
 User.prototype.setLocation = function(location) {
     // Set the location and it's update time
     this._location = location;
-    this._locationTime = new Date();
+    this._locationTime = Date.now();
 };
 
 /**
@@ -394,7 +394,7 @@ User.prototype.getLocationAge = function() {
         return null;
 
     // Calculate and return the age
-    return Date.now() - this._locationTime.getTime();
+    return Date.now() - this._locationTime;
 };
 
 /**
