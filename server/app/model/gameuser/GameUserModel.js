@@ -896,6 +896,13 @@ GameUserModel.prototype.isAllyWith = function(otherUser, callback) {
             return;
         }
 
+        // Call back if the team is null
+        if(team === null) {
+            if(!calledBack)
+                callback(null, false);
+            calledBack = true;
+        }
+
         // Set the user team
         userTeam = team;
 
@@ -912,6 +919,13 @@ GameUserModel.prototype.isAllyWith = function(otherUser, callback) {
                 callback(err);
             calledBack = true;
             return;
+        }
+
+        // Call back if the team is null
+        if(team === null) {
+            if(!calledBack)
+                callback(null, false);
+            calledBack = true;
         }
 
         // Set the user team
