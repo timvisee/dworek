@@ -125,6 +125,10 @@ h3.table-list,
   height: 100%;
 }
 
+#map {
+  margin: 0 -16px;
+}
+
 // Range slider input field size fix for big numbers
 input[type=number] {
   width: 80px;
