@@ -282,47 +282,37 @@ ShopManager.prototype.worker = function() {
 
     // Continue
     latch.then(function() {
-        // Get the game configuration
-        self.game.getConfig(function(err, gameConfig) {
-            // Handle errors
-            if(err !== null) {
-                console.error(err.stack || err);
-                console.error('Failed to get game configuration');
-                return;
-            }
+        // Loop through the map
+        for(var teamId in prefShopCountDelta) {
+            // Make sure this team ID is part of the counter object
+            if(!prefShopCountDelta.hasOwnProperty(teamId))
+                continue;
 
-            // Loop through the map
-            for(var teamId in prefShopCountDelta) {
-                // Make sure this team ID is part of the counter object
-                if(!prefShopCountDelta.hasOwnProperty(teamId))
-                    continue;
+            // Get the delta count for the shops for ths team
+            const shopDeltaCount = prefShopCountDelta[teamId];
 
-                // Get the delta count for the shops for ths team
-                const shopDeltaCount = prefShopCountDelta[teamId];
+            // Continue if the delta count is zero or below
+            if(shopDeltaCount <= 0)
+                continue;
 
-                // Continue if the delta count is zero or below
-                if(shopDeltaCount <= 0)
-                    continue;
+            // Find as much new shop users as we need
+            for(var i = 0; i < shopDeltaCount; i++)
+                self.findNewShopUser(teamId, function(err, newUser) {
+                    // Handle errors
+                    if(err !== null) {
+                        console.error(err.stack || err);
+                        console.error('Failed to find new shop user');
+                        return;
+                    }
 
-                // Find as much new shop users as we need
-                for(var i = 0; i < shopDeltaCount; i++)
-                    self.findNewShopUser(teamId, function(err, newUser) {
-                        // Handle errors
-                        if(err !== null) {
-                            console.error(err.stack || err);
-                            console.error('Failed to find new shop user');
-                            return;
-                        }
+                    // Make sure a new user was found
+                    if(newUser === null)
+                        return;
 
-                        // Make sure a new user was found
-                        if(newUser === null)
-                            return;
-
-                        // Schedule the user
-                        self.scheduleUser(newUser);
-                    });
-            }
-        });
+                    // Schedule the user
+                    self.scheduleUser(newUser);
+                });
+        }
     });
 };
 
@@ -368,7 +358,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
         setTimeout(function() {
             // Make sure the shop is still in the array
             if(self._scheduledShops.indexOf(shop) < 0) {
-                console.warn('Scheduled shop not instantiating, it was removed from the scheduled list');
+                console.error('Error: Scheduled shop not instantiating, it was removed from the scheduled list');
                 return;
             }
 
