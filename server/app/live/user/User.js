@@ -923,14 +923,6 @@ User.prototype.isVisibleFor = function(other, callback) {
             return;
         }
 
-        // Return true if the other user is a spectator
-        if(otherRoles.spectator) {
-            if(!calledBack)
-                callback(null, true);
-            calledBack = true;
-            return;
-        }
-
         // Return true if this user is a shop, and is visible to everyone
         if(self.getGame().shopManager.isShopUser(self, true, false)) {
             callback(null, true);
@@ -940,6 +932,14 @@ User.prototype.isVisibleFor = function(other, callback) {
         // Make sure this user has a recent location
         if(!self.hasRecentLocation()) {
             callback(null, false);
+            return;
+        }
+
+        // Return true if the other user is a spectator
+        if(otherRoles.spectator) {
+            if(!calledBack)
+                callback(null, true);
+            calledBack = true;
             return;
         }
 
