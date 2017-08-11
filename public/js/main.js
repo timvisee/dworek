@@ -930,7 +930,7 @@ var Dworek = {
                         message: 'Dworek has detected that Chrome is having problems getting you to the proper page.<br><br>' +
                         'Please click the link below to reload the application, and work around this problem.<br><br>' +
                         '<meta http-equiv="refresh" content="0; url=' + targetUrl + '">' +
-                        '<div align="center"><a href="' + targetUrl + '" data-ajax="false">Fuck Google Chrome</a></div>'
+                        '<div align="center"><a href="' + targetUrl + '" data-ajax="false">!@#$&* Google Chrome</a></div>'
                     });
                 }, 2000);
             }
