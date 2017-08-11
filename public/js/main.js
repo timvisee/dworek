@@ -920,7 +920,7 @@ var Dworek = {
             // Show an error dialog for Chrome users
             if(Dworek.utils.isChrome(true)) {
                 // Add the refresh meta to the page
-                $(body).append('<meta http-equiv="refresh" content="0; url=' + targetUrl + '">');
+                $('body').append('<meta http-equiv="refresh" content="0; url=' + targetUrl + '">');
 
                 // Show a dialog after half a second
                 setTimeout(function() {
