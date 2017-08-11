@@ -4104,28 +4104,70 @@ function focusActive() {
 
     // Create an array of things to fit
     var fitters = [];
+    var activePositions = [];
 
     // TODO: Don't fit ranges that are too large
     // TODO: Only focus on one hotstop
     // TODO: Focus on factories that are close to the hotspot
 
+    // Define the maximum size a range circle may have to include it in the fit box
+    const maxRangeCircleRadius = 20;
+
+    // Define the maximum distance of a factory to any player to include it
+    const maxFactoryDistance = 65;
+
     // Add the player marker
-    if(playerMarker !== null)
-        fitters.push(playerMarker);
+    if(playerMarker !== null) {
+        // Add the player marker to the list of fitters
+        if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            fitters.push(playerMarker.rangeCircle);
+        else
+            fitters.push(playerMarker);
+
+        // Add the active position of the player
+        activePositions.push(playerMarker.getLatLng());
+    }
 
     // Add the player markers
     playersMarkers.forEach(function(marker) {
-        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle != undefined)
+        // Add the marker itself, or it's range circle if it's in bound to the fitters
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            fitters.push(marker.rangeCircle);
+        else
+            fitters.push(marker);
+
+        // Add the active position of the player
+        activePositions.push(marker.getLatLng());
+    });
+
+    // Add the factory markers
+    factoryMarkers.forEach(function(marker) {
+        // Get the position of the factory, and make sure it's valid
+        const pos = marker.getLatLng();
+        if(pos === null || pos === undefined)
+            return;
+
+        // Make sure the factory is in range of any of the active positions
+        var inRange = false;
+        activePositions.forEach(function(activePos) {
+            // Skip if we're already in range
+            if(inRange)
+                return;
+
+            // Determine if this factory is in range with this position
+            inRange = pos.distanceTo(activePos) <= maxFactoryDistance;
+        });
+
+        // Skip this factory if it's not in range
+        if(!inRange)
+            return;
+
+        // Add the factory to the list of fitters
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
         else
             fitters.push(marker);
     });
-
-//    // Add the factory markers
-//    if(factoryMarkers != null)
-//        factoryMarkers.forEach(function(factoryMarker) {
-//            fitters.push(factoryMarker.rangeCircle);
-//        });
 
     // Make sure we have any fitters, if not, focus everything instead
     if(fitters.length === 0) {
@@ -4184,27 +4226,36 @@ function focusEverything() {
     // Create an array of things to fit
     var fitters = [];
 
-    // Add the player marker
-    if(playerMarker != null)
-        fitters.push(playerMarker);
+    // Define the maximum size a range circle may have to include it in the fit box
+    const maxRangeCircleRadius = 20;
 
     // Add the player marker
-    if(playersMarkers != null)
-        playersMarkers.forEach(function(marker) {
-            if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle != undefined)
-                fitters.push(marker.rangeCircle);
-            else
-                fitters.push(marker);
-        });
+    if(playerMarker !== null) {
+        if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            fitters.push(playerMarker.rangeCircle);
+        else
+            fitters.push(playerMarker);
+    }
+
+    // Add the player marker
+    playersMarkers.forEach(function(marker) {
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            fitters.push(marker.rangeCircle);
+        else
+            fitters.push(marker);
+    });
 
     // Add the factory markers
-    if(factoryMarkers != null)
-        factoryMarkers.forEach(function(factoryMarker) {
-            fitters.push(factoryMarker.rangeCircle);
-        });
+    factoryMarkers.forEach(function(marker) {
+        // Add the factory to the list of fitters
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            fitters.push(marker.rangeCircle);
+        else
+            fitters.push(marker);
+    });
 
     // Make sure we have any fitters
-    if(fitters.length == 0)
+    if(fitters.length === 0)
         return;
 
     // Fly to the bounds
