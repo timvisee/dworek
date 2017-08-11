@@ -158,11 +158,11 @@ var gameConfig = {
          */
         getShopsInTeam: function(playerCount) {
             // Return zero if there are no players in the team
-            if(playerCount === 0)
+            if(playerCount <= 0)
                 return 0;
 
             // Determine the preferred number of shops
-            return Math.ceil(playerCount / 15)
+            return Math.ceil(playerCount / 8)
         },
 
         /**
