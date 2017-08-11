@@ -295,6 +295,9 @@ ShopManager.prototype.worker = function() {
             if(shopDeltaCount <= 0)
                 continue;
 
+            // Show a console message
+            console.log('Team doesn\'t have enough shops, will search for players (team id: ' + teamId + ', missing shops: ' + shopDeltaCount + ')');
+
             // Find as much new shop users as we need
             for(var i = 0; i < shopDeltaCount; i++)
                 self.findNewShopUser(teamId, function(err, newUser) {
@@ -339,6 +342,9 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
         // Get the alert time for a scheduled user
         const alertTime = gameConfig.shop.shopAlertTime;
 
+        // Show a console message
+        console.log('Scheduling a player to become a shop soon (user id: ' + liveUser.getIdHex() + ', time: ' + alertTime + ' ms)');
+
         // Create a new shop instance
         var shop = new Shop(liveUser, self);
 
@@ -362,7 +368,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
                 return;
             }
 
-            // Remove the shop from the list
+            // Remove the shop from the scheduled ist
             self._scheduledShops.splice(self._scheduledShops.indexOf(shop), 1);
 
             // Add the shop to the list of shops
@@ -385,6 +391,8 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
                     console.error(err.stack || err);
                     console.error('An error occurred while loading a shop, ignoring...');
                 }
+
+                // TODO: Do we need to unload the shop, because it is in an unloaded state now?
             });
 
             // Update the game data for everyone

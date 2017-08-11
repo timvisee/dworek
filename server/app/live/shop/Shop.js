@@ -209,10 +209,16 @@ Shop.prototype.load = function(callback) {
         const lifeTime = gameConfig.shop.getShopLifetime();
         const alertTime = Math.min(gameConfig.shop.shopAlertTime, lifeTime);
 
+        // Show a console message
+        console.log('Player became a shop (user id: ' + self.getUser().getIdHex() + ', for: ' + lifeTime + 'ms)');
+
         // Function to actually transfer the shop
         const functionTransfer = function() {
             // Remove the shop from the list
             self.getShopManager().shops.splice(self.getShopManager().shops.indexOf(self), 1);
+
+            // Show a console message
+            console.log('Player is no longer a shop (user id: ' + self.getUser().getIdHex() + ')');
 
             // Send a notification to the current shop user
             Core.realTime.packetProcessor.sendPacketUser(PacketType.MESSAGE_RESPONSE, {
