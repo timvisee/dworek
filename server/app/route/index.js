@@ -47,8 +47,8 @@ router.get('/', function(req, res, next) {
         var pageVars = {};
 
         // Set the next property if known
-        if(_.isString(req.param('next')))
-            pageVars.next = req.param('next');
+        if(_.isString(req.params.next))
+            pageVars.next = req.params.next;
 
         // Render the index page
         LayoutRenderer.render(req, res, next, 'index', appInfo.APP_NAME, pageVars);
