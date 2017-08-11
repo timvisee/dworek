@@ -4587,10 +4587,10 @@ function updatePlayerMarker() {
 
             // Bind a popup to the marker
             playerMarker.bindPopup('<b>You!</b>');
-            playerMarker.on('mouseover touchstart', function (e) {
+            playerMarker.on('mouseover', function (e) {
                 this.openPopup();
             });
-            playerMarker.on('mouseout touchend', function (e) {
+            playerMarker.on('mouseout', function (e) {
                 this.closePopup();
             });
 
@@ -4676,10 +4676,10 @@ function updatePlayerMarkers(users) {
 
             // Bind a popup to the marker
             marker.bindPopup('<b>' + (!user.shop.isShop ? 'Player' : __('shop.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() })) + '</b><br />' + user.userName);
-            marker.on('mouseover touchstart', function (e) {
+            marker.on('mouseover', function (e) {
                 this.openPopup();
             });
-            marker.on('mouseout touchend', function (e) {
+            marker.on('mouseout', function (e) {
                 this.closePopup();
             });
 
@@ -4900,10 +4900,10 @@ function updateFactoryMarkers(factories) {
 
             // Bind a popup to the marker
             marker.bindPopup('<b>' + __('factory.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() }) + '</b><br />' + factory.name);
-            marker.on('mouseover touchstart', function (e) {
+            marker.on('mouseover', function (e) {
                 this.openPopup();
             });
-            marker.on('mouseout touchend', function (e) {
+            marker.on('mouseout', function (e) {
                 this.closePopup();
             });
 
