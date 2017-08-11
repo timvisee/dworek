@@ -132,6 +132,11 @@ FactoryDestroyHandler.prototype.handler = function(packet, socket) {
     Core.model.factoryModelManager.isValidFactoryId(rawFactory, function(err, isValidFactory) {
         // Call back errors
         if(!isValidFactory || err !== null) {
+            // Make sure the factory is valid
+            if(err === null && !isValidFactory)
+                err = new Error('Invalid factory (id: ' + rawFactory + ')');
+
+            // Call back the error
             callbackError(err);
             return;
         }
