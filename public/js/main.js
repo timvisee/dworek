@@ -4112,13 +4112,13 @@ function focusActive() {
     // TODO: Focus on factories that are close to the hotspot
 
     // Define the maximum size a range circle may have to include it in the fit box
-    const maxRangeCircleRadius = 20;
+    const maxRangeCircleRadius = 25;
 
     // Define the maximum distance of a factory to any player to include it
     const maxFactoryDistance = 100;
 
     // Define the maximum distance markers may be from the player when the player is followed
-    const maxDistanceFromPlayer = 50;
+    const maxDistanceFromPlayer = 65;
 
     // Get the player position if known
     const hasPlayer = playerMarker !== null;
@@ -4126,14 +4126,17 @@ function focusActive() {
 
     // Add the player marker
     if(hasPlayer) {
-        // Add the player marker to the list of fitters
-        if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
-            fitters.push(playerMarker.rangeCircle);
-        else
-            fitters.push(playerMarker);
+        // Add the player to follow when player or everything following is enabled
+        if(getFollowPlayer() && getFollowEverything()) {
+            // Add the player marker to the list of fitters
+            if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+                fitters.push(playerMarker.rangeCircle);
+            else
+                fitters.push(playerMarker);
 
-        // Add the active position of the player
-        activePositions.push(playerMarker.getLatLng());
+            // Add the active position of the player
+            activePositions.push(playerMarker.getLatLng());
+        }
 
         // Store the player position
         playerPos = playerMarker.getLatLng();
