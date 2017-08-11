@@ -224,16 +224,14 @@ ShopManager.prototype.worker = function() {
         // Get the game user
         latch.add();
         liveUser.getGameUser(function(err, gameUser) {
-            // Handle errors
-            if(err !== null) {
-                console.error(err.stack || err);
-                console.error('Failed to get game user instance');
-                return;
-            }
+            // Make sure the game user isn't null
+            if(err === null && gameUser === null)
+                err = new Error('Game user instance is null');
 
-            // Continue if we can't find a game user for this user
-            if(gameUser === null) {
-                latch.resolve();
+            // Handle errors
+            if(err !== null || gameUser === null) {
+                console.error('Failed to get game user instance');
+                console.error(err.stack || err);
                 return;
             }
 
@@ -241,8 +239,8 @@ ShopManager.prototype.worker = function() {
             gameUser.getTeam(function(err, userTeam) {
                 // Handle errors
                 if(err !== null) {
+                    console.error('Failed to get game users team, ignoring');
                     console.error(err.stack || err);
-                    console.error('Failed to get game configuration, ignoring');
                     return;
                 }
 
@@ -260,6 +258,9 @@ ShopManager.prototype.worker = function() {
                     latch.resolve();
                     return;
                 }
+
+                // Add the user ID key to the object
+                prefShopCountDelta[userTeamId] = 0;
 
                 // Get the preferred shop count delta for this team
                 self.getTeamPreferredShopCountDelta(userTeamId, function(err, delta) {
@@ -638,8 +639,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
     else if(_.isString(teamId) && ObjectId.isValid(teamId))
         teamId = new ObjectId(teamId);
     else if(!(teamId instanceof ObjectId)) {
-        // Call back with zero
-        callback(null, 0);
+        callback(new Error('Invalid team ID given:' + teamId), 0);
         return;
     }
 
@@ -661,15 +661,13 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
         // Get the game user
         latch.add();
         Core.model.gameUserModelManager.getGameUser(liveUser.getGame().getGameModel(), liveUser.getUserModel(), function(err, gameUser) {
-            // Handle errors
-            if(err !== null) {
-                callback(err);
-                return;
-            }
+            // The game user instance may not be null
+            if(err === null && gameUser === null)
+                err = new Error('Game user instance is null');
 
-            // Continue if we can't find a game user for this user
-            if(gameUser === null) {
-                latch.resolve();
+            // Handle errors
+            if(err !== null || gameUser === null) {
+                callback(err);
                 return;
             }
 

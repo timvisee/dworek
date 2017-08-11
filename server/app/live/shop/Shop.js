@@ -269,7 +269,7 @@ Shop.prototype.load = function(callback) {
                     }
 
                     // Get the preferred shop count delta
-                    self.getShopManager().getTeamPreferredShopCountDelta(team, function(err, delta) {
+                    self.getShopManager().getTeamPreferredShopCountDelta(team.getId(), function(err, delta) {
                         // Handle errors
                         if(err !== null) {
                             console.error('Failed to determine whether to find a new shop.');
