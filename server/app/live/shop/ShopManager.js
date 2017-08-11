@@ -221,6 +221,10 @@ ShopManager.prototype.worker = function() {
 
     // Loop through the list of users
     this.game.userManager.users.forEach(function(liveUser) {
+        // Skip if the user doesn't have a recent location
+        if(!liveUser.hasRecentLocation())
+            return;
+
         // Get the game user
         latch.add();
         liveUser.getGameUser(function(err, gameUser) {
@@ -344,7 +348,7 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
         const alertTime = gameConfig.shop.shopAlertTime;
 
         // Show a console message
-        console.log('Scheduling a player to become a shop soon (user id: ' + liveUser.getIdHex() + ', time: ' + alertTime + ' ms)');
+        console.log('Scheduling player to become a shop soon (user id: ' + liveUser.getIdHex() + ', time: ' + alertTime + ' ms)');
 
         // Create a new shop instance
         var shop = new Shop(liveUser, self);
@@ -364,13 +368,16 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
         // Create a timer
         setTimeout(function() {
             // Make sure the shop is still in the array
-            if(self._scheduledShops.indexOf(shop) < 0) {
+            if(self._scheduledShops.indexOf(shop) < 0 || self._scheduledShops.indexOf(shop) === -1) {
                 console.error('Error: Scheduled shop not instantiating, it was removed from the scheduled list');
                 return;
             }
 
             // Remove the shop from the scheduled ist
             self._scheduledShops.splice(self._scheduledShops.indexOf(shop), 1);
+
+            // Always make users shops even if their last known location isn't recent anymore
+            // Otherwise players would be able to skip the shop role by disconnecting temporarily
 
             // Add the shop to the list of shops
             self.shops.push(shop);
@@ -414,9 +421,11 @@ ShopManager.prototype.scheduleUser = function(liveUser) {
  * This includes scheduled shops, that aren't available on the map yet.
  *
  * @param {ObjectId} teamId Team ID
- * @param {ShopManager~getTeamShopCount} callback Called with the team's shop count or when an error occurred.
+ * @param {boolean} current True to count current players, false if not.
+ * @param {boolean} scheduled True to count scheduled players, false if not.
+ * @param {ShopManager~getTeamShopCountCallback} callback Called with the team's shop count or when an error occurred.
  */
-ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
+ShopManager.prototype.getTeamShopCount = function(teamId, current, scheduled, callback) {
     // Create a counter
     var count = 0;
 
@@ -453,10 +462,12 @@ ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
     };
 
     // Loop through the list of shops
-    this.shops.forEach(processingFunction);
+    if(current)
+        this.shops.forEach(processingFunction);
 
     // Loop through the list of scheduled shops
-    this._scheduledShops.forEach(processingFunction);
+    if(scheduled)
+        this._scheduledShops.forEach(processingFunction);
 
     // Call back the count when we're done with the latch
     latch.then(function() {
@@ -468,7 +479,7 @@ ShopManager.prototype.getTeamShopCount = function(teamId, callback) {
 /**
  * Called with the team's shop count or when an error occurred.
  *
- * @callback ShopManager~getTeamShopCount
+ * @callback ShopManager~getTeamShopCountCallback
  * @param {Error|null} Error instance if an error occurred, null otherwise.
  * @param {Number=} Number of shops for the given team.
  */
@@ -639,7 +650,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
     else if(_.isString(teamId) && ObjectId.isValid(teamId))
         teamId = new ObjectId(teamId);
     else if(!(teamId instanceof ObjectId)) {
-        callback(new Error('Invalid team ID given:' + teamId), 0);
+        callback(new Error('Invalid team ID given:' + teamId));
         return;
     }
 
@@ -708,7 +719,7 @@ ShopManager.prototype.getTeamPreferredShopCountDelta = function(teamId, callback
             const preferredShopCount = gameConfig.shop.getShopsInTeam(userCount);
 
             // Get the number of shops
-            self.getTeamShopCount(teamId, function(err, currentCount) {
+            self.getTeamShopCount(teamId, true, true, function(err, currentCount) {
                 // Handle errors
                 if(err !== null) {
                     callback(err);
