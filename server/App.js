@@ -286,12 +286,15 @@ App.prototype._initWebServer = function() {
 
         // Create the HTTP redirect server
         const redirectServer = http.createServer(function (req, res) {
+            // Define the url to go to, without it's protocol
+            const url = req.headers['host'] + req.url;
+
             // Show a log message
-            console.log('Redirecting HTTP client to HTTPS');
+            console.log('Redirecting HTTP client to HTTPS (url: ' + url + ')');
 
             // Redirect the user to HTTPS
             res.writeHead(301, {
-                Location: 'https://' + req.headers['host'] + req.url
+                Location: 'https://' + url
             });
 
             // End the request
