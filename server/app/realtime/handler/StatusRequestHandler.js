@@ -49,7 +49,7 @@ var StatusRequestHandler = function(init) {
  */
 StatusRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -67,7 +67,12 @@ StatusRequestHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log errors
+        console.error('Failed to fetch status update');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -88,7 +93,7 @@ StatusRequestHandler.prototype.handler = function(packet, socket) {
     StatusUtils.getStatus(function(err, status) {
         // Handle errors
         if(err !== null) {
-            callbackError();
+            callbackError(err);
             return;
         }
 

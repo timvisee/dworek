@@ -70,10 +70,9 @@ FactoryDefenceBuyHandler.prototype.handler = function(packet, socket) {
     // Create a function to call back an error
     const callbackError = function(err) {
         // Print the error
-        if(err !== null && err !== undefined) {
-            console.error('An error occurred while buying defence upgrades for a user');
+        console.error('An error occurred while buying defence upgrades for a user');
+        if(err !== null && err !== undefined)
             console.error(err.stack || err);
-        }
 
         // Only call back once
         if(calledBack)

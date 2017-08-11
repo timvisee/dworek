@@ -71,10 +71,9 @@ ShopSellInHandler.prototype.handler = function(packet, socket) {
     // Create a function to call back an error
     const callbackError = function(err) {
         // Print the error
-        if(err !== null && err !== undefined) {
-            console.error('An error occurred while selling in goods to a user');
+        console.error('An error occurred while selling in goods to a user');
+        if(err !== null && err !== undefined)
             console.error(err.stack || err);
-        }
 
         // Only call back once
         if(calledBack)

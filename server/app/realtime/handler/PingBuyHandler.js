@@ -53,7 +53,7 @@ var PingBuyHandler = function(init) {
  */
 PingBuyHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -71,7 +71,12 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log the errors
+        console.error('Failed  to buy ping, a server error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -79,7 +84,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
         // Send a message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
-            message: 'Failed to buy upgrade, a server error occurred.',
+            message: 'Failed to buy ping, a server error occurred.',
             dialog: true
         }, socket);
 
@@ -117,7 +122,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
     Core.model.gameModelManager.getGameById(rawGame, function(err, gameModel) {
         // Call back errors
         if(err !== null) {
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -125,7 +130,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
         Core.model.gameUserModelManager.getGameUser(gameModel, user, function(err, gameUser) {
             // Call back errors
             if(err !== null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -133,12 +138,12 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
             gameUser.getTeam(function(err, teamModel) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
                 // Make sure the game user has a team
-                if(teamModel == null) {
+                if(teamModel === null) {
                     Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                         error: true,
                         message: 'Failed to execute ping, because you aren\'t part of any team.',
@@ -151,7 +156,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                 Core.gameManager.getGame(gameModel, function(err, liveGame) {
                     // Call back errors
                     if(err !== null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -159,7 +164,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                     liveGame.getTeamMoney(teamModel, function(err, teamStandingsFiltered) {
                         // Call back errors
                         if(err !== null) {
-                            callbackError();
+                            callbackError(err);
                             return;
                         }
 
@@ -195,18 +200,18 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                 return;
 
                             // Compare the ID
-                            if(ping.id == rawPingId)
+                            if(ping.id === rawPingId)
                                 selectedPing = ping;
                         });
 
                         // Make sure a ping is found
-                        if(selectedPing == null) {
-                            callbackError();
+                        if(selectedPing === null) {
+                            callbackError(new Error('No ping was selected'));
                             return;
                         }
 
                         // Compare the current cost of the ping to the cost send along with the packet
-                        if(selectedPing.price != rawCost) {
+                        if(selectedPing.price !== rawCost) {
                             Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
                                 error: true,
                                 message: 'The price of this ping seems to have been changed while executing it, therefore your ping hasn\'t been executed to prevent problems.<br><br>' +
@@ -219,8 +224,8 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                         // Get the live user instance
                         liveGame.userManager.getUser(user, function(err, liveUser) {
                             // Call back errors
-                            if(err !== null || liveUser == null) {
-                                callbackError();
+                            if(err !== null || liveUser === null) {
+                                callbackError(err);
                                 return;
                             }
 
@@ -242,7 +247,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                             gameUser.getMoney(function(err, money) {
                                 // Call back errors
                                 if(err !== null) {
-                                    callbackError();
+                                    callbackError(err);
                                     return;
                                 }
 
@@ -260,7 +265,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                 gameUser.subtractMoney(selectedPing.price, function(err) {
                                     // Call back errors
                                     if (err !== null) {
-                                        callbackError();
+                                        callbackError(err);
                                         return;
                                     }
 
@@ -273,7 +278,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                     // Loop through the list of factories, and determine
                                     liveGame.factoryManager.factories.forEach(function(factory) {
                                         // Make sure the factory is valid
-                                        if(factory == null)
+                                        if(factory === null)
                                             return;
 
                                         // Add the normal latch, and keep track of whether we resolved it
@@ -291,7 +296,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         factory.isVisibleFor(liveUser, function(err, result) {
                                             // Call back errors
                                             if(err !== null) {
-                                                callbackError();
+                                                callbackError(err);
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();
@@ -316,8 +321,8 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         factoryLatch.add();
                                         factory.getTeam(function(err, factoryTeam) {
                                             // Call back errors
-                                            if(err !== null || liveUser == null) {
-                                                callbackError();
+                                            if(err !== null || liveUser === null) {
+                                                callbackError(err);
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();
@@ -326,7 +331,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                             }
 
                                             // Make sure the factory team is known
-                                            if(factoryTeam == null) {
+                                            if(factoryTeam === null) {
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();
@@ -351,8 +356,8 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                         factoryLatch.add();
                                         factory.getFactoryModel().getLocation(function(err, factoryLocation) {
                                             // Call back errors
-                                            if(err !== null || liveUser == null) {
-                                                callbackError();
+                                            if(err !== null || liveUser === null) {
+                                                callbackError(err);
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();
@@ -361,7 +366,7 @@ PingBuyHandler.prototype.handler = function(packet, socket) {
                                             }
 
                                             // Make sure the factory location is known
-                                            if(factoryLocation == null) {
+                                            if(factoryLocation === null) {
                                                 if(!isResolved) {
                                                     isResolved = true;
                                                     latch.resolve();

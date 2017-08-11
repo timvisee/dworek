@@ -70,6 +70,11 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
 
     // Create a function to call back an error
     const callbackError = function(err) {
+        // Print the error to the console if anything is given
+        console.error('Failed to execute a special custom action on client request');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -83,13 +88,6 @@ SpecialCustomActionExecute.prototype.handler = function(packet, socket) {
 
         // Set the called back flag
         calledBack = true;
-
-        // Print the error to the console if anything is given
-        if(err !== undefined) {
-            console.error('Failed to execute a special custom action on client request:');
-            console.error(err.stack || err);
-            throw err;
-        }
     };
 
     // Make sure a session is given

@@ -51,7 +51,7 @@ var BroadcastMessageHandler = function(init) {
  */
 BroadcastMessageHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler

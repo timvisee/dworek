@@ -70,7 +70,12 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log errors
+        console.error('Failed to send your location, a server error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -89,7 +94,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
     // Make sure a session is given
     if(!packet.hasOwnProperty('game') || !packet.hasOwnProperty('location')) {
         console.log('Received malformed packet, location packet doesn\'t contain game/location data');
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -114,7 +119,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
     // Parse the coordinate
     const coordinate = Coordinate.parse(rawLocation);
     if(coordinate === null) {
-        callbackError();
+        callbackError(new Error('Invalid coordinate'));
         return;
     }
 
@@ -122,11 +127,12 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
         if(err !== null || game === null) {
-            // Print the error to the console
-            console.error(err.stack || err);
+            // Set the game instance error
+            if(err === null && game === null)
+                err = new Error('Game instance is null');
 
-            // Call back an error
-            callbackError();
+            // Call back the error
+            callbackError(err);
             return;
         }
 
@@ -138,7 +144,12 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
         game.getStage(function(err, stage) {
             // Call back errors
             if(err !== null || stage !== 1) {
-                callbackError();
+                // Set the game stage error
+                if(err === null && stage !== 1)
+                    err = new Error('Invalid game stage, the game stage must be 1');
+
+                // Call back the error
+                callbackError(err);
                 return;
             }
 
@@ -151,7 +162,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
         game.getUserState(user, function(err, userState) {
             // Call back errors and make sure the user has the correct state
             if(err !== null || (!userState.player && !userState.special)) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -167,7 +178,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
         Core.gameManager.getGame(game, function(err, result) {
             // Call back errors
             if(err !== null || result === null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -184,7 +195,7 @@ LocationUpdateHandler.prototype.handler = function(packet, socket) {
             liveGame.getUser(user, function(err, liveUser) {
                 // Call back errors
                 if(err !== null || liveUser === null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 

@@ -24,7 +24,6 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -69,7 +68,12 @@ GameLangObjectRequestHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log the error
+        console.error('Failed to get game language object, an error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -109,23 +113,25 @@ GameLangObjectRequestHandler.prototype.handler = function(packet, socket) {
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
         if(err !== null || game === null) {
-            // Print the error to the console
-            console.error(err.stack || err);
+            // Set the game error instance
+            if(err === null && game === null)
+                err = new Error('The game instance was null');
 
             // Call back an error
-            callbackError();
+            callbackError(err);
             return;
         }
 
         // Get the live game
         Core.gameManager.getGame(game, function(err, liveGame) {
             // Handle errors
-            if(err !== null || game === null) {
-                // Print the error to the console
-                console.error(err.stack || err);
+            if(err !== null || liveGame === null) {
+                // Set the error instance
+                if(err === null && liveGame === null)
+                    err = new Error('The live game instance was null');
 
                 // Call back an error
-                callbackError();
+                callbackError(err);
                 return;
             }
 

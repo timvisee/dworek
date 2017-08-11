@@ -51,7 +51,7 @@ var GameInfoRequestHandler = function(init) {
  */
 GameInfoRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -88,24 +88,41 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
     // Get the user
     const user = socket.session.user;
 
+    // Remember whether we called back
+    var calledBack = false;
+
     // Create an error callback
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log errors
+        console.error('Failed to request game info, an internal error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
+        // Only call back once
+        if(calledBack)
+            return;
+
+        // Show an error message to the user
         Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
             error: true,
             message: 'Failed to request game info, an internal error occurred.',
             dialog: true
         }, socket);
+
+        // Set the called back flag
+        calledBack = true;
     };
 
     // Get the game instance by it's ID
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
         if(err !== null || game === null) {
-            // Print the error to the console
-            console.error(err.stack || err);
+            // Set the game instance error
+            if(err === null && game === null)
+                err = new Error('Game instance is null');
 
             // Send a message response to the user
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -126,9 +143,8 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
-                    callbackError();
+                    callbackError(err);
                 calledBack = true;
-                console.error(err.stack || err);
                 return;
             }
 
@@ -145,9 +161,8 @@ GameInfoRequestHandler.prototype.handler = function(packet, socket) {
             // Call back errors
             if(err !== null) {
                 if(!calledBack)
-                    callbackError();
+                    callbackError(err);
                 calledBack = true;
-                console.error(err.stack || err);
                 return;
             }
 

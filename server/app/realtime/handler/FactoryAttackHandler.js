@@ -69,7 +69,12 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Print the error to the console
+        console.error('Failed to attack factory, an internal error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -113,7 +118,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
     Core.gameManager.getGame(rawGame, function(err, liveGame) {
         // Call back errors
         if(err !== null || liveGame === null) {
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -129,7 +134,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
         liveGame.factoryManager.getFactory(rawFactory, function(err, result) {
             // Call back errors
             if(err !== null || result === null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -145,7 +150,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
         liveGame.getUser(user, function(err, result) {
             // Call back errors
             if(err !== null || result === null) {
-                callbackError();
+                callbackError(err);
                 return;
             }
 
@@ -166,7 +171,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
             liveUser.getTeam(function(err, userTeam) {
                 // Call back errors
                 if(err !== null || userTeam === null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
@@ -174,7 +179,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
                 liveFactory.isTeam(userTeam, function(err, isTeam) {
                     // Call back errors
                     if(err !== null || userTeam === null) {
-                        callbackError();
+                        callbackError(err);
                         return;
                     }
 
@@ -206,7 +211,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
             liveFactory.getConquer(function(err, conquerValue) {
                 // Call back errors
                 if(err !== null) {
-                    callbackError();
+                    callbackError(err);
                     return;
                 }
 
@@ -238,7 +243,7 @@ FactoryAttackHandler.prototype.handler = function(packet, socket) {
                 liveFactory.attack(liveUser, function(err) {
                     // Call back errors
                     if(err !== null)
-                        callbackError();
+                        callbackError(err);
                 });
             });
         });

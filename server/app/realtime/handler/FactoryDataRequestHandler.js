@@ -50,7 +50,7 @@ var FactoryDataRequestHandler = function(init) {
  */
 FactoryDataRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -70,10 +70,9 @@ FactoryDataRequestHandler.prototype.handler = function(packet, socket) {
     // Create a function to call back an error
     const callbackError = function(err) {
         // Print the error
-        if(err !== null) {
-            console.error('Failed to load factory data, an error occurred:');
+        console.error('Failed to load factory data, an error occurred');
+        if(err !== null && err !== null)
             console.error(err.stack || err);
-        }
 
         // Only call back once
         if(calledBack)

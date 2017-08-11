@@ -52,7 +52,7 @@ var FactoryDepositHandler = function(init) {
  */
 FactoryDepositHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -72,10 +72,9 @@ FactoryDepositHandler.prototype.handler = function(packet, socket) {
     // Create a function to call back an error
     const callbackError = function(err) {
         // Print the error
-        if(err !== null && err !== undefined) {
-            console.error('An error occurred while depositing goods to a factory');
+        console.error('An error occurred while depositing goods to a factory');
+        if(err !== null && err !== undefined)
             console.error(err.stack || err);
-        }
 
         // Only call back once
         if(calledBack)

@@ -65,26 +65,6 @@ AppLangObjectRequestHandler.prototype.init = function() {
  * @param socket SocketIO socket.
  */
 AppLangObjectRequestHandler.prototype.handler = function(packet, socket) {
-    // Make sure we only call back once
-    var calledBack = false;
-
-    // Create a function to call back an error
-    const callbackError = function() {
-        // Only call back once
-        if(calledBack)
-            return;
-
-        // Send a message to the user
-        Core.realTime.packetProcessor.sendPacket(PacketType.MESSAGE_RESPONSE, {
-            error: true,
-            message: 'Failed to get global language object, an error occurred.',
-            dialog: true
-        }, socket);
-
-        // Set the called back flag
-        calledBack = true;
-    };
-
     // Send the language object
     Core.realTime.packetProcessor.sendPacket(PacketType.APP_LANG_OBJECT_UPDATE, {
         langObject: Core.langManager.getDefaultLangObject()

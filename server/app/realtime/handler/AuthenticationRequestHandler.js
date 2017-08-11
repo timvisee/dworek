@@ -50,7 +50,7 @@ var AuthenticationRequestHandler = function(init) {
  */
 AuthenticationRequestHandler.prototype.init = function() {
     // Make sure the real time instance is initialized
-    if(Core.realTime == null)
+    if(Core.realTime === null)
         throw new Error('Real time server not initialized yet');
 
     // Register the handler
@@ -77,7 +77,7 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
     const sessionToken = rawSession.trim().toLowerCase();
 
     // Return a success packet if the session is empty
-    if(sessionToken.length == 0) {
+    if(sessionToken.length === 0) {
         // Send a response to the client
         Core.realTime.packetProcessor.sendPacket(PacketType.AUTH_RESPONSE, {
             loggedIn: false
@@ -128,13 +128,13 @@ AuthenticationRequestHandler.prototype.handler = function(packet, socket) {
 
         // Set the logged in state and user
         socket.session.valid = isValid;
-        socket.session.userId = user != null ? user.getIdHex() : null;
+        socket.session.userId = user !== null ? user.getIdHex() : null;
         socket.session.user = user;
 
         // TODO: Invalidate other sessions with this user!
 
         // Don't authenticate if the user instance is null
-        if(user == null) {
+        if(user === null) {
             console.error('Failed to authenticate real-time client, user is null!');
             return;
         }

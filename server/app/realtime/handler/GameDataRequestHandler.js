@@ -24,7 +24,6 @@ var _ = require('lodash');
 
 var Core = require('../../../Core');
 var PacketType = require('../PacketType');
-var CallbackLatch = require('../../util/CallbackLatch');
 
 /**
  * Type of packets to handle by this handler.
@@ -69,7 +68,12 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
     var calledBack = false;
 
     // Create a function to call back an error
-    const callbackError = function() {
+    const callbackError = function(err) {
+        // Log errors
+        console.error('Failed to load game data, an error occurred');
+        if(err !== null && err !== undefined)
+            console.error(err.stack || err);
+
         // Only call back once
         if(calledBack)
             return;
@@ -87,7 +91,7 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
 
     // Make sure a session is given
     if(!packet.hasOwnProperty('game')) {
-        callbackError();
+        callbackError(new Error('Malformed packet'));
         return;
     }
 
@@ -112,11 +116,12 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
     Core.model.gameModelManager.getGameById(rawGame, function(err, game) {
         // Handle errors
         if(err !== null || game === null) {
-            // Print the error to the console
-            console.error(err.stack || err);
+            // Set the game instance error
+            if(err === null && game === null)
+                err = new Error('The game instance was null');
 
             // Call back an error
-            callbackError();
+            callbackError(err);
             return;
         }
 
@@ -124,7 +129,7 @@ GameDataRequestHandler.prototype.handler = function(packet, socket) {
         Core.gameManager.sendGameData(game, user, socket, function(err) {
             // Call back errors
             if(err !== null)
-                callbackError();
+                callbackError(err);
         });
     });
 };
