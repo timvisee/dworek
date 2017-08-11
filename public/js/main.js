@@ -2032,8 +2032,14 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
 
     // Set the player/everyone following mode if the user roles changed and the user is a player/spectator
     if(rolesChanged) {
+        // Focus on points of interest
+        setFollowActive(true, {
+            showNotification: false
+        });
+
+        // Set the following mode
         if(roles.spectator)
-            setFollowActive(true, {
+            setFollowEverything(true, {
                 showNotification: false
             });
         else if(roles.player)
@@ -2071,10 +2077,8 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_LOCATIONS_UPDATE
         updateFactoryMarkers(packet.factories);
 
     // Focus on everything if enabled, also focus on everything if we should focus on the player, but no player is available
-    if(getFollowActive() || (getFollowPlayer() && playerMarker == null))
-        focusActive();
-    else if(getFollowEverything() || (getFollowPlayer() && playerMarker == null))
-        focusEverything();
+    if(getFollowPlayer() || getFollowEverything() || (getFollowPlayer() && playerMarker == null))
+        focusMap(true);
 });
 
 // Update the active game and status labels when a new page is being shown
@@ -3950,19 +3954,8 @@ function setFollowActive(state, options) {
     // Set whether to follow activity
     followActive = state;
 
-    // Focus on the player if the following state is enabled and stop following everything
-    if(state) {
-        // Stop following the player and everything
-        setFollowPlayer(false, {
-            showNotification: false
-        });
-        setFollowEverything(false, {
-            showNotification: false
-        });
-
-        // Focus on the activity
-        focusActive();
-    }
+    // Focus on the map for the changed state
+    focusMap(true);
 
     // Set the button state depending on the follow activity state
     if(mapFollowActiveButton !== null)
@@ -3970,7 +3963,7 @@ function setFollowActive(state, options) {
 
     // Show a notification if the state changed
     if(options.showNotification && state !== oldState)
-        showNotification((state ? 'Now' : 'Stopped') + ' following activity');
+        showNotification((state ? 'Focus' : 'Don\'t focus') + ' on interests');
 }
 
 /**
@@ -4010,16 +4003,13 @@ function setFollowPlayer(state, options) {
 
     // Focus on the player if the following state is enabled and stop following everything
     if(state) {
-        // Stop following activity and everything
-        setFollowActive(false, {
-            showNotification: false
-        });
+        // Stop following everything
         setFollowEverything(false, {
             showNotification: false
         });
 
         // Focus the player
-        focusPlayer(true);
+        focusMap(true);
     }
 
     // Set the button state depending on the follow player state
@@ -4068,16 +4058,13 @@ function setFollowEverything(state, options) {
 
     // Focus on everything if the following state is enabled and stop following the player
     if(state) {
-        // Stop following the activity and the player
-        setFollowActive(false, {
-            showNotification: false
-        });
+        // Stop following the player
         setFollowPlayer(false, {
             showNotification: false
         });
 
         // Focus the map
-        focusEverything();
+        focusMap();
     }
 
     // Set the button state depending on the follow everything state
@@ -4087,6 +4074,20 @@ function setFollowEverything(state, options) {
     // Show a notification if the state changed
     if(options.showNotification && state !== oldState)
         showNotification((state ? 'Now' : 'Stopped') + ' following everything');
+}
+
+/**
+ * Focus on the map, with the currently selected focussing method.
+ *
+ * @param {boolean} zoom True to allow zooming to focus, false to keep the current zoom level.
+ */
+function focusMap(zoom) {
+    if(getFollowActive())
+        focusActive();
+    else if(getFollowPlayer())
+        focusPlayer(zoom);
+    else if(getFollowEverything())
+        focusEverything(zoom);
 }
 
 /**
@@ -4114,10 +4115,17 @@ function focusActive() {
     const maxRangeCircleRadius = 20;
 
     // Define the maximum distance of a factory to any player to include it
-    const maxFactoryDistance = 65;
+    const maxFactoryDistance = 100;
+
+    // Define the maximum distance markers may be from the player when the player is followed
+    const maxDistanceFromPlayer = 50;
+
+    // Get the player position if known
+    const hasPlayer = playerMarker !== null;
+    var playerPos = null;
 
     // Add the player marker
-    if(playerMarker !== null) {
+    if(hasPlayer) {
         // Add the player marker to the list of fitters
         if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(playerMarker.rangeCircle);
@@ -4126,10 +4134,28 @@ function focusActive() {
 
         // Add the active position of the player
         activePositions.push(playerMarker.getLatLng());
+
+        // Store the player position
+        playerPos = playerMarker.getLatLng();
     }
 
     // Add the player markers
     playersMarkers.forEach(function(marker) {
+        // Get the position of the player, and make sure it's valid
+        const pos = marker.getLatLng();
+        if(pos === null || pos === undefined)
+            return;
+
+        // Determine whether this player is in range
+        var inRange = true;
+        if(hasPlayer && getFollowPlayer())
+            // The player must be in range of the player in player following mode
+            inRange = playerPos.distanceTo(pos) <= maxDistanceFromPlayer;
+
+        // Skip this factory if it's not in range
+        if(!inRange)
+            return;
+
         // Add the marker itself, or it's range circle if it's in bound to the fitters
         if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
@@ -4147,16 +4173,23 @@ function focusActive() {
         if(pos === null || pos === undefined)
             return;
 
-        // Make sure the factory is in range of any of the active positions
+        // Determine whether this factory is in range
         var inRange = false;
-        activePositions.forEach(function(activePos) {
-            // Skip if we're already in range
-            if(inRange)
-                return;
+        if(hasPlayer && getFollowPlayer())
+            // The factory must be in range of the player in player following mode
+            inRange = playerPos.distanceTo(pos) <= maxDistanceFromPlayer;
 
-            // Determine if this factory is in range with this position
-            inRange = pos.distanceTo(activePos) <= maxFactoryDistance;
-        });
+        else {
+            // Make sure the factory is in range of any of the active positions
+            activePositions.forEach(function(activePos) {
+                // Skip if we're already in range
+                if(inRange)
+                    return;
+
+                // Determine if this factory is in range with this position
+                inRange = pos.distanceTo(activePos) <= maxFactoryDistance;
+            });
+        }
 
         // Skip this factory if it's not in range
         if(!inRange)
@@ -4284,13 +4317,8 @@ $(document).bind('pageshow', function() {
     // Update the map size
     updateMapSize(true, true);
 
-    // Focus on the player/everything
-    if(getFollowActive())
-        focusActive();
-    else if(getFollowPlayer())
-        focusPlayer(true);
-    else if(getFollowEverything())
-        focusEverything();
+    // Focus the map
+    focusMap(true);
 });
 
 /**
@@ -4371,13 +4399,8 @@ function initMap(element) {
             map.on('dragend', function(e) {
                 // Revert the view if the user dragged the map less than 150 pixels, stop following otherwise
                 if(e.distance <= 150) {
-                    // Revert the view
-                    if(getFollowActive())
-                        focusActive();
-                    if(getFollowPlayer())
-                        focusPlayer(false);
-                    if(getFollowEverything())
-                        focusEverything();
+                    // Focus the map
+                    focusMap(false);
 
                 } else {
                     // Stop following
@@ -4392,7 +4415,7 @@ function initMap(element) {
                 states: [{
                     stateName: 'no-follow-active',
                     icon:      'zmdi zmdi-star-outline',
-                    title:     'Start following activity',
+                    title:     'Focus on points of interest',
                     onClick: function(button, map) {
                         // Set whether to follow the activity
                         setFollowActive(true);
@@ -4403,7 +4426,7 @@ function initMap(element) {
                 }, {
                     stateName: 'follow-active',
                     icon:      'zmdi zmdi-star',
-                    title:     'Stop following activity',
+                    title:     'Don\'t focus on points of interest',
                     onClick: function(button, map) {
                         // Set whether to follow the activity
                         setFollowActive(false);
@@ -4478,7 +4501,8 @@ function initMap(element) {
             mapFollowEverythingButton.state(getFollowEverything() ? 'follow-everything' : 'no-follow-everything');
 
             // Add the follow buttons to the map in a bar
-            L.easyBar([mapFollowActiveButton, mapFollowPlayerButton, mapFollowEverythingButton]).addTo(map);
+            L.easyBar([mapFollowActiveButton]).addTo(map);
+            L.easyBar([mapFollowPlayerButton, mapFollowEverythingButton]).addTo(map);
 
             // Add a refresh button
             L.easyButton('<i class="zmdi zmdi-refresh"></i>', function() {
@@ -4486,8 +4510,6 @@ function initMap(element) {
                 requestMapData();
 
             }).addTo(map);
-
-            // TODO: Request player positions from server
 
             // Force update the last player position if it's known
             if(Dworek.state.geoPlayerPosition != null)
@@ -4655,8 +4677,10 @@ function updatePlayerMarker() {
             playerMarker.addTo(map);
             playerMarker.rangeCircle.addTo(map);
 
-            // Fit the map
-            focusEverything();
+            // Focus the map
+            focusMap(true);
+
+            return;
 
         } else {
             // Update the position if it's known
@@ -4675,13 +4699,8 @@ function updatePlayerMarker() {
         }
     }
 
-    // Focus on the player if player following is enabled
-    if(getFollowActive())
-        focusActive();
-    else if(getFollowPlayer())
-        focusPlayer(false);
-    else if(getFollowEverything())
-        focusEverything();
+    // Focus the map
+    focusMap(false);
 }
 
 /**
@@ -4904,11 +4923,9 @@ function updatePlayerMarkers(users) {
     if(focusMarkers && playersMarkers.length == 0)
         focusMarkers = false;
 
-    // Focus on activity or everything
-    if(focusMarkers && getFollowActive())
-        focusActive();
-    else if(focusMarkers && getFollowEverything())
-        focusEverything();
+    // Focus the map
+    if(focusMarkers)
+        focusMap(true);
 }
 
 /**
