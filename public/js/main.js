@@ -4207,7 +4207,8 @@ function focusInterests() {
     map.fitBounds(
         L.featureGroup(fitters).getBounds(),
         {
-            padding: [15, 45],
+            paddingTopLeft: [25, 45],
+            paddingBottomRight: [5, 45],
             animate: Dworek.state.animate
         }
     );
@@ -4290,7 +4291,8 @@ function focusEverything() {
     map.fitBounds(
         L.featureGroup(fitters).getBounds(),
         {
-            padding: [15, 45],
+            paddingTopLeft: [25, 45],
+            paddingBottomRight: [5, 45],
             animate: Dworek.state.animate
         }
     );
