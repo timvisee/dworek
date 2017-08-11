@@ -2033,7 +2033,7 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
     // Set the player/everyone following mode if the user roles changed and the user is a player/spectator
     if(rolesChanged) {
         // Focus on points of interest
-        setFollowActive(true, {
+        setFollowInterests(true, {
             showNotification: false
         });
 
@@ -2046,6 +2046,9 @@ Dworek.realtime.packetProcessor.registerHandler(PacketType.GAME_INFO, function(p
             setFollowPlayer(true, {
                 showNotification: false
             });
+
+        // Focus the map
+        focusMap(true);
     }
 });
 
@@ -3895,9 +3898,9 @@ var factoryMarkers = [];
 var mapFollowPlayerButton = null;
 
 /**
- * Button to toggle to follow the activity.
+ * Button to toggle to follow the points of interest.
  */
-var mapFollowActiveButton = null;
+var mapFollowInterestsButton = null;
 
 /**
  * Button to toggle to follow everything.
@@ -3905,9 +3908,9 @@ var mapFollowActiveButton = null;
 var mapFollowEverythingButton = null;
 
 /**
- * True to follow the activity.
+ * True to follow the points of interest.
  */
-var followActive = false;
+var followInterests = false;
 
 /**
  * True to follow the player, when it moves.
@@ -3920,22 +3923,22 @@ var followPlayer = false;
 var followEverything = false;
 
 /**
- * Check whether to follow the activity.
+ * Check whether to follow the points of interest.
  *
- * @return {boolean} True to follow the activity, false if not.
+ * @return {boolean} True to follow the points of interest, false if not.
  */
-function getFollowActive() {
-    return followActive;
+function getFollowInterests() {
+    return followInterests;
 }
 
 /**
- * Set whether to follow the activity.
+ * Set whether to follow the points of interest.
  *
- * @param {boolean} state True to follow the activity, false if not.
+ * @param {boolean} state True to follow the points of interest, false if not.
  * @param {Object} [options] Options object.
  * @param {boolean} [options.showNotification=true] True to show a notification, false if not.
  */
-function setFollowActive(state, options) {
+function setFollowInterests(state, options) {
     // Create a defaults object
     const defaultOptions = {
         showNotification: true
@@ -3949,17 +3952,14 @@ function setFollowActive(state, options) {
     options = merge(defaultOptions, options, true);
 
     // Get the old state
-    const oldState = followActive;
+    const oldState = followInterests;
 
-    // Set whether to follow activity
-    followActive = state;
+    // Set whether to follow points of interest
+    followInterests = state;
 
-    // Focus on the map for the changed state
-    focusMap(true);
-
-    // Set the button state depending on the follow activity state
-    if(mapFollowActiveButton !== null)
-        mapFollowActiveButton.state(state ? 'follow-active' : 'no-follow-active');
+    // Set the button state depending on the follow points of interest state
+    if(mapFollowInterestsButton !== null)
+        mapFollowInterestsButton.state(state ? 'follow-interests' : 'no-follow-interests');
 
     // Show a notification if the state changed
     if(options.showNotification && state !== oldState)
@@ -4001,16 +4001,12 @@ function setFollowPlayer(state, options) {
     // Set whether to follow players
     followPlayer = state;
 
-    // Focus on the player if the following state is enabled and stop following everything
-    if(state) {
+    // Stop following everything
+    if(state)
         // Stop following everything
         setFollowEverything(false, {
             showNotification: false
         });
-
-        // Focus the player
-        focusMap(true);
-    }
 
     // Set the button state depending on the follow player state
     if(mapFollowPlayerButton !== null)
@@ -4056,16 +4052,12 @@ function setFollowEverything(state, options) {
     // Set whether to follow everything
     followEverything = state;
 
-    // Focus on everything if the following state is enabled and stop following the player
-    if(state) {
+    // Stop following the player
+    if(state)
         // Stop following the player
         setFollowPlayer(false, {
             showNotification: false
         });
-
-        // Focus the map
-        focusMap();
-    }
 
     // Set the button state depending on the follow everything state
     if(mapFollowEverythingButton !== null)
@@ -4082,8 +4074,8 @@ function setFollowEverything(state, options) {
  * @param {boolean} zoom True to allow zooming to focus, false to keep the current zoom level.
  */
 function focusMap(zoom) {
-    if(getFollowActive())
-        focusActive();
+    if(getFollowInterests())
+        focusInterests();
     else if(getFollowPlayer())
         focusPlayer(zoom);
     else if(getFollowEverything())
@@ -4091,10 +4083,10 @@ function focusMap(zoom) {
 }
 
 /**
- * Focus on the activity (on the map) if there is any.
- * Focus on everything instead if there's no activity.
+ * Focus on the points of interest (on the map) if there are any.
+ * Focus on everything instead if there's no points of interest.
  */
-function focusActive() {
+function focusInterests() {
     // Make sure the map is created
     if(map === null)
         return;
@@ -4105,7 +4097,7 @@ function focusActive() {
 
     // Create an array of things to fit
     var fitters = [];
-    var activePositions = [];
+    var interestsPositions = [];
 
     // TODO: Don't fit ranges that are too large
     // TODO: Only focus on one hotstop
@@ -4127,15 +4119,15 @@ function focusActive() {
     // Add the player marker
     if(hasPlayer) {
         // Add the player to follow when player or everything following is enabled
-        if(getFollowPlayer() && getFollowEverything()) {
+        if(getFollowPlayer() || getFollowEverything()) {
             // Add the player marker to the list of fitters
             if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
                 fitters.push(playerMarker.rangeCircle);
             else
                 fitters.push(playerMarker);
 
-            // Add the active position of the player
-            activePositions.push(playerMarker.getLatLng());
+            // Add the position of the player
+            interestsPositions.push(playerMarker.getLatLng());
         }
 
         // Store the player position
@@ -4165,8 +4157,8 @@ function focusActive() {
         else
             fitters.push(marker);
 
-        // Add the active position of the player
-        activePositions.push(marker.getLatLng());
+        // Add the position of the player
+        interestsPositions.push(marker.getLatLng());
     });
 
     // Add the factory markers
@@ -4183,14 +4175,14 @@ function focusActive() {
             inRange = playerPos.distanceTo(pos) <= maxDistanceFromPlayer;
 
         else {
-            // Make sure the factory is in range of any of the active positions
-            activePositions.forEach(function(activePos) {
+            // Make sure the factory is in range of any of the interesting positions
+            interestsPositions.forEach(function(interestsPos) {
                 // Skip if we're already in range
                 if(inRange)
                     return;
 
                 // Determine if this factory is in range with this position
-                inRange = pos.distanceTo(activePos) <= maxFactoryDistance;
+                inRange = pos.distanceTo(interestsPos) <= maxFactoryDistance;
             });
         }
 
@@ -4235,9 +4227,9 @@ function focusPlayer(zoom) {
     if(map === null)
         return;
 
-    // Make sure a player marker is available, focus on active if not
+    // Make sure a player marker is available, focus on points of interest if not
     if(playerMarker === null) {
-        focusActive();
+        focusInterests();
         return;
     }
 
@@ -4407,41 +4399,43 @@ function initMap(element) {
 
                 } else {
                     // Stop following
-                    setFollowActive(false);
+                    setFollowInterests(false);
                     setFollowPlayer(false);
                     setFollowEverything(false);
                 }
             });
 
-            // Set the map follow active button
-            mapFollowActiveButton = L.easyButton({
+            // Set the map follow points of interests button
+            mapFollowInterestsButton = L.easyButton({
                 states: [{
-                    stateName: 'no-follow-active',
+                    stateName: 'no-follow-interests',
                     icon:      'zmdi zmdi-star-outline',
                     title:     'Focus on points of interest',
                     onClick: function(button, map) {
-                        // Set whether to follow the activity
-                        setFollowActive(true);
+                        // Set whether to follow the points of interest
+                        setFollowInterests(true);
+                        focusMap(true);
 
                         // Set the button state
-                        button.state('follow-active');
+                        button.state('follow-interests');
                     }
                 }, {
-                    stateName: 'follow-active',
+                    stateName: 'follow-interests',
                     icon:      'zmdi zmdi-star',
                     title:     'Don\'t focus on points of interest',
                     onClick: function(button, map) {
-                        // Set whether to follow the activity
-                        setFollowActive(false);
+                        // Set whether to follow the points of interest
+                        setFollowInterests(false);
+                        focusMap(true);
 
                         // Set the button state
-                        button.state('no-follow-active');
+                        button.state('no-follow-interests');
                     }
                 }]
             });
 
-            // Set the button state depending on the follow activity state
-            mapFollowActiveButton.state(getFollowActive() ? 'follow-active' : 'no-follow-active');
+            // Set the button state depending on the follow points of interest state
+            mapFollowInterestsButton.state(getFollowInterests() ? 'follow-interests' : 'no-follow-interests');
 
             // Set the map follow player button
             mapFollowPlayerButton = L.easyButton({
@@ -4452,6 +4446,7 @@ function initMap(element) {
                     onClick: function(button, map) {
                         // Set whether to follow the player
                         setFollowPlayer(true);
+                        focusMap(true);
 
                         // Set the button state
                         button.state('follow-player');
@@ -4463,6 +4458,7 @@ function initMap(element) {
                     onClick: function(button, map) {
                         // Set whether to follow the player
                         setFollowPlayer(false);
+                        focusMap(true);
 
                         // Set the button state
                         button.state('no-follow-player');
@@ -4482,6 +4478,7 @@ function initMap(element) {
                     onClick: function(button, map) {
                         // Set whether to follow everything
                         setFollowEverything(true);
+                        focusMap(true);
 
                         // Set the button state
                         button.state('follow-everything');
@@ -4493,6 +4490,7 @@ function initMap(element) {
                     onClick: function(button, map) {
                         // Set whether to follow everything
                         setFollowEverything(false);
+                        focusMap(true);
 
                         // Set the button state
                         button.state('no-follow-everything');
@@ -4504,7 +4502,7 @@ function initMap(element) {
             mapFollowEverythingButton.state(getFollowEverything() ? 'follow-everything' : 'no-follow-everything');
 
             // Add the follow buttons to the map in a bar
-            L.easyBar([mapFollowActiveButton]).addTo(map);
+            L.easyBar([mapFollowInterestsButton]).addTo(map);
             L.easyBar([mapFollowPlayerButton, mapFollowEverythingButton]).addTo(map);
 
             // Add a refresh button
