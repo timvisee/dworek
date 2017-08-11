@@ -4585,6 +4585,15 @@ function updatePlayerMarker() {
                 })
             });
 
+            // Bind a popup to the marker
+            playerMarker.bindPopup('<b>You!</b>');
+            playerMarker.on('mouseover', function (e) {
+                this.openPopup();
+            });
+            playerMarker.on('mouseout', function (e) {
+                this.closePopup();
+            });
+
             // Create a player range circle
             playerMarker.rangeCircle = L.circle([position.coords.latitude, position.coords.longitude], position.coords.accuracy);
             playerMarker.rangeCircle.setStyle({
@@ -4665,6 +4674,15 @@ function updatePlayerMarkers(users) {
                 icon: !user.shop.isShop ? L.spriteIcon('green') : L.spriteIcon('purple')
             });
 
+            // Bind a popup to the marker
+            marker.bindPopup('<b>' + (!user.shop.isShop ? 'Player' : __('shop.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() })) + '</b><br />' + user.userName);
+            marker.on('mouseover', function (e) {
+                this.openPopup();
+            });
+            marker.on('mouseout', function (e) {
+                this.closePopup();
+            });
+
             // Store the marker state
             marker.state = {
                 user: user.user,
@@ -4702,8 +4720,9 @@ function updatePlayerMarkers(users) {
                 color: 'purple'
             });
 
-            // Update the icon
+            // Update the icon and popup
             if(!marker.state.isShop) {
+                marker.bindPopup('<b>' + __('shop.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() }) + '</b><br />' + user.userName);
                 marker.setIcon(L.spriteIcon('purple'));
                 marker.state.isShop = true;
             }
@@ -4713,8 +4732,9 @@ function updatePlayerMarkers(users) {
             map.removeLayer(marker.rangeCircle);
             marker.rangeCircle = null;
 
-            // Update the icon
+            // Update the icon and popup
             if(marker.state.isShop) {
+                marker.bindPopup('<b>Player</b><br />' + user.userName);
                 marker.setIcon(L.spriteIcon('green'));
                 marker.state.isShop = false;
             }
@@ -4876,6 +4896,15 @@ function updateFactoryMarkers(factories) {
             // Create the marker
             marker = L.marker(pos, {
                 icon: L.spriteIcon(factory.ally ? 'orange' : 'red')
+            });
+
+            // Bind a popup to the marker
+            marker.bindPopup('<b>' + __('factory.name', { capitalizeFirst: true, game: Dworek.utils.getGameId() }) + '</b><br />' + factory.name);
+            marker.on('mouseover', function (e) {
+                this.openPopup();
+            });
+            marker.on('mouseout', function (e) {
+                this.closePopup();
             });
 
             // Create a range circle
