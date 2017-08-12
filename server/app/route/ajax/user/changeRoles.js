@@ -286,6 +286,32 @@ router.post('/', function(req, res, next) {
                             status: 'ok',
                             updatedUsers
                         });
+
+                    // Loop through the user IDs to send them game updates
+                    updatedUsers.forEach(function(userId) {
+                        // Get the user model
+                        Core.model.userManager.getUser(userId, function(err, user) {
+                            // Make sure the user model isn't null
+                            if(err === null && user === null)
+                                err = new Error('User model is null');
+
+                            // Log errors
+                            if(err !== null || user === null) {
+                                console.error('Failed to send updated game data to all players, unable to get user model for user, ignoring (user id: ' + userId + ')');
+                                console.error(err.stack || err);
+                                return;
+                            }
+
+                            // Send the updated game data to the player
+                            Core.gameManager.sendGameData(game, user, function(err) {
+                                // Log errors
+                                if(err !== null) {
+                                    console.error('Failed to send updated game data to a player, ignoring');
+                                    console.error(err.stack || err);
+                                }
+                            });
+                        });
+                    });
                 });
             });
         });

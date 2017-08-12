@@ -417,7 +417,7 @@ var Dworek = {
                     });
                 });
 
-            } else if(!sendLocationUpdates && Dworek.state.geoWatcher != null) {
+            } else if(!sendLocationUpdates && Dworek.state.geoWatcher !== null) {
                 // Show a status message
                 console.log('Stopping GPS watcher...');
 
