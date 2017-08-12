@@ -255,7 +255,7 @@ Shop.prototype.load = function(callback) {
 
                 // Return if the team is null
                 if(team === null) {
-                    console.error('Failed to find new shop user, user\'s team is null');
+                    console.error('Failed to find new shop user, the retiring shop user doesn\'t currently have an assigned team');
                     return;
                 }
 
