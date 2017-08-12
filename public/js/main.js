@@ -4121,7 +4121,7 @@ function focusInterests() {
         // Add the player to follow when player or everything following is enabled
         if(getFollowPlayer() || getFollowEverything()) {
             // Add the player marker to the list of fitters
-            if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+            if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle !== null && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
                 fitters.push(playerMarker.rangeCircle);
             else
                 fitters.push(playerMarker);
@@ -4152,7 +4152,7 @@ function focusInterests() {
             return;
 
         // Add the marker itself, or it's range circle if it's in bound to the fitters
-        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle !== null && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
         else
             fitters.push(marker);
@@ -4191,7 +4191,7 @@ function focusInterests() {
             return;
 
         // Add the factory to the list of fitters
-        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle !== null && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
         else
             fitters.push(marker);
@@ -4260,7 +4260,7 @@ function focusEverything() {
 
     // Add the player marker
     if(playerMarker !== null) {
-        if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+        if(playerMarker.rangeCircle !== undefined && playerMarker.rangeCircle !== null && playerMarker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(playerMarker.rangeCircle);
         else
             fitters.push(playerMarker);
@@ -4268,7 +4268,7 @@ function focusEverything() {
 
     // Add the player marker
     playersMarkers.forEach(function(marker) {
-        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle !== null && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
         else
             fitters.push(marker);
@@ -4277,7 +4277,7 @@ function focusEverything() {
     // Add the factory markers
     factoryMarkers.forEach(function(marker) {
         // Add the factory to the list of fitters
-        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
+        if(marker.hasOwnProperty('rangeCircle') && marker.rangeCircle !== undefined && marker.rangeCircle !== null && marker.rangeCircle.getRadius() <= maxRangeCircleRadius)
             fitters.push(marker.rangeCircle);
         else
             fitters.push(marker);

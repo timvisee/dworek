@@ -210,7 +210,7 @@ Shop.prototype.load = function(callback) {
         const alertTime = Math.min(gameConfig.shop.shopAlertTime, lifeTime);
 
         // Show a console message
-        console.log('Player became a shop (user id: ' + self.getUser().getIdHex() + ', for: ' + lifeTime + 'ms, in price: ' + self._inSellPrice + ', out price: ' + self._outBuyPrice + ')');
+        console.log('Player became a shop (user id: ' + self.getUser().getIdHex() + ', for: ' + lifeTime + 'ms)');
         console.log('- in price; ally: ' + self._inSellPrice.ally + ', enemy: ' + self._inSellPrice.enemy);
         console.log('- out price; ally: ' + self._outBuyPrice.ally + ', enemy: ' + self._outBuyPrice.enemy);
 
