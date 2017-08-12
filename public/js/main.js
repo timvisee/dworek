@@ -4110,7 +4110,7 @@ function focusInterests() {
     const maxFactoryDistance = 100;
 
     // Define the maximum distance markers may be from the player when the player is followed
-    const maxDistanceFromPlayer = 65;
+    const maxDistanceFromPlayer = 100;
 
     // Get the player position if known
     const hasPlayer = playerMarker !== null;
