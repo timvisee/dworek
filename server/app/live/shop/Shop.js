@@ -259,33 +259,49 @@ Shop.prototype.load = function(callback) {
                     return;
                 }
 
-                // Find a replacement user
-                self.getShopManager().findNewShopUser(team.getId().toString(), function(err, newUser) {
+                // Get the preferred shop count delta
+                self.getShopManager().getTeamPreferredShopCountDelta(team.getId(), function(err, delta) {
                     // Handle errors
                     if(err !== null) {
-                        console.error('Failed to find new shop user');
+                        console.error('Failed to determine whether to find a new shop.');
                         console.error(err.stack || err);
                         return;
                     }
 
-                    // Get the preferred shop count delta
-                    self.getShopManager().getTeamPreferredShopCountDelta(team.getId(), function(err, delta) {
-                        // Handle errors
-                        if(err !== null) {
-                            console.error('Failed to determine whether to find a new shop.');
-                            console.error(err.stack || err);
-                            return;
-                        }
+                    // Create a new user finding latch
+                    var userFindLatch = new CallbackLatch();
 
-                        // Reschedule the shop transfer if no new user was found and the delta is not below zero
-                        if(newUser === null && delta >= 0) {
-                            setTimeout(functionPrepareTransfer, gameConfig.shop.workerInterval);
-                            return;
-                        }
+                    // Define a variable for the possible new user
+                    var newUser = null;
 
-                        // Schedule the shop transfer (also for the new user)
-                        if(newUser !== null)
-                            self.getShopManager().scheduleUser(newUser);
+                    // Find a replacement user if the shop count delta value is zero or above
+                    if(delta >= 0) {
+                        userFindLatch.add();
+
+                        // Find a replacement user
+                        self.getShopManager().findNewShopUser(team.getId().toString(), function(err, foundUser) {
+                            // Handle errors
+                            if (err !== null) {
+                                console.error('Failed to find new shop user, ignoring');
+                                console.error(err.stack || err);
+                                userFindLatch.resolve();
+                                return;
+                            }
+
+                            // Schedule this new user to become a shop
+                            if(foundUser !== null) {
+                                self.getShopManager().scheduleUser(foundUser);
+                                newUser = foundUser;
+                            }
+
+                            // Resolve the latch
+                            userFindLatch.resolve();
+                        });
+                    }
+
+                    // Continue when the user find latch is complete
+                    userFindLatch.then(function() {
+                        // Schedule the transfer for the current shop
                         setTimeout(functionTransfer, alertTime);
 
                         // Determine what message to show to the current shop owner
