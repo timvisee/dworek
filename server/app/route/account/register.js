@@ -48,8 +48,8 @@ router.get('/', function(req, res, next) {
     };
 
     // Set the next property
-    if(_.isString(req.param('next')))
-        pageVars.next = req.param('next');
+    if(_.isString(req.params.next))
+        pageVars.next = req.params.next;
 
     // Show the registration page
     LayoutRenderer.render(req, res, next, 'account/register', 'Registration', pageVars);
@@ -217,7 +217,7 @@ router.post('/', function(req, res, next) {
                     };
 
                     // Set the proper register message
-                    if(!_.isString(req.param('next')))
+                    if(!_.isString(req.params.next))
                         pageVars.message = 'Welcome ' + firstName + '!\n\n' +
                                 'You\'ve successfully been registered.\n\n' +
                                 'Please click the button below to login and continue to your dashboard.';
@@ -228,7 +228,7 @@ router.post('/', function(req, res, next) {
                             'Please click the button below to continue to the page you wanted to visit.';
 
                         // Set the next parameter
-                        pageVars.next = req.param('next');
+                        pageVars.next = req.params.next;
                     }
 
                     // Show registration success page

@@ -49,8 +49,8 @@ router.get('/', function(req, res, next) {
     };
 
     // Set the next parameter if there is any
-    if(_.isString(req.param('next')))
-        pageVars.next = req.param('next');
+    if(_.isString(req.params.next))
+        pageVars.next = req.params.next;
 
     // Show the login page
     LayoutRenderer.render(req, res, next, 'account/login', 'Login', pageVars);
@@ -151,9 +151,9 @@ router.post('/', function(req, res, next) {
  */
 function redirectLogin(req, res) {
     // Redirect the user to the redirection page
-    if(req.param('next')) {
+    if(req.params.next) {
         // Get the redirection URL
-        const redirectionUrl = req.param('next');
+        const redirectionUrl = req.params.next;
 
         // Make sure the redirection URL is valid
         if(Validator.isValidRedirectUrl(redirectionUrl)) {
