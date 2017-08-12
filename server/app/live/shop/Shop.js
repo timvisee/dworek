@@ -210,7 +210,7 @@ Shop.prototype.load = function(callback) {
         const alertTime = Math.min(gameConfig.shop.shopAlertTime, lifeTime);
 
         // Show a console message
-        console.log('Player became a shop (user id: ' + self.getUser().getIdHex() + ', for: ' + lifeTime + 'ms)');
+        console.log('Player became a shop (user id: ' + self.getUser().getIdHex() + ', for: ' + lifeTime + 'ms, in price: ' + self._inSellPrice + ', out price: ' + self._outBuyPrice + ')');
 
         // Function to actually transfer the shop
         const functionTransfer = function() {
