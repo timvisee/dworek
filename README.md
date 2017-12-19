@@ -1,4 +1,5 @@
 [![Codeship](https://img.shields.io/codeship/f4078120-8526-0134-2eee-0ea196d1355a/master.svg)](https://codeship.com/projects/183333)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftimvisee%2Fdworek.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftimvisee%2Fdworek?ref=badge_shield)
 
 *The project - Dworek - is codenamed after a Polish alcoholic drink that was extensively used throughout many nights when inventing the game mechanics.*
 
@@ -31,3 +32,6 @@ The project is currently developed and maintained by [Tim Visée](https://github
 
 ## License
 This project is released under the GNU GPL-3.0 license. Check out the [LICENSE](LICENSE) file for more information.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftimvisee%2Fdworek.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftimvisee%2Fdworek?ref=badge_large)
