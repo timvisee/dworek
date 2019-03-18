@@ -29,7 +29,7 @@
     "pug": "2.0.0-rc.3",
     "raven": "2.1.1",
     "redis": "2.8.0",
-    "serve-favicon": "2.4.3",
+    "serve-favicon": "2.5.0",
     "socket.io": "1.7.4",
     "stats-percentile": "3.1.0",
     "validator": "10.11.0"
