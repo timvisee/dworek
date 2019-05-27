@@ -16,7 +16,7 @@
     "url": "https://github.com/timvisee/dworek/issues"
   },
   "dependencies": {
-    "async": "2.5.0",
+    "async": "3.0.1",
     "bcryptjs": "2.4.3",
     "body-parser": "1.17.1",
     "cookie-parser": "~1.4.3",
