@@ -20,7 +20,7 @@
     "bcryptjs": "2.4.3",
     "body-parser": "1.17.1",
     "cookie-parser": "~1.4.3",
-    "debug": "2.6.8",
+    "debug": "4.3.1",
     "express": "4.16.4",
     "geolib": "2.0.24",
     "lodash": "4.17.4",
