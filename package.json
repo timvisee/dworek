@@ -32,7 +32,7 @@
     "serve-favicon": "2.4.3",
     "socket.io": "1.7.4",
     "stats-percentile": "3.1.0",
-    "validator": "10.11.0"
+    "validator": "13.6.0"
   },
   "devDependencies": {
     "mocha": "6.0.2",
