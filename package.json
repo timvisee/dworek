@@ -31,7 +31,7 @@
     "redis": "3.1.2",
     "serve-favicon": "2.5.0",
     "socket.io": "1.7.4",
-    "stats-percentile": "3.1.0",
+    "stats-percentile": "3.3.0",
     "validator": "13.6.0"
   },
   "devDependencies": {
