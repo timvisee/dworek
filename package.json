@@ -22,7 +22,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "4.3.2",
     "express": "4.17.1",
-    "geolib": "2.0.24",
+    "geolib": "3.3.3",
     "lodash": "4.17.21",
     "mongodb": "4.1.3",
     "morgan": "1.10.0",
